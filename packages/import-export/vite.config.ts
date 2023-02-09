@@ -1,40 +1,44 @@
 /// <reference types="vitest" />
-import { defineConfig } from "vite";
-import { readFileSync } from "node:fs";
-import react from "@vitejs/plugin-react";
+import { defineConfig } from 'vite'
+import { readFileSync } from 'node:fs'
+import react from '@vitejs/plugin-react'
 
 const ext = {
-  cjs: "cjs",
-  es: "mjs",
-} as const;
+  cjs: 'cjs',
+  es: 'mjs',
+} as const
 
-const packageJson = JSON.parse(readFileSync("./package.json", "utf-8"));
+const packageJson = JSON.parse(readFileSync('./package.json', 'utf-8')) as {
+  dependencies: Record<string, string>
+  peerDependencies: Record<string, string>
+}
+
 const externalPackages = [
-  ...Object.keys(packageJson.dependencies || {}),
-  ...Object.keys(packageJson.peerDependencies || {}),
-  "@lexical/react/LexicalHorizontalRuleNode",
-];
+  ...Object.keys(packageJson.dependencies),
+  ...Object.keys(packageJson.peerDependencies),
+  '@lexical/react/LexicalHorizontalRuleNode',
+]
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     react({
-      jsxRuntime: "classic",
+      jsxRuntime: 'classic',
     }),
   ],
   build: {
-    minify: "terser",
+    minify: 'terser',
     lib: {
-      entry: ["src/index.ts"],
-      formats: ["es", "cjs"],
-      fileName: (format) => `index.${ext[format as "cjs" | "es"]}`,
+      entry: ['src/index.ts'],
+      formats: ['es', 'cjs'],
+      fileName: (format) => `index.${ext[format as 'cjs' | 'es']}`,
     },
     rollupOptions: {
       external: externalPackages,
     },
   },
   test: {
-    include: ["test/**/*.test.{ts,tsx}"],
-    environment: "jsdom",
+    include: ['test/**/*.test.{ts,tsx}'],
+    environment: 'jsdom',
   },
-});
+})
