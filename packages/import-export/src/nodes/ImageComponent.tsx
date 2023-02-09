@@ -1,7 +1,6 @@
-/* eslint-disable @next/next/no-img-element */
 import type { LexicalEditor, NodeKey } from 'lexical'
 
-import * as React from 'react'
+import React from 'react'
 import { Suspense, useRef } from 'react'
 
 const imageCache = new Set()

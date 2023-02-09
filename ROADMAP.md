@@ -1,6 +1,4 @@
 Impex
-- build with vite
-- run typecheck
 - run tests with vitest
 - setup eslint+prettier
 

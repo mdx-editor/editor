@@ -6,7 +6,9 @@
   "main": "index.js",
   "scripts": {
     "build": "vite build",
-    "test": "echo test impex"
+    "test": "echo test impex",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts,.tsx"
   },
   "keywords": [],
   "author": "",
