@@ -4,58 +4,37 @@ import {
   LexicalNode,
   RootNode as LexicalRootNode,
   ElementNode as LexicalElementNode,
-  $createParagraphNode,
-  $createTextNode,
   $isTextNode,
   TextNode,
   ParagraphNode,
   $isElementNode,
-  ElementNode,
 } from 'lexical'
 import * as Mdast from 'mdast'
 import { toMarkdown } from 'mdast-util-to-markdown'
-import { mdxFromMarkdown, MdxJsxTextElement, mdxToMarkdown } from 'mdast-util-mdx'
-import { mdxjs } from 'micromark-extension-mdxjs'
-import { fromMarkdown } from 'mdast-util-from-markdown'
+import { mdxToMarkdown } from 'mdast-util-mdx'
 import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from './FormatConstants'
-import { $createLinkNode, $isLinkNode, LinkNode } from '@lexical/link'
-import { $createHeadingNode, $createQuoteNode, $isHeadingNode, $isQuoteNode, HeadingNode, QuoteNode } from '@lexical/rich-text'
-import { $createListItemNode, $createListNode, $isListItemNode, $isListNode, ListItemNode, ListNode } from '@lexical/list'
-import { $createCodeNode, $isCodeNode, CodeNode } from '@lexical/code'
-import { HorizontalRuleNode, $createHorizontalRuleNode, $isHorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode'
-import { $createImageNode, $isImageNode, ImageNode } from './nodes/ImageNode'
+import { $isLinkNode, LinkNode } from '@lexical/link'
+import { $isHeadingNode, $isQuoteNode, HeadingNode, QuoteNode } from '@lexical/rich-text'
+import { $isListItemNode, $isListNode, ListItemNode, ListNode } from '@lexical/list'
+import { $isCodeNode, CodeNode } from '@lexical/code'
+import { HorizontalRuleNode, $isHorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode'
+import { $isImageNode, ImageNode } from './nodes/ImageNode'
 
 type MdastNode = Mdast.Content
 
-interface LexicalVisitActions<T extends LexicalNode> {
+export interface LexicalVisitActions<T extends LexicalNode> {
   visitChildren(node: T, mdastParent: Mdast.Parent): void
   addAndStepInto(type: string, props?: Record<string, unknown>, hasChildren?: boolean): void
   appendToParent<T extends Mdast.Parent>(parentNode: T, node: T['children'][number]): T['children'][number] | Mdast.Root
 }
 
-interface MdastVisitActions {
-  visitChildren(node: Mdast.Parent, lexicalParent: LexicalNode): void
-  addAndStepInto(lexicalNode: LexicalNode): void
-  addFormatting(format: typeof IS_BOLD | typeof IS_ITALIC | typeof IS_UNDERLINE): void
-  getParentFormatting(): number
-}
-
-interface MdastVisitParams<T extends MdastNode> {
-  mdastNode: T
-  lexicalParent: LexicalNode
-  actions: MdastVisitActions
-}
-
-interface LexicalNodeVisitParams<T extends LexicalNode> {
+export interface LexicalNodeVisitParams<T extends LexicalNode> {
   lexicalNode: T
   mdastParent: Mdast.Parent
   actions: LexicalVisitActions<T>
 }
 
-interface MarkdownImportExportVisitor<LN extends LexicalNode, UN extends MdastNode> {
-  testMdastNode: ((mdastNode: MdastNode | Mdast.Root) => boolean) | string
-  visitMdastNode(params: MdastVisitParams<UN>): void
-
+export interface LexicalExportVisitor<LN extends LexicalNode, UN extends MdastNode> {
   testLexicalNode?(lexicalNode: LexicalNode): lexicalNode is LN
   visitLexicalNode?(params: LexicalNodeVisitParams<LN>): void
 
@@ -63,53 +42,28 @@ interface MarkdownImportExportVisitor<LN extends LexicalNode, UN extends MdastNo
   join?<T extends Mdast.Content>(prevNode: T, currentNode: T): T
 }
 
-const RootVisitor: MarkdownImportExportVisitor<LexicalRootNode, Mdast.Content> = {
-  testMdastNode: 'root',
-  visitMdastNode({ actions, mdastNode, lexicalParent }) {
-    actions.visitChildren(mdastNode as unknown as Mdast.Root, lexicalParent)
-  },
-
+export const LexicalRootVisitor: LexicalExportVisitor<LexicalRootNode, Mdast.Content> = {
   testLexicalNode: $isRootNode,
   visitLexicalNode: ({ actions }) => {
     actions.addAndStepInto('root')
   },
 }
 
-const ParagraphVisitor: MarkdownImportExportVisitor<ParagraphNode, Mdast.Paragraph> = {
-  testMdastNode: 'paragraph',
-  visitMdastNode: function ({ mdastNode, lexicalParent, actions }): void {
-    // markdown inserts paragraphs in lists. lexical does not.
-    if ($isListItemNode(lexicalParent) || $isQuoteNode(lexicalParent)) {
-      actions.visitChildren(mdastNode, lexicalParent)
-    } else {
-      actions.addAndStepInto($createParagraphNode())
-    }
-  },
-
+export const LexicalParagraphVisitor: LexicalExportVisitor<ParagraphNode, Mdast.Paragraph> = {
   testLexicalNode: $isParagraphNode,
   visitLexicalNode: ({ actions }) => {
     actions.addAndStepInto('paragraph')
   },
 }
 
-const LinkVisitor: MarkdownImportExportVisitor<LinkNode, Mdast.Link> = {
-  testMdastNode: 'link',
-  visitMdastNode({ mdastNode, actions }) {
-    actions.addAndStepInto($createLinkNode(mdastNode.url))
-  },
-
+const LexicalLinkVisitor: LexicalExportVisitor<LinkNode, Mdast.Link> = {
   testLexicalNode: $isLinkNode,
   visitLexicalNode: ({ lexicalNode, actions }) => {
     actions.addAndStepInto('link', { url: lexicalNode.getURL() })
   },
 }
 
-const HeadingVisitor: MarkdownImportExportVisitor<HeadingNode, Mdast.Heading> = {
-  testMdastNode: 'heading',
-  visitMdastNode: function ({ mdastNode, actions }): void {
-    actions.addAndStepInto($createHeadingNode(`h${mdastNode.depth}`))
-  },
-
+export const LexicalHeadingVisitor: LexicalExportVisitor<HeadingNode, Mdast.Heading> = {
   testLexicalNode: $isHeadingNode,
   visitLexicalNode: ({ lexicalNode, actions }) => {
     const depth = parseInt(lexicalNode.getTag()[1], 10) as Mdast.Heading['depth']
@@ -117,22 +71,7 @@ const HeadingVisitor: MarkdownImportExportVisitor<HeadingNode, Mdast.Heading> = 
   },
 }
 
-const ListVisitor: MarkdownImportExportVisitor<ListNode, Mdast.List> = {
-  testMdastNode: 'list',
-  visitMdastNode: function ({ mdastNode, lexicalParent, actions }): void {
-    const lexicalNode = $createListNode(mdastNode.ordered ? 'number' : 'bullet')
-
-    if ($isListItemNode(lexicalParent)) {
-      const dedicatedParent = $createListItemNode()
-      dedicatedParent.append(lexicalNode)
-      lexicalParent.insertAfter(dedicatedParent)
-    } else {
-      ;(lexicalParent as ElementNode).append(lexicalNode)
-    }
-
-    actions.visitChildren(mdastNode, lexicalNode)
-  },
-
+export const LexicalListVisitor: LexicalExportVisitor<ListNode, Mdast.List> = {
   testLexicalNode: $isListNode,
   visitLexicalNode: ({ lexicalNode, actions }) => {
     actions.addAndStepInto('list', {
@@ -143,13 +82,7 @@ const ListVisitor: MarkdownImportExportVisitor<ListNode, Mdast.List> = {
   },
 }
 
-// use Parent interface since we construct a list item to a paragraph :)
-const ListItemVisitor: MarkdownImportExportVisitor<ListItemNode, Mdast.ListItem> = {
-  testMdastNode: 'listItem',
-  visitMdastNode: function ({ actions }): void {
-    actions.addAndStepInto($createListItemNode())
-  },
-
+export const LexicalListItemVisitor: LexicalExportVisitor<ListItemNode, Mdast.ListItem> = {
   testLexicalNode: $isListItemNode,
   visitLexicalNode: ({ lexicalNode, mdastParent, actions }) => {
     const children = lexicalNode.getChildren()
@@ -171,12 +104,7 @@ const ListItemVisitor: MarkdownImportExportVisitor<ListItemNode, Mdast.ListItem>
   },
 }
 
-const BlockQuoteVisitor: MarkdownImportExportVisitor<QuoteNode, Mdast.Blockquote> = {
-  testMdastNode: 'blockquote',
-  visitMdastNode: ({ actions }) => {
-    actions.addAndStepInto($createQuoteNode())
-  },
-
+export const LexicalQuoteVisitor: LexicalExportVisitor<QuoteNode, Mdast.Blockquote> = {
   testLexicalNode: $isQuoteNode,
   visitLexicalNode: ({ lexicalNode, mdastParent, actions }) => {
     const blockquote = actions.appendToParent(mdastParent, {
@@ -187,41 +115,7 @@ const BlockQuoteVisitor: MarkdownImportExportVisitor<QuoteNode, Mdast.Blockquote
   },
 }
 
-const FormattingVisitor: MarkdownImportExportVisitor<
-  LexicalElementNode,
-  Mdast.Paragraph | Mdast.Emphasis | Mdast.Strong | MdxJsxTextElement
-> = {
-  testMdastNode(mdastNode) {
-    return (
-      mdastNode.type === 'emphasis' || mdastNode.type === 'strong' || (mdastNode.type === 'mdxJsxTextElement' && mdastNode?.name === 'u')
-    )
-  },
-
-  visitMdastNode: function ({ mdastNode, lexicalParent, actions }): void {
-    if (mdastNode.type === 'emphasis') {
-      actions.addFormatting(IS_ITALIC)
-    } else if (mdastNode.type === 'strong') {
-      actions.addFormatting(IS_BOLD)
-    } else if (mdastNode.type === 'mdxJsxTextElement' && mdastNode.name === 'u') {
-      actions.addFormatting(IS_UNDERLINE)
-    }
-    actions.visitChildren(mdastNode, lexicalParent)
-  },
-}
-
-const InlineCodeVisitor: MarkdownImportExportVisitor<LexicalElementNode, Mdast.InlineCode> = {
-  testMdastNode: 'inlineCode',
-  visitMdastNode({ mdastNode, actions }) {
-    actions.addAndStepInto($createTextNode(mdastNode.value).setFormat(IS_CODE))
-  },
-}
-
-const CodeVisitor: MarkdownImportExportVisitor<CodeNode, Mdast.Code> = {
-  testMdastNode: 'code',
-  visitMdastNode({ mdastNode, actions }) {
-    actions.addAndStepInto($createCodeNode(mdastNode.lang).append($createTextNode(mdastNode.value)))
-  },
-
+export const LexicalCodeVisitor: LexicalExportVisitor<CodeNode, Mdast.Code> = {
   testLexicalNode: $isCodeNode,
   visitLexicalNode: ({ lexicalNode, actions }) => {
     actions.addAndStepInto('code', {
@@ -235,12 +129,7 @@ function isMdastText(mdastNode: Mdast.Content): mdastNode is Mdast.Text {
   return mdastNode.type === 'text'
 }
 
-const TextVisitor: MarkdownImportExportVisitor<TextNode, Mdast.Text> = {
-  testMdastNode: 'text',
-  visitMdastNode: function ({ mdastNode, actions }): void {
-    actions.addAndStepInto($createTextNode(mdastNode.value).setFormat(actions.getParentFormatting()))
-  },
-
+export const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text> = {
   shouldJoin: (prevNode, currentNode) => {
     return ['text', 'emphasis', 'strong', 'mdxJsxTextElement'].includes(prevNode.type) && prevNode.type === currentNode.type
   },
@@ -326,30 +215,14 @@ const TextVisitor: MarkdownImportExportVisitor<TextNode, Mdast.Text> = {
   },
 }
 
-const ThematicBreakVisitor: MarkdownImportExportVisitor<HorizontalRuleNode, Mdast.ThematicBreak> = {
-  testMdastNode: 'thematicBreak',
-  visitMdastNode({ actions }) {
-    actions.addAndStepInto($createHorizontalRuleNode())
-  },
-
+export const LexicalThematicBreakVisitor: LexicalExportVisitor<HorizontalRuleNode, Mdast.ThematicBreak> = {
   testLexicalNode: $isHorizontalRuleNode,
   visitLexicalNode({ actions }) {
     actions.addAndStepInto('thematicBreak')
   },
 }
 
-const ImageVisitor: MarkdownImportExportVisitor<ImageNode, Mdast.Image> = {
-  testMdastNode: 'image',
-  visitMdastNode({ mdastNode, actions }) {
-    actions.addAndStepInto(
-      $createImageNode({
-        src: mdastNode.url,
-        altText: mdastNode.alt || '',
-        title: mdastNode.title || '',
-      })
-    )
-  },
-
+export const LexicalImageVisitor: LexicalExportVisitor<ImageNode, Mdast.Image> = {
   testLexicalNode: $isImageNode,
   visitLexicalNode({ lexicalNode, actions }) {
     actions.addAndStepInto('image', {
@@ -360,79 +233,22 @@ const ImageVisitor: MarkdownImportExportVisitor<ImageNode, Mdast.Image> = {
   },
 }
 
-export const VISITORS = [
-  RootVisitor,
-  ParagraphVisitor,
-  TextVisitor,
-  FormattingVisitor,
-  InlineCodeVisitor,
-  LinkVisitor,
-  HeadingVisitor,
-  ListVisitor,
-  ListItemVisitor,
-  BlockQuoteVisitor,
-  CodeVisitor,
-  ThematicBreakVisitor,
-  ImageVisitor,
+export const LexicalVisitors = [
+  LexicalRootVisitor,
+  LexicalParagraphVisitor,
+  LexicalTextVisitor,
+  LexicalLinkVisitor,
+  LexicalHeadingVisitor,
+  LexicalListVisitor,
+  LexicalListItemVisitor,
+  LexicalQuoteVisitor,
+  LexicalCodeVisitor,
+  LexicalThematicBreakVisitor,
+  LexicalImageVisitor,
 ]
-
-export type Visitors = Array<MarkdownImportExportVisitor<LexicalNode, Mdast.Content>>
 
 function isParent(node: unknown): node is Mdast.Parent {
   return (node as { children?: Array<any> }).children instanceof Array
-}
-
-export function importMarkdownToLexical(root: LexicalRootNode, markdown: string, visitors: Visitors = VISITORS): void {
-  const formattingMap = new WeakMap<object, number>()
-
-  const tree = fromMarkdown(markdown, {
-    extensions: [mdxjs()],
-    mdastExtensions: [mdxFromMarkdown()],
-  })
-
-  function visitChildren(mdastNode: Mdast.Parent, lexicalParent: LexicalNode) {
-    if (!isParent(mdastNode)) {
-      throw new Error('Attempting to visit children of a non-parent')
-    }
-    mdastNode.children.forEach((child) => visit(child, lexicalParent, mdastNode))
-  }
-
-  function visit(mdastNode: Mdast.Content | Mdast.Root, lexicalParent: LexicalNode, mdastParent: Mdast.Parent | null) {
-    const visitor = visitors.find((visitor) => {
-      if (typeof visitor.testMdastNode === 'string') {
-        return visitor.testMdastNode === mdastNode.type
-      }
-      return visitor.testMdastNode(mdastNode)
-    })
-    if (!visitor) {
-      throw new Error(`no unist visitor found for ${mdastNode.type}`, {
-        cause: mdastNode,
-      })
-    }
-
-    visitor.visitMdastNode({
-      //@ts-expect-error root type is glitching
-      mdastNode,
-      lexicalParent,
-      actions: {
-        visitChildren,
-        addAndStepInto(lexicalNode) {
-          ;(lexicalParent as ElementNode).append(lexicalNode)
-          if (isParent(mdastNode)) {
-            visitChildren(mdastNode, lexicalNode)
-          }
-        },
-        addFormatting(format) {
-          formattingMap.set(mdastNode, format | (formattingMap.get(mdastParent!) ?? 0))
-        },
-        getParentFormatting() {
-          return formattingMap.get(mdastParent!) ?? 0
-        },
-      },
-    })
-  }
-
-  visit(tree, root, null)
 }
 
 function traverseLexicalTree(root: LexicalRootNode, visitors: Visitors): Mdast.Root {
@@ -506,7 +322,10 @@ function traverseLexicalTree(root: LexicalRootNode, visitors: Visitors): Mdast.R
   return unistRoot
 }
 
-export function exportMarkdownFromLexical(root: LexicalRootNode, visitors: Visitors = VISITORS): string {
+export function exportMarkdownFromLexical(
+  root: LexicalRootNode,
+  visitors: Array<LexicalExportVisitor<LexicalNode, Mdast.Content>> = LexicalVisitors
+): string {
   return toMarkdown(traverseLexicalTree(root, visitors), {
     extensions: [mdxToMarkdown()],
     listItemIndent: 'one',

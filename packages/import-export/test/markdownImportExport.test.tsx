@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { initializeUnitTest } from './lexical-utils'
 import { $getRoot, $createParagraphNode, $createTextNode, LexicalEditor } from 'lexical'
 
-import { importMarkdownToLexical, VISITORS, exportMarkdownFromLexical } from '../src/markdownImportExport'
+import { importMarkdownToLexical, VISITORS, exportMarkdownFromLexical } from '../src/'
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 ;(globalThis as any).IS_REACT_ACT_ENVIRONMENT = true

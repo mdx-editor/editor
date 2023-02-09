@@ -1,1 +1,2 @@
-export * from './markdownImportExport'
+export * from './exportMarkdownFromLexical'
+export * from './importMarkdownToLexical'
