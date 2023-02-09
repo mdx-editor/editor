@@ -1,0 +1,30 @@
+{
+  "name": "@virtuoso.dev/lexical-mdx-monorepo",
+  "private": true,
+  "type": "module",
+  "version": "0.0.0",
+  "description": "",
+  "scripts": {
+    "test": "lerna run test",
+    "lerna:version": "lerna version"
+  },
+  "keywords": [],
+  "author": "",
+  "engines": {
+    "node": ">=16"
+  },
+  "packageManager": "pnpm@7.27.0",
+  "license": "MIT",
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "@types/node": "^18.13.0",
+    "@vitejs/plugin-react": "^3.1.0",
+    "lerna": "^6.4.1",
+    "terser": "^5.16.3",
+    "typescript": "5.0.0-beta",
+    "vite": "^4.1.1",
+    "vitest": "^0.28.4"
+  }
+}

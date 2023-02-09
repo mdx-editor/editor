@@ -1,0 +1,49 @@
+{
+  "name": "@virtuoso.dev/lexical-mdx-import-export",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "vite build",
+    "test": "echo test impex"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "peerDependencies": {
+    "@lexical/clipboard": "^0.7.8",
+    "@lexical/code": "^0.7.8",
+    "@lexical/link": "^0.7.8",
+    "@lexical/list": "^0.7.8",
+    "@lexical/react": "^0.7.8",
+    "@lexical/rich-text": "^0.7.8",
+    "@lexical/selection": "^0.7.8",
+    "@lexical/utils": "^0.7.8",
+    "lexical": "^0.7.8",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@lexical/clipboard": "^0.7.8",
+    "@lexical/code": "^0.7.8",
+    "@lexical/link": "^0.7.8",
+    "@lexical/list": "^0.7.8",
+    "@lexical/react": "^0.7.8",
+    "@lexical/rich-text": "^0.7.8",
+    "@lexical/selection": "^0.7.8",
+    "@lexical/utils": "^0.7.8",
+    "@types/mdast": "^3.0.10",
+    "@types/react": "^18.0.27",
+    "@types/unist": "^2.0.6",
+    "lexical": "^0.7.8",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "dependencies": {
+    "mdast-util-from-markdown": "^1.3.0",
+    "mdast-util-mdx": "^2.0.1",
+    "mdast-util-to-markdown": "^1.5.0",
+    "micromark-extension-mdxjs": "^1.0.0"
+  }
+}
