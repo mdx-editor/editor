@@ -19,7 +19,7 @@
   ],
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "peerDependencies": {
     "@lexical/clipboard": "^0.8.0",
     "@lexical/code": "^0.8.0",
