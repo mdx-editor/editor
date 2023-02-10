@@ -56,5 +56,8 @@
     "mdast-util-mdx": "^2.0.1",
     "mdast-util-to-markdown": "^1.5.0",
     "micromark-extension-mdxjs": "^1.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
