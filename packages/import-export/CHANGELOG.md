@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 0.0.4 (2023-02-10)
+
+### Bug Fixes
+
+- add the right flags to package.json ([76b7ece](https://github.com/virtuoso-dev/lexical-mdx/commit/76b7ece5cd8ee360e0a9312e0d947de900f580b9))
+
 ## 0.0.3 (2023-02-10)
 
 ### Bug Fixes
