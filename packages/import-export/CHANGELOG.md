@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 0.0.3 (2023-02-10)
+
+### Bug Fixes
+
+- add token to npmrc ([d0de906](https://github.com/virtuoso-dev/lexical-mdx/commit/d0de906216842c7de1b59160940f220df2377fd1))
+
 ## 0.0.2 (2023-02-10)
 
 ### Bug Fixes
