@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { initializeUnitTest } from './lexical-utils'
 import { $getRoot, $createParagraphNode, $createTextNode, LexicalEditor } from 'lexical'
-
-import { importMarkdownToLexical, VISITORS, exportMarkdownFromLexical } from '../src/'
+import { importMarkdownToLexical, exportMarkdownFromLexical, ToMarkdownOptions } from '../src/'
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 ;(globalThis as any).IS_REACT_ACT_ENVIRONMENT = true
@@ -13,7 +12,7 @@ describe('importing markdown into lexical', () => {
       const { editor } = testEnv
       editor!.update(() => {
         const root = $getRoot()
-        importMarkdownToLexical(root, '', VISITORS)
+        importMarkdownToLexical(root, '')
       })
 
       expect(editor?.getEditorState().toJSON().root).toMatchObject({
@@ -40,7 +39,7 @@ describe('importing markdown into lexical', () => {
 
       editor!.update(() => {
         const root = $getRoot()
-        importMarkdownToLexical(root, 'Hello World', VISITORS)
+        importMarkdownToLexical(root, 'Hello World')
       })
     })
   })
@@ -51,7 +50,7 @@ describe('converting', () => {
     it('generates root node from a Lexical RootNode', () => {
       const { editor } = testEnv
       editor!.update(() => {
-        expect(exportMarkdownFromLexical($getRoot(), VISITORS)).toEqual('')
+        expect(exportMarkdownFromLexical($getRoot())).toEqual('')
       })
     })
 
@@ -61,24 +60,25 @@ describe('converting', () => {
         const paragraph = $createParagraphNode()
         paragraph.append($createTextNode('Hello World'))
         $getRoot().append(paragraph)
-        expect(exportMarkdownFromLexical($getRoot(), VISITORS)).toEqual('Hello World\n')
+        expect(exportMarkdownFromLexical($getRoot())).toEqual('Hello World\n')
       })
     })
   })
 })
 
-function testIdenticalMarkdownAfterImportExport(editor: LexicalEditor, markdown: string) {
+function testIdenticalMarkdownAfterImportExport(editor: LexicalEditor, markdown: string, exportOptions?: ToMarkdownOptions) {
   editor.registerUpdateListener(({ editorState }) => {
     editorState.read(() => {
-      expect(exportMarkdownFromLexical($getRoot(), VISITORS).trim()).toEqual(markdown.trim())
+      expect(exportMarkdownFromLexical($getRoot(), exportOptions).trim()).toEqual(markdown.trim())
     })
   })
 
   editor.update(() => {
     const root = $getRoot()
-    importMarkdownToLexical(root, markdown, VISITORS)
+    importMarkdownToLexical(root, markdown)
   })
 }
+
 describe('markdown import export', () => {
   initializeUnitTest((testEnv) => {
     it('works with an empty string', () => {
@@ -182,6 +182,7 @@ Try to put a blank line before...
 
       testIdenticalMarkdownAfterImportExport(testEnv.editor!, md)
     })
+
     it('supports images', () => {
       const md = `
       ![The San Juan Mountains are beautiful!](/assets/images/san-juan-mountains.jpg "San Juan Mountains")
@@ -189,5 +190,16 @@ Try to put a blank line before...
       testIdenticalMarkdownAfterImportExport(testEnv.editor!, md)
     })
   })
-  // images
+})
+
+describe('markdown export options', () => {
+  initializeUnitTest((testEnv) => {
+    it('accepts toMarkdown options', () => {
+      const md = `
+- Bullet 1
+- Bullet 2
+      `
+      testIdenticalMarkdownAfterImportExport(testEnv.editor!, md, { bullet: '-' })
+    })
+  })
 })

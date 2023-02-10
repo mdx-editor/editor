@@ -10,7 +10,7 @@ import {
   $isElementNode,
 } from 'lexical'
 import * as Mdast from 'mdast'
-import { toMarkdown } from 'mdast-util-to-markdown'
+import { toMarkdown, Options as ToMarkdownOptions } from 'mdast-util-to-markdown'
 import { mdxToMarkdown } from 'mdast-util-mdx'
 import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from './FormatConstants'
 import { $isLinkNode, LinkNode } from '@lexical/link'
@@ -20,6 +20,7 @@ import { $isCodeNode, CodeNode } from '@lexical/code'
 import { HorizontalRuleNode, $isHorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode'
 import { $isImageNode, ImageNode } from './nodes/ImageNode'
 import { MdastNode } from './types'
+export { Options as ToMarkdownOptions } from 'mdast-util-to-markdown'
 
 export interface LexicalVisitActions<T extends LexicalNode> {
   visitChildren(node: T, mdastParent: Mdast.Parent): void
@@ -323,10 +324,12 @@ function traverseLexicalTree(root: LexicalRootNode, visitors: Array<LexicalExpor
 
 export function exportMarkdownFromLexical(
   root: LexicalRootNode,
+  options?: ToMarkdownOptions,
   visitors: Array<LexicalExportVisitor<LexicalNode, Mdast.Content>> = LexicalVisitors
 ): string {
   return toMarkdown(traverseLexicalTree(root, visitors), {
     extensions: [mdxToMarkdown()],
     listItemIndent: 'one',
+    ...options,
   })
 }
