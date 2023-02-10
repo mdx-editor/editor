@@ -6,12 +6,27 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo test playground"
+    "start": "ladle serve"
   },
   "dependencies": {
-    "@virtuoso.dev/lexical-mdx-import-export": "workspace:*"
+    "@ladle/react": "^2.6.0",
+    "@lexical/clipboard": "^0.8.0",
+    "@lexical/code": "^0.8.0",
+    "@lexical/link": "^0.8.0",
+    "@lexical/list": "^0.8.0",
+    "@lexical/markdown": "^0.8.0",
+    "@lexical/react": "^0.8.0",
+    "@lexical/rich-text": "^0.8.0",
+    "@lexical/selection": "^0.8.0",
+    "@lexical/utils": "^0.8.0",
+    "@virtuoso.dev/lexical-mdx-import-export": "workspace:*",
+    "lexical": "^0.8.0"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
 }

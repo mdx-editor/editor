@@ -1,15 +1,15 @@
-import { LexicalNode, RootNode as LexicalRootNode, $createParagraphNode, $createTextNode, ElementNode } from 'lexical'
+import { LexicalNode, RootNode as LexicalRootNode, $createParagraphNode, $createTextNode, ElementNode, ParagraphNode } from 'lexical'
 import * as Mdast from 'mdast'
 import { mdxFromMarkdown, MdxJsxTextElement } from 'mdast-util-mdx'
 import { mdxjs } from 'micromark-extension-mdxjs'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from './FormatConstants'
-import { $createLinkNode } from '@lexical/link'
-import { $createHeadingNode, $createQuoteNode, $isQuoteNode } from '@lexical/rich-text'
-import { $createListItemNode, $createListNode, $isListItemNode } from '@lexical/list'
-import { $createCodeNode } from '@lexical/code'
-import { $createHorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode'
-import { $createImageNode } from './nodes/ImageNode'
+import { $createLinkNode, LinkNode } from '@lexical/link'
+import { $createHeadingNode, $createQuoteNode, $isQuoteNode, HeadingNode, QuoteNode } from '@lexical/rich-text'
+import { $createListItemNode, $createListNode, $isListItemNode, ListItemNode, ListNode } from '@lexical/list'
+import { $createCodeNode, CodeNode } from '@lexical/code'
+import { $createHorizontalRuleNode, HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode'
+import { $createImageNode, ImageNode } from './nodes/ImageNode'
 import { MdastNode } from './types'
 
 export interface MdastVisitActions {
@@ -231,3 +231,15 @@ export function importMarkdownToLexical(
 
   visit(tree, root, null)
 }
+
+export const UsedLexicalNodes = [
+  ParagraphNode,
+  LinkNode,
+  HeadingNode,
+  QuoteNode,
+  CodeNode,
+  ListNode,
+  ListItemNode,
+  HorizontalRuleNode,
+  ImageNode,
+]

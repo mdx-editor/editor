@@ -1,0 +1,43 @@
+code {
+  border: 0;
+  padding: 0;
+  background: #e5e5e5;
+}
+
+pre {
+  background: transparent;
+}
+
+code pre {
+  margin: 0;
+}
+
+blockquote {
+  border-left: 4px solid #e5e5e5;
+  padding-left: 1em;
+  margin: 0;
+}
+
+.EditorContentEditable {
+  height: 300px;
+  overflow: auto;
+  border: 2px inset #e5e5e5;
+  border-radius: 4px;
+  padding: 1rem;
+}
+
+.PlaygroundEditorTheme__textUnderline {
+  text-decoration: underline;
+}
+
+.PlaygroundEditorTheme__textItalic {
+  font-style: italic;
+}
+
+[data-lexical-decorator] img {
+  max-width: 100%;
+}
+
+.PlaygroundEditorTheme__nestedListItem {
+  list-style-type: none;
+}

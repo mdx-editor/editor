@@ -1,6 +1,4 @@
 Impex
-- Add ladle to the playground package
-- Run editor in it
 - add imp/exp formatting options 
 - publish through lerna + gh 
 
@@ -9,3 +7,6 @@ Impex
 - codesandbox
 - impex options explained
 - visitor explained
+
+- Fix package.json description, etc. 
+- Add license

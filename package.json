@@ -39,6 +39,8 @@
     "jsdom": "^21.1.0",
     "lerna": "^6.4.1",
     "prettier": "^2.8.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "terser": "^5.16.3",
     "typescript": "5.0.0-beta",
     "vite": "^4.1.1",
