@@ -14,6 +14,9 @@
     "lint": "eslint src --ext .ts,.tsx",
     "test": "vitest"
   },
+  "files": [
+    "dist"
+  ],
   "keywords": [],
   "author": "",
   "license": "ISC",
