@@ -57,5 +57,5 @@ jobs:
         run: |
           git config user.name "${{ github.actor }}"
           git config user.email "${{ github.actor}}@users.noreply.github.com"
-
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
           pnpm run lerna:publish
