@@ -1,5 +1,4 @@
 Impex
-- add imp/exp formatting options 
 - publish through lerna + gh 
 
 # Docs
