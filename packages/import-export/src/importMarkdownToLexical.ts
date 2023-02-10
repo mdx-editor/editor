@@ -10,8 +10,7 @@ import { $createListItemNode, $createListNode, $isListItemNode } from '@lexical/
 import { $createCodeNode } from '@lexical/code'
 import { $createHorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode'
 import { $createImageNode } from './nodes/ImageNode'
-
-type MdastNode = Mdast.Content
+import { MdastNode } from './types'
 
 export interface MdastVisitActions {
   visitChildren(node: Mdast.Parent, lexicalParent: LexicalNode): void

@@ -19,8 +19,7 @@ import { $isListItemNode, $isListNode, ListItemNode, ListNode } from '@lexical/l
 import { $isCodeNode, CodeNode } from '@lexical/code'
 import { HorizontalRuleNode, $isHorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode'
 import { $isImageNode, ImageNode } from './nodes/ImageNode'
-
-type MdastNode = Mdast.Content
+import { MdastNode } from './types'
 
 export interface LexicalVisitActions<T extends LexicalNode> {
   visitChildren(node: T, mdastParent: Mdast.Parent): void
@@ -251,7 +250,7 @@ function isParent(node: unknown): node is Mdast.Parent {
   return (node as { children?: Array<any> }).children instanceof Array
 }
 
-function traverseLexicalTree(root: LexicalRootNode, visitors: Visitors): Mdast.Root {
+function traverseLexicalTree(root: LexicalRootNode, visitors: Array<LexicalExportVisitor<LexicalNode, Mdast.Content>>): Mdast.Root {
   let unistRoot: Mdast.Root | null = null
   visit(root, null)
 

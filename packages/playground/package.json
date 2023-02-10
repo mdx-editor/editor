@@ -9,7 +9,7 @@
     "test": "echo test playground"
   },
   "dependencies": {
-    "@virtuoso.dev/lexical-mdx-impex": "workspace:*"
+    "@virtuoso.dev/lexical-mdx-import-export": "workspace:*"
   },
   "keywords": [],
   "author": "",

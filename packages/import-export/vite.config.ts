@@ -2,6 +2,7 @@
 import { defineConfig } from 'vite'
 import { readFileSync } from 'node:fs'
 import react from '@vitejs/plugin-react'
+import dts from 'vite-plugin-dts'
 
 const ext = {
   cjs: 'cjs',
@@ -25,6 +26,7 @@ export default defineConfig({
     react({
       jsxRuntime: 'classic',
     }),
+    dts(),
   ],
   build: {
     minify: 'terser',

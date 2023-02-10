@@ -19,6 +19,7 @@
     "packages/*"
   ],
   "devDependencies": {
+    "@microsoft/api-extractor": "^7.34.4",
     "@types/node": "^18.13.0",
     "@types/react": "^18.0.27",
     "@types/react-dom": "^18.0.10",
@@ -41,6 +42,7 @@
     "terser": "^5.16.3",
     "typescript": "5.0.0-beta",
     "vite": "^4.1.1",
+    "vite-plugin-dts": "^1.7.2",
     "vitest": "^0.28.4"
   }
 }
