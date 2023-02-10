@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 0.0.5 (2023-02-10)
+
+### Bug Fixes
+
+- publishConfig ([e61687e](https://github.com/virtuoso-dev/lexical-mdx/commit/e61687e1c74463513ef5a1146c25c9c28a1bb944))
+
 ## 0.0.4 (2023-02-10)
 
 ### Bug Fixes
