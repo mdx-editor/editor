@@ -1,5 +1,7 @@
 {
   "name": "@virtuoso.dev/lexical-mdx-import-export",
+  "private": false,
+  "sideEffects": false,
   "type": "module",
   "version": "0.0.3",
   "description": "",
