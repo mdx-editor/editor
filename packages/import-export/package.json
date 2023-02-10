@@ -1,7 +1,7 @@
 {
   "name": "@virtuoso.dev/lexical-mdx-import-export",
   "type": "module",
-  "version": "0.0.0-development",
+  "version": "0.0.1",
   "description": "",
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
