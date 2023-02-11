@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 0.0.6 (2023-02-11)
+
+**Note:** Version bump only for package @virtuoso.dev/lexical-mdx-monorepo
+
 ## 0.0.5 (2023-02-10)
 
 ### Bug Fixes

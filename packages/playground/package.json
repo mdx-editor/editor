@@ -1,7 +1,7 @@
 {
   "name": "@virtuoso.dev/lexical-mdx-playground",
   "type": "module",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "private": true,
   "description": "",
   "main": "index.js",
