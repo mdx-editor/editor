@@ -8,7 +8,7 @@
     "test": "lerna run test",
     "ci": "lerna run test --ci && lerna run lint && lerna run typecheck",
     "build": "lerna run build",
-    "lerna:publish": "lerna version --conventional-commits --yes && lerna publish from-git --yes"
+    "lerna:publish": "lerna version --conventional-commits --create-release github --yes && lerna publish from-git --yes"
   },
   "keywords": [],
   "author": "",
