@@ -1,6 +1,3 @@
-Impex
-- publish through lerna + gh 
-
 # Docs
 - basic example
 - codesandbox
@@ -8,4 +5,4 @@ Impex
 - visitor explained
 
 - Fix package.json description, etc. 
-- Add license
+-CoC, licensing

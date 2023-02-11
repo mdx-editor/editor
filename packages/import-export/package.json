@@ -9,6 +9,8 @@
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
+    "prepack": "cp ../../README.md .",
+    "postpack": "rm README.md",
     "build": "vite build && pnpm run dts:bundle",
     "start": "vite build -w",
     "dts:bundle": "../../scripts/npm/bundle-types.sh",
