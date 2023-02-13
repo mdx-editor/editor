@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.0.7](https://github.com/virtuoso-dev/lexical-mdx/compare/v0.0.6...v0.0.7) (2023-02-13)
+
+### Bug Fixes
+
+- description, CoC, License ([01bacd4](https://github.com/virtuoso-dev/lexical-mdx/commit/01bacd4eaa4fba8de09daca77270bf8d469a0eac))
+
 ## 0.0.6 (2023-02-11)
 
 **Note:** Version bump only for package @virtuoso.dev/lexical-mdx-import-export
