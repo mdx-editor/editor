@@ -6,6 +6,9 @@ If you're using markdown with Lexical and you need help or would like to collabo
 
 ## Markdown import/export
 
+![npm](https://img.shields.io/npm/v/@virtuoso.dev/lexical-mdx-import-export)
+![npm bundle size (scoped)](https://img.shields.io/bundlephobia/minzip/@virtuoso.dev/lexical-mdx-import-export)
+
 The markdown import/export utility supports **extensible** and **configurable** markdown interoperability with Lexical.
 
 Unlike the built-in Lexical support, this implementation uses [Markdown Abstract Syntax Tree](https://github.com/syntax-tree/mdast) with the mdx extension turned on. 
@@ -24,15 +27,41 @@ Out of the box, the following syntax is supported:
 - Images
 - Horizontal rules
 
-### Basic usage
-
-Check [the live example with all markdown syntax](https://codesandbox.io/s/lexical-markdown-import-export-0p1dn0?file=/src/App.tsx) supported first.
+### Usage
 
 To add the package to your project, install it with 
 
 ```bash
 npm install --save @virtuoso.dev/lexical-mdx-import-export
 ```
+
+To import markdown, call the respective function in the initial config:
+
+```jsx
+const markdown = '# hello world'
+  const initialConfig = {
+    editorState: () => {
+      importMarkdownToLexical($getRoot(), mardkown)
+    },
+    //...
+  }
+
+//....
+<LexicalComposer initialConfig={initialConfig}>
+```
+
+To export markdown, read the editor state, and call the function with the root node:
+
+```jsx
+//...
+state.read(() => {
+  console.log(exportMarkdownFromLexical($getRoot()))
+})
+//
+```
+
+Check [the live example with the supported markdown syntax](https://codesandbox.io/s/lexical-markdown-import-export-0p1dn0?file=/src/App.tsx) supported first.
+
 
 ### Configure markdown export formatting
 

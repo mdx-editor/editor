@@ -1,16 +1,22 @@
 {
   "name": "@virtuoso.dev/lexical-mdx-import-export",
+  "author": "Petyo Ivanov <petyo@virtuoso.dev> (https://virtuoso.dev/)",
+  "homepage": "https://github.com/virtuoso-dev/lexical-mdx",
+  "bugs": {
+    "url": "https://github.com/virtuoso-dev/lexical-mdx/issues",
+    "email": "petyo@virtuoso.dev"
+  },
   "private": false,
   "sideEffects": false,
   "type": "module",
   "version": "0.0.6",
-  "description": "",
+  "description": "utility for extensible and configurable markdown interoperability with Lexical.",
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
-    "prepack": "cp ../../README.md .",
-    "postpack": "rm README.md",
+    "prepack": "cp ../../README.md ../../LICENSE .",
+    "postpack": "rm README.md LICENSE",
     "build": "vite build && pnpm run dts:bundle",
     "start": "vite build -w",
     "dts:bundle": "../../scripts/npm/bundle-types.sh",
@@ -21,7 +27,7 @@
   "files": [
     "dist"
   ],
-  "keywords": [],
+  "keywords": ["lexical", "mdx", "rich-text-editor", "react"],
   "author": "",
   "license": "MIT",
   "peerDependencies": {
