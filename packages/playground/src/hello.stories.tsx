@@ -3,7 +3,7 @@
  * @typedef {import('mdast-util-mdx')}
  */
 import React from 'react'
-import { $getRoot, EditorState, ParagraphNode } from 'lexical'
+import { $getRoot, EditorState } from 'lexical'
 import { useCallback, useEffect, useState } from 'react'
 
 import { LexicalComposer } from '@lexical/react/LexicalComposer'
@@ -18,14 +18,9 @@ import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { TRANSFORMERS } from '@lexical/markdown'
 import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin'
-import { HeadingNode, QuoteNode } from '@lexical/rich-text'
-import { CodeNode } from '@lexical/code'
-import { LinkNode } from '@lexical/link'
-import { ListItemNode, ListNode } from '@lexical/list'
 import { ListPlugin } from '@lexical/react/LexicalListPlugin'
 
-import { exportMarkdownFromLexical, importMarkdownToLexical, ImageNode, UsedLexicalNodes } from '@virtuoso.dev/lexical-mdx-import-export'
-import { HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode'
+import { exportMarkdownFromLexical, importMarkdownToLexical, UsedLexicalNodes } from '@virtuoso.dev/lexical-mdx-import-export'
 
 const initialMarkdown = `
 

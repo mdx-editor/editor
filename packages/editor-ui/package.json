@@ -1,5 +1,5 @@
 {
-  "name": "@virtuoso.dev/lexical-mdx-import-export",
+  "name": "@virtuoso.dev/lexical-editor-ui",
   "author": "",
   "homepage": "https://github.com/virtuoso-dev/lexical-mdx",
   "bugs": {
@@ -10,7 +10,7 @@
   "sideEffects": false,
   "type": "module",
   "version": "0.0.7",
-  "description": "utility for extensible and configurable markdown interoperability with Lexical.",
+  "description": "Lexical MDX Editor UI",
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",

@@ -20,7 +20,7 @@ import { $isCodeNode, CodeNode } from '@lexical/code'
 import { HorizontalRuleNode, $isHorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode'
 import { $isImageNode, ImageNode } from './nodes/ImageNode'
 import { MdastNode } from './types'
-export { Options as ToMarkdownOptions } from 'mdast-util-to-markdown'
+export type { Options as ToMarkdownOptions } from 'mdast-util-to-markdown'
 
 export interface LexicalVisitActions<T extends LexicalNode> {
   visitChildren(node: T, mdastParent: Mdast.Parent): void
