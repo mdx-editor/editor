@@ -11,6 +11,7 @@ import {
   COMMAND_PRIORITY_LOW,
   ElementNode,
   KEY_MODIFIER_COMMAND,
+  KEY_ESCAPE_COMMAND,
   LexicalEditor,
   RangeSelection,
   SELECTION_CHANGE_COMMAND,
@@ -207,6 +208,19 @@ export function LinkPopupPlugin() {
         () => {
           updateLinkUI()
           return true
+        },
+        COMMAND_PRIORITY_LOW
+      ),
+      editor.registerCommand(
+        KEY_ESCAPE_COMMAND,
+        () => {
+          // this is kinda hacky, relying on a sync state update to return a value
+          let shouldHandle = false
+          setOpen((value) => {
+            shouldHandle = value
+            return false
+          })
+          return shouldHandle
         },
         COMMAND_PRIORITY_LOW
       ),
