@@ -13,12 +13,13 @@ import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary'
 import { ListPlugin } from '@lexical/react/LexicalListPlugin'
 import { importMarkdownToLexical, UsedLexicalNodes } from '@virtuoso.dev/lexical-mdx-import-export'
 import { LinkPopupPlugin } from '@virtuoso.dev/lexical-editor-ui'
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 
 const initialMarkdown = `
 [A link](https://google.com/ "Link To Google")
 
 In commodo tempor lorem, id lobortis purus pharetra nec. Morbi sagittis ultricies lectus ut placerat. Praesent vestibulum ligula non sapien efficitur, sit amet viverra est imperdiet. Nam rutrum massa quam, sit amet convallis erat viverra nec. Donec pharetra urna urna, non malesuada orci consequat cursus. Nulla blandit ligula ac leo dictum fermentum. Fusce augue purus, dignissim ut posuere gravida, laoreet eget quam. Nunc porttitor leo sem, eget posuere magna congue ut. Nunc tempus mi quis efficitur accumsan. Ut efficitur, felis eu lacinia finibus, nisl quam ultrices eros, eget scelerisque dolor diam nec turpis. Nam ultricies, sapien auctor condimentum bibendum, metus est maximus neque, id ornare metus eros quis libero. Nulla facilisi.
+
+[A link](https://google.com/ "Link To Google")
 `
 
 const theme = {

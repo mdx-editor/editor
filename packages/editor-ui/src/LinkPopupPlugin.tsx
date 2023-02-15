@@ -20,25 +20,18 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { $isAtNodeEnd } from '@lexical/selection'
 import { mergeRegister } from '@lexical/utils'
 import { $isLinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link'
-import { styled } from '@linaria/react'
-
-// Write your styles in `styled` tag
-const Title = styled.h1`
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-`
-
-const Container = styled.div`
-  font-size: 14px;
-  border: 1px solid blue;
-
-  &:hover {
-    border-color: blue;
-  }
-
-  ${Title} {
-    margin-bottom: 24px;
-  }
-`
+import {
+  LinkTextContainer,
+  LinkUIInput,
+  PopoverAnchor,
+  PopoverArrow,
+  PopoverButton,
+  PopoverButtons,
+  PopoverContent,
+  TooltipArrow,
+  TooltipContent,
+  WorkingLink,
+} from './primitives'
 
 export function getSelectedNode(selection: RangeSelection): TextNode | ElementNode {
   const anchor = selection.anchor
@@ -261,58 +254,48 @@ export function LinkPopupPlugin() {
 
   return (
     <Popover.Root open={open && !!rect}>
-      <Popover.Anchor asChild>
-        <div
-          className="PopoverAnchor"
-          style={{
-            visibility: open && editMode ? 'visible' : 'hidden',
-            position: 'absolute',
-            top: `${rect?.top}px`,
-            left: `${rect?.left}px`,
-            width: `${rect?.width}px`,
-            height: `${rect?.height}px`,
-          }}
-        />
-      </Popover.Anchor>
+      <PopoverAnchor
+        css={{
+          visibility: open && editMode ? 'visible' : 'hidden',
+          top: rect?.top,
+          left: rect?.left,
+          width: rect?.width,
+          height: rect?.height,
+        }}
+      />
+
       <Popover.Portal>
-        <Popover.Content className="PopoverContent" sideOffset={5} onOpenAutoFocus={(e) => e.preventDefault()} key={popoverKey}>
-          <Container>Hello Linaria meh</Container>
+        <PopoverContent sideOffset={5} onOpenAutoFocus={(e) => e.preventDefault()} key={popoverKey}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 10 }}>
             {editMode ? (
-              <input className="LinkUIInput Input" value={url || ''} ref={inputRef} onChange={(e) => setUrl(e.target.value)} autoFocus />
+              <LinkUIInput value={url || ''} ref={inputRef} onChange={(e) => setUrl(e.target.value)} autoFocus />
             ) : (
-              <a
-                href={url!}
-                target="_blank"
-                rel="noreferrer"
-                title={url!}
-                style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
-              >
-                <span className="LinkTextContainer">{url}</span>
+              <WorkingLink href={url!} target="_blank" rel="noreferrer" title={url!}>
+                <LinkTextContainer>{url}</LinkTextContainer>
                 <ExternalLinkIcon />
-              </a>
+              </WorkingLink>
             )}
           </div>
-          <div className="PopoverButtons">
+          <PopoverButtons>
             {editMode ? (
               <>
-                <button onClick={() => applyUrlChanges(inputElRef.current!)} title="Set URL" aria-label="Set URL">
+                <PopoverButton onClick={() => applyUrlChanges(inputElRef.current!)} title="Set URL" aria-label="Set URL">
                   <CheckIcon />
-                </button>
+                </PopoverButton>
 
-                <button onClick={cancelChange} title="Cancel change" aria-label="Cancel change">
+                <PopoverButton onClick={cancelChange} title="Cancel change" aria-label="Cancel change">
                   <Cross2Icon />
-                </button>
+                </PopoverButton>
               </>
             ) : (
               <>
-                <button onClick={() => setEditMode((v) => !v)} title="Edit link URL" aria-label="Edit link URL">
+                <PopoverButton onClick={() => setEditMode((v) => !v)} title="Edit link URL" aria-label="Edit link URL">
                   <Pencil1Icon />
-                </button>
+                </PopoverButton>
                 <Tooltip.Provider>
                   <Tooltip.Root open={copyUrlTooltipOpen}>
                     <Tooltip.Trigger asChild>
-                      <button
+                      <PopoverButton
                         title="Copy to clipboard"
                         aria-label="Copy link URL"
                         onClick={() => {
@@ -323,18 +306,18 @@ export function LinkPopupPlugin() {
                         }}
                       >
                         {copyUrlTooltipOpen ? <CheckIcon /> : <ClipboardCopyIcon />}
-                      </button>
+                      </PopoverButton>
                     </Tooltip.Trigger>
                     <Tooltip.Portal>
-                      <Tooltip.Content className="TooltipContent" sideOffset={5}>
+                      <TooltipContent sideOffset={5}>
                         Copied!
-                        <Tooltip.Arrow className="TooltipArrow" />
-                      </Tooltip.Content>
+                        <TooltipArrow />
+                      </TooltipContent>
                     </Tooltip.Portal>
                   </Tooltip.Root>
                 </Tooltip.Provider>
 
-                <button
+                <PopoverButton
                   title="Remove link"
                   aria-label="Remove link"
                   onClick={() => {
@@ -342,12 +325,12 @@ export function LinkPopupPlugin() {
                   }}
                 >
                   <LinkBreak1Icon />
-                </button>
+                </PopoverButton>
               </>
             )}
-          </div>
-          <Popover.Arrow className="PopoverArrow" />
-        </Popover.Content>
+          </PopoverButtons>
+          <PopoverArrow />
+        </PopoverContent>
       </Popover.Portal>
     </Popover.Root>
   )
