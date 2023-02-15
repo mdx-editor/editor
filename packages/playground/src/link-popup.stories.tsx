@@ -11,9 +11,9 @@ import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary'
 import { ListPlugin } from '@lexical/react/LexicalListPlugin'
-
 import { importMarkdownToLexical, UsedLexicalNodes } from '@virtuoso.dev/lexical-mdx-import-export'
 import { LinkPopupPlugin } from '@virtuoso.dev/lexical-editor-ui'
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 
 const initialMarkdown = `
 [A link](https://google.com/ "Link To Google")

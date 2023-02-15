@@ -2,6 +2,7 @@
 import { defineConfig } from 'vite'
 import { readFileSync } from 'node:fs'
 import react from '@vitejs/plugin-react'
+import linaria from '@linaria/vite'
 import dts from 'vite-plugin-dts'
 
 const ext = {
@@ -18,6 +19,7 @@ const externalPackages = [
   ...Object.keys(packageJson.dependencies),
   ...Object.keys(packageJson.peerDependencies),
   '@lexical/react/LexicalHorizontalRuleNode',
+  '@lexical/react/LexicalComposerContext',
 ]
 
 // https://vitejs.dev/config/
@@ -25,6 +27,12 @@ export default defineConfig({
   plugins: [
     react({
       jsxRuntime: 'classic',
+    }),
+    linaria({
+      include: ['**/*.{ts,tsx}'],
+      babelOptions: {
+        presets: ['@babel/preset-typescript', '@babel/preset-react'],
+      },
     }),
     dts(),
   ],
