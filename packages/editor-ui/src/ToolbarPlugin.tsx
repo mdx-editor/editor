@@ -2,7 +2,16 @@ import React from 'react'
 import * as RadixToolbar from '@radix-ui/react-toolbar'
 import { styled } from '@stitches/react'
 import { violet, blackA, mauve } from '@radix-ui/colors'
-import { FontBoldIcon, FontItalicIcon, UnderlineIcon } from '@radix-ui/react-icons'
+import {
+  FontBoldIcon,
+  CodeIcon,
+  FontItalicIcon,
+  UnderlineIcon,
+  ListBulletIcon,
+  DividerHorizontalIcon,
+  Link1Icon,
+  ImageIcon,
+} from '@radix-ui/react-icons'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import {
   $getSelection,
@@ -13,6 +22,8 @@ import {
   SELECTION_CHANGE_COMMAND,
 } from 'lexical'
 import { $findMatchingParent, mergeRegister } from '@lexical/utils'
+import { NumberedListIcon } from './toolbar/NumberedListIcon'
+import { BlockTypeSelect } from './toolbar/BlockTypeSelect'
 
 // Text node formatting
 export const DEFAULT_FORMAT = 0 as const
@@ -122,6 +133,35 @@ export const ToolbarPlugin = () => {
         </ToolbarToggleItem>
       </RadixToolbar.ToggleGroup>
       <ToolbarSeparator />
+      <RadixToolbar.ToggleGroup type="single" aria-label="Inline Code">
+        <ToolbarToggleItem value="on" aria-label="Underline">
+          <CodeIcon />
+        </ToolbarToggleItem>
+      </RadixToolbar.ToggleGroup>
+      <ToolbarSeparator />
+
+      <RadixToolbar.ToggleGroup type="single" aria-label="List type" onValueChange={(e) => console.log(e)}>
+        <ToolbarToggleItem value="bullet" aria-label="Bulleted list">
+          <ListBulletIcon />
+        </ToolbarToggleItem>
+        <ToolbarToggleItem value="numbered" aria-label="Numbered list">
+          <NumberedListIcon />
+        </ToolbarToggleItem>
+      </RadixToolbar.ToggleGroup>
+
+      <ToolbarSeparator />
+      <BlockTypeSelect />
+      <ToolbarSeparator />
+
+      <ToolbarButton>
+        <Link1Icon />
+      </ToolbarButton>
+      <ToolbarButton>
+        <ImageIcon />
+      </ToolbarButton>
+      <ToolbarButton>
+        <DividerHorizontalIcon />
+      </ToolbarButton>
     </ToolbarRoot>
   )
 }
@@ -135,6 +175,7 @@ const ToolbarRoot = styled(RadixToolbar.Root, {
   borderRadius: 6,
   backgroundColor: 'white',
   boxShadow: `0 2px 10px ${blackA.blackA7}`,
+  alignItems: 'center',
 })
 
 const itemStyles = {
@@ -150,6 +191,7 @@ const itemStyles = {
   alignItems: 'center',
   justifyContent: 'center',
   '&:hover': { backgroundColor: violet.violet3, color: violet.violet11 },
+  '&:active:hover': { backgroundColor: violet.violet6, transform: 'translateY(1px)' },
   '&:focus': { position: 'relative', boxShadow: `0 0 0 2px ${violet.violet7}` },
 }
 
@@ -165,4 +207,11 @@ const ToolbarSeparator = styled(RadixToolbar.Separator, {
   width: 1,
   backgroundColor: mauve.mauve6,
   margin: '0 10px',
+  alignSelf: 'stretch',
+})
+
+const ToolbarButton = styled(RadixToolbar.Button, {
+  ...itemStyles,
+  color: mauve.mauve11,
+  backgroundColor: 'white',
 })

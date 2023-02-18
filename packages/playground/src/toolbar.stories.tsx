@@ -45,7 +45,7 @@ function onError(error: Error) {
   console.error(error)
 }
 
-export function BasicSetup() {
+export function ToolbarKitchenSink() {
   const initialConfig = {
     editorState: () => {
       importMarkdownToLexical($getRoot(), initialMarkdown)
