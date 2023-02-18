@@ -19,7 +19,7 @@ blockquote {
 }
 
 .EditorContentEditable {
-  height: 300px;
+  height: 380px;
   overflow: auto;
   border: 2px inset #e5e5e5;
   border-radius: 4px;

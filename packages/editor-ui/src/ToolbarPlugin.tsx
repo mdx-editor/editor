@@ -19,11 +19,20 @@ import {
   $isRootOrShadowRoot,
   COMMAND_PRIORITY_CRITICAL,
   FORMAT_TEXT_COMMAND,
+  LexicalCommand,
   SELECTION_CHANGE_COMMAND,
 } from 'lexical'
-import { $findMatchingParent, mergeRegister } from '@lexical/utils'
+import { $findMatchingParent, $getNearestNodeOfType, mergeRegister } from '@lexical/utils'
 import { NumberedListIcon } from './toolbar/NumberedListIcon'
 import { BlockTypeSelect } from './toolbar/BlockTypeSelect'
+import {
+  $isListNode,
+  INSERT_ORDERED_LIST_COMMAND,
+  INSERT_UNORDERED_LIST_COMMAND,
+  ListNode,
+  ListType,
+  REMOVE_LIST_COMMAND,
+} from '@lexical/list'
 
 // Text node formatting
 export const DEFAULT_FORMAT = 0 as const
@@ -36,10 +45,17 @@ export const IS_SUBSCRIPT = 0b100000 as const
 export const IS_SUPERSCRIPT = 0b1000000 as const
 export const IS_HIGHLIGHT = 0b10000000 as const
 
+const ListTypeCommandMap = new Map<ListType | '', LexicalCommand<void>>([
+  ['number', INSERT_ORDERED_LIST_COMMAND],
+  ['bullet', INSERT_UNORDERED_LIST_COMMAND],
+  ['', REMOVE_LIST_COMMAND],
+])
+
 export const ToolbarPlugin = () => {
   const [editor] = useLexicalComposerContext()
   const [activeEditor, setActiveEditor] = React.useState(editor)
   const [format, setFormat] = React.useState<number>(DEFAULT_FORMAT)
+  const [listType, setListType] = React.useState('' as ListType | '')
 
   const updateToolbar = React.useCallback(() => {
     const selection = $getSelection()
@@ -72,6 +88,33 @@ export const ToolbarPlugin = () => {
       }
 
       setFormat(newFormat)
+
+      const elementKey = element.getKey()
+      const elementDOM = activeEditor.getElementByKey(elementKey)
+
+      // block type
+      if (elementDOM !== null) {
+        if ($isListNode(element)) {
+          const parentList = $getNearestNodeOfType<ListNode>(anchorNode, ListNode)
+          const type = parentList ? parentList.getListType() : element.getListType()
+          setListType(type)
+        } else {
+          setListType('')
+        }
+
+        /*
+        else {
+          const type = $isHeadingNode(element) ? element.getTag() : element.getType()
+          if (type in blockTypeToBlockName) {
+            setBlockType(type as keyof typeof blockTypeToBlockName)
+          }
+          if ($isCodeNode(element)) {
+            const language = element.getLanguage() as keyof typeof CODE_LANGUAGE_MAP
+            setCodeLanguage(language ? CODE_LANGUAGE_MAP[language] || language : '')
+            return
+          }
+        }*/
+      }
     }
   }, [activeEditor])
 
@@ -94,19 +137,27 @@ export const ToolbarPlugin = () => {
     )
   }, [editor, updateToolbar])
 
-  const handleToggle = React.useCallback(
+  const handleFormatChange = React.useCallback(
     (format: 'bold' | 'italic' | 'underline') => {
       activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, format)
     },
     [activeEditor]
   )
+
+  const handleListTypeChange = React.useCallback(
+    (type: ListType | '') => {
+      activeEditor.dispatchCommand(ListTypeCommandMap.get(type)!, undefined)
+    },
+    [activeEditor]
+  )
+
   return (
     <ToolbarRoot aria-label="Formatting options">
       <RadixToolbar.ToggleGroup
         type="single"
         aria-label="Text formatting"
         value={format & IS_BOLD ? 'on' : 'off'}
-        onValueChange={handleToggle.bind(null, 'bold')}
+        onValueChange={handleFormatChange.bind(null, 'bold')}
       >
         <ToolbarToggleItem value="on" aria-label="Bold">
           <FontBoldIcon />
@@ -116,7 +167,7 @@ export const ToolbarPlugin = () => {
         type="single"
         aria-label="Text formatting"
         value={format & IS_ITALIC ? 'on' : 'off'}
-        onValueChange={handleToggle.bind(null, 'italic')}
+        onValueChange={handleFormatChange.bind(null, 'italic')}
       >
         <ToolbarToggleItem value="on" aria-label="Italic">
           <FontItalicIcon />
@@ -126,7 +177,7 @@ export const ToolbarPlugin = () => {
         type="single"
         aria-label="Text formatting"
         value={format & IS_UNDERLINE ? 'on' : 'off'}
-        onValueChange={handleToggle.bind(null, 'underline')}
+        onValueChange={handleFormatChange.bind(null, 'underline')}
       >
         <ToolbarToggleItem value="on" aria-label="Underline">
           <UnderlineIcon />
@@ -140,11 +191,11 @@ export const ToolbarPlugin = () => {
       </RadixToolbar.ToggleGroup>
       <ToolbarSeparator />
 
-      <RadixToolbar.ToggleGroup type="single" aria-label="List type" onValueChange={(e) => console.log(e)}>
+      <RadixToolbar.ToggleGroup type="single" aria-label="List type" onValueChange={handleListTypeChange} value={listType}>
         <ToolbarToggleItem value="bullet" aria-label="Bulleted list">
           <ListBulletIcon />
         </ToolbarToggleItem>
-        <ToolbarToggleItem value="numbered" aria-label="Numbered list">
+        <ToolbarToggleItem value="number" aria-label="Numbered list">
           <NumberedListIcon />
         </ToolbarToggleItem>
       </RadixToolbar.ToggleGroup>

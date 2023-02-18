@@ -17,9 +17,19 @@ import { LinkPopupPlugin, ToolbarPlugin } from '@virtuoso.dev/lexical-editor-ui'
 const initialMarkdown = `
 [A link](https://google.com/ "Link To Google")
 
-In commodo tempor lorem, id lobortis purus pharetra nec. Morbi sagittis ultricies lectus ut placerat. Praesent vestibulum ligula non sapien efficitur, sit amet viverra est imperdiet. Nam rutrum massa quam, sit amet convallis erat viverra nec. Donec pharetra urna urna, non malesuada orci consequat cursus. Nulla blandit ligula ac leo dictum fermentum. Fusce augue purus, dignissim ut posuere gravida, laoreet eget quam. Nunc porttitor leo sem, eget posuere magna congue ut. Nunc tempus mi quis efficitur accumsan. Ut efficitur, felis eu lacinia finibus, nisl quam ultrices eros, eget scelerisque dolor diam nec turpis. Nam ultricies, sapien auctor condimentum bibendum, metus est maximus neque, id ornare metus eros quis libero. Nulla facilisi.
+In commodo tempor lorem, id lobortis purus pharetra nec. Morbi sagittis ultricies lectus ut placerat. 
 
 [A link](https://google.com/ "Link To Google")
+
+# Heading 1
+
+## Heading 2
+
+* Bullet 1
+* Bullet 2
+
+1. Numbered 1
+2. Numbered 2
 `
 
 const theme = {
