@@ -3,6 +3,7 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import type { EditorConfig, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
 
 import { DecoratorNode } from 'lexical'
+import { useActiveCode, SandpackProvider, SandpackLayout, SandpackCodeEditor, SandpackPreview } from '@codesandbox/sandpack-react'
 
 export interface SandpackPayload {
   code: string
@@ -16,6 +17,40 @@ export type SerializedSandpackNode = Spread<
   },
   SerializedLexicalNode
 >
+
+const CodeUpdateEmitter = ({ onChange }: { onChange: (code: string) => void }) => {
+  const { code } = useActiveCode()
+  onChange(code)
+  return null
+}
+
+const CodeEditor = ({ code, onChange }: CodeEditorProps) => {
+  const [editor] = useLexicalComposerContext()
+
+  const wrappedOnChange = React.useCallback(
+    (code: string) => {
+      editor.update(() => {
+        onChange(code)
+      })
+    },
+    [onChange]
+  )
+
+  return (
+    <SandpackProvider
+      template="react"
+      files={{
+        '/App.js': code,
+      }}
+    >
+      <SandpackLayout>
+        <SandpackCodeEditor showLineNumbers showInlineErrors />
+        <SandpackPreview />
+      </SandpackLayout>
+      <CodeUpdateEmitter onChange={wrappedOnChange} />
+    </SandpackProvider>
+  )
+}
 
 export class SandpackNode extends DecoratorNode<JSX.Element> {
   __code: string
@@ -76,23 +111,6 @@ export class SandpackNode extends DecoratorNode<JSX.Element> {
 interface CodeEditorProps {
   code: string
   onChange: (code: string) => void
-}
-
-const CodeEditor = ({ code, onChange }: CodeEditorProps) => {
-  const [value, setValue] = React.useState(code)
-  const [editor] = useLexicalComposerContext()
-  useEffect(() => {
-    editor.update(() => {
-      onChange(value)
-    })
-  }, [value])
-
-  useEffect(() => {
-    console.log('mount')
-    return () => console.log('unmount')
-  }, [])
-
-  return <textarea value={code} rows={10} cols={40} onChange={(e) => setValue(e.target.value)} />
 }
 
 export function $createSandpackNode({ code }: SandpackPayload): SandpackNode {

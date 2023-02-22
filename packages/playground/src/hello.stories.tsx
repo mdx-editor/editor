@@ -24,10 +24,14 @@ import { exportMarkdownFromLexical, importMarkdownToLexical, UsedLexicalNodes } 
 
 const initialMarkdown = `
 
+[A link](https://google.com/ "Googl Title")
+
 Block of code:
 
 \`\`\`js
-const hello = 'world'
+export default function App() {
+  return <h1>Hello world from a markdown</h1>
+}
 \`\`\`
 
 # Heading 1 
