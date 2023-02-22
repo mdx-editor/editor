@@ -194,14 +194,6 @@ export function LinkPopupPlugin() {
           updateLinkUI()
         })
       }),
-      editor.registerCommand(
-        BLUR_COMMAND,
-        () => {
-          // TODO: find a way to remove the popover when the editor blurs, but it also blurs when the popover opens. examine the event.
-          return false
-        },
-        COMMAND_PRIORITY_LOW
-      ),
 
       editor.registerCommand(
         SELECTION_CHANGE_COMMAND,

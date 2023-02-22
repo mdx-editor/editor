@@ -24,6 +24,12 @@ import { exportMarkdownFromLexical, importMarkdownToLexical, UsedLexicalNodes } 
 
 const initialMarkdown = `
 
+Block of code:
+
+\`\`\`js
+const hello = 'world'
+\`\`\`
+
 # Heading 1 
 
  - bullet 1 *italic*
@@ -46,12 +52,6 @@ And *some italic with nested **bold** text*.
 \`inlineVariable\` code
 
 [A link](https://google.com/ "Googl Title")
-
-Block of code:
-
-\`\`\`js
-const hello = 'world'
-\`\`\`
 
 Image:
 

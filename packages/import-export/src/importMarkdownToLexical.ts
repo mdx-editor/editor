@@ -10,6 +10,7 @@ import { $createListItemNode, $createListNode, $isListItemNode, ListItemNode, Li
 import { $createCodeNode, CodeNode } from '@lexical/code'
 import { $createHorizontalRuleNode, HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode'
 import { $createImageNode, ImageNode } from './nodes/ImageNode'
+import { $createSandpackNode, SandpackNode } from './nodes/SandpackNode'
 import { MdastNode } from './types'
 
 export interface MdastVisitActions {
@@ -124,7 +125,7 @@ export const MdastInlineCodeVisitor: MdastImportVisitor<Mdast.InlineCode> = {
 export const MdastCodeVisitor: MdastImportVisitor<Mdast.Code> = {
   testNode: 'code',
   visitNode({ mdastNode, actions }) {
-    actions.addAndStepInto($createCodeNode(mdastNode.lang).append($createTextNode(mdastNode.value)))
+    actions.addAndStepInto($createSandpackNode({ code: mdastNode.value }))
   },
 }
 
@@ -242,4 +243,5 @@ export const UsedLexicalNodes = [
   ListItemNode,
   HorizontalRuleNode,
   ImageNode,
+  SandpackNode,
 ]

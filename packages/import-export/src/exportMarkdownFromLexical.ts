@@ -19,6 +19,7 @@ import { $isListItemNode, $isListNode, ListItemNode, ListNode } from '@lexical/l
 import { $isCodeNode, CodeNode } from '@lexical/code'
 import { HorizontalRuleNode, $isHorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode'
 import { $isImageNode, ImageNode } from './nodes/ImageNode'
+import { $isSandpackNode, SandpackNode } from './nodes/SandpackNode'
 import { MdastNode } from './types'
 export type { Options as ToMarkdownOptions } from 'mdast-util-to-markdown'
 
@@ -115,12 +116,11 @@ export const LexicalQuoteVisitor: LexicalExportVisitor<QuoteNode, Mdast.Blockquo
   },
 }
 
-export const LexicalCodeVisitor: LexicalExportVisitor<CodeNode, Mdast.Code> = {
-  testLexicalNode: $isCodeNode,
+export const LexicalCodeVisitor: LexicalExportVisitor<SandpackNode, Mdast.Code> = {
+  testLexicalNode: $isSandpackNode,
   visitLexicalNode: ({ lexicalNode, actions }) => {
     actions.addAndStepInto('code', {
-      lang: lexicalNode.getLanguage(),
-      value: lexicalNode.getTextContent(),
+      value: lexicalNode.getCode(),
     })
   },
 }

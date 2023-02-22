@@ -125,8 +125,21 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     return this.__title
   }
 
+  setTitle(title: string | undefined): void {
+    this.getWritable().__title = title
+  }
+
   decorate(): JSX.Element {
-    return <img title={this.__title} src={this.__src} alt={this.__altText} />
+    return (
+      <img
+        title={this.__title}
+        src={this.__src}
+        alt={this.__altText}
+        onDoubleClick={() => {
+          this.setTitle('Hello')
+        }}
+      />
+    )
   }
 }
 
