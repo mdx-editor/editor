@@ -96,9 +96,11 @@ describe('markdown import export', () => {
     it('works with two paragraphs', () => {
       testIdenticalMarkdownAfterImportExport(testEnv.editor!, `Hello\n\nWorld`)
     })
+
     it('works with italics', () => {
       testIdenticalMarkdownAfterImportExport(testEnv.editor!, `*Hello* World`)
     })
+
     it('works with strong', () => {
       testIdenticalMarkdownAfterImportExport(testEnv.editor!, `**Hello** World`)
     })
@@ -163,7 +165,7 @@ Line
       const md = `
 Hello Js!
 
-\`\`\`js
+\`\`\`
 const hello = 'world'
 \`\`\`
 `
@@ -187,6 +189,18 @@ Try to put a blank line before...
       const md = `
       ![The San Juan Mountains are beautiful!](/assets/images/san-juan-mountains.jpg "San Juan Mountains")
       `
+      testIdenticalMarkdownAfterImportExport(testEnv.editor!, md)
+    })
+
+    it('supports frontmatter', () => {
+      const md = `
+---
+id: my-favorite-page
+title: My Favorite page
+---
+
+# Hello world
+      `.trim()
       testIdenticalMarkdownAfterImportExport(testEnv.editor!, md)
     })
   })

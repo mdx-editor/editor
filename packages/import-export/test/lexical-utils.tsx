@@ -34,6 +34,8 @@ import { createRef } from 'react'
 import { createRoot } from 'react-dom/client'
 import * as ReactTestUtils from 'react-dom/test-utils'
 import { ImageNode } from '../src/nodes/ImageNode'
+import { SandpackNode } from '../src/nodes/SandpackNode'
+import { FrontmatterNode } from '../src/nodes/FrontmatterNode'
 
 let _keyCounter = 1
 
@@ -404,6 +406,8 @@ const DEFAULT_NODES = [
   TestTextNode,
   HorizontalRuleNode,
   ImageNode,
+  SandpackNode,
+  FrontmatterNode,
 ]
 
 export function createTestEditor(

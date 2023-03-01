@@ -16,11 +16,13 @@ import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from './FormatConstants'
 import { $isLinkNode, LinkNode } from '@lexical/link'
 import { $isHeadingNode, $isQuoteNode, HeadingNode, QuoteNode } from '@lexical/rich-text'
 import { $isListItemNode, $isListNode, ListItemNode, ListNode } from '@lexical/list'
-import { $isCodeNode, CodeNode } from '@lexical/code'
 import { HorizontalRuleNode, $isHorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode'
 import { $isImageNode, ImageNode } from './nodes/ImageNode'
+import { $isFrontmatterNode, FrontmatterNode } from './nodes/FrontmatterNode'
 import { $isSandpackNode, SandpackNode } from './nodes/SandpackNode'
 import { MdastNode } from './types'
+import { frontmatterToMarkdown } from 'mdast-util-frontmatter'
+import { directiveToMarkdown } from 'mdast-util-directive'
 export type { Options as ToMarkdownOptions } from 'mdast-util-to-markdown'
 
 export interface LexicalVisitActions<T extends LexicalNode> {
@@ -54,6 +56,13 @@ export const LexicalParagraphVisitor: LexicalExportVisitor<ParagraphNode, Mdast.
   testLexicalNode: $isParagraphNode,
   visitLexicalNode: ({ actions }) => {
     actions.addAndStepInto('paragraph')
+  },
+}
+
+export const LexicalFrontmatterVisitor: LexicalExportVisitor<FrontmatterNode, Mdast.YAML> = {
+  testLexicalNode: $isFrontmatterNode,
+  visitLexicalNode: ({ actions, lexicalNode }) => {
+    actions.addAndStepInto('yaml', { value: lexicalNode.getYaml() })
   },
 }
 
@@ -236,6 +245,7 @@ export const LexicalImageVisitor: LexicalExportVisitor<ImageNode, Mdast.Image> =
 export const LexicalVisitors = [
   LexicalRootVisitor,
   LexicalParagraphVisitor,
+  LexicalFrontmatterVisitor,
   LexicalTextVisitor,
   LexicalLinkVisitor,
   LexicalHeadingVisitor,
@@ -328,7 +338,7 @@ export function exportMarkdownFromLexical(
   visitors: Array<LexicalExportVisitor<LexicalNode, Mdast.Content>> = LexicalVisitors
 ): string {
   return toMarkdown(traverseLexicalTree(root, visitors), {
-    extensions: [mdxToMarkdown()],
+    extensions: [mdxToMarkdown(), frontmatterToMarkdown('yaml'), directiveToMarkdown],
     listItemIndent: 'one',
     ...options,
   })

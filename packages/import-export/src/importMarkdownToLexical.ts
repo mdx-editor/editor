@@ -1,14 +1,18 @@
-import { LexicalNode, RootNode as LexicalRootNode, $createParagraphNode, $createTextNode, ElementNode, ParagraphNode } from 'lexical'
-import * as Mdast from 'mdast'
-import { mdxFromMarkdown, MdxJsxTextElement } from 'mdast-util-mdx'
-import { mdxjs } from 'micromark-extension-mdxjs'
-import { fromMarkdown } from 'mdast-util-from-markdown'
-import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from './FormatConstants'
 import { $createLinkNode, LinkNode } from '@lexical/link'
-import { $createHeadingNode, $createQuoteNode, $isQuoteNode, HeadingNode, QuoteNode } from '@lexical/rich-text'
 import { $createListItemNode, $createListNode, $isListItemNode, ListItemNode, ListNode } from '@lexical/list'
-import { $createCodeNode, CodeNode } from '@lexical/code'
 import { $createHorizontalRuleNode, HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode'
+import { $createHeadingNode, $createQuoteNode, $isQuoteNode, HeadingNode, QuoteNode } from '@lexical/rich-text'
+import { $createParagraphNode, $createTextNode, ElementNode, LexicalNode, RootNode as LexicalRootNode, ParagraphNode } from 'lexical'
+import * as Mdast from 'mdast'
+import { directiveFromMarkdown } from 'mdast-util-directive'
+import { fromMarkdown } from 'mdast-util-from-markdown'
+import { frontmatterFromMarkdown } from 'mdast-util-frontmatter'
+import { MdxJsxTextElement, mdxFromMarkdown } from 'mdast-util-mdx'
+import { directive } from 'micromark-extension-directive'
+import { frontmatter } from 'micromark-extension-frontmatter'
+import { mdxjs } from 'micromark-extension-mdxjs'
+import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from './FormatConstants'
+import { $createFrontmatterNode, FrontmatterNode } from './nodes/FrontmatterNode'
 import { $createImageNode, ImageNode } from './nodes/ImageNode'
 import { $createSandpackNode, SandpackNode } from './nodes/SandpackNode'
 import { MdastNode } from './types'
@@ -156,6 +160,17 @@ export const MdastImageVisitor: MdastImportVisitor<Mdast.Image> = {
   },
 }
 
+export const MdastFrontmatterVisitor: MdastImportVisitor<Mdast.YAML> = {
+  testNode: 'yaml',
+  visitNode({ mdastNode, actions }) {
+    actions.addAndStepInto(
+      $createFrontmatterNode({
+        yaml: mdastNode.value,
+      })
+    )
+  },
+}
+
 export const MdastVisitors = [
   MdastRootVisitor,
   MdastParagraphVisitor,
@@ -170,6 +185,7 @@ export const MdastVisitors = [
   MdastCodeVisitor,
   MdastThematicBreakVisitor,
   MdastImageVisitor,
+  MdastFrontmatterVisitor,
 ]
 
 function isParent(node: unknown): node is Mdast.Parent {
@@ -184,8 +200,8 @@ export function importMarkdownToLexical(
   const formattingMap = new WeakMap<object, number>()
 
   const tree = fromMarkdown(markdown, {
-    extensions: [mdxjs()],
-    mdastExtensions: [mdxFromMarkdown()],
+    extensions: [mdxjs(), frontmatter(), directive()],
+    mdastExtensions: [mdxFromMarkdown(), frontmatterFromMarkdown('yaml'), directiveFromMarkdown],
   })
 
   function visitChildren(mdastNode: Mdast.Parent, lexicalParent: LexicalNode) {
@@ -238,10 +254,10 @@ export const UsedLexicalNodes = [
   LinkNode,
   HeadingNode,
   QuoteNode,
-  CodeNode,
   ListNode,
   ListItemNode,
   HorizontalRuleNode,
   ImageNode,
   SandpackNode,
+  FrontmatterNode,
 ]
