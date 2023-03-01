@@ -87,6 +87,10 @@ export const ToolbarPlugin = () => {
         newFormat |= IS_UNDERLINE
       }
 
+      if (selection.hasFormat('code')) {
+        newFormat |= IS_CODE
+      }
+
       setFormat(newFormat)
 
       const elementKey = element.getKey()
@@ -138,7 +142,7 @@ export const ToolbarPlugin = () => {
   }, [editor, updateToolbar])
 
   const handleFormatChange = React.useCallback(
-    (format: 'bold' | 'italic' | 'underline') => {
+    (format: 'bold' | 'italic' | 'underline' | 'code') => {
       activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, format)
     },
     [activeEditor]
@@ -184,8 +188,13 @@ export const ToolbarPlugin = () => {
         </ToolbarToggleItem>
       </RadixToolbar.ToggleGroup>
       <ToolbarSeparator />
-      <RadixToolbar.ToggleGroup type="single" aria-label="Inline Code">
-        <ToolbarToggleItem value="on" aria-label="Underline">
+      <RadixToolbar.ToggleGroup
+        type="single"
+        aria-label="Inline Code"
+        value={format & IS_CODE ? 'on' : 'off'}
+        onValueChange={handleFormatChange.bind(null, 'code')}
+      >
+        <ToolbarToggleItem value="on" aria-label="Inline Code">
           <CodeIcon />
         </ToolbarToggleItem>
       </RadixToolbar.ToggleGroup>
