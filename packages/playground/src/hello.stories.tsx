@@ -22,7 +22,9 @@ import { ListPlugin } from '@lexical/react/LexicalListPlugin'
 
 import { exportMarkdownFromLexical, importMarkdownToLexical, UsedLexicalNodes } from '@virtuoso.dev/lexical-mdx-import-export'
 
-const initialMarkdown = `
+const initialMarkdown = `---
+title: Hello World
+---
 
 [A link](https://google.com/ "Googl Title")
 

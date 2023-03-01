@@ -15,6 +15,10 @@ import { importMarkdownToLexical, UsedLexicalNodes } from '@virtuoso.dev/lexical
 import { LinkPopupPlugin, ToolbarPlugin } from '@virtuoso.dev/lexical-editor-ui'
 
 const initialMarkdown = `
+---
+id: my-page-id
+title: My page
+---
 [A link](https://google.com/ "Link To Google")
 
 In commodo tempor lorem, id lobortis purus pharetra nec. Morbi sagittis ultricies lectus ut placerat. 
@@ -51,7 +55,7 @@ In commodo tempor lorem, id lobortis purus pharetra nec. Morbi sagittis ultricie
 [A link](https://google.com/ "Link To Google")
 
 [A link](https://google.com/ "Link To Google")
-`
+`.trim()
 
 const theme = {
   text: {

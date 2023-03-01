@@ -16,6 +16,7 @@ import { $createFrontmatterNode, FrontmatterNode } from './nodes/FrontmatterNode
 import { $createImageNode, ImageNode } from './nodes/ImageNode'
 import { $createSandpackNode, SandpackNode } from './nodes/SandpackNode'
 import { MdastNode } from './types'
+import { CodeNode } from '@lexical/code'
 
 export interface MdastVisitActions {
   visitChildren(node: Mdast.Parent, lexicalParent: LexicalNode): void
@@ -259,5 +260,6 @@ export const UsedLexicalNodes = [
   HorizontalRuleNode,
   ImageNode,
   SandpackNode,
+  CodeNode,
   FrontmatterNode,
 ]
