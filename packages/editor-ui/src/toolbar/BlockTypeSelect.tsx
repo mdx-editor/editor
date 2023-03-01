@@ -1,11 +1,17 @@
 import React from 'react'
 import * as Select from '@radix-ui/react-select'
 import { styled } from '@stitches/react'
-import { violet, mauve, blackA } from '@radix-ui/colors'
+import { violet, mauve } from '@radix-ui/colors'
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from '@radix-ui/react-icons'
 
-export const BlockTypeSelect = () => (
-  <Select.Root>
+export type BlockType = 'paragraph' | 'code' | 'quote' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
+export interface BLockTypeSelectProps {
+  value: BlockType | ''
+  onValueChange: (value: BlockType) => void
+}
+
+export const BlockTypeSelect = ({ value, onValueChange }: BLockTypeSelectProps) => (
+  <Select.Root value={value} onValueChange={onValueChange}>
     <SelectTrigger aria-label="Food">
       <Select.Value placeholder="Block type" />
       <SelectIcon>
@@ -20,14 +26,14 @@ export const BlockTypeSelect = () => (
         <SelectViewport>
           <SelectItem value="paragraph">Paragraph</SelectItem>
           <SelectItem value="code">Code Block</SelectItem>
-          <SelectItem value="blockquote">Quote</SelectItem>
+          <SelectItem value="quote">Quote</SelectItem>
           <SelectSeparator />
-          <SelectItem value="heading1">Heading 1</SelectItem>
-          <SelectItem value="heading2">Heading 2</SelectItem>
-          <SelectItem value="heading3">Heading 3</SelectItem>
-          <SelectItem value="heading4">Heading 4</SelectItem>
-          <SelectItem value="heading5">Heading 5</SelectItem>
-          <SelectItem value="heading6">Heading 6</SelectItem>
+          <SelectItem value="h1">Heading 1</SelectItem>
+          <SelectItem value="h2">Heading 2</SelectItem>
+          <SelectItem value="h3">Heading 3</SelectItem>
+          <SelectItem value="h4">Heading 4</SelectItem>
+          <SelectItem value="h5">Heading 5</SelectItem>
+          <SelectItem value="h6">Heading 6</SelectItem>
         </SelectViewport>
         <SelectScrollDownButton>
           <ChevronDownIcon />

@@ -1,18 +1,28 @@
-import React from 'react'
+import {
+  $isListNode,
+  INSERT_ORDERED_LIST_COMMAND,
+  INSERT_UNORDERED_LIST_COMMAND,
+  ListNode,
+  ListType,
+  REMOVE_LIST_COMMAND,
+} from '@lexical/list'
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import { INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontalRuleNode'
+import { $isHeadingNode } from '@lexical/rich-text'
+import { $findMatchingParent, $getNearestNodeOfType, mergeRegister } from '@lexical/utils'
+import { blackA, mauve, violet } from '@radix-ui/colors'
+import {
+  CodeIcon,
+  DividerHorizontalIcon,
+  FontBoldIcon,
+  FontItalicIcon,
+  ImageIcon,
+  Link1Icon,
+  ListBulletIcon,
+  UnderlineIcon,
+} from '@radix-ui/react-icons'
 import * as RadixToolbar from '@radix-ui/react-toolbar'
 import { styled } from '@stitches/react'
-import { violet, blackA, mauve } from '@radix-ui/colors'
-import {
-  FontBoldIcon,
-  CodeIcon,
-  FontItalicIcon,
-  UnderlineIcon,
-  ListBulletIcon,
-  DividerHorizontalIcon,
-  Link1Icon,
-  ImageIcon,
-} from '@radix-ui/react-icons'
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import {
   $getSelection,
   $isRangeSelection,
@@ -22,17 +32,11 @@ import {
   LexicalCommand,
   SELECTION_CHANGE_COMMAND,
 } from 'lexical'
-import { $findMatchingParent, $getNearestNodeOfType, mergeRegister } from '@lexical/utils'
+import React from 'react'
+import { OPEN_LINK_DIALOG } from './LinkPopupPlugin'
+import { formatCode, formatHeading, formatParagraph, formatQuote } from './blockFormatters'
+import { BlockType, BlockTypeSelect } from './toolbar/BlockTypeSelect'
 import { NumberedListIcon } from './toolbar/NumberedListIcon'
-import { BlockTypeSelect } from './toolbar/BlockTypeSelect'
-import {
-  $isListNode,
-  INSERT_ORDERED_LIST_COMMAND,
-  INSERT_UNORDERED_LIST_COMMAND,
-  ListNode,
-  ListType,
-  REMOVE_LIST_COMMAND,
-} from '@lexical/list'
 
 // Text node formatting
 export const DEFAULT_FORMAT = 0 as const
@@ -56,6 +60,7 @@ export const ToolbarPlugin = () => {
   const [activeEditor, setActiveEditor] = React.useState(editor)
   const [format, setFormat] = React.useState<number>(DEFAULT_FORMAT)
   const [listType, setListType] = React.useState('' as ListType | '')
+  const [blockType, setBlockType] = React.useState('' as BlockType | '')
 
   const updateToolbar = React.useCallback(() => {
     const selection = $getSelection()
@@ -106,18 +111,15 @@ export const ToolbarPlugin = () => {
           setListType('')
         }
 
-        /*
-        else {
-          const type = $isHeadingNode(element) ? element.getTag() : element.getType()
-          if (type in blockTypeToBlockName) {
-            setBlockType(type as keyof typeof blockTypeToBlockName)
-          }
-          if ($isCodeNode(element)) {
-            const language = element.getLanguage() as keyof typeof CODE_LANGUAGE_MAP
-            setCodeLanguage(language ? CODE_LANGUAGE_MAP[language] || language : '')
-            return
-          }
-        }*/
+        const type = $isHeadingNode(element) ? element.getTag() : (element.getType() as BlockType)
+        setBlockType(type)
+        // console.log(type)
+
+        //          if ($isCodeNode(element)) {
+        //            const language = element.getLanguage() as keyof typeof CODE_LANGUAGE_MAP
+        //            setCodeLanguage(language ? CODE_LANGUAGE_MAP[language] || language : '')
+        //            return
+        //          }
       }
     }
   }, [activeEditor])
@@ -151,6 +153,29 @@ export const ToolbarPlugin = () => {
   const handleListTypeChange = React.useCallback(
     (type: ListType | '') => {
       activeEditor.dispatchCommand(ListTypeCommandMap.get(type)!, undefined)
+    },
+    [activeEditor]
+  )
+
+  const handleBlockTypeChange = React.useCallback(
+    (type: BlockType) => {
+      switch (type) {
+        case 'paragraph': {
+          formatParagraph(activeEditor)
+          break
+        }
+        case 'quote': {
+          formatQuote(activeEditor)
+          break
+        }
+        case 'code': {
+          formatCode(activeEditor)
+          break
+        }
+        default: {
+          formatHeading(activeEditor, type)
+        }
+      }
     },
     [activeEditor]
   )
@@ -210,16 +235,20 @@ export const ToolbarPlugin = () => {
       </RadixToolbar.ToggleGroup>
 
       <ToolbarSeparator />
-      <BlockTypeSelect />
+      <BlockTypeSelect value={blockType} onValueChange={handleBlockTypeChange} />
       <ToolbarSeparator />
 
-      <ToolbarButton>
+      <ToolbarButton onClick={() => activeEditor.dispatchCommand(OPEN_LINK_DIALOG, undefined)}>
         <Link1Icon />
       </ToolbarButton>
       <ToolbarButton>
         <ImageIcon />
       </ToolbarButton>
-      <ToolbarButton>
+      <ToolbarButton
+        onClick={() => {
+          activeEditor.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, undefined)
+        }}
+      >
         <DividerHorizontalIcon />
       </ToolbarButton>
     </ToolbarRoot>

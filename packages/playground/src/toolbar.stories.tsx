@@ -13,6 +13,7 @@ import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary'
 import { ListPlugin } from '@lexical/react/LexicalListPlugin'
 import { importMarkdownToLexical, UsedLexicalNodes } from '@virtuoso.dev/lexical-mdx-import-export'
 import { LinkPopupPlugin, ToolbarPlugin } from '@virtuoso.dev/lexical-editor-ui'
+import { HorizontalRulePlugin } from '@lexical/react/LexicalHorizontalRulePlugin'
 
 const initialMarkdown = `
 ---
@@ -21,7 +22,12 @@ title: My page
 ---
 [A link](https://google.com/ "Link To Google")
 
+----------------
+
 In commodo tempor lorem, id lobortis purus pharetra nec. Morbi sagittis ultricies lectus ut placerat. 
+
+> Quote 
+> More quote
 
 [A link](https://google.com/ "Link To Google")
 
@@ -100,6 +106,7 @@ export function ToolbarKitchenSink() {
         ErrorBoundary={LexicalErrorBoundary}
       />
       <LexicalLinkPlugin />
+      <HorizontalRulePlugin />
       <ListPlugin />
       <LinkPopupPlugin />
     </LexicalComposer>

@@ -16,6 +16,8 @@ import {
   RangeSelection,
   SELECTION_CHANGE_COMMAND,
   TextNode,
+  LexicalCommand,
+  createCommand,
 } from 'lexical'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { $isAtNodeEnd } from '@lexical/selection'
@@ -49,6 +51,8 @@ export function getSelectedNode(selection: RangeSelection): TextNode | ElementNo
     return $isAtNodeEnd(anchor) ? anchorNode : focusNode
   }
 }
+
+export const OPEN_LINK_DIALOG: LexicalCommand<undefined> = createCommand()
 
 function getSelectionRectangle(editor: LexicalEditor) {
   const selection = $getSelection()
@@ -217,30 +221,38 @@ export function LinkPopupPlugin() {
         COMMAND_PRIORITY_LOW
       ),
       editor.registerCommand(
+        OPEN_LINK_DIALOG,
+        () => {
+          const selection = $getSelection()
+          if ($isRangeSelection(selection)) {
+            const node = getSelectedNode(selection)
+            const parent = node.getParent()
+            if ($isLinkNode(parent)) {
+              setEditMode(true)
+            } else if ($isLinkNode(node)) {
+              setRect(getSelectionRectangle(editor))
+              setUrl(node.getURL())
+              setInitialUrl(node.getURL())
+              setEditMode(true)
+              setOpen(true)
+            } else {
+              setRect(getSelectionRectangle(editor))
+              setUrl('')
+              setInitialUrl(null)
+              setEditMode(true)
+              setOpen(true)
+            }
+          }
+          return true
+        },
+        COMMAND_PRIORITY_HIGH
+      ),
+      editor.registerCommand(
         KEY_MODIFIER_COMMAND,
         (event) => {
           // TODO: handle windows
           if (event.key === 'k' && event.metaKey) {
-            const selection = $getSelection()
-            if ($isRangeSelection(selection)) {
-              const node = getSelectedNode(selection)
-              const parent = node.getParent()
-              if ($isLinkNode(parent)) {
-                setEditMode(true)
-              } else if ($isLinkNode(node)) {
-                setRect(getSelectionRectangle(editor))
-                setUrl(node.getURL())
-                setInitialUrl(node.getURL())
-                setEditMode(true)
-                setOpen(true)
-              } else {
-                setRect(getSelectionRectangle(editor))
-                setUrl('')
-                setInitialUrl(null)
-                setEditMode(true)
-                setOpen(true)
-              }
-            }
+            editor.dispatchCommand(OPEN_LINK_DIALOG, undefined)
             return true
           }
           return false

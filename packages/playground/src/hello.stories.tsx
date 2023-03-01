@@ -28,6 +28,10 @@ title: Hello World
 
 [A link](https://google.com/ "Googl Title")
 
+horizontal rule
+
+---------------
+
 Block of code:
 
 \`\`\`js
