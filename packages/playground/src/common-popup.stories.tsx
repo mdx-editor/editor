@@ -26,7 +26,7 @@ import { ListPlugin } from '@lexical/react/LexicalListPlugin'
 import { $isAtNodeEnd } from '@lexical/selection'
 import { importMarkdownToLexical, UsedLexicalNodes } from '@virtuoso.dev/lexical-mdx-import-export'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { $isLinkNode } from '@lexical/link'
+import { SimplePopover } from './SimplePopover'
 
 const initialMarkdown = `
 [A link](https://google.com/ "Link To Google")
@@ -168,25 +168,10 @@ function useLexicalSelection() {
 
 function SelectionRectanglePlugin() {
   const { selectionRectangle } = useLexicalSelection()
-  if (selectionRectangle?.width === 0) {
-    return
+  if (!selectionRectangle || selectionRectangle?.width === 0) {
+    return null
   }
-  return (
-    <div
-      style={{
-        position: 'absolute',
-        top: selectionRectangle?.top,
-        left: selectionRectangle?.left,
-        width: selectionRectangle?.width,
-        height: selectionRectangle?.height,
-        opacity: 0.5,
-        backgroundColor: 'red',
-        transform: 'translatey(-30px)',
-      }}
-    >
-      Selection
-    </div>
-  )
+  return <SimplePopover selection={selectionRectangle} />
 }
 
 export function BasicSetup() {

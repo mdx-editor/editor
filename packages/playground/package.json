@@ -19,14 +19,18 @@
     "@lexical/rich-text": "^0.8.0",
     "@lexical/selection": "^0.8.0",
     "@lexical/utils": "^0.8.0",
-    "@virtuoso.dev/lexical-mdx-import-export": "workspace:*",
+    "@radix-ui/react-popover": "^1.0.3",
+    "@radix-ui/react-popper": "^1.1.0",
+    "@vanilla-extract/css": "^1.9.5",
     "@virtuoso.dev/lexical-editor-ui": "workspace:*",
+    "@virtuoso.dev/lexical-mdx-import-export": "workspace:*",
     "lexical": "^0.8.0"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@vanilla-extract/vite-plugin": "^3.8.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   }
