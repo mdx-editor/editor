@@ -4,8 +4,9 @@ import * as styles from './SimplePopover.css'
 
 interface SimpePopperProps {
   selection: DOMRect
+  children: React.ReactNode
 }
-export const SimplePopover = ({ selection }: SimpePopperProps) => (
+export const SimplePopover = ({ children, selection }: SimpePopperProps) => (
   <Popover.Root open>
     <Popover.Anchor
       style={{
@@ -19,8 +20,7 @@ export const SimplePopover = ({ selection }: SimpePopperProps) => (
     ></Popover.Anchor>
     <Popover.Portal>
       <Popover.Content side="top" className={styles.PopoverContent} onOpenAutoFocus={(e) => e.preventDefault()} sideOffset={5}>
-        Popover content
-        <Popover.Arrow className={styles.PopoverArrow} />
+        {children}
       </Popover.Content>
     </Popover.Portal>
   </Popover.Root>
