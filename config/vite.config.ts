@@ -7,7 +7,7 @@ import dts from 'vite-plugin-dts'
 
 const ext = {
   cjs: 'cjs',
-  es: 'mjs',
+  es: 'js',
 } as const
 
 const packageJson = JSON.parse(readFileSync('./package.json', 'utf-8')) as {

@@ -12,7 +12,7 @@
   "version": "0.0.7",
   "description": "Lexical MDX Editor UI",
   "main": "dist/index.cjs",
-  "module": "dist/index.mjs",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "prepack": "cp ../../README.md ../../LICENSE .",
