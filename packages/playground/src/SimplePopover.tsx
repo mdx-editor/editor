@@ -19,7 +19,7 @@ export const SimplePopover = ({ children, open, selection }: SimpePopperProps) =
         visibility: 'hidden',
       }}
     ></Popover.Anchor>
-    <Popover.Portal forceMount>
+    <Popover.Portal>
       <Popover.Content
         side="top"
         className={styles.PopoverContent}

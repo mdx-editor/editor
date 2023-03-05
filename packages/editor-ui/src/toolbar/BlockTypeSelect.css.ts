@@ -1,5 +1,8 @@
 import { style } from '@vanilla-extract/css'
 
+const systemFont =
+  '-apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Cantarell, Ubuntu, roboto, noto, arial, sans-serif'
+
 export const SelectTrigger = style({
   all: 'unset',
   display: 'inline-flex',
@@ -19,6 +22,7 @@ export const SelectTrigger = style({
   selectors: {
     '&[data-placeholder]': { color: 'red' },
   },
+  fontFamily: systemFont,
 })
 
 export const SelectIcon = style({
@@ -31,6 +35,7 @@ export const SelectContent = style({
   backgroundColor: 'white',
   borderRadius: 6,
   boxShadow: '0px 10px 38px -10px rgba(22, 23, 24, 0.35), 0px 10px 20px -15px rgba(22, 23, 24, 0.2)',
+  fontFamily: systemFont,
 })
 
 export const SelectViewport = style({

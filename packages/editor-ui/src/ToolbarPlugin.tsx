@@ -127,6 +127,10 @@ export const ToolbarPlugin = () => {
   }, [activeEditor])
 
   React.useEffect(() => {
+    editor.getEditorState().read(() => {
+      updateToolbar()
+    })
+
     return mergeRegister(
       editor.registerCommand(
         SELECTION_CHANGE_COMMAND,
