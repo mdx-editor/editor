@@ -3,6 +3,7 @@ import { defineConfig } from 'vite'
 import { readFileSync } from 'node:fs'
 import react from '@vitejs/plugin-react'
 import dts from 'vite-plugin-dts'
+import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin'
 
 const ext = {
   cjs: 'cjs',
@@ -28,6 +29,7 @@ export default defineConfig({
       jsxRuntime: 'classic',
     }),
     dts(),
+    vanillaExtractPlugin(),
   ],
   build: {
     minify: 'terser',

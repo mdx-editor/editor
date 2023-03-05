@@ -59,11 +59,11 @@ function onError(error: Error) {
 
 function FloatingToolbarPlugin() {
   const { selectionRectangle } = useLexicalSelection()
-  if (!selectionRectangle || selectionRectangle?.width === 0) {
-    return null
-  }
+  const isOpen = selectionRectangle !== null && selectionRectangle?.width > 0
+  console.log({ isOpen })
+
   return (
-    <SimplePopover selection={selectionRectangle}>
+    <SimplePopover selection={selectionRectangle} open={isOpen}>
       <ToolbarPlugin />
     </SimplePopover>
   )

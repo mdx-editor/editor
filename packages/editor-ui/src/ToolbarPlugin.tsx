@@ -101,6 +101,8 @@ export const ToolbarPlugin = () => {
       const elementKey = element.getKey()
       const elementDOM = activeEditor.getElementByKey(elementKey)
 
+      console.log('element', element)
+
       // block type
       if (elementDOM !== null) {
         if ($isListNode(element)) {

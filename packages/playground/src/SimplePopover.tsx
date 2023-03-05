@@ -3,11 +3,12 @@ import * as Popover from '@radix-ui/react-popover'
 import * as styles from './SimplePopover.css'
 
 interface SimpePopperProps {
-  selection: DOMRect
+  selection: DOMRect | null
   children: React.ReactNode
+  open: boolean
 }
-export const SimplePopover = ({ children, selection }: SimpePopperProps) => (
-  <Popover.Root open>
+export const SimplePopover = ({ children, open, selection }: SimpePopperProps) => (
+  <Popover.Root open={open}>
     <Popover.Anchor
       style={{
         position: 'absolute',
@@ -18,8 +19,14 @@ export const SimplePopover = ({ children, selection }: SimpePopperProps) => (
         visibility: 'hidden',
       }}
     ></Popover.Anchor>
-    <Popover.Portal>
-      <Popover.Content side="top" className={styles.PopoverContent} onOpenAutoFocus={(e) => e.preventDefault()} sideOffset={5}>
+    <Popover.Portal forceMount>
+      <Popover.Content
+        side="top"
+        className={styles.PopoverContent}
+        onOpenAutoFocus={(e) => e.preventDefault()}
+        sideOffset={5}
+        style={{ display: open ? '' : 'none' }}
+      >
         {children}
       </Popover.Content>
     </Popover.Portal>
