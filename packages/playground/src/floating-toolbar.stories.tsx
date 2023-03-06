@@ -12,9 +12,7 @@ import { ContentEditable } from '@lexical/react/LexicalContentEditable'
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary'
 import { ListPlugin } from '@lexical/react/LexicalListPlugin'
 import { importMarkdownToLexical, UsedLexicalNodes } from '@virtuoso.dev/lexical-mdx-import-export'
-import { SimplePopover } from './SimplePopover'
-import { useLexicalSelection } from './useLexicalSelection'
-import { LinkPopupPlugin, ToolbarPlugin } from '@virtuoso.dev/lexical-editor-ui'
+import { FloatingToolbarPlugin, LinkPopupPlugin } from '@virtuoso.dev/lexical-editor-ui'
 
 const initialMarkdown = `
 [A link](https://google.com/ "Link To Google")
@@ -55,18 +53,6 @@ const theme = {
 
 function onError(error: Error) {
   console.error(error)
-}
-
-function FloatingToolbarPlugin() {
-  const { selectionRectangle } = useLexicalSelection()
-  const isOpen = selectionRectangle !== null && selectionRectangle?.width > 0
-  console.log({ isOpen })
-
-  return (
-    <SimplePopover selection={selectionRectangle} open={isOpen}>
-      <ToolbarPlugin />
-    </SimplePopover>
-  )
 }
 
 export function BasicSetup() {

@@ -1,5 +1,4 @@
 import { $setBlocksType_experimental } from '@lexical/selection'
-import { BlockType } from './toolbar/BlockTypeSelect'
 import { $createParagraphNode, $getSelection, $isRangeSelection, DEPRECATED_$isGridSelection, LexicalEditor } from 'lexical'
 import { $createHeadingNode, $createQuoteNode, HeadingTagType } from '@lexical/rich-text'
 import { $createCodeNode } from '@lexical/code'

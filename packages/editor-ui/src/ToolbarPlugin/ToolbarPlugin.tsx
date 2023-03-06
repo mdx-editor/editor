@@ -1,3 +1,4 @@
+/// <reference types="vite-plugin-svgr/client" />
 import {
   $isListNode,
   INSERT_ORDERED_LIST_COMMAND,
@@ -10,19 +11,8 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontalRuleNode'
 import { $isHeadingNode } from '@lexical/rich-text'
 import { $findMatchingParent, $getNearestNodeOfType, mergeRegister } from '@lexical/utils'
-import { blackA, mauve, violet } from '@radix-ui/colors'
-import {
-  CodeIcon,
-  DividerHorizontalIcon,
-  FontBoldIcon,
-  FontItalicIcon,
-  ImageIcon,
-  Link1Icon,
-  ListBulletIcon,
-  UnderlineIcon,
-} from '@radix-ui/react-icons'
 import * as RadixToolbar from '@radix-ui/react-toolbar'
-import { styled } from '@stitches/react'
+import * as styles from './ToolbarPlugin.css'
 import {
   $getSelection,
   $isRangeSelection,
@@ -33,10 +23,17 @@ import {
   SELECTION_CHANGE_COMMAND,
 } from 'lexical'
 import React from 'react'
-import { OPEN_LINK_DIALOG } from './LinkPopupPlugin'
-import { formatCode, formatHeading, formatParagraph, formatQuote } from './blockFormatters'
-import { BlockType, BlockTypeSelect } from './toolbar/BlockTypeSelect'
-import { NumberedListIcon } from './toolbar/NumberedListIcon'
+import { OPEN_LINK_DIALOG } from '../LinkPopupPlugin/LinkPopupPlugin'
+import { formatCode, formatHeading, formatParagraph, formatQuote } from '../BlockTypeSelect/blockFormatters'
+import { BlockType, BlockTypeSelect } from '../BlockTypeSelect/BlockTypeSelect'
+import { ReactComponent as BoldIcon } from '../icons/format_bold.svg'
+import { ReactComponent as ItalicIcon } from '../icons/format_italic.svg'
+import { ReactComponent as UnderlinedIcon } from '../icons/format_underlined.svg'
+import { ReactComponent as BulletedListIcon } from '../icons/format_list_bulleted.svg'
+import { ReactComponent as NumberedListIcon } from '../icons/format_list_numbered.svg'
+import { ReactComponent as CodeIcon } from '../icons/code.svg'
+import { ReactComponent as HorizontalRuleIcon } from '../icons/horizontal_rule.svg'
+import { ReactComponent as LinkIcon } from '../icons/link.svg'
 
 // Text node formatting
 export const DEFAULT_FORMAT = 0 as const
@@ -100,8 +97,6 @@ export const ToolbarPlugin = () => {
 
       const elementKey = element.getKey()
       const elementDOM = activeEditor.getElementByKey(elementKey)
-
-      console.log('element', element)
 
       // block type
       if (elementDOM !== null) {
@@ -187,7 +182,7 @@ export const ToolbarPlugin = () => {
   )
 
   return (
-    <ToolbarRoot aria-label="Formatting options">
+    <RadixToolbar.Root className={styles.Root} aria-label="Formatting options">
       <RadixToolbar.ToggleGroup
         type="single"
         aria-label="Text formatting"
@@ -195,7 +190,7 @@ export const ToolbarPlugin = () => {
         onValueChange={handleFormatChange.bind(null, 'bold')}
       >
         <ToolbarToggleItem value="on" aria-label="Bold">
-          <FontBoldIcon />
+          <BoldIcon />
         </ToolbarToggleItem>
       </RadixToolbar.ToggleGroup>
       <RadixToolbar.ToggleGroup
@@ -205,7 +200,7 @@ export const ToolbarPlugin = () => {
         onValueChange={handleFormatChange.bind(null, 'italic')}
       >
         <ToolbarToggleItem value="on" aria-label="Italic">
-          <FontItalicIcon />
+          <ItalicIcon />
         </ToolbarToggleItem>
       </RadixToolbar.ToggleGroup>
       <RadixToolbar.ToggleGroup
@@ -214,8 +209,8 @@ export const ToolbarPlugin = () => {
         value={format & IS_UNDERLINE ? 'on' : 'off'}
         onValueChange={handleFormatChange.bind(null, 'underline')}
       >
-        <ToolbarToggleItem value="on" aria-label="Underline">
-          <UnderlineIcon />
+        <ToolbarToggleItem value="on" aria-label="Underlined">
+          <UnderlinedIcon style={{ transform: 'translateY(2px)' }} />
         </ToolbarToggleItem>
       </RadixToolbar.ToggleGroup>
       <ToolbarSeparator />
@@ -233,7 +228,7 @@ export const ToolbarPlugin = () => {
 
       <RadixToolbar.ToggleGroup type="single" aria-label="List type" onValueChange={handleListTypeChange} value={listType}>
         <ToolbarToggleItem value="bullet" aria-label="Bulleted list">
-          <ListBulletIcon />
+          <BulletedListIcon />
         </ToolbarToggleItem>
         <ToolbarToggleItem value="number" aria-label="Numbered list">
           <NumberedListIcon />
@@ -245,68 +240,27 @@ export const ToolbarPlugin = () => {
       <ToolbarSeparator />
 
       <ToolbarButton onClick={() => activeEditor.dispatchCommand(OPEN_LINK_DIALOG, undefined)}>
-        <Link1Icon />
-      </ToolbarButton>
-      <ToolbarButton>
-        <ImageIcon />
+        <LinkIcon />
       </ToolbarButton>
       <ToolbarButton
         onClick={() => {
           activeEditor.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, undefined)
         }}
       >
-        <DividerHorizontalIcon />
+        <HorizontalRuleIcon />
       </ToolbarButton>
-    </ToolbarRoot>
+    </RadixToolbar.Root>
   )
 }
 
-const ToolbarRoot = styled(RadixToolbar.Root, {
-  boxSizing: 'border-box',
-  display: 'flex',
-  padding: 10,
-  width: '100%',
-  minWidth: 'max-content',
-  borderRadius: 6,
-  backgroundColor: 'white',
-  boxShadow: `0 2px 10px ${blackA.blackA7}`,
-  alignItems: 'center',
-})
-
-const itemStyles = {
-  all: 'unset',
-  flex: '0 0 auto',
-  color: mauve.mauve11,
-  height: 25,
-  padding: '0 5px',
-  borderRadius: 4,
-  display: 'inline-flex',
-  fontSize: 13,
-  lineHeight: 1,
-  alignItems: 'center',
-  justifyContent: 'center',
-  '&:hover': { backgroundColor: violet.violet3, color: violet.violet11 },
-  '&:active:hover': { backgroundColor: violet.violet6, transform: 'translateY(1px)' },
-  '&:focus': { position: 'relative', boxShadow: `0 0 0 2px ${violet.violet7}` },
+function ToolbarToggleItem(props: RadixToolbar.ToolbarToggleItemProps) {
+  return <RadixToolbar.ToggleItem {...props} className={styles.ToggleItem} />
 }
 
-const ToolbarToggleItem = styled(RadixToolbar.ToggleItem, {
-  ...itemStyles,
-  backgroundColor: 'white',
-  marginLeft: 2,
-  '&:first-child': { marginLeft: 0 },
-  '&[data-state=on]': { backgroundColor: violet.violet5, color: violet.violet11 },
-})
+function ToolbarButton(props: RadixToolbar.ToolbarButtonProps) {
+  return <RadixToolbar.Button {...props} className={styles.Button} />
+}
 
-const ToolbarSeparator = styled(RadixToolbar.Separator, {
-  width: 1,
-  backgroundColor: mauve.mauve6,
-  margin: '0 10px',
-  alignSelf: 'stretch',
-})
-
-const ToolbarButton = styled(RadixToolbar.Button, {
-  ...itemStyles,
-  color: mauve.mauve11,
-  backgroundColor: 'white',
-})
+function ToolbarSeparator() {
+  return <RadixToolbar.Separator className={styles.Separator} />
+}

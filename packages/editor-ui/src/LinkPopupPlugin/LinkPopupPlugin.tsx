@@ -6,7 +6,6 @@ import { CheckIcon, ClipboardCopyIcon, Cross2Icon, ExternalLinkIcon, LinkBreak1I
 import {
   $getSelection,
   $isRangeSelection,
-  BLUR_COMMAND,
   COMMAND_PRIORITY_HIGH,
   COMMAND_PRIORITY_LOW,
   ElementNode,
@@ -23,18 +22,8 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { $isAtNodeEnd } from '@lexical/selection'
 import { mergeRegister } from '@lexical/utils'
 import { $isLinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link'
-import {
-  LinkTextContainer,
-  LinkUIInput,
-  PopoverAnchor,
-  PopoverArrow,
-  PopoverButton,
-  PopoverButtons,
-  PopoverContent,
-  TooltipArrow,
-  TooltipContent,
-  WorkingLink,
-} from './primitives'
+import { LinkTextContainer, LinkUIInput, PopoverButton, PopoverButtons, TooltipArrow, TooltipContent, WorkingLink } from './primitives'
+import { PopoverAnchor, PopoverContent } from '../Popover/primitives'
 
 export function getSelectedNode(selection: RangeSelection): TextNode | ElementNode {
   const anchor = selection.anchor
@@ -273,7 +262,7 @@ export function LinkPopupPlugin() {
   return (
     <Popover.Root open={open && !!rect}>
       <PopoverAnchor
-        css={{
+        style={{
           visibility: open && editMode ? 'visible' : 'hidden',
           top: rect?.top,
           left: rect?.left,
@@ -347,7 +336,6 @@ export function LinkPopupPlugin() {
               </>
             )}
           </PopoverButtons>
-          <PopoverArrow />
         </PopoverContent>
       </Popover.Portal>
     </Popover.Root>

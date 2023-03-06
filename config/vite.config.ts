@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs'
 import react from '@vitejs/plugin-react'
 import dts from 'vite-plugin-dts'
 import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin'
+import svgr from 'vite-plugin-svgr'
 
 const ext = {
   cjs: 'cjs',
@@ -30,6 +31,7 @@ export default defineConfig({
     }),
     dts(),
     vanillaExtractPlugin(),
+    svgr(),
   ],
   build: {
     minify: 'terser',

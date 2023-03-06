@@ -1,6 +1,4 @@
-import { styled, keyframes } from './stitches.config'
-import * as Popover from '@radix-ui/react-popover'
-import * as Tooltip from '@radix-ui/react-tooltip'
+import { style, keyframes } from '@vanilla-extract/css'
 
 export const SlideKeyframes = {
   slideUpAndFade: keyframes({
@@ -48,17 +46,17 @@ export const SlideKeyframes = {
   }),
 }
 
-export const LinkUIInput = styled('input', {
+export const LinkUIInput = style({
   marginRight: '50px',
   boxShadow: '0 0 0 1px var(--violet7)',
   borderRadius: '4px',
   padding: '2px 5px',
-  '&:focus': {
+  ':focus': {
     boxShadow: '0 0 0 2px var(--violet8)',
   },
 })
 
-export const LinkTextContainer = styled('span', {
+export const LinkTextContainer = style({
   padding: '2px 5px',
   maxWidth: 'calc(100% - 30px)',
   display: 'inline-block',
@@ -66,7 +64,7 @@ export const LinkTextContainer = styled('span', {
   overflow: 'hidden',
 })
 
-export const TooltipContent = styled(Tooltip.Content, {
+export const TooltipContent = style({
   borderRadius: '4px',
   padding: '10px 15px',
   fontSize: '15px',
@@ -79,21 +77,23 @@ export const TooltipContent = styled(Tooltip.Content, {
   animationTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
   willChange: 'transform, opacity',
 
-  "&[data-state='delayed-open'][data-side='top']": {
-    animationName: SlideKeyframes.slideDownAndFade,
-  },
-  "&[data-state='delayed-open'][data-side='right']": {
-    animationName: SlideKeyframes.slideLeftAndFade,
-  },
-  "&[data-state='delayed-open'][data-side='bottom']": {
-    animationName: SlideKeyframes.slideUpAndFade,
-  },
-  "&[data-state='delayed-open'][data-side='left']": {
-    animationName: SlideKeyframes.slideRightAndFade,
+  selectors: {
+    "&[data-state='delayed-open'][data-side='top']": {
+      animationName: SlideKeyframes.slideDownAndFade,
+    },
+    "&[data-state='delayed-open'][data-side='right']": {
+      animationName: SlideKeyframes.slideLeftAndFade,
+    },
+    "&[data-state='delayed-open'][data-side='bottom']": {
+      animationName: SlideKeyframes.slideUpAndFade,
+    },
+    "&[data-state='delayed-open'][data-side='left']": {
+      animationName: SlideKeyframes.slideRightAndFade,
+    },
   },
 })
 
-export const PopoverAnchor = styled(Popover.Anchor, {
+export const PopoverAnchor = style({
   position: 'absolute',
   backgroundColor: 'Highlight',
   zIndex: '-1',
@@ -102,7 +102,7 @@ export const PopoverAnchor = styled(Popover.Anchor, {
   transform: 'translateX(-1px)',
 })
 
-export const PopoverContent = styled(Popover.Content, {
+export const PopoverContent = style({
   borderRadius: '4px',
   padding: 20,
   width: 260,
@@ -112,27 +112,29 @@ export const PopoverContent = styled(Popover.Content, {
   animationTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
   willChange: 'transform, opacity',
 
-  '&:focus': {
+  ':focus': {
     boxShadow: 'hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px, 0 0 0 2px var($violet7)',
   },
-  "&[data-state='open'][data-side='top']": {
-    animationName: SlideKeyframes.slideDownAndFade,
-  },
-  "&[data-state='open'][data-side='right']": {
-    animationName: SlideKeyframes.slideLeftAndFade,
-  },
-  "&[data-state='open'][data-side='bottom']": {
-    animationName: SlideKeyframes.slideUpAndFade,
-  },
-  "&[data-state='open'][data-side='left']": {
-    animationName: SlideKeyframes.slideRightAndFade,
+  selectors: {
+    "&[data-state='open'][data-side='top']": {
+      animationName: SlideKeyframes.slideDownAndFade,
+    },
+    "&[data-state='open'][data-side='right']": {
+      animationName: SlideKeyframes.slideLeftAndFade,
+    },
+    "&[data-state='open'][data-side='bottom']": {
+      animationName: SlideKeyframes.slideUpAndFade,
+    },
+    "&[data-state='open'][data-side='left']": {
+      animationName: SlideKeyframes.slideRightAndFade,
+    },
   },
 })
 
-export const PopoverArrow = styled(Popover.Arrow, { fill: 'white' })
-export const TooltipArrow = styled(Tooltip.Arrow, { fill: 'white' })
+export const PopoverArrow = style({ fill: 'white' })
+export const TooltipArrow = style({ fill: 'white' })
 
-export const PopoverButtons = styled('div', {
+export const PopoverButtons = style({
   position: 'absolute',
   top: 5,
   right: 5,
@@ -140,7 +142,7 @@ export const PopoverButtons = styled('div', {
   columnGap: 3,
 })
 
-export const PopoverButton = styled('button', {
+export const PopoverButton = style({
   all: 'unset',
   fontFamily: 'inherit',
   borderRadius: '100%',
@@ -150,15 +152,15 @@ export const PopoverButton = styled('button', {
   alignItems: 'center',
   justifyContent: 'center',
   color: '$violet11',
-  '&:hover': {
+  ':hover': {
     backgroundColor: '$violet4',
   },
-  '&:focus': {
+  ':focus': {
     boxShadow: '0 0 0 2px $violet7',
   },
 })
 
-export const WorkingLink = styled('a', {
+export const WorkingLink = style({
   display: 'inline-flex',
   alignItems: 'center',
   gap: '8px',
