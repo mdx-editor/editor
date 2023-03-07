@@ -10,8 +10,8 @@ export const Root = style({
   width: '100%',
   minWidth: 'max-content',
   borderRadius: 6,
-  backgroundColor: 'white',
-  boxShadow: `0 2px 10px black`,
+  // backgroundColor: 'white',
+  // boxShadow: `0 2px 10px black`,
   alignItems: 'center',
 })
 

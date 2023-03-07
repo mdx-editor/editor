@@ -60,6 +60,7 @@
     "@types/react": "^18.0.27",
     "@types/unist": "^2.0.6",
     "lexical": "^0.8.0",
+    "polished": "^4.2.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

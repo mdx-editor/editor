@@ -1,4 +1,5 @@
 import { style, keyframes } from '@vanilla-extract/css'
+import * as polished from 'polished'
 
 const slideUpAndFade = keyframes({
   '0%': { opacity: 0, transform: 'translateY(2px)' },
@@ -11,7 +12,11 @@ const slideRightAndFade = keyframes({
 })
 
 const slideDownAndFade = keyframes({
-  '0%': { opacity: 0, transform: 'translateY(-2px)' },
+  '0%': {
+    opacity: 0,
+    transform: 'translate(3px, 4px)',
+    boxShadow: '0px 0px 0px rgba(104, 221, 253, 0.1)',
+  },
   '100%': { opacity: 1, transform: 'translateY(0)' },
 })
 
@@ -21,9 +26,13 @@ const slideLeftAndFade = keyframes({
 })
 
 export const Content = style({
-  animationDuration: '400ms',
+  animationDuration: '300ms',
   animationTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
-  willChange: 'transform, opacity',
+  willChange: 'transform, opacity, box-shadow',
+
+  background: '#FAFDFE',
+  border: '2px solid #000000',
+  boxShadow: '3px 4px 0px rgba(104, 221, 253, 0.7)',
 
   ':focus': {
     boxShadow: `hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px, 0 0 0 2px red`,

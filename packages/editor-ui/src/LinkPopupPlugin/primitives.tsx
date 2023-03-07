@@ -22,7 +22,7 @@ export function PopoverButtons(props: React.ComponentProps<'div'>) {
   return <div {...props} className={styles.PopoverButtons} />
 }
 
-export const PopoverButton = React.forwardRef<any>((props: React.ComponentProps<'button'>, ref) => {
+export const PopoverButton = React.forwardRef<any, React.ComponentProps<'button'>>((props, ref) => {
   return <button {...props} className={styles.PopoverButton} ref={ref} />
 })
 

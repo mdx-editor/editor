@@ -6,6 +6,8 @@ export function PopoverAnchor(props: React.ComponentProps<typeof Popover.Anchor>
   return <Popover.Anchor {...props} className={styles.Anchor} />
 }
 
-export const PopoverContent = React.forwardRef<any>((props: React.ComponentProps<typeof Popover.Content>, ref) => {
-  return <Popover.Content {...props} className={styles.Content} ref={ref} />
-})
+export const PopoverContent = React.forwardRef<any, React.ComponentProps<typeof Popover.Content>>(
+  (props: React.ComponentProps<typeof Popover.Content>, ref) => {
+    return <Popover.Content {...props} className={styles.Content} ref={ref} />
+  }
+)
