@@ -1,34 +1,33 @@
 import { style } from '@vanilla-extract/css'
-
-const systemFont =
-  '-apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Cantarell, Ubuntu, roboto, noto, arial, sans-serif'
+import { themeVars } from '../theme.css'
 
 export const Root = style({
   boxSizing: 'border-box',
   display: 'flex',
-  padding: 10,
+  padding: themeVars.sizing.containerPadding,
   width: '100%',
   minWidth: 'max-content',
-  borderRadius: 6,
-  // backgroundColor: 'white',
-  // boxShadow: `0 2px 10px black`,
   alignItems: 'center',
 })
+
+const repeatingStripe = `
+  repeating-linear-gradient(
+    -45deg,
+    transparent 0 2px,
+    ${themeVars.toolbar.buttonHoverBackground} 2px 4px
+  );
+`.trim()
 
 const itemStyles = {
   all: 'unset',
   flex: '0 0 auto',
-  color: 'black',
-  height: 25,
-  padding: '0 5px',
-  borderRadius: 4,
+  color: themeVars.colors.foreground,
+  padding: themeVars.toolbar.buttonPadding,
   display: 'inline-flex',
-  fontSize: 13,
-  lineHeight: 1,
   alignItems: 'center',
   justifyContent: 'center',
-  ':hover': { backgroundColor: 'black', color: 'white' },
-  ':focus': { position: 'relative', boxShadow: `0 0 0 2px red` },
+  ':hover': { backgroundImage: repeatingStripe },
+  ':focus': { transform: 'translate(2px, 2px)' },
   selectors: {
     '&:active:hover': { backgroundColor: 'red', transform: 'translateY(1px)' },
   },
@@ -36,17 +35,20 @@ const itemStyles = {
 
 export const ToggleItem = style({
   ...itemStyles,
-  backgroundColor: 'white',
-  marginLeft: 2,
+  marginLeft: themeVars.toolbar.buttonSpacing,
   ':first-child': { marginLeft: 0 },
   selectors: {
-    '&[data-state=on]': { backgroundColor: 'red', color: 'blue' },
+    '&[data-state=on]': {
+      backgroundColor: themeVars.toolbar.toggleButtonOnBackground,
+      backgroundImage: 'none',
+      transform: 'translate(1px, 1px)',
+    },
   },
 })
 
 export const Separator = style({
   width: 1,
-  backgroundColor: 'red',
+  backgroundColor: 'transparent',
   margin: '0 10px',
   alignSelf: 'stretch',
 })

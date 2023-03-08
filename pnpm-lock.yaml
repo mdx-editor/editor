@@ -97,6 +97,7 @@ importers:
       '@types/mdast': ^3.0.10
       '@types/react': ^18.0.27
       '@types/unist': ^2.0.6
+      colorcolor: ^3.0.1
       lexical: ^0.8.0
       mdast-util-from-markdown: ^1.3.0
       mdast-util-mdx: ^2.0.1
@@ -130,6 +131,7 @@ importers:
       '@types/mdast': 3.0.10
       '@types/react': 18.0.27
       '@types/unist': 2.0.6
+      colorcolor: 3.0.1
       lexical: 0.8.0
       polished: 4.2.2
       react: 18.2.0
@@ -5472,6 +5474,12 @@ packages:
     hasBin: true
     dev: true
 
+  /colorcolor/3.0.1:
+    resolution: {integrity: sha512-DIGQgRENjBP+MTI5Ua9teyZs2E7+ismYFxVN1vb3It1u+7G93aZzmDsUeRgxyoSKIsAz9PzEa7mHCCc6bChfJw==}
+    dependencies:
+      css-color-names: 1.0.1
+    dev: true
+
   /colors/1.2.5:
     resolution: {integrity: sha512-erNRLao/Y3Fv54qUa0LBB+//Uf3YwMUmdJinN20yMXm9zdKKqH9wt7R9IIVZ+K7ShzfpLV/Zg8+VyrBJYB4lpg==}
     engines: {node: '>=0.1.90'}
@@ -5723,6 +5731,10 @@ packages:
       path-key: 3.1.1
       shebang-command: 2.0.0
       which: 2.0.2
+
+  /css-color-names/1.0.1:
+    resolution: {integrity: sha512-/loXYOch1qU1biStIFsHH8SxTmOseh1IJqFvy8IujXOm1h+QjUdDhkzOrR5HG8K8mlxREj0yfi8ewCHx0eMxzA==}
+    dev: true
 
   /css-what/5.1.0:
     resolution: {integrity: sha512-arSMRWIIFY0hV8pIxZMEfmMI47Wj3R/aWpZDDxWYCPEiOMv6tfOrnpDtgxBYPEQD4V0Y/958+1TdC3iWTFcUPw==}
