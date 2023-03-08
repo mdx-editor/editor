@@ -10,14 +10,6 @@ export const Root = style({
   alignItems: 'center',
 })
 
-const repeatingStripe = `
-  repeating-linear-gradient(
-    -45deg,
-    transparent 0 2px,
-    ${themeVars.toolbar.buttonHoverBackground} 2px 4px
-  );
-`.trim()
-
 const itemStyles = {
   all: 'unset',
   flex: '0 0 auto',
@@ -26,10 +18,10 @@ const itemStyles = {
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
-  ':hover': { backgroundImage: repeatingStripe },
+  ':hover': { backgroundImage: themeVars.backgroundHover },
   ':focus': { transform: 'translate(2px, 2px)' },
   selectors: {
-    '&:active:hover': { backgroundColor: 'red', transform: 'translateY(1px)' },
+    '&:active:hover': { backgroundColor: themeVars.toolbar.toggleButtonOnBackground },
   },
 } as const
 
@@ -49,12 +41,10 @@ export const ToggleItem = style({
 export const Separator = style({
   width: 1,
   backgroundColor: 'transparent',
-  margin: '0 10px',
+  margin: '0 4px',
   alignSelf: 'stretch',
 })
 
 export const Button = style({
   ...itemStyles,
-  color: 'red',
-  backgroundColor: 'white',
 })

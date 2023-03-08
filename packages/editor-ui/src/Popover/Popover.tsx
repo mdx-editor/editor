@@ -11,14 +11,16 @@ interface PopoverProps {
 
 export const Popover = ({ children, open, selection, popoverContentProps }: PopoverProps) => (
   <RadixPopover.Root open={open}>
-    <PopoverAnchor
-      style={{
-        top: selection?.top,
-        left: selection?.left,
-        width: selection?.width,
-        height: selection?.height,
-      }}
-    />
+    {open && (
+      <PopoverAnchor
+        style={{
+          top: selection?.top,
+          left: selection?.left,
+          width: selection?.width,
+          height: selection?.height,
+        }}
+      />
+    )}
     <RadixPopover.Portal>
       <PopoverContent onOpenAutoFocus={(e) => e.preventDefault()} sideOffset={5} side="top" {...popoverContentProps}>
         {children}

@@ -45,9 +45,8 @@ export const Anchor = style({
   position: 'absolute',
   backgroundColor: 'Highlight',
   zIndex: '-1',
-  borderRadius: '4px',
   padding: '1px',
-  transform: 'translateX(-1px)',
+  visibility: 'hidden',
 })
 
 // TODO: unused

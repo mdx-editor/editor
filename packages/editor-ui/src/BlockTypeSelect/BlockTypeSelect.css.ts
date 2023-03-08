@@ -1,28 +1,22 @@
 import { style } from '@vanilla-extract/css'
-
-const systemFont =
-  '-apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Cantarell, Ubuntu, roboto, noto, arial, sans-serif'
+import { themeVars } from '../theme.css'
 
 export const SelectTrigger = style({
   all: 'unset',
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'flex-start',
-  borderRadius: 4,
-  padding: '0 15px',
-  fontSize: 13,
-  lineHeight: 1,
-  height: 35,
+  padding: '8px',
   gap: 5,
-  backgroundColor: 'white',
-  color: 'black',
   minWidth: 130,
-  ':hover': { backgroundColor: 'gray' },
-  ':focus': {},
+  ':hover': { backgroundImage: themeVars.backgroundHover },
+  ':focus': {
+    outline: `2px solid ${themeVars.colors.border}`,
+  },
   selectors: {
     '&[data-placeholder]': { color: 'red' },
   },
-  fontFamily: systemFont,
+  fontFamily: themeVars.font,
 })
 
 export const SelectIcon = style({
@@ -32,14 +26,14 @@ export const SelectIcon = style({
 
 export const SelectContent = style({
   overflow: 'hidden',
-  backgroundColor: 'white',
-  borderRadius: 6,
-  boxShadow: '0px 10px 38px -10px rgba(22, 23, 24, 0.35), 0px 10px 20px -15px rgba(22, 23, 24, 0.2)',
-  fontFamily: systemFont,
+  fontFamily: themeVars.font,
+  backgroundColor: themeVars.colors.background,
+  border: `2px solid ${themeVars.colors.border}`,
 })
 
 export const SelectViewport = style({
   padding: 0,
+  backgroundColor: themeVars.colors.background,
 })
 
 export const SelectItem = style({
