@@ -1,7 +1,10 @@
 import React from 'react'
 import * as Select from '@radix-ui/react-select'
-import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from '@radix-ui/react-icons'
+import { ReactComponent as DropDownIcon } from '../icons/arrow_drop_down.svg'
+import { ReactComponent as SelectedIcon } from '../icons/check_small.svg'
+import { ChevronDownIcon, ChevronUpIcon } from '@radix-ui/react-icons'
 import * as styles from './BlockTypeSelect.css'
+import { themeClassName } from '../theme.css'
 
 export type BlockType = 'paragraph' | 'code' | 'quote' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
 export interface BLockTypeSelectProps {
@@ -14,11 +17,11 @@ export const BlockTypeSelect = ({ value, onValueChange }: BLockTypeSelectProps) 
     <Select.Trigger aria-label="Block type" className={styles.SelectTrigger}>
       <Select.Value placeholder="Block type" />
       <Select.Icon className={styles.SelectIcon}>
-        <ChevronDownIcon />
+        <DropDownIcon />
       </Select.Icon>
     </Select.Trigger>
-    <Select.Portal>
-      <Select.Content className={styles.SelectContent}>
+    <Select.Portal className={themeClassName}>
+      <Select.Content className={`${styles.SelectContent}`}>
         <Select.ScrollUpButton className={styles.SelectScrollUpButton}>
           <ChevronUpIcon />
         </Select.ScrollUpButton>
@@ -48,7 +51,7 @@ const SelectItem = React.forwardRef<HTMLDivElement | null, { children: React.Rea
       <Select.Item {...props} ref={forwardedRef} className={styles.SelectItem}>
         <Select.ItemText>{children}</Select.ItemText>
         <Select.ItemIndicator className={styles.ItemIndicator}>
-          <CheckIcon />
+          <SelectedIcon />
         </Select.ItemIndicator>
       </Select.Item>
     )

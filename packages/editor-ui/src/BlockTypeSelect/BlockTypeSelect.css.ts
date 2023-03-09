@@ -9,9 +9,8 @@ export const SelectTrigger = style({
   padding: '8px',
   gap: 5,
   minWidth: 130,
-  ':hover': { backgroundImage: themeVars.backgroundHover },
   ':focus': {
-    outline: `2px solid ${themeVars.colors.border}`,
+    // outline: `2px solid ${themeVars.colors.border}`,
   },
   selectors: {
     '&[data-placeholder]': { color: 'red' },
@@ -22,6 +21,9 @@ export const SelectTrigger = style({
 export const SelectIcon = style({
   color: 'black',
   marginInlineStart: 'auto',
+  selectors: {
+    [`${SelectTrigger}:hover &`]: { backgroundImage: themeVars.backgroundHover },
+  },
 })
 
 export const SelectContent = style({
@@ -32,18 +34,13 @@ export const SelectContent = style({
 })
 
 export const SelectViewport = style({
-  padding: 0,
-  backgroundColor: themeVars.colors.background,
+  padding: themeVars.sizing.containerPadding,
 })
 
 export const SelectItem = style({
-  fontSize: 13,
-  lineHeight: 1,
-  color: 'black',
-  borderRadius: 3,
   display: 'flex',
   alignItems: 'center',
-  height: 25,
+  height: 30,
   padding: '0 35px 0 25px',
   position: 'relative',
   userSelect: 'none',
@@ -55,8 +52,7 @@ export const SelectItem = style({
     },
     '&[data-highlighted]': {
       outline: 'none',
-      backgroundColor: 'gray',
-      color: 'white',
+      backgroundColor: themeVars.colors.selectedBackground,
     },
   },
 })

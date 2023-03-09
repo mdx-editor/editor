@@ -10,6 +10,7 @@ export const [themeClassName, themeVars] = createTokenizedTheme({
     accent: sky.sky9,
     glow: makeHslTransparent(sky.sky9, 0.8),
     transitionStartGlow: makeHslTransparent(sky.sky9, 0.2),
+    selectedBackground: '$colors.glow',
   },
   sizing: {
     borderRadius: '4px',
