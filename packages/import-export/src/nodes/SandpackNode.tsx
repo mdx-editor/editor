@@ -1,6 +1,6 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import React, { useContext } from 'react'
-import { SandpackCodeEditor, SandpackLayout, SandpackPreview, SandpackProvider, useActiveCode } from '@codesandbox/sandpack-react'
+import { SandpackCodeEditor, SandpackLayout, SandpackPreview, SandpackProvider, useSandpack } from '@codesandbox/sandpack-react'
 import { DecoratorNode, EditorConfig, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
 import { parseCodeBlockMeta } from '../parseCodeBlockMeta'
 
@@ -63,9 +63,14 @@ const DefaultSandpackConfig: SandpackConfig = {
 
 export const SandpackConfigContext = React.createContext<SandpackConfig>(DefaultSandpackConfig)
 
-const CodeUpdateEmitter = ({ onChange }: { onChange: (code: string) => void }) => {
-  const { code } = useActiveCode()
-  onChange(code)
+interface CodeUpdateEmitterProps {
+  snippetFileName: string
+  onChange: (code: string) => void
+}
+
+const CodeUpdateEmitter = ({ onChange, snippetFileName }: CodeUpdateEmitterProps) => {
+  const { sandpack } = useSandpack()
+  onChange(sandpack.files[snippetFileName].code)
   return null
 }
 
@@ -94,7 +99,10 @@ const CodeEditor = ({ code, meta, onChange }: CodeEditorProps) => {
       theme={preset.sandpackTheme}
       files={{
         [preset.snippetFileName]: code,
-        ...preset.files,
+        ...Object.entries(preset.files || {}).reduce(
+          (acc, [filePath, fileContents]) => ({ ...acc, ...{ [filePath]: { code: fileContents, readOnly: true } } }),
+          {}
+        ),
       }}
       customSetup={{
         dependencies: preset.dependencies,
@@ -104,7 +112,7 @@ const CodeEditor = ({ code, meta, onChange }: CodeEditorProps) => {
         <SandpackCodeEditor showLineNumbers showInlineErrors />
         <SandpackPreview />
       </SandpackLayout>
-      <CodeUpdateEmitter onChange={wrappedOnChange} />
+      <CodeUpdateEmitter onChange={wrappedOnChange} snippetFileName={preset.snippetFileName} />
     </SandpackProvider>
   )
 }

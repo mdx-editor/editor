@@ -30,6 +30,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@ngneat/falso": "^6.4.0",
     "@vanilla-extract/vite-plugin": "^3.8.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"

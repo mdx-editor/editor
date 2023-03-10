@@ -204,6 +204,7 @@ importers:
       '@lexical/rich-text': ^0.8.0
       '@lexical/selection': ^0.8.0
       '@lexical/utils': ^0.8.0
+      '@ngneat/falso': ^6.4.0
       '@radix-ui/react-popover': ^1.0.3
       '@radix-ui/react-popper': ^1.1.0
       '@vanilla-extract/css': ^1.9.5
@@ -231,6 +232,7 @@ importers:
       '@virtuoso.dev/lexical-mdx-import-export': link:../import-export
       lexical: 0.8.0
     devDependencies:
+      '@ngneat/falso': 6.4.0
       '@vanilla-extract/vite-plugin': 3.8.0
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
@@ -3216,6 +3218,13 @@ packages:
 
   /@microsoft/tsdoc/0.14.2:
     resolution: {integrity: sha512-9b8mPpKrfeGRuhFH5iO1iwCLeIIsV6+H1sRfxbkoGXIyQE2BTsPd9zqSqQJ+pv5sJ/hT5M1zvOFL02MnEezFug==}
+    dev: true
+
+  /@ngneat/falso/6.4.0:
+    resolution: {integrity: sha512-f6r036h2fX/AoHw1eV2t8+qWQwrbSrozs3zXMhhwoO7SJBc+DGMxRWEhFeYIinfwx0uhUH8ggx5+PDLzYESLOA==}
+    dependencies:
+      seedrandom: 3.0.5
+      uuid: 8.3.2
     dev: true
 
   /@nodelib/fs.scandir/2.1.5:
@@ -10704,6 +10713,10 @@ packages:
     resolution: {integrity: sha512-CtuThmgHNg7zIZWAXi3AsyIzA3n4xx7aNyjwC2VJldO2LMVDhFK+63xGqq6CsJH4rTAt6/M+N4GhZiDYPx9eUw==}
     dependencies:
       loose-envify: 1.4.0
+
+  /seedrandom/3.0.5:
+    resolution: {integrity: sha512-8OwmbklUNzwezjGInmZ+2clQmExQPvomqjL7LFqOYqtmuxRgQYqOD3mHaU+MvZn5FLUeVxVfQjwLZW/n/JFuqg==}
+    dev: true
 
   /semver/5.7.1:
     resolution: {integrity: sha512-sauaDf/PZdVgrLTNYHRtpXa1iRiKcaebiKQ1BJdpQlWH2lCvexQdX55snPFyK7QzpudqbCI0qXFfOasHdyNDGQ==}

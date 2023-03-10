@@ -20,7 +20,7 @@
           }
         }
       ],
-      "additionalFileSets": [{ "name": "data", "files": { "./data.ts": "./data.ts" } }]
+      "additionalFileSets": [{ "name": "data", "files": { "/data.ts": "./data.ts" } }]
     }
   ]
 }
