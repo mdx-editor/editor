@@ -1,7 +1,8 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import React from 'react'
+import React, { useContext } from 'react'
 import { SandpackCodeEditor, SandpackLayout, SandpackPreview, SandpackProvider, useActiveCode } from '@codesandbox/sandpack-react'
 import { DecoratorNode, EditorConfig, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
+import { parseCodeBlockMeta } from '../parseCodeBlockMeta'
 
 export interface SandpackPayload {
   code: string
@@ -18,6 +19,50 @@ export type SerializedSandpackNode = Spread<
   SerializedLexicalNode
 >
 
+type SandpackProviderProps = React.ComponentProps<typeof SandpackProvider>
+
+export type Dependencies = Record<string, string>
+
+export type DependencySet = {
+  name: string
+  dependencies: Dependencies
+}
+
+export type FileSet = {
+  name: string
+  files: Record<string, string>
+}
+
+export interface SandpackPreset {
+  name: string
+  sandpackTemplate: SandpackProviderProps['template']
+  sandpackTheme: SandpackProviderProps['theme']
+  snippetFileName: string
+  dependencies?: Dependencies
+  files?: Record<string, string>
+  additionalDependencySets?: Array<DependencySet>
+  additionalFileSets?: Array<FileSet>
+}
+
+export interface SandpackConfig {
+  defaultPreset: string
+  presets: Array<SandpackPreset>
+}
+
+const DefaultSandpackConfig: SandpackConfig = {
+  defaultPreset: 'react',
+  presets: [
+    {
+      name: 'react',
+      sandpackTemplate: 'react',
+      sandpackTheme: 'light',
+      snippetFileName: '/App.js',
+    },
+  ],
+}
+
+export const SandpackConfigContext = React.createContext<SandpackConfig>(DefaultSandpackConfig)
+
 const CodeUpdateEmitter = ({ onChange }: { onChange: (code: string) => void }) => {
   const { code } = useActiveCode()
   onChange(code)
@@ -26,6 +71,13 @@ const CodeUpdateEmitter = ({ onChange }: { onChange: (code: string) => void }) =
 
 const CodeEditor = ({ code, meta, onChange }: CodeEditorProps) => {
   const [editor] = useLexicalComposerContext()
+  const config = useContext(SandpackConfigContext)
+  const metaObj = parseCodeBlockMeta(meta)
+  const presetName = metaObj.preset || config.defaultPreset
+  const preset = config.presets.find((p) => p.name === presetName)
+  if (!preset) {
+    throw new Error(`Unknown preset: ${presetName}`)
+  }
 
   const wrappedOnChange = React.useCallback(
     (code: string) => {
@@ -38,9 +90,14 @@ const CodeEditor = ({ code, meta, onChange }: CodeEditorProps) => {
 
   return (
     <SandpackProvider
-      template="react"
+      template={preset.sandpackTemplate}
+      theme={preset.sandpackTheme}
       files={{
-        '/App.js': code,
+        [preset.snippetFileName]: code,
+        ...preset.files,
+      }}
+      customSetup={{
+        dependencies: preset.dependencies,
       }}
     >
       <SandpackLayout>

@@ -1,25 +1,26 @@
 {
   "defaultPreset": "react-virtuoso",
-  "presets": {
-    "name": "react-virtuoso",
-    "sandpackTemplate": "react-tsx",
-    "sandpackTheme": "dracula",
-    "snippetFileName": "/App.tsx",
-    "dependencies": {
+  "presets": [
+    {
+      "name": "react-virtuoso",
+      "sandpackTemplate": "react-tsx",
+      "sandpackTheme": "dracula",
+      "snippetFileName": "/App.tsx",
+      "dependencies": {
         "react": "latest",
         "react-dom": "latest",
         "react-virtuoso": "latest"
-    },
-    "additionalDependencySets": {
-      "emotion": {
-        "@emotion/styled": "latest",
-        "@emotion/react": "latest"
-      }
-    }, 
-    "additionalFiles": {
-      "data": {
-        "./data.ts": "./data.ts"
-      }
+      },
+      "additionalDependencySets": [
+        {
+          "name": "emotion",
+          "dependencies": {
+            "@emotion/styled": "latest",
+            "@emotion/react": "latest"
+          }
+        }
+      ],
+      "additionalFileSets": [{ "name": "data", "files": { "./data.ts": "./data.ts" } }]
     }
-  }
+  ]
 }
