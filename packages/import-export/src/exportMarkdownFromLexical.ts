@@ -23,6 +23,7 @@ import { $isSandpackNode, SandpackNode } from './nodes/SandpackNode'
 import { MdastNode } from './types'
 import { frontmatterToMarkdown } from 'mdast-util-frontmatter'
 import { directiveToMarkdown } from 'mdast-util-directive'
+import { $isCodeNode, CodeNode } from '@lexical/code'
 export type { Options as ToMarkdownOptions } from 'mdast-util-to-markdown'
 
 export interface LexicalVisitActions<T extends LexicalNode> {
@@ -125,11 +126,21 @@ export const LexicalQuoteVisitor: LexicalExportVisitor<QuoteNode, Mdast.Blockquo
   },
 }
 
-export const LexicalCodeVisitor: LexicalExportVisitor<SandpackNode, Mdast.Code> = {
+export const SandpackNodeVisitor: LexicalExportVisitor<SandpackNode, Mdast.Code> = {
   testLexicalNode: $isSandpackNode,
   visitLexicalNode: ({ lexicalNode, actions }) => {
     actions.addAndStepInto('code', {
       value: lexicalNode.getCode(),
+    })
+  },
+}
+
+export const LexicalCodeVisitor: LexicalExportVisitor<CodeNode, Mdast.Code> = {
+  testLexicalNode: $isCodeNode,
+  visitLexicalNode: ({ lexicalNode, actions }) => {
+    actions.addAndStepInto('code', {
+      lang: lexicalNode.getLanguage(),
+      value: lexicalNode.getTextContent(),
     })
   },
 }
@@ -252,6 +263,7 @@ export const LexicalVisitors = [
   LexicalListVisitor,
   LexicalListItemVisitor,
   LexicalQuoteVisitor,
+  SandpackNodeVisitor,
   LexicalCodeVisitor,
   LexicalThematicBreakVisitor,
   LexicalImageVisitor,

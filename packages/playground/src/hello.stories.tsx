@@ -102,7 +102,7 @@ function convertLexicalStateToMarkdown(state: EditorState) {
   })
 }
 
-function MarkdownResult() {
+function MarkdownResult({ initialCode }: { initialCode: string }) {
   const [editor] = useLexicalComposerContext()
   const [outMarkdown, setOutMarkdown] = useState('')
   useEffect(() => {
@@ -135,7 +135,7 @@ function MarkdownResult() {
         <div style={{ flex: 1 }}>
           <h3>Initial markdown</h3>
           <code>
-            <pre>{initialMarkdown.trim()}</pre>
+            <pre>{initialCode.trim()}</pre>
           </code>
         </div>
       </div>
@@ -166,7 +166,49 @@ export function BasicEditor() {
       <TabIndentationPlugin />
       <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
       <HistoryPlugin />
-      <MarkdownResult />
+      <MarkdownResult initialCode={initialMarkdown} />
+    </LexicalComposer>
+  )
+}
+
+const codeBlocksMarkdown = `
+Block of code:
+
+\`\`\`js
+export default function App() {
+  return <h1>Hello world from a markdown</h1>
+}
+\`\`\`
+
+Sandpack:
+
+\`\`\`tsx live 
+export default function App() {
+  return <h1>Hello world from a markdown</h1>
+}
+\`\`\`
+`
+
+export function CodeBlocks() {
+  const initialConfig = {
+    editorState: () => {
+      importMarkdownToLexical($getRoot(), codeBlocksMarkdown)
+    },
+    namespace: 'MyEditor',
+    theme,
+    nodes: UsedLexicalNodes,
+    onError,
+  }
+
+  return (
+    <LexicalComposer initialConfig={initialConfig}>
+      <RichTextPlugin contentEditable={<ContentEditable />} placeholder={<div></div>} ErrorBoundary={LexicalErrorBoundary} />
+      <LexicalLinkPlugin />
+      <ListPlugin />
+      <TabIndentationPlugin />
+      <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
+      <HistoryPlugin />
+      <MarkdownResult initialCode={codeBlocksMarkdown} />
     </LexicalComposer>
   )
 }

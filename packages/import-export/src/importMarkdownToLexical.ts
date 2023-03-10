@@ -16,7 +16,7 @@ import { $createFrontmatterNode, FrontmatterNode } from './nodes/FrontmatterNode
 import { $createImageNode, ImageNode } from './nodes/ImageNode'
 import { $createSandpackNode, SandpackNode } from './nodes/SandpackNode'
 import { MdastNode } from './types'
-import { CodeNode } from '@lexical/code'
+import { $createCodeNode, CodeNode } from '@lexical/code'
 
 export interface MdastVisitActions {
   visitChildren(node: Mdast.Parent, lexicalParent: LexicalNode): void
@@ -130,7 +130,11 @@ export const MdastInlineCodeVisitor: MdastImportVisitor<Mdast.InlineCode> = {
 export const MdastCodeVisitor: MdastImportVisitor<Mdast.Code> = {
   testNode: 'code',
   visitNode({ mdastNode, actions }) {
-    actions.addAndStepInto($createSandpackNode({ code: mdastNode.value }))
+    if (mdastNode.meta?.startsWith('live')) {
+      actions.addAndStepInto($createSandpackNode({ code: mdastNode.value, meta: mdastNode.meta }))
+    } else {
+      actions.addAndStepInto($createCodeNode(mdastNode.lang).append($createTextNode(mdastNode.value)))
+    }
   },
 }
 
