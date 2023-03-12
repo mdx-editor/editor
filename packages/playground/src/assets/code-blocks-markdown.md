@@ -1,4 +1,4 @@
-Block of code:
+## Block of code:
 
 ```js
 export default function App() {
@@ -6,7 +6,23 @@ export default function App() {
 }
 ```
 
-Virtuoso Sandpack:
+----
+
+```css
+body {
+    color: red;
+}
+```
+
+## React sandpack:
+
+```tsx live 
+export default function App() {
+  return <h1>Hello world from a markdown</h1>
+}
+```
+
+## Virtuoso Sandpack:
 
 ```tsx live preset=virtuoso
 import { Virtuoso } from 'react-virtuoso'
@@ -33,8 +49,3 @@ export default function App() {
 }
 ```
 
-```tsx live 
-export default function App() {
-  return <h1>Hello world from a markdown</h1>
-}
-```

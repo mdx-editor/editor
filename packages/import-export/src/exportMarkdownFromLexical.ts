@@ -24,6 +24,7 @@ import { MdastNode } from './types'
 import { frontmatterToMarkdown } from 'mdast-util-frontmatter'
 import { directiveToMarkdown } from 'mdast-util-directive'
 import { $isCodeNode, CodeNode } from '@lexical/code'
+import { $isCodeBlockNode, CodeBlockNode } from './nodes/CodeBlockNode'
 export type { Options as ToMarkdownOptions } from 'mdast-util-to-markdown'
 
 export interface LexicalVisitActions<T extends LexicalNode> {
@@ -131,16 +132,17 @@ export const SandpackNodeVisitor: LexicalExportVisitor<SandpackNode, Mdast.Code>
   visitLexicalNode: ({ lexicalNode, actions }) => {
     actions.addAndStepInto('code', {
       value: lexicalNode.getCode(),
+      meta: lexicalNode.getMeta(),
     })
   },
 }
 
-export const LexicalCodeVisitor: LexicalExportVisitor<CodeNode, Mdast.Code> = {
-  testLexicalNode: $isCodeNode,
+export const CodeBlockVisitor: LexicalExportVisitor<CodeBlockNode, Mdast.Code> = {
+  testLexicalNode: $isCodeBlockNode,
   visitLexicalNode: ({ lexicalNode, actions }) => {
     actions.addAndStepInto('code', {
       lang: lexicalNode.getLanguage(),
-      value: lexicalNode.getTextContent(),
+      value: lexicalNode.getCode(),
     })
   },
 }
@@ -264,7 +266,7 @@ export const LexicalVisitors = [
   LexicalListItemVisitor,
   LexicalQuoteVisitor,
   SandpackNodeVisitor,
-  LexicalCodeVisitor,
+  CodeBlockVisitor,
   LexicalThematicBreakVisitor,
   LexicalImageVisitor,
 ]

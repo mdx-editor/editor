@@ -15,6 +15,7 @@ import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from './FormatConstants'
 import { $createFrontmatterNode, FrontmatterNode } from './nodes/FrontmatterNode'
 import { $createImageNode, ImageNode } from './nodes/ImageNode'
 import { $createSandpackNode, SandpackNode } from './nodes/SandpackNode'
+import { $createCodeBlockNode, CodeBlockNode } from './nodes/CodeBlockNode'
 import { MdastNode } from './types'
 import { $createCodeNode, CodeNode } from '@lexical/code'
 
@@ -133,7 +134,7 @@ export const MdastCodeVisitor: MdastImportVisitor<Mdast.Code> = {
     if (mdastNode.meta?.startsWith('live')) {
       actions.addAndStepInto($createSandpackNode({ code: mdastNode.value, meta: mdastNode.meta }))
     } else {
-      actions.addAndStepInto($createCodeNode(mdastNode.lang).append($createTextNode(mdastNode.value)))
+      actions.addAndStepInto($createCodeBlockNode({ code: mdastNode.value, language: mdastNode.lang || '' }))
     }
   },
 }
@@ -265,5 +266,6 @@ export const UsedLexicalNodes = [
   ImageNode,
   SandpackNode,
   CodeNode,
+  CodeBlockNode,
   FrontmatterNode,
 ]

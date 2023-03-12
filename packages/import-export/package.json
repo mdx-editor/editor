@@ -64,7 +64,7 @@
     "react-dom": "^18.2.0"
   },
   "dependencies": {
-    "@codesandbox/sandpack-react": "^2.0.10",
+    "@codesandbox/sandpack-react": "^2.1.2",
     "@types/js-yaml": "4.0.5",
     "@types/mdast": "3.0.10",
     "js-yaml": "4.1.0",
