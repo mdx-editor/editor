@@ -28,7 +28,6 @@
     "@babel/plugin-transform-typescript": "^7.20.13",
     "@babel/preset-react": "^7.18.6",
     "@babel/preset-typescript": "^7.18.6",
-    "@microsoft/api-extractor": "^7.34.4",
     "@types/node": "^18.13.0",
     "@types/react": "^18.0.27",
     "@types/react-dom": "^18.0.10",
@@ -55,7 +54,7 @@
     "terser": "^5.16.3",
     "typescript": "5.0.0-beta",
     "vite": "^4.1.1",
-    "vite-plugin-dts": "^1.7.2",
+    "vite-plugin-dts": "^2.1.0",
     "vite-plugin-svgr": "^2.4.0",
     "vitest": "^0.28.4"
   }

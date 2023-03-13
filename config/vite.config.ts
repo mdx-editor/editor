@@ -29,7 +29,12 @@ export default defineConfig({
     react({
       jsxRuntime: 'classic',
     }),
-    dts(),
+    dts({
+      rollupTypes: true,
+      compilerOptions: {
+        skipLibCheck: true,
+      },
+    }),
     vanillaExtractPlugin(),
     svgr(),
   ],

@@ -17,9 +17,8 @@
   "scripts": {
     "prepack": "cp ../../README.md ../../LICENSE .",
     "postpack": "rm README.md LICENSE",
-    "build": "vite -c ../../config/vite.config.ts build && pnpm run dts:bundle",
+    "build": "vite -c ../../config/vite.config.ts build",
     "start": "vite -c ../../config/vite.config.ts build -w",
-    "dts:bundle": "../../scripts/npm/bundle-types.sh",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext .ts,.tsx",
     "test": "vitest -c ../../config/vite.config.ts"

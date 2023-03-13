@@ -17,7 +17,6 @@ import {
   $getSelection,
   $isRangeSelection,
   $isRootOrShadowRoot,
-  BLUR_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
   FORMAT_TEXT_COMMAND,
   LexicalCommand,
@@ -194,7 +193,7 @@ export const ToolbarPlugin = () => {
   )
 
   if (isCodeBlockOnFocus) {
-    return <div>You're in a code block.</div>
+    return <div>You are in a code block.</div>
   }
 
   return (

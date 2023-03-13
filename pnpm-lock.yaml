@@ -36,7 +36,7 @@ importers:
       terser: ^5.16.3
       typescript: 5.0.0-beta
       vite: ^4.1.1
-      vite-plugin-dts: ^1.7.2
+      vite-plugin-dts: ^2.1.0
       vite-plugin-svgr: ^2.4.0
       vitest: ^0.28.4
     devDependencies:
@@ -72,7 +72,7 @@ importers:
       terser: 5.16.3
       typescript: 5.0.0-beta
       vite: 4.1.1_d7kjmwg5lyp5bmymljws654d5q
-      vite-plugin-dts: 1.7.2_rgy4fnry75xg7rw6lgswyd3x2m
+      vite-plugin-dts: 2.1.0_rgy4fnry75xg7rw6lgswyd3x2m
       vite-plugin-svgr: 2.4.0_vite@4.1.1
       vitest: 0.28.4_jsdom@21.1.0+terser@5.16.3
 
@@ -515,6 +515,14 @@ packages:
     hasBin: true
     dependencies:
       '@babel/types': 7.20.7
+
+  /@babel/parser/7.21.2:
+    resolution: {integrity: sha512-URpaIJQwEkEC2T9Kn+Ai6Xe/02iNaVCuT/PtoRz3GPVJVDpPd7mLo+VddTbhCRU9TXqW5mSrQfXZyi8kDKOVpQ==}
+    engines: {node: '>=6.0.0'}
+    hasBin: true
+    dependencies:
+      '@babel/types': 7.21.2
+    dev: true
 
   /@babel/plugin-bugfix-safari-id-destructuring-collision-in-function-expression/7.18.6_@babel+core@7.20.12:
     resolution: {integrity: sha512-Dgxsyg54Fx1d4Nge8UnvTrED63vrwOdPmyvPzlNN/boaliRP54pm3pGzZD1SJUwrBA+Cs/xdG8kXX6Mn/RfISQ==}
@@ -1480,6 +1488,15 @@ packages:
       '@babel/helper-string-parser': 7.19.4
       '@babel/helper-validator-identifier': 7.19.1
       to-fast-properties: 2.0.0
+
+  /@babel/types/7.21.2:
+    resolution: {integrity: sha512-3wRZSs7jiFaB8AjxiiD+VqN5DTG2iRvJGQ+qYFrs/654lg6kGTQWIOFjlBo5RaXuAZjBmP3+OQH4dmhqiiyYxw==}
+    engines: {node: '>=6.9.0'}
+    dependencies:
+      '@babel/helper-string-parser': 7.19.4
+      '@babel/helper-validator-identifier': 7.19.1
+      to-fast-properties: 2.0.0
+    dev: true
 
   /@code-hike/classer/0.0.0-e48fa74_react@18.2.0:
     resolution: {integrity: sha512-CyPYvfl4K5Hp9uyhLhUemul56eiGOF0FNXh5ALzzK9VNhRmRmj1O0mKtLDpoccI8W90r9kQES/nW2FC8jVVieg==}
@@ -4139,7 +4156,7 @@ packages:
     resolution: {integrity: sha512-1hnUxxjd83EAxbL4a0JDJoD3Dao3hmjvyvyEV8PzWmLK3B9m9NPlW7GKjFyoWE8nM7HnXzPcmmSyOW8yOddSXw==}
     engines: {node: '>=10'}
     dependencies:
-      '@babel/types': 7.20.7
+      '@babel/types': 7.21.2
       entities: 4.4.0
     dev: true
 
@@ -8172,6 +8189,13 @@ packages:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.4.14
 
+  /magic-string/0.29.0:
+    resolution: {integrity: sha512-WcfidHrDjMY+eLjlU+8OvwREqHwpgCeKVBUpQ3OhYYuvfaYCUgcbuBzappNzZvg/v8onU3oQj+BYpkOJe9Iw4Q==}
+    engines: {node: '>=12'}
+    dependencies:
+      '@jridgewell/sourcemap-codec': 1.4.14
+    dev: true
+
   /make-dir/2.1.0:
     resolution: {integrity: sha512-LS9X+dc8KLxXCb8dni79fLIIUA5VyZoyjSMCwTluaXA0o27cCK0bhXkpgw+sTXVpPy/lSO57ilRixqk0vDmtRA==}
     engines: {node: '>=6'}
@@ -11592,12 +11616,13 @@ packages:
       - terser
     dev: true
 
-  /vite-plugin-dts/1.7.2_rgy4fnry75xg7rw6lgswyd3x2m:
-    resolution: {integrity: sha512-55Jwfv6n8gAlRSVGCpIY13TCqadtaKex9d2mCbaSxMFAU06suMDsFhIch1x55eptpC2RpeiresqbTjhN2HSEtQ==}
+  /vite-plugin-dts/2.1.0_rgy4fnry75xg7rw6lgswyd3x2m:
+    resolution: {integrity: sha512-Vw0FdCuM3VLR4hTFHh0yMEzfwI7NyFvPIMFwvE+Q0t4qtoHIfYOP/JXs7nTnHuQk87FSjlhGeIJ1fLBcktgPgA==}
     engines: {node: ^14.18.0 || >=16.0.0}
     peerDependencies:
       vite: '>=2.9.0'
     dependencies:
+      '@babel/parser': 7.21.2
       '@microsoft/api-extractor': 7.34.4_@types+node@18.13.0
       '@rollup/pluginutils': 5.0.2
       '@rushstack/node-core-library': 3.55.2_@types+node@18.13.0
@@ -11605,6 +11630,7 @@ packages:
       fast-glob: 3.2.12
       fs-extra: 10.1.0
       kolorist: 1.7.0
+      magic-string: 0.29.0
       ts-morph: 17.0.1
       vite: 4.1.1_d7kjmwg5lyp5bmymljws654d5q
     transitivePeerDependencies:
