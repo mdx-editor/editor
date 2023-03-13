@@ -1,4 +1,4 @@
-import { $setBlocksType_experimental } from '@lexical/selection'
+import { $setBlocksType } from '@lexical/selection'
 import { $createParagraphNode, $getSelection, $isRangeSelection, DEPRECATED_$isGridSelection, LexicalEditor } from 'lexical'
 import { $createHeadingNode, $createQuoteNode, HeadingTagType } from '@lexical/rich-text'
 import { $createCodeNode } from '@lexical/code'
@@ -6,8 +6,7 @@ import { $createCodeNode } from '@lexical/code'
 export const formatParagraph = (editor: LexicalEditor) => {
   editor.update(() => {
     const selection = $getSelection()
-    if ($isRangeSelection(selection) || DEPRECATED_$isGridSelection(selection))
-      $setBlocksType_experimental(selection, () => $createParagraphNode())
+    if ($isRangeSelection(selection) || DEPRECATED_$isGridSelection(selection)) $setBlocksType(selection, () => $createParagraphNode())
   })
 }
 
@@ -15,7 +14,7 @@ export const formatHeading = (editor: LexicalEditor, headingType: HeadingTagType
   editor.update(() => {
     const selection = $getSelection()
     if ($isRangeSelection(selection) || DEPRECATED_$isGridSelection(selection)) {
-      $setBlocksType_experimental(selection, () => $createHeadingNode(headingType))
+      $setBlocksType(selection, () => $createHeadingNode(headingType))
     }
   })
 }
@@ -24,7 +23,7 @@ export const formatQuote = (editor: LexicalEditor) => {
   editor.update(() => {
     const selection = $getSelection()
     if ($isRangeSelection(selection) || DEPRECATED_$isGridSelection(selection)) {
-      $setBlocksType_experimental(selection, () => $createQuoteNode())
+      $setBlocksType(selection, () => $createQuoteNode())
     }
   })
 }
@@ -35,7 +34,7 @@ export const formatCode = (editor: LexicalEditor) => {
 
     if ($isRangeSelection(selection) || DEPRECATED_$isGridSelection(selection)) {
       if (selection.isCollapsed()) {
-        $setBlocksType_experimental(selection, () => $createCodeNode())
+        $setBlocksType(selection, () => $createCodeNode())
       } else {
         const textContent = selection.getTextContent()
         const codeNode = $createCodeNode()

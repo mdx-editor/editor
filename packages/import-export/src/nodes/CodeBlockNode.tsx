@@ -1,8 +1,18 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import React, { useEffect } from 'react'
-import { CodeEditor as TheEditorFromSandpack, SandpackPreview, SandpackProvider } from '@codesandbox/sandpack-react'
-import { DecoratorNode, EditorConfig, LexicalNode, NodeKey, SerializedLexicalNode, Spread, createCommand } from 'lexical'
+import { CodeEditor as TheEditorFromSandpack, SandpackProvider } from '@codesandbox/sandpack-react'
+import {
+  COMMAND_PRIORITY_CRITICAL,
+  DecoratorNode,
+  EditorConfig,
+  LexicalNode,
+  NodeKey,
+  SerializedLexicalNode,
+  Spread,
+  createCommand,
+} from 'lexical'
 import { CodeMirrorRef } from '@codesandbox/sandpack-react/dist/types/components/CodeEditor/CodeMirror'
+import { mergeRegister } from '@lexical/utils'
 
 export interface CodeBlockPayload {
   code: string
@@ -26,32 +36,25 @@ interface CodeEditorProps {
   onLanguageChange: (language: string) => void
 }
 
-export const CODE_BLOCK_FOCUS_COMMAND = createCommand<boolean>('CODE_BLOCK_FOCUS')
+export const CODE_BLOCK_ACTIVE_COMMAND = createCommand<{ language: string } | null>('CODE_BLOCK_ACTIVE')
+export const SET_CODE_BLOCK_LANGUAGE_COMMAND = createCommand<string>('SET_CODE_BLOCK_LANGUAGE')
 
 const CodeEditor = ({ code, language, onChange, onLanguageChange }: CodeEditorProps) => {
   const [editor] = useLexicalComposerContext()
   const codeMirrorRef = React.useRef<CodeMirrorRef>(null)
-  const [isFocused, setIsFocused] = React.useState(false)
+  console.log({ language })
 
   const onFocusHandler = React.useCallback(() => {
-    setIsFocused(true)
-    editor.dispatchCommand(CODE_BLOCK_FOCUS_COMMAND, true)
-  }, [editor])
-
-  const onBlurHandler = React.useCallback(() => {
-    setIsFocused(false)
-    editor.dispatchCommand(CODE_BLOCK_FOCUS_COMMAND, false)
-  }, [editor])
+    editor.dispatchCommand(CODE_BLOCK_ACTIVE_COMMAND, { language })
+  }, [editor, language])
 
   useEffect(() => {
     const cmContentDom = codeMirrorRef.current?.getCodemirror()?.contentDOM
     cmContentDom?.addEventListener('focus', onFocusHandler)
-    cmContentDom?.addEventListener('blur', onBlurHandler)
     return () => {
       cmContentDom?.removeEventListener('focus', onFocusHandler)
-      cmContentDom?.removeEventListener('blur', onBlurHandler)
     }
-  }, [codeMirrorRef, onFocusHandler, onBlurHandler])
+  }, [codeMirrorRef, onFocusHandler, language])
 
   const wrappedOnChange = React.useCallback(
     (code: string) => {
@@ -59,34 +62,35 @@ const CodeEditor = ({ code, language, onChange, onLanguageChange }: CodeEditorPr
         onChange(code)
       })
     },
-    [onChange]
+    [editor, onChange]
   )
 
-  const wrappedOnLanguageChange = React.useCallback(
-    (language: string) => {
-      editor.update(() => {
-        onLanguageChange(language)
-      })
-    },
-    [onChange]
-  )
+  useEffect(() => {
+    console.log('effect ran')
+    return mergeRegister(
+      editor.registerCommand(
+        SET_CODE_BLOCK_LANGUAGE_COMMAND,
+        (newLanguage) => {
+          editor.update(() => {
+            onLanguageChange(newLanguage)
+          })
+          editor.dispatchCommand(CODE_BLOCK_ACTIVE_COMMAND, { language: newLanguage })
+          return true
+        },
+        COMMAND_PRIORITY_CRITICAL
+      )
+    )
+  }, [editor, onLanguageChange])
 
   // the sandpack provider does nothing, but it's required for the sandpack components to work.
-  // force-remount the sandpack provider when the language changes, so that the editor is reloaded
+  // force-remount the editor with the key prop when the language changes, so that the editor is reloaded
   return (
-    <div key={language}>
-      <select value={language} onChange={(e) => wrappedOnLanguageChange(e.target.value)}>
-        <option value="js">JavaScript</option>
-        <option value="jsx">JavaScript (React)</option>
-        <option value="ts">TypeScript</option>
-        <option value="tsx">TypeScript (React)</option>
-        <option value="css">CSS</option>
-      </select>
-
+    <div>
       <SandpackProvider>
         <TheEditorFromSandpack
           initMode="immediate"
           showLineNumbers
+          key={language}
           filePath={`file.${language || 'txt'}`}
           code={code}
           onCodeUpdate={wrappedOnChange}

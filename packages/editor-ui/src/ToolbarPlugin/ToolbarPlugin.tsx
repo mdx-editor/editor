@@ -18,6 +18,8 @@ import {
   $isRangeSelection,
   $isRootOrShadowRoot,
   COMMAND_PRIORITY_CRITICAL,
+  COMMAND_PRIORITY_LOW,
+  FOCUS_COMMAND,
   FORMAT_TEXT_COMMAND,
   LexicalCommand,
   SELECTION_CHANGE_COMMAND,
@@ -34,7 +36,7 @@ import { ReactComponent as NumberedListIcon } from '../icons/format_list_numbere
 import { ReactComponent as CodeIcon } from '../icons/code.svg'
 import { ReactComponent as HorizontalRuleIcon } from '../icons/horizontal_rule.svg'
 import { ReactComponent as LinkIcon } from '../icons/link.svg'
-import { CODE_BLOCK_FOCUS_COMMAND } from '@virtuoso.dev/lexical-mdx-import-export'
+import { CODE_BLOCK_ACTIVE_COMMAND, SET_CODE_BLOCK_LANGUAGE_COMMAND } from '@virtuoso.dev/lexical-mdx-import-export'
 
 // Text node formatting
 export const DEFAULT_FORMAT = 0 as const
@@ -59,7 +61,7 @@ export const ToolbarPlugin = () => {
   const [format, setFormat] = React.useState<number>(DEFAULT_FORMAT)
   const [listType, setListType] = React.useState('' as ListType | '')
   const [blockType, setBlockType] = React.useState('' as BlockType | '')
-  const [isCodeBlockOnFocus, setIsCodeBlockOnFocus] = React.useState(false)
+  const [codeBlockActive, setCodeBlockActive] = React.useState<{ language: string } | null>(null)
 
   const updateToolbar = React.useCallback(() => {
     const selection = $getSelection()
@@ -140,12 +142,22 @@ export const ToolbarPlugin = () => {
         COMMAND_PRIORITY_CRITICAL
       ),
       editor.registerCommand(
-        CODE_BLOCK_FOCUS_COMMAND,
-        (isOnFocus) => {
-          setIsCodeBlockOnFocus(isOnFocus)
+        CODE_BLOCK_ACTIVE_COMMAND,
+        (codeBlockActive) => {
+          console.log('codeBlockActive', codeBlockActive)
+          setCodeBlockActive(codeBlockActive)
           return false
         },
         COMMAND_PRIORITY_CRITICAL
+      ),
+      editor.registerCommand(
+        FOCUS_COMMAND,
+        () => {
+          console.log('codeBlockActive', null)
+          setCodeBlockActive(null)
+          return false
+        },
+        COMMAND_PRIORITY_LOW
       ),
       activeEditor.registerUpdateListener(({ editorState }) => {
         editorState.read(() => {
@@ -192,8 +204,23 @@ export const ToolbarPlugin = () => {
     [activeEditor]
   )
 
-  if (isCodeBlockOnFocus) {
-    return <div>You are in a code block.</div>
+  if (codeBlockActive !== null) {
+    return (
+      <div style={{ height: 64 }}>
+        <select
+          value={codeBlockActive.language}
+          onChange={(e) => {
+            editor.dispatchCommand(SET_CODE_BLOCK_LANGUAGE_COMMAND, e.target.value)
+          }}
+        >
+          <option value="js">JavaScript</option>
+          <option value="jsx">JavaScript (React)</option>
+          <option value="ts">TypeScript</option>
+          <option value="tsx">TypeScript (React)</option>
+          <option value="css">CSS</option>
+        </select>
+      </div>
+    )
   }
 
   return (
