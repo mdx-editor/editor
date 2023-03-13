@@ -1,7 +1,8 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { CodeEditor as TheEditorFromSandpack, SandpackPreview, SandpackProvider } from '@codesandbox/sandpack-react'
-import { DecoratorNode, EditorConfig, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
+import { DecoratorNode, EditorConfig, LexicalNode, NodeKey, SerializedLexicalNode, Spread, createCommand } from 'lexical'
+import { CodeMirrorRef } from '@codesandbox/sandpack-react/dist/types/components/CodeEditor/CodeMirror'
 
 export interface CodeBlockPayload {
   code: string
@@ -25,8 +26,32 @@ interface CodeEditorProps {
   onLanguageChange: (language: string) => void
 }
 
+export const CODE_BLOCK_FOCUS_COMMAND = createCommand<boolean>('CODE_BLOCK_FOCUS')
+
 const CodeEditor = ({ code, language, onChange, onLanguageChange }: CodeEditorProps) => {
   const [editor] = useLexicalComposerContext()
+  const codeMirrorRef = React.useRef<CodeMirrorRef>(null)
+  const [isFocused, setIsFocused] = React.useState(false)
+
+  const onFocusHandler = React.useCallback(() => {
+    setIsFocused(true)
+    editor.dispatchCommand(CODE_BLOCK_FOCUS_COMMAND, true)
+  }, [editor])
+
+  const onBlurHandler = React.useCallback(() => {
+    setIsFocused(false)
+    editor.dispatchCommand(CODE_BLOCK_FOCUS_COMMAND, false)
+  }, [editor])
+
+  useEffect(() => {
+    const cmContentDom = codeMirrorRef.current?.getCodemirror()?.contentDOM
+    cmContentDom?.addEventListener('focus', onFocusHandler)
+    cmContentDom?.addEventListener('blur', onBlurHandler)
+    return () => {
+      cmContentDom?.removeEventListener('focus', onFocusHandler)
+      cmContentDom?.removeEventListener('blur', onBlurHandler)
+    }
+  }, [codeMirrorRef, onFocusHandler, onBlurHandler])
 
   const wrappedOnChange = React.useCallback(
     (code: string) => {
@@ -65,6 +90,7 @@ const CodeEditor = ({ code, language, onChange, onLanguageChange }: CodeEditorPr
           filePath={`file.${language || 'txt'}`}
           code={code}
           onCodeUpdate={wrappedOnChange}
+          ref={codeMirrorRef}
         />
       </SandpackProvider>
     </div>

@@ -17,6 +17,7 @@ import {
   $getSelection,
   $isRangeSelection,
   $isRootOrShadowRoot,
+  BLUR_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
   FORMAT_TEXT_COMMAND,
   LexicalCommand,
@@ -34,6 +35,7 @@ import { ReactComponent as NumberedListIcon } from '../icons/format_list_numbere
 import { ReactComponent as CodeIcon } from '../icons/code.svg'
 import { ReactComponent as HorizontalRuleIcon } from '../icons/horizontal_rule.svg'
 import { ReactComponent as LinkIcon } from '../icons/link.svg'
+import { CODE_BLOCK_FOCUS_COMMAND } from '@virtuoso.dev/lexical-mdx-import-export'
 
 // Text node formatting
 export const DEFAULT_FORMAT = 0 as const
@@ -58,9 +60,11 @@ export const ToolbarPlugin = () => {
   const [format, setFormat] = React.useState<number>(DEFAULT_FORMAT)
   const [listType, setListType] = React.useState('' as ListType | '')
   const [blockType, setBlockType] = React.useState('' as BlockType | '')
+  const [isCodeBlockOnFocus, setIsCodeBlockOnFocus] = React.useState(false)
 
   const updateToolbar = React.useCallback(() => {
     const selection = $getSelection()
+
     if ($isRangeSelection(selection)) {
       const anchorNode = selection.anchor.getNode()
       let element =
@@ -136,6 +140,14 @@ export const ToolbarPlugin = () => {
         },
         COMMAND_PRIORITY_CRITICAL
       ),
+      editor.registerCommand(
+        CODE_BLOCK_FOCUS_COMMAND,
+        (isOnFocus) => {
+          setIsCodeBlockOnFocus(isOnFocus)
+          return false
+        },
+        COMMAND_PRIORITY_CRITICAL
+      ),
       activeEditor.registerUpdateListener(({ editorState }) => {
         editorState.read(() => {
           updateToolbar()
@@ -180,6 +192,10 @@ export const ToolbarPlugin = () => {
     },
     [activeEditor]
   )
+
+  if (isCodeBlockOnFocus) {
+    return <div>You're in a code block.</div>
+  }
 
   return (
     <RadixToolbar.Root className={styles.Root} aria-label="Formatting options">

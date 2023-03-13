@@ -74,6 +74,7 @@
     "@radix-ui/react-select": "^1.2.0",
     "@radix-ui/react-toolbar": "^1.0.2",
     "@radix-ui/react-tooltip": "^1.0.3",
+    "@virtuoso.dev/lexical-mdx-import-export": "workspace:*",
     "mdast-util-from-markdown": "^1.3.0",
     "mdast-util-mdx": "^2.0.1",
     "mdast-util-to-markdown": "^1.5.0",

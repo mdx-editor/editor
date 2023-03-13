@@ -97,6 +97,7 @@ importers:
       '@types/mdast': ^3.0.10
       '@types/react': ^18.0.27
       '@types/unist': ^2.0.6
+      '@virtuoso.dev/lexical-mdx-import-export': workspace:*
       colorcolor: ^3.0.1
       lexical: ^0.8.0
       mdast-util-from-markdown: ^1.3.0
@@ -115,6 +116,7 @@ importers:
       '@radix-ui/react-select': 1.2.0_5ndqzdd6t4rivxsukjv3i3ak2q
       '@radix-ui/react-toolbar': 1.0.2_biqbaboplfbrettd7655fr4n2y
       '@radix-ui/react-tooltip': 1.0.3_5ndqzdd6t4rivxsukjv3i3ak2q
+      '@virtuoso.dev/lexical-mdx-import-export': link:../import-export
       mdast-util-from-markdown: 1.3.0
       mdast-util-mdx: 2.0.1
       mdast-util-to-markdown: 1.5.0

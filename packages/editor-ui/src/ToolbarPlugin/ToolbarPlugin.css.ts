@@ -1,14 +1,17 @@
 import { style } from '@vanilla-extract/css'
-import { themeVars } from '../theme.css'
+import { themeVars, themeClassName } from '../theme.css'
 
-export const Root = style({
-  boxSizing: 'border-box',
-  display: 'flex',
-  padding: themeVars.sizing.containerPadding,
-  width: '100%',
-  minWidth: 'max-content',
-  alignItems: 'center',
-})
+export const Root = style([
+  themeClassName,
+  {
+    boxSizing: 'border-box',
+    display: 'flex',
+    padding: themeVars.sizing.containerPadding,
+    width: '100%',
+    minWidth: 'max-content',
+    alignItems: 'center',
+  },
+])
 
 const itemStyles = {
   all: 'unset',
