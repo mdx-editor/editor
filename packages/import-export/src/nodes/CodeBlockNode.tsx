@@ -1,5 +1,5 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import React, { useEffect } from 'react'
+import React from 'react'
 import { CodeEditor as TheEditorFromSandpack, SandpackProvider } from '@codesandbox/sandpack-react'
 import {
   COMMAND_PRIORITY_CRITICAL,
@@ -32,29 +32,41 @@ export type SerializedCodeBlockNode = Spread<
 interface CodeEditorProps {
   code: string
   language: string
+  nodeKey: string
   onChange: (code: string) => void
   onLanguageChange: (language: string) => void
 }
 
-export const CODE_BLOCK_ACTIVE_COMMAND = createCommand<{ language: string } | null>('CODE_BLOCK_ACTIVE')
-export const SET_CODE_BLOCK_LANGUAGE_COMMAND = createCommand<string>('SET_CODE_BLOCK_LANGUAGE')
+export interface CodeBlockLanguagePayload {
+  language: string
+  nodeKey: string
+}
+export const CODE_BLOCK_ACTIVE_COMMAND = createCommand<CodeBlockLanguagePayload | null>('CODE_BLOCK_ACTIVE')
+export const SET_CODE_BLOCK_LANGUAGE_COMMAND = createCommand<CodeBlockLanguagePayload>('SET_CODE_BLOCK_LANGUAGE')
+export const FOCUS_CODE_BLOCK_COMMAND = createCommand<{ nodeKey: string }>('FOCUS_CODE_BLOCK')
 
-const CodeEditor = ({ code, language, onChange, onLanguageChange }: CodeEditorProps) => {
+const CodeEditor = ({ nodeKey, code, language, onChange, onLanguageChange }: CodeEditorProps) => {
   const [editor] = useLexicalComposerContext()
   const codeMirrorRef = React.useRef<CodeMirrorRef>(null)
-  console.log({ language })
 
   const onFocusHandler = React.useCallback(() => {
-    editor.dispatchCommand(CODE_BLOCK_ACTIVE_COMMAND, { language })
+    editor.dispatchCommand(CODE_BLOCK_ACTIVE_COMMAND, { language, nodeKey })
   }, [editor, language])
 
-  useEffect(() => {
+  React.useEffect(() => {
     const cmContentDom = codeMirrorRef.current?.getCodemirror()?.contentDOM
     cmContentDom?.addEventListener('focus', onFocusHandler)
     return () => {
       cmContentDom?.removeEventListener('focus', onFocusHandler)
     }
   }, [codeMirrorRef, onFocusHandler, language])
+
+  // if newly inserted, focus the editor
+  React.useEffect(() => {
+    if (code === '') {
+      codeMirrorRef.current?.getCodemirror()?.focus()
+    }
+  }, [codeMirrorRef])
 
   const wrappedOnChange = React.useCallback(
     (code: string) => {
@@ -65,27 +77,42 @@ const CodeEditor = ({ code, language, onChange, onLanguageChange }: CodeEditorPr
     [editor, onChange]
   )
 
-  useEffect(() => {
-    console.log('effect ran')
+  React.useEffect(() => {
     return mergeRegister(
       editor.registerCommand(
         SET_CODE_BLOCK_LANGUAGE_COMMAND,
-        (newLanguage) => {
-          editor.update(() => {
-            onLanguageChange(newLanguage)
-          })
-          editor.dispatchCommand(CODE_BLOCK_ACTIVE_COMMAND, { language: newLanguage })
-          return true
+        ({ language: newLanguage, nodeKey: theKeyOfTheChangedNode }) => {
+          if (nodeKey === theKeyOfTheChangedNode) {
+            editor.update(() => {
+              onLanguageChange(newLanguage)
+            })
+            editor.dispatchCommand(CODE_BLOCK_ACTIVE_COMMAND, { language: newLanguage, nodeKey })
+            return true
+          }
+          return false
+        },
+        COMMAND_PRIORITY_CRITICAL
+      ),
+      editor.registerCommand(
+        FOCUS_CODE_BLOCK_COMMAND,
+        ({ nodeKey: theKeyOfTheChangedNode }) => {
+          console.log('FOCUS_CODE_BLOCK_COMMAND', theKeyOfTheChangedNode, nodeKey)
+
+          if (nodeKey === theKeyOfTheChangedNode) {
+            // codeMirrorRef.current?.getCodemirror()?.focus()
+            return true
+          }
+          return false
         },
         COMMAND_PRIORITY_CRITICAL
       )
     )
-  }, [editor, onLanguageChange])
+  }, [editor, onLanguageChange, nodeKey])
 
   // the sandpack provider does nothing, but it's required for the sandpack components to work.
   // force-remount the editor with the key prop when the language changes, so that the editor is reloaded
   return (
-    <div>
+    <div onKeyDown={(e) => e.stopPropagation()}>
       <SandpackProvider>
         <TheEditorFromSandpack
           initMode="immediate"
@@ -170,6 +197,7 @@ export class CodeBlockNode extends DecoratorNode<JSX.Element> {
     return (
       <CodeEditor
         code={this.getCode()}
+        nodeKey={this.getKey()}
         language={this.getLanguage()}
         onChange={(code) => this.setCode(code)}
         onLanguageChange={(language) => this.setLanguage(language)}

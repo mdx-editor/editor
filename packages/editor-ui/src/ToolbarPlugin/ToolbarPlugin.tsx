@@ -10,7 +10,7 @@ import {
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontalRuleNode'
 import { $isHeadingNode } from '@lexical/rich-text'
-import { $findMatchingParent, $getNearestNodeOfType, mergeRegister } from '@lexical/utils'
+import { $findMatchingParent, $getNearestNodeOfType, $insertNodeToNearestRoot, mergeRegister } from '@lexical/utils'
 import * as RadixToolbar from '@radix-ui/react-toolbar'
 import * as styles from './ToolbarPlugin.css'
 import {
@@ -36,7 +36,15 @@ import { ReactComponent as NumberedListIcon } from '../icons/format_list_numbere
 import { ReactComponent as CodeIcon } from '../icons/code.svg'
 import { ReactComponent as HorizontalRuleIcon } from '../icons/horizontal_rule.svg'
 import { ReactComponent as LinkIcon } from '../icons/link.svg'
-import { CODE_BLOCK_ACTIVE_COMMAND, SET_CODE_BLOCK_LANGUAGE_COMMAND } from '@virtuoso.dev/lexical-mdx-import-export'
+import { ReactComponent as FrameSourceIcon } from '../icons/frame_source.svg'
+import { ReactComponent as LiveCodeIcon } from '../icons/deployed_code.svg'
+import {
+  $createCodeBlockNode,
+  CODE_BLOCK_ACTIVE_COMMAND,
+  FOCUS_CODE_BLOCK_COMMAND,
+  SET_CODE_BLOCK_LANGUAGE_COMMAND,
+  CodeBlockLanguagePayload,
+} from '@virtuoso.dev/lexical-mdx-import-export'
 
 // Text node formatting
 export const DEFAULT_FORMAT = 0 as const
@@ -61,7 +69,7 @@ export const ToolbarPlugin = () => {
   const [format, setFormat] = React.useState<number>(DEFAULT_FORMAT)
   const [listType, setListType] = React.useState('' as ListType | '')
   const [blockType, setBlockType] = React.useState('' as BlockType | '')
-  const [codeBlockActive, setCodeBlockActive] = React.useState<{ language: string } | null>(null)
+  const [codeBlockActive, setCodeBlockActive] = React.useState<CodeBlockLanguagePayload | null>(null)
 
   const updateToolbar = React.useCallback(() => {
     const selection = $getSelection()
@@ -115,13 +123,6 @@ export const ToolbarPlugin = () => {
 
         const type = $isHeadingNode(element) ? element.getTag() : (element.getType() as BlockType)
         setBlockType(type)
-        // console.log(type)
-
-        //          if ($isCodeNode(element)) {
-        //            const language = element.getLanguage() as keyof typeof CODE_LANGUAGE_MAP
-        //            setCodeLanguage(language ? CODE_LANGUAGE_MAP[language] || language : '')
-        //            return
-        //          }
       }
     }
   }, [activeEditor])
@@ -144,16 +145,14 @@ export const ToolbarPlugin = () => {
       editor.registerCommand(
         CODE_BLOCK_ACTIVE_COMMAND,
         (codeBlockActive) => {
-          console.log('codeBlockActive', codeBlockActive)
           setCodeBlockActive(codeBlockActive)
-          return false
+          return true
         },
         COMMAND_PRIORITY_CRITICAL
       ),
       editor.registerCommand(
         FOCUS_COMMAND,
         () => {
-          console.log('codeBlockActive', null)
           setCodeBlockActive(null)
           return false
         },
@@ -173,6 +172,25 @@ export const ToolbarPlugin = () => {
     },
     [activeEditor]
   )
+
+  const insertCodeBlock = React.useCallback(() => {
+    activeEditor.getEditorState().read(() => {
+      const selection = $getSelection()
+
+      if (!$isRangeSelection(selection)) {
+        return false
+      }
+
+      const focusNode = selection.focus.getNode()
+
+      if (focusNode !== null) {
+        activeEditor.update(() => {
+          const codeBlockNode = $createCodeBlockNode({ code: '', language: '' })
+          $insertNodeToNearestRoot(codeBlockNode)
+        })
+      }
+    })
+  }, [activeEditor])
 
   const handleListTypeChange = React.useCallback(
     (type: ListType | '') => {
@@ -210,7 +228,7 @@ export const ToolbarPlugin = () => {
         <select
           value={codeBlockActive.language}
           onChange={(e) => {
-            editor.dispatchCommand(SET_CODE_BLOCK_LANGUAGE_COMMAND, e.target.value)
+            editor.dispatchCommand(SET_CODE_BLOCK_LANGUAGE_COMMAND, { language: e.target.value, nodeKey: codeBlockActive.nodeKey })
           }}
         >
           <option value="js">JavaScript</option>
@@ -290,6 +308,15 @@ export const ToolbarPlugin = () => {
         }}
       >
         <HorizontalRuleIcon />
+      </ToolbarButton>
+      <ToolbarSeparator />
+
+      <ToolbarButton onClick={insertCodeBlock}>
+        <FrameSourceIcon />
+      </ToolbarButton>
+
+      <ToolbarButton>
+        <LiveCodeIcon />
       </ToolbarButton>
     </RadixToolbar.Root>
   )
