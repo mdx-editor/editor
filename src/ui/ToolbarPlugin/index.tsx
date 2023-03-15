@@ -12,7 +12,7 @@ import { INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontal
 import { $isHeadingNode } from '@lexical/rich-text'
 import { $findMatchingParent, $getNearestNodeOfType, $insertNodeToNearestRoot, mergeRegister } from '@lexical/utils'
 import * as RadixToolbar from '@radix-ui/react-toolbar'
-import * as styles from './ToolbarPlugin.css'
+import * as styles from './styles.css'
 import {
   $getSelection,
   $isRangeSelection,
@@ -25,37 +25,27 @@ import {
   SELECTION_CHANGE_COMMAND,
 } from 'lexical'
 import React from 'react'
-import { OPEN_LINK_DIALOG } from '../LinkPopupPlugin/LinkPopupPlugin'
-import { formatCode, formatHeading, formatParagraph, formatQuote } from '../BlockTypeSelect/blockFormatters'
-import { BlockType, BlockTypeSelect } from '../BlockTypeSelect/BlockTypeSelect'
-import { ReactComponent as BoldIcon } from '../icons/format_bold.svg'
-import { ReactComponent as ItalicIcon } from '../icons/format_italic.svg'
-import { ReactComponent as UnderlinedIcon } from '../icons/format_underlined.svg'
-import { ReactComponent as BulletedListIcon } from '../icons/format_list_bulleted.svg'
-import { ReactComponent as NumberedListIcon } from '../icons/format_list_numbered.svg'
-import { ReactComponent as CodeIcon } from '../icons/code.svg'
-import { ReactComponent as HorizontalRuleIcon } from '../icons/horizontal_rule.svg'
-import { ReactComponent as LinkIcon } from '../icons/link.svg'
-import { ReactComponent as FrameSourceIcon } from '../icons/frame_source.svg'
-import { ReactComponent as LiveCodeIcon } from '../icons/deployed_code.svg'
+import { OPEN_LINK_DIALOG } from '../LinkDialogPlugin/'
+import { formatCode, formatHeading, formatParagraph, formatQuote } from './BlockTypeSelect/blockFormatters'
+import { BlockType, BlockTypeSelect } from './BlockTypeSelect/'
+import { ReactComponent as BoldIcon } from './icons/format_bold.svg'
+import { ReactComponent as ItalicIcon } from './icons/format_italic.svg'
+import { ReactComponent as UnderlinedIcon } from './icons/format_underlined.svg'
+import { ReactComponent as BulletedListIcon } from './icons/format_list_bulleted.svg'
+import { ReactComponent as NumberedListIcon } from './icons/format_list_numbered.svg'
+import { ReactComponent as CodeIcon } from './icons/code.svg'
+import { ReactComponent as HorizontalRuleIcon } from './icons/horizontal_rule.svg'
+import { ReactComponent as LinkIcon } from './icons/link.svg'
+import { ReactComponent as FrameSourceIcon } from './icons/frame_source.svg'
+import { ReactComponent as LiveCodeIcon } from './icons/deployed_code.svg'
 import {
   $createCodeBlockNode,
   CODE_BLOCK_ACTIVE_COMMAND,
-  FOCUS_CODE_BLOCK_COMMAND,
   SET_CODE_BLOCK_LANGUAGE_COMMAND,
   CodeBlockLanguagePayload,
-} from '@virtuoso.dev/lexical-mdx-import-export'
+} from '../../nodes/CodeBlock'
 
-// Text node formatting
-export const DEFAULT_FORMAT = 0 as const
-export const IS_BOLD = 0b1 as const
-export const IS_ITALIC = 0b10 as const
-export const IS_STRIKETHROUGH = 0b100 as const
-export const IS_UNDERLINE = 0b1000 as const
-export const IS_CODE = 0b10000 as const
-export const IS_SUBSCRIPT = 0b100000 as const
-export const IS_SUPERSCRIPT = 0b1000000 as const
-export const IS_HIGHLIGHT = 0b10000000 as const
+import { DEFAULT_FORMAT, IS_BOLD, IS_ITALIC, IS_UNDERLINE, IS_CODE } from '../../FormatConstants'
 
 const ListTypeCommandMap = new Map<ListType | '', LexicalCommand<void>>([
   ['number', INSERT_ORDERED_LIST_COMMAND],

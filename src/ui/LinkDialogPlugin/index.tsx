@@ -76,7 +76,7 @@ function getSelectionRectangle(editor: LexicalEditor) {
   return null
 }
 
-export function LinkPopupPlugin() {
+export function LinkDialogPlugin() {
   const [editor] = useLexicalComposerContext()
   const [open, setOpen] = React.useState(false)
   const [url, setUrl] = React.useState<string | null>(null)

@@ -2,7 +2,7 @@
 /**
  * @typedef {import('mdast-util-mdx')}
  */
-import '../rawContents.d.ts'
+import './rawContents.d.ts'
 import React from 'react'
 import { $getRoot, EditorState } from 'lexical'
 import { useCallback, useEffect, useState } from 'react'
@@ -21,13 +21,7 @@ import { TRANSFORMERS } from '@lexical/markdown'
 import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin'
 import { ListPlugin } from '@lexical/react/LexicalListPlugin'
 
-import {
-  exportMarkdownFromLexical,
-  importMarkdownToLexical,
-  UsedLexicalNodes,
-  SandpackConfigContext,
-  SandpackConfig,
-} from '@virtuoso.dev/lexical-mdx-import-export'
+import { exportMarkdownFromLexical, importMarkdownToLexical, UsedLexicalNodes, SandpackConfigContext, SandpackConfig } from '../'
 
 import initialMarkdown from './assets/kitchen-sink-markdown.md?raw'
 import codeBlocksMarkdown from './assets/code-blocks-markdown.md?raw'

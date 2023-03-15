@@ -3,8 +3,8 @@ import * as Select from '@radix-ui/react-select'
 import { ReactComponent as DropDownIcon } from '../icons/arrow_drop_down.svg'
 import { ReactComponent as SelectedIcon } from '../icons/check_small.svg'
 import { ChevronDownIcon, ChevronUpIcon } from '@radix-ui/react-icons'
-import * as styles from './BlockTypeSelect.css'
-import { themeClassName } from '../theme.css'
+import * as styles from './styles.css'
+import { themeClassName } from '../../theme.css'
 
 export type BlockType = 'paragraph' | 'code' | 'quote' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
 export interface BLockTypeSelectProps {

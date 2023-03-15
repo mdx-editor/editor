@@ -10,7 +10,7 @@ import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary'
 import { ListPlugin } from '@lexical/react/LexicalListPlugin'
-import { LinkPopupPlugin, ToolbarPlugin } from '@virtuoso.dev/lexical-editor-ui'
+import { LinkDialogPlugin, ToolbarPlugin } from '../'
 import { HorizontalRulePlugin } from '@lexical/react/LexicalHorizontalRulePlugin'
 import initialMarkdown from './assets/kitchen-sink-markdown.md?raw'
 import { standardConfig } from './boilerplate'
@@ -40,7 +40,7 @@ export function ToolbarKitchenSink() {
           <LexicalLinkPlugin />
           <HorizontalRulePlugin />
           <ListPlugin />
-          <LinkPopupPlugin />
+          <LinkDialogPlugin />
         </div>
       </div>
     </LexicalComposer>

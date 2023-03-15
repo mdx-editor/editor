@@ -1,6 +1,6 @@
 import React from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import * as styles from './LinkPopupPlugin.css'
+import * as styles from './styles.css'
 
 export const LinkUIInput = React.forwardRef<HTMLInputElement, React.ComponentProps<'input'>>((props, ref) => {
   return <input {...props} className={styles.LinkUIInput} ref={ref} />

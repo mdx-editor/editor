@@ -1,4 +1,4 @@
-import { UsedLexicalNodes, importMarkdownToLexical } from '@virtuoso.dev/lexical-mdx-import-export'
+import { UsedLexicalNodes, importMarkdownToLexical } from '../'
 import { $getRoot } from 'lexical'
 
 const theme = {

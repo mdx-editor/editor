@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css'
-import { themeVars } from '../theme.css'
+import { themeVars } from '../../theme.css'
 
 export const SelectTrigger = style({
   all: 'unset',
