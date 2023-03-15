@@ -10,16 +10,12 @@ export function LinkTextContainer(props: React.ComponentProps<'span'>) {
   return <span {...props} className={styles.LinkTextContainer} />
 }
 
-export function TooltipContent(props: React.ComponentProps<typeof Tooltip.Content>) {
-  return <Tooltip.Content {...props} className={styles.TooltipContent} />
-}
+export const TooltipContent = React.forwardRef<any, React.ComponentProps<typeof Tooltip.Content>>((props, ref) => {
+  return <Tooltip.Content {...props} className={styles.TooltipContent} ref={ref} />
+})
 
 export function TooltipArrow(props: React.ComponentProps<typeof Tooltip.Arrow>) {
   return <Tooltip.Arrow {...props} className={styles.TooltipArrow} />
-}
-
-export function PopoverButtons(props: React.ComponentProps<'div'>) {
-  return <div {...props} className={styles.PopoverButtons} />
 }
 
 export const PopoverButton = React.forwardRef<any, React.ComponentProps<'button'>>((props, ref) => {

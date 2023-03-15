@@ -47,7 +47,6 @@ export const SlideKeyframes = {
 }
 
 export const LinkUIInput = style({
-  marginRight: '50px',
   boxShadow: '0 0 0 1px var(--violet7)',
   borderRadius: '4px',
   padding: '2px 5px',
@@ -134,14 +133,6 @@ export const PopoverContent = style({
 export const PopoverArrow = style({ fill: 'white' })
 export const TooltipArrow = style({ fill: 'white' })
 
-export const PopoverButtons = style({
-  position: 'absolute',
-  top: 5,
-  right: 5,
-  display: 'flex',
-  columnGap: 3,
-})
-
 export const PopoverButton = style({
   all: 'unset',
   fontFamily: 'inherit',
@@ -163,5 +154,4 @@ export const PopoverButton = style({
 export const WorkingLink = style({
   display: 'inline-flex',
   alignItems: 'center',
-  gap: '8px',
 })

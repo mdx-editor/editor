@@ -57,15 +57,17 @@ export function BasicSetup() {
   }
 
   return (
-    <LexicalComposer initialConfig={initialConfig}>
-      <RichTextPlugin
-        contentEditable={<ContentEditable className="EditorContentEditable" />}
-        placeholder={<div></div>}
-        ErrorBoundary={LexicalErrorBoundary}
-      />
-      <LexicalLinkPlugin />
-      <ListPlugin />
-      <LinkDialogPlugin />
-    </LexicalComposer>
+    <div style={{ padding: '8rem' }}>
+      <LexicalComposer initialConfig={initialConfig}>
+        <RichTextPlugin
+          contentEditable={<ContentEditable className="EditorContentEditable" />}
+          placeholder={<div></div>}
+          ErrorBoundary={LexicalErrorBoundary}
+        />
+        <LexicalLinkPlugin />
+        <ListPlugin />
+        <LinkDialogPlugin />
+      </LexicalComposer>
+    </div>
   )
 }

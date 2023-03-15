@@ -2,7 +2,6 @@ import React from 'react'
 import * as Popover from '@radix-ui/react-popover'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
-import { CheckIcon, ClipboardCopyIcon, Cross2Icon, ExternalLinkIcon, LinkBreak1Icon, Pencil1Icon } from '@radix-ui/react-icons'
 import {
   $getSelection,
   $isRangeSelection,
@@ -22,8 +21,14 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { $isAtNodeEnd } from '@lexical/selection'
 import { mergeRegister } from '@lexical/utils'
 import { $isLinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link'
-import { LinkTextContainer, LinkUIInput, PopoverButton, PopoverButtons, TooltipArrow, TooltipContent, WorkingLink } from './primitives'
+import { LinkTextContainer, LinkUIInput, PopoverButton, TooltipArrow, TooltipContent, WorkingLink } from './primitives'
 import { PopoverAnchor, PopoverContent } from '../Popover/primitives'
+import { ReactComponent as LinkOffIcon } from './icons/link_off.svg'
+import { ReactComponent as CheckIcon } from './icons/check.svg'
+import { ReactComponent as CloseIcon } from './icons/close.svg'
+import { ReactComponent as CopyIcon } from './icons/content_copy.svg'
+import { ReactComponent as EditIcon } from './icons/edit.svg'
+import { ReactComponent as OpenInNewIcon } from './icons/open_in_new.svg'
 
 export function getSelectedNode(selection: RangeSelection): TextNode | ElementNode {
   const anchor = selection.anchor
@@ -273,31 +278,26 @@ export function LinkDialogPlugin() {
 
       <Popover.Portal>
         <PopoverContent sideOffset={5} onOpenAutoFocus={(e) => e.preventDefault()} key={popoverKey}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 10 }}>
-            {editMode ? (
-              <LinkUIInput value={url || ''} ref={inputRef} onChange={(e) => setUrl(e.target.value)} autoFocus />
-            ) : (
-              <WorkingLink href={url!} target="_blank" rel="noreferrer" title={url!}>
-                <LinkTextContainer>{url}</LinkTextContainer>
-                <ExternalLinkIcon />
-              </WorkingLink>
-            )}
-          </div>
-          <PopoverButtons>
+          <div style={{ display: 'flex', gap: 8, alignContent: 'center', padding: 8 }}>
             {editMode ? (
               <>
+                <LinkUIInput value={url || ''} ref={inputRef} onChange={(e) => setUrl(e.target.value)} autoFocus />
                 <PopoverButton onClick={() => applyUrlChanges(inputElRef.current!)} title="Set URL" aria-label="Set URL">
                   <CheckIcon />
                 </PopoverButton>
 
                 <PopoverButton onClick={cancelChange} title="Cancel change" aria-label="Cancel change">
-                  <Cross2Icon />
+                  <CloseIcon />
                 </PopoverButton>
               </>
             ) : (
               <>
+                <WorkingLink href={url!} target="_blank" rel="noreferrer" title={url!}>
+                  <LinkTextContainer>{url}</LinkTextContainer>
+                  <OpenInNewIcon />
+                </WorkingLink>
                 <PopoverButton onClick={() => setEditMode((v) => !v)} title="Edit link URL" aria-label="Edit link URL">
-                  <Pencil1Icon />
+                  <EditIcon />
                 </PopoverButton>
                 <Tooltip.Provider>
                   <Tooltip.Root open={copyUrlTooltipOpen}>
@@ -312,7 +312,7 @@ export function LinkDialogPlugin() {
                           })
                         }}
                       >
-                        {copyUrlTooltipOpen ? <CheckIcon /> : <ClipboardCopyIcon />}
+                        {copyUrlTooltipOpen ? <CheckIcon /> : <CopyIcon />}
                       </PopoverButton>
                     </Tooltip.Trigger>
                     <Tooltip.Portal>
@@ -331,11 +331,11 @@ export function LinkDialogPlugin() {
                     editor.dispatchCommand(TOGGLE_LINK_COMMAND, null)
                   }}
                 >
-                  <LinkBreak1Icon />
+                  <LinkOffIcon />
                 </PopoverButton>
               </>
             )}
-          </PopoverButtons>
+          </div>
         </PopoverContent>
       </Popover.Portal>
     </Popover.Root>
