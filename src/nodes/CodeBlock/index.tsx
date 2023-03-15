@@ -11,7 +11,7 @@ import {
   Spread,
   createCommand,
 } from 'lexical'
-import { CodeMirrorRef } from '@codesandbox/sandpack-react/dist/types/components/CodeEditor/CodeMirror'
+import { CodeMirrorRef } from '@codesandbox/sandpack-react/dist/components/CodeEditor/CodeMirror'
 import { mergeRegister } from '@lexical/utils'
 
 export interface CodeBlockPayload {

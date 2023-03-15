@@ -33,9 +33,10 @@ import * as React from 'react'
 import { createRef } from 'react'
 import { createRoot } from 'react-dom/client'
 import * as ReactTestUtils from 'react-dom/test-utils'
-import { ImageNode } from '../src/nodes/ImageNode'
-import { SandpackNode } from '../src/nodes/SandpackNode'
-import { FrontmatterNode } from '../src/nodes/FrontmatterNode'
+import { ImageNode } from '../src/nodes/Image'
+import { SandpackNode } from '../src/nodes/Sandpack'
+import { FrontmatterNode } from '../src/nodes/Frontmatter'
+import { CodeBlockNode } from '../src/nodes/CodeBlock'
 
 let _keyCounter = 1
 
@@ -408,6 +409,7 @@ const DEFAULT_NODES = [
   ImageNode,
   SandpackNode,
   FrontmatterNode,
+  CodeBlockNode,
 ]
 
 export function createTestEditor(

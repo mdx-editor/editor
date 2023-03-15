@@ -1,8 +1,8 @@
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import React, { useContext } from 'react'
 import { SandpackCodeEditor, SandpackLayout, SandpackPreview, SandpackProvider, useSandpack } from '@codesandbox/sandpack-react'
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { DecoratorNode, EditorConfig, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
-import { parseCodeBlockMeta } from '../parseCodeBlockMeta'
+import React, { useContext } from 'react'
+import { parseCodeBlockMeta } from './parseCodeBlockMeta'
 
 export interface SandpackPayload {
   code: string

@@ -1,6 +1,6 @@
 {
-  "name": "@virtuoso.dev/lexical-mdx-import-export",
-  "author": "",
+  "name": "@virtuoso.dev/lexical-mdx",
+  "author": "Petyo Ivanov",
   "homepage": "https://github.com/virtuoso-dev/lexical-mdx",
   "bugs": {
     "url": "https://github.com/virtuoso-dev/lexical-mdx/issues",

@@ -1,31 +1,31 @@
+import { $isLinkNode, LinkNode } from '@lexical/link'
+import { $isListItemNode, $isListNode, ListItemNode, ListNode } from '@lexical/list'
+import { $isHorizontalRuleNode, HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode'
+import { $isHeadingNode, $isQuoteNode, HeadingNode, QuoteNode } from '@lexical/rich-text'
 import {
-  $isRootNode,
-  $isParagraphNode,
-  LexicalNode,
-  RootNode as LexicalRootNode,
-  ElementNode as LexicalElementNode,
-  $isTextNode,
-  TextNode,
-  ParagraphNode,
   $isElementNode,
+  $isParagraphNode,
+  $isRootNode,
+  $isTextNode,
+  ElementNode as LexicalElementNode,
+  LexicalNode,
+  ParagraphNode,
+  RootNode as LexicalRootNode,
+  TextNode,
 } from 'lexical'
 import * as Mdast from 'mdast'
-import { toMarkdown, Options as ToMarkdownOptions } from 'mdast-util-to-markdown'
-import { mdxToMarkdown } from 'mdast-util-mdx'
-import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from './FormatConstants'
-import { $isLinkNode, LinkNode } from '@lexical/link'
-import { $isHeadingNode, $isQuoteNode, HeadingNode, QuoteNode } from '@lexical/rich-text'
-import { $isListItemNode, $isListNode, ListItemNode, ListNode } from '@lexical/list'
-import { HorizontalRuleNode, $isHorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode'
-import { $isImageNode, ImageNode } from './nodes/ImageNode'
-import { $isFrontmatterNode, FrontmatterNode } from './nodes/FrontmatterNode'
-import { $isSandpackNode, SandpackNode } from './nodes/SandpackNode'
-import { MdastNode } from './types'
-import { frontmatterToMarkdown } from 'mdast-util-frontmatter'
 import { directiveToMarkdown } from 'mdast-util-directive'
-import { $isCodeNode, CodeNode } from '@lexical/code'
-import { $isCodeBlockNode, CodeBlockNode } from './nodes/CodeBlockNode'
+import { frontmatterToMarkdown } from 'mdast-util-frontmatter'
+import { mdxToMarkdown } from 'mdast-util-mdx'
+import { Options as ToMarkdownOptions, toMarkdown } from 'mdast-util-to-markdown'
+import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from '../FormatConstants'
+import { $isCodeBlockNode, CodeBlockNode } from '../nodes/CodeBlock'
+import { $isFrontmatterNode, FrontmatterNode } from '../nodes/Frontmatter'
+import { $isImageNode, ImageNode } from '../nodes/Image'
+import { $isSandpackNode, SandpackNode } from '../nodes/Sandpack'
 export type { Options as ToMarkdownOptions } from 'mdast-util-to-markdown'
+
+type MdastNode = Mdast.Content
 
 export interface LexicalVisitActions<T extends LexicalNode> {
   visitChildren(node: T, mdastParent: Mdast.Parent): void

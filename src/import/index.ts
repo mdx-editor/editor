@@ -1,23 +1,24 @@
+import { CodeNode } from '@lexical/code'
 import { $createLinkNode, LinkNode } from '@lexical/link'
 import { $createListItemNode, $createListNode, $isListItemNode, ListItemNode, ListNode } from '@lexical/list'
 import { $createHorizontalRuleNode, HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode'
 import { $createHeadingNode, $createQuoteNode, $isQuoteNode, HeadingNode, QuoteNode } from '@lexical/rich-text'
-import { $createParagraphNode, $createTextNode, ElementNode, LexicalNode, RootNode as LexicalRootNode, ParagraphNode } from 'lexical'
+import { $createParagraphNode, $createTextNode, ElementNode, LexicalNode, ParagraphNode, RootNode as LexicalRootNode } from 'lexical'
 import * as Mdast from 'mdast'
 import { directiveFromMarkdown } from 'mdast-util-directive'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { frontmatterFromMarkdown } from 'mdast-util-frontmatter'
-import { MdxJsxTextElement, mdxFromMarkdown } from 'mdast-util-mdx'
+import { mdxFromMarkdown, MdxJsxTextElement } from 'mdast-util-mdx'
 import { directive } from 'micromark-extension-directive'
 import { frontmatter } from 'micromark-extension-frontmatter'
 import { mdxjs } from 'micromark-extension-mdxjs'
-import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from './FormatConstants'
-import { $createFrontmatterNode, FrontmatterNode } from './nodes/FrontmatterNode'
-import { $createImageNode, ImageNode } from './nodes/ImageNode'
-import { $createSandpackNode, SandpackNode } from './nodes/SandpackNode'
-import { $createCodeBlockNode, CodeBlockNode } from './nodes/CodeBlockNode'
-import { MdastNode } from './types'
-import { $createCodeNode, CodeNode } from '@lexical/code'
+import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from '../FormatConstants'
+import { $createCodeBlockNode, CodeBlockNode } from '../nodes/CodeBlock'
+import { $createFrontmatterNode, FrontmatterNode } from '../nodes/Frontmatter'
+import { $createImageNode, ImageNode } from '../nodes/Image'
+import { $createSandpackNode, SandpackNode } from '../nodes/Sandpack'
+
+type MdastNode = Mdast.Content
 
 export interface MdastVisitActions {
   visitChildren(node: Mdast.Parent, lexicalParent: LexicalNode): void
