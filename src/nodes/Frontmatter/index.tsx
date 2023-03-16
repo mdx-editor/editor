@@ -37,7 +37,7 @@ const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) => {
       }, {} as Record<string, string>)
       onChange(YamlParser.dump(yaml).trim())
     })
-  }, [entries])
+  }, [entries, editor, onChange])
 
   return (
     <div>

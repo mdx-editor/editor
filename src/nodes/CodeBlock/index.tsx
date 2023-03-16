@@ -43,7 +43,6 @@ export interface CodeBlockLanguagePayload {
 }
 export const CODE_BLOCK_ACTIVE_COMMAND = createCommand<CodeBlockLanguagePayload | null>('CODE_BLOCK_ACTIVE')
 export const SET_CODE_BLOCK_LANGUAGE_COMMAND = createCommand<CodeBlockLanguagePayload>('SET_CODE_BLOCK_LANGUAGE')
-export const FOCUS_CODE_BLOCK_COMMAND = createCommand<{ nodeKey: string }>('FOCUS_CODE_BLOCK')
 
 const CodeEditor = ({ nodeKey, code, language, onChange, onLanguageChange }: CodeEditorProps) => {
   const [editor] = useLexicalComposerContext()
@@ -51,7 +50,7 @@ const CodeEditor = ({ nodeKey, code, language, onChange, onLanguageChange }: Cod
 
   const onFocusHandler = React.useCallback(() => {
     editor.dispatchCommand(CODE_BLOCK_ACTIVE_COMMAND, { language, nodeKey })
-  }, [editor, language])
+  }, [editor, language, nodeKey])
 
   React.useEffect(() => {
     const cmContentDom = codeMirrorRef.current?.getCodemirror()?.contentDOM
@@ -66,6 +65,7 @@ const CodeEditor = ({ nodeKey, code, language, onChange, onLanguageChange }: Cod
     if (code === '') {
       codeMirrorRef.current?.getCodemirror()?.focus()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [codeMirrorRef])
 
   const wrappedOnChange = React.useCallback(
@@ -87,19 +87,6 @@ const CodeEditor = ({ nodeKey, code, language, onChange, onLanguageChange }: Cod
               onLanguageChange(newLanguage)
             })
             editor.dispatchCommand(CODE_BLOCK_ACTIVE_COMMAND, { language: newLanguage, nodeKey })
-            return true
-          }
-          return false
-        },
-        COMMAND_PRIORITY_CRITICAL
-      ),
-      editor.registerCommand(
-        FOCUS_CODE_BLOCK_COMMAND,
-        ({ nodeKey: theKeyOfTheChangedNode }) => {
-          console.log('FOCUS_CODE_BLOCK_COMMAND', theKeyOfTheChangedNode, nodeKey)
-
-          if (nodeKey === theKeyOfTheChangedNode) {
-            // codeMirrorRef.current?.getCodemirror()?.focus()
             return true
           }
           return false

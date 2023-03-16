@@ -44,6 +44,7 @@ import {
   SET_CODE_BLOCK_LANGUAGE_COMMAND,
   CodeBlockLanguagePayload,
 } from '../../nodes/CodeBlock'
+import { ActiveSandpackPayload, ACTIVE_SANDPACK_COMMAND } from '../../nodes/Sandpack'
 
 import { DEFAULT_FORMAT, IS_BOLD, IS_ITALIC, IS_UNDERLINE, IS_CODE } from '../../FormatConstants'
 
@@ -59,7 +60,8 @@ export const ToolbarPlugin = () => {
   const [format, setFormat] = React.useState<number>(DEFAULT_FORMAT)
   const [listType, setListType] = React.useState('' as ListType | '')
   const [blockType, setBlockType] = React.useState('' as BlockType | '')
-  const [codeBlockActive, setCodeBlockActive] = React.useState<CodeBlockLanguagePayload | null>(null)
+  const [activeCodeBlock, setActiveCodeBlock] = React.useState<CodeBlockLanguagePayload | null>(null)
+  const [activeSandpack, setActiveSandpack] = React.useState<ActiveSandpackPayload | null>(null)
 
   const updateToolbar = React.useCallback(() => {
     const selection = $getSelection()
@@ -118,12 +120,12 @@ export const ToolbarPlugin = () => {
   }, [activeEditor])
 
   React.useEffect(() => {
-    editor.getEditorState().read(() => {
+    activeEditor.getEditorState().read(() => {
       updateToolbar()
     })
 
     return mergeRegister(
-      editor.registerCommand(
+      activeEditor.registerCommand(
         SELECTION_CHANGE_COMMAND,
         (_payload, newEditor) => {
           updateToolbar()
@@ -132,18 +134,27 @@ export const ToolbarPlugin = () => {
         },
         COMMAND_PRIORITY_CRITICAL
       ),
-      editor.registerCommand(
+      activeEditor.registerCommand(
         CODE_BLOCK_ACTIVE_COMMAND,
         (codeBlockActive) => {
-          setCodeBlockActive(codeBlockActive)
+          setActiveCodeBlock(codeBlockActive)
           return true
         },
         COMMAND_PRIORITY_CRITICAL
       ),
-      editor.registerCommand(
+      activeEditor.registerCommand(
+        ACTIVE_SANDPACK_COMMAND,
+        (activeSandpack) => {
+          setActiveSandpack(activeSandpack)
+          return true
+        },
+        COMMAND_PRIORITY_CRITICAL
+      ),
+      activeEditor.registerCommand(
         FOCUS_COMMAND,
         () => {
-          setCodeBlockActive(null)
+          setActiveCodeBlock(null)
+          setActiveSandpack(null)
           return false
         },
         COMMAND_PRIORITY_LOW
@@ -154,7 +165,7 @@ export const ToolbarPlugin = () => {
         })
       })
     )
-  }, [editor, updateToolbar])
+  }, [activeEditor, updateToolbar])
 
   const handleFormatChange = React.useCallback(
     (format: 'bold' | 'italic' | 'underline' | 'code') => {
@@ -212,13 +223,16 @@ export const ToolbarPlugin = () => {
     [activeEditor]
   )
 
-  if (codeBlockActive !== null) {
+  if (activeSandpack !== null) {
+    return <div style={{ height: 64 }}>Sandpack</div>
+  }
+  if (activeCodeBlock !== null) {
     return (
       <div style={{ height: 64 }}>
         <select
-          value={codeBlockActive.language}
+          value={activeCodeBlock.language}
           onChange={(e) => {
-            editor.dispatchCommand(SET_CODE_BLOCK_LANGUAGE_COMMAND, { language: e.target.value, nodeKey: codeBlockActive.nodeKey })
+            editor.dispatchCommand(SET_CODE_BLOCK_LANGUAGE_COMMAND, { language: e.target.value, nodeKey: activeCodeBlock.nodeKey })
           }}
         >
           <option value="js">JavaScript</option>

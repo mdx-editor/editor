@@ -21,11 +21,11 @@ import { TRANSFORMERS } from '@lexical/markdown'
 import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin'
 import { ListPlugin } from '@lexical/react/LexicalListPlugin'
 
-import { exportMarkdownFromLexical, importMarkdownToLexical, UsedLexicalNodes, SandpackConfigContext, SandpackConfig } from '../'
+import { exportMarkdownFromLexical, importMarkdownToLexical, UsedLexicalNodes, SandpackConfigContext } from '../'
 
 import initialMarkdown from './assets/kitchen-sink-markdown.md?raw'
 import codeBlocksMarkdown from './assets/code-blocks-markdown.md?raw'
-import dataCode from './assets/dataCode.ts?raw'
+import { sandpackConfig } from './boilerplate'
 
 const theme = {
   text: {
@@ -128,31 +128,6 @@ export function BasicEditor() {
       <MarkdownResult initialCode={initialMarkdown} />
     </LexicalComposer>
   )
-}
-
-const sandpackConfig: SandpackConfig = {
-  defaultPreset: 'react',
-  presets: [
-    {
-      name: 'react',
-      sandpackTemplate: 'react',
-      sandpackTheme: 'light',
-      snippetFileName: '/App.js',
-    },
-    {
-      name: 'virtuoso',
-      sandpackTemplate: 'react-ts',
-      sandpackTheme: 'light',
-      snippetFileName: '/App.tsx',
-      dependencies: {
-        'react-virtuoso': 'latest',
-        '@ngneat/falso': 'latest',
-      },
-      files: {
-        '/data.ts': dataCode,
-      },
-    },
-  ],
 }
 
 export function CodeBlocks() {

@@ -1,5 +1,6 @@
-import { UsedLexicalNodes, importMarkdownToLexical } from '../'
+import { UsedLexicalNodes, importMarkdownToLexical, SandpackConfig } from '../'
 import { $getRoot } from 'lexical'
+import dataCode from './assets/dataCode.ts?raw'
 
 const theme = {
   text: {
@@ -30,4 +31,28 @@ export function standardConfig(markdown: string) {
     nodes: UsedLexicalNodes,
     onError: (error: Error) => console.error(error),
   }
+}
+export const sandpackConfig: SandpackConfig = {
+  defaultPreset: 'react',
+  presets: [
+    {
+      name: 'react',
+      sandpackTemplate: 'react',
+      sandpackTheme: 'light',
+      snippetFileName: '/App.js',
+    },
+    {
+      name: 'virtuoso',
+      sandpackTemplate: 'react-ts',
+      sandpackTheme: 'light',
+      snippetFileName: '/App.tsx',
+      dependencies: {
+        'react-virtuoso': 'latest',
+        '@ngneat/falso': 'latest',
+      },
+      files: {
+        '/data.ts': dataCode,
+      },
+    },
+  ],
 }

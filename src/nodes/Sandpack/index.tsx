@@ -1,6 +1,7 @@
 import { SandpackCodeEditor, SandpackLayout, SandpackPreview, SandpackProvider, useSandpack } from '@codesandbox/sandpack-react'
+import { CodeMirrorRef } from '@codesandbox/sandpack-react/dist/components/CodeEditor/CodeMirror'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { DecoratorNode, EditorConfig, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
+import { createCommand, DecoratorNode, EditorConfig, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
 import React, { useContext } from 'react'
 import { parseCodeBlockMeta } from './parseCodeBlockMeta'
 
@@ -74,9 +75,16 @@ const CodeUpdateEmitter = ({ onChange, snippetFileName }: CodeUpdateEmitterProps
   return null
 }
 
-const CodeEditor = ({ code, meta, onChange }: CodeEditorProps) => {
+export interface ActiveSandpackPayload {
+  nodeKey: NodeKey
+}
+
+export const ACTIVE_SANDPACK_COMMAND = createCommand<ActiveSandpackPayload | null>('ACTIVE_SANDPACK_COMMAND')
+
+const CodeEditor = ({ nodeKey, code, meta, onChange }: CodeEditorProps) => {
   const [editor] = useLexicalComposerContext()
   const config = useContext(SandpackConfigContext)
+  const codeMirrorRef = React.useRef<CodeMirrorRef>(null)
   const metaObj = parseCodeBlockMeta(meta)
   const presetName = metaObj.preset || config.defaultPreset
   const preset = config.presets.find((p) => p.name === presetName)
@@ -90,8 +98,26 @@ const CodeEditor = ({ code, meta, onChange }: CodeEditorProps) => {
         onChange(code)
       })
     },
-    [onChange]
+    [onChange, editor]
   )
+
+  const onFocusHandler = React.useCallback(() => {
+    editor.dispatchCommand(ACTIVE_SANDPACK_COMMAND, { nodeKey })
+  }, [editor, nodeKey])
+
+  React.useEffect(() => {
+    const codeMirror = codeMirrorRef.current
+
+    // TODO: This is a hack to get around the fact that the CodeMirror instance
+    // is not available immediately after the component is mounted. We should we should what?
+    setTimeout(() => {
+      codeMirror?.getCodemirror()?.contentDOM?.addEventListener('focus', onFocusHandler)
+    }, 100)
+
+    return () => {
+      codeMirror?.getCodemirror()?.contentDOM.removeEventListener('focus', onFocusHandler)
+    }
+  }, [codeMirrorRef, onFocusHandler])
 
   return (
     <SandpackProvider
@@ -109,7 +135,7 @@ const CodeEditor = ({ code, meta, onChange }: CodeEditorProps) => {
       }}
     >
       <SandpackLayout>
-        <SandpackCodeEditor showLineNumbers showInlineErrors />
+        <SandpackCodeEditor showLineNumbers showInlineErrors ref={codeMirrorRef} />
         <SandpackPreview />
       </SandpackLayout>
       <CodeUpdateEmitter onChange={wrappedOnChange} snippetFileName={preset.snippetFileName} />
@@ -183,12 +209,13 @@ export class SandpackNode extends DecoratorNode<JSX.Element> {
   }
 
   decorate(): JSX.Element {
-    return <CodeEditor code={this.getCode()} meta={this.getMeta()} onChange={(code) => this.setCode(code)} />
+    return <CodeEditor nodeKey={this.getKey()} code={this.getCode()} meta={this.getMeta()} onChange={(code) => this.setCode(code)} />
   }
 }
 
 interface CodeEditorProps {
   code: string
+  nodeKey: string
   meta: string
   onChange: (code: string) => void
 }
