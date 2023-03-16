@@ -18,6 +18,8 @@ import { sandpackConfig, standardConfig } from './boilerplate'
 import { registerCodeHighlighting } from '@lexical/code'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { useEffect } from 'react'
+import { TRANSFORMERS } from '@lexical/markdown'
+import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin'
 
 function CodeHighlightPlugin(): JSX.Element | null {
   const [editor] = useLexicalComposerContext()
@@ -57,6 +59,7 @@ export function ToolbarWithCode() {
         <ListPlugin />
         <CodeHighlightPlugin />
         <LinkDialogPlugin />
+        <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
       </LexicalComposer>
     </SandpackConfigContext.Provider>
   )

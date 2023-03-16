@@ -36,7 +36,6 @@ import * as ReactTestUtils from 'react-dom/test-utils'
 import { ImageNode } from '../src/nodes/Image'
 import { SandpackNode } from '../src/nodes/Sandpack'
 import { FrontmatterNode } from '../src/nodes/Frontmatter'
-import { CodeBlockNode } from '../src/nodes/CodeBlock'
 
 let _keyCounter = 1
 
@@ -409,7 +408,6 @@ const DEFAULT_NODES = [
   ImageNode,
   SandpackNode,
   FrontmatterNode,
-  CodeBlockNode,
 ]
 
 export function createTestEditor(

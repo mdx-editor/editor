@@ -38,15 +38,10 @@ import { ReactComponent as HorizontalRuleIcon } from './icons/horizontal_rule.sv
 import { ReactComponent as LinkIcon } from './icons/link.svg'
 import { ReactComponent as FrameSourceIcon } from './icons/frame_source.svg'
 import { ReactComponent as LiveCodeIcon } from './icons/deployed_code.svg'
-import {
-  $createCodeBlockNode,
-  CODE_BLOCK_ACTIVE_COMMAND,
-  SET_CODE_BLOCK_LANGUAGE_COMMAND,
-  CodeBlockLanguagePayload,
-} from '../../nodes/CodeBlock'
 import { ActiveSandpackPayload, ACTIVE_SANDPACK_COMMAND } from '../../nodes/Sandpack'
 
 import { DEFAULT_FORMAT, IS_BOLD, IS_ITALIC, IS_UNDERLINE, IS_CODE } from '../../FormatConstants'
+import { $createCodeNode } from '@lexical/code'
 
 const ListTypeCommandMap = new Map<ListType | '', LexicalCommand<void>>([
   ['number', INSERT_ORDERED_LIST_COMMAND],
@@ -60,7 +55,7 @@ export const ToolbarPlugin = () => {
   const [format, setFormat] = React.useState<number>(DEFAULT_FORMAT)
   const [listType, setListType] = React.useState('' as ListType | '')
   const [blockType, setBlockType] = React.useState('' as BlockType | '')
-  const [activeCodeBlock, setActiveCodeBlock] = React.useState<CodeBlockLanguagePayload | null>(null)
+  const [activeCodeBlock, setActiveCodeBlock] = React.useState<string | null>(null)
   const [activeSandpack, setActiveSandpack] = React.useState<ActiveSandpackPayload | null>(null)
 
   const updateToolbar = React.useCallback(() => {
@@ -134,14 +129,14 @@ export const ToolbarPlugin = () => {
         },
         COMMAND_PRIORITY_CRITICAL
       ),
-      activeEditor.registerCommand(
-        CODE_BLOCK_ACTIVE_COMMAND,
-        (codeBlockActive) => {
-          setActiveCodeBlock(codeBlockActive)
-          return true
-        },
-        COMMAND_PRIORITY_CRITICAL
-      ),
+      //       activeEditor.registerCommand(
+      //         CODE_BLOCK_ACTIVE_COMMAND,
+      //         (codeBlockActive) => {
+      //           setActiveCodeBlock(codeBlockActive)
+      //           return true
+      //         },
+      //         COMMAND_PRIORITY_CRITICAL
+      //       ),
       activeEditor.registerCommand(
         ACTIVE_SANDPACK_COMMAND,
         (activeSandpack) => {
@@ -186,7 +181,7 @@ export const ToolbarPlugin = () => {
 
       if (focusNode !== null) {
         activeEditor.update(() => {
-          const codeBlockNode = $createCodeBlockNode({ code: '', language: '' })
+          const codeBlockNode = $createCodeNode()
           $insertNodeToNearestRoot(codeBlockNode)
         })
       }
@@ -230,9 +225,9 @@ export const ToolbarPlugin = () => {
     return (
       <div style={{ height: 64 }}>
         <select
-          value={activeCodeBlock.language}
+          value={activeCodeBlock}
           onChange={(e) => {
-            editor.dispatchCommand(SET_CODE_BLOCK_LANGUAGE_COMMAND, { language: e.target.value, nodeKey: activeCodeBlock.nodeKey })
+            // editor.dispatchCommand(SET_CODE_BLOCK_LANGUAGE_COMMAND, { language: e.target.value, nodeKey: activeCodeBlock.nodeKey })
           }}
         >
           <option value="js">JavaScript</option>
