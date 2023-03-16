@@ -1,4 +1,4 @@
-import { CodeNode } from '@lexical/code'
+import { CodeNode, $createCodeNode, $createCodeHighlightNode, CodeHighlightNode } from '@lexical/code'
 import { $createLinkNode, LinkNode } from '@lexical/link'
 import { $createListItemNode, $createListNode, $isListItemNode, ListItemNode, ListNode } from '@lexical/list'
 import { $createHorizontalRuleNode, HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode'
@@ -135,7 +135,7 @@ export const MdastCodeVisitor: MdastImportVisitor<Mdast.Code> = {
     if (mdastNode.meta?.startsWith('live')) {
       actions.addAndStepInto($createSandpackNode({ code: mdastNode.value, meta: mdastNode.meta }))
     } else {
-      actions.addAndStepInto($createCodeBlockNode({ code: mdastNode.value, language: mdastNode.lang || '' }))
+      actions.addAndStepInto($createCodeNode(mdastNode.lang).append($createTextNode(mdastNode.value)))
     }
   },
 }
@@ -268,5 +268,6 @@ export const UsedLexicalNodes = [
   SandpackNode,
   CodeNode,
   CodeBlockNode,
+  CodeHighlightNode,
   FrontmatterNode,
 ]
