@@ -1,11 +1,14 @@
-import { CodeNode, $createCodeNode, $createCodeHighlightNode, CodeHighlightNode } from '@lexical/code'
+/**
+ * @typedef {import('mdast-util-directive')}
+ */
+import { CodeNode, $createCodeNode, CodeHighlightNode } from '@lexical/code'
 import { $createLinkNode, LinkNode } from '@lexical/link'
 import { $createListItemNode, $createListNode, $isListItemNode, ListItemNode, ListNode } from '@lexical/list'
 import { $createHorizontalRuleNode, HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode'
 import { $createHeadingNode, $createQuoteNode, $isQuoteNode, HeadingNode, QuoteNode } from '@lexical/rich-text'
 import { $createParagraphNode, $createTextNode, ElementNode, LexicalNode, ParagraphNode, RootNode as LexicalRootNode } from 'lexical'
 import * as Mdast from 'mdast'
-import { directiveFromMarkdown } from 'mdast-util-directive'
+import { ContainerDirective, directiveFromMarkdown } from 'mdast-util-directive'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { frontmatterFromMarkdown } from 'mdast-util-frontmatter'
 import { mdxFromMarkdown, MdxJsxTextElement } from 'mdast-util-mdx'
@@ -13,7 +16,7 @@ import { directive } from 'micromark-extension-directive'
 import { frontmatter } from 'micromark-extension-frontmatter'
 import { mdxjs } from 'micromark-extension-mdxjs'
 import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from '../FormatConstants'
-import { $createCodeBlockNode, CodeBlockNode } from '../nodes/CodeBlock'
+import { $createAdmonitionNode, AdmonitionNode, AdmonitionKind } from '../nodes/Admonition'
 import { $createFrontmatterNode, FrontmatterNode } from '../nodes/Frontmatter'
 import { $createImageNode, ImageNode } from '../nodes/Image'
 import { $createSandpackNode, SandpackNode } from '../nodes/Sandpack'
@@ -62,6 +65,13 @@ export const MdastLinkVisitor: MdastImportVisitor<Mdast.Link> = {
   testNode: 'link',
   visitNode({ mdastNode, actions }) {
     actions.addAndStepInto($createLinkNode(mdastNode.url))
+  },
+}
+
+export const MdastAdmonitionVisitor: MdastImportVisitor<ContainerDirective> = {
+  testNode: 'containerDirective',
+  visitNode({ mdastNode, actions }) {
+    actions.addAndStepInto($createAdmonitionNode(mdastNode.name as AdmonitionKind))
   },
 }
 
@@ -193,6 +203,7 @@ export const MdastVisitors = [
   MdastThematicBreakVisitor,
   MdastImageVisitor,
   MdastFrontmatterVisitor,
+  MdastAdmonitionVisitor,
 ]
 
 function isParent(node: unknown): node is Mdast.Parent {
@@ -226,6 +237,7 @@ export function importMarkdownToLexical(
       return visitor.testNode(mdastNode)
     })
     if (!visitor) {
+      debugger
       throw new Error(`no unist visitor found for ${mdastNode.type}`, {
         cause: mdastNode,
       })
@@ -267,7 +279,7 @@ export const UsedLexicalNodes = [
   ImageNode,
   SandpackNode,
   CodeNode,
-  CodeBlockNode,
   CodeHighlightNode,
   FrontmatterNode,
+  AdmonitionNode,
 ]

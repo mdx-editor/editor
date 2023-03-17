@@ -52,6 +52,14 @@ const theme = {
       listitem: 'PlaygroundEditorTheme__nestedListItem',
     },
   },
+
+  admonition: {
+    danger: 'PlaygroundEditorTheme__admonitionDanger',
+    info: 'PlaygroundEditorTheme__admonitionInfo',
+    note: 'PlaygroundEditorTheme__admonitionNote',
+    tip: 'PlaygroundEditorTheme__admonitionTip',
+    caution: 'PlaygroundEditorTheme__admonitionCaution',
+  },
 }
 
 export function standardConfig(markdown: string) {

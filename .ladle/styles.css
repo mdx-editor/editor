@@ -41,3 +41,9 @@ blockquote {
 .PlaygroundEditorTheme__nestedListItem {
   list-style-type: none;
 }
+
+.PlaygroundEditorTheme__admonitionInfo {
+  border: 2px solid blue;
+  padding: 1rem;
+  margin: 1rem 0;
+}

@@ -15,14 +15,24 @@ import {
   TextNode,
 } from 'lexical'
 import * as Mdast from 'mdast'
-import { directiveToMarkdown } from 'mdast-util-directive'
+import { ContainerDirective, directiveToMarkdown } from 'mdast-util-directive'
 import { frontmatterToMarkdown } from 'mdast-util-frontmatter'
 import { mdxToMarkdown } from 'mdast-util-mdx'
 import { Options as ToMarkdownOptions, toMarkdown } from 'mdast-util-to-markdown'
-import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from '../FormatConstants'
-import { $isFrontmatterNode, FrontmatterNode } from '../nodes/Frontmatter'
-import { $isImageNode, ImageNode } from '../nodes/Image'
-import { $isSandpackNode, SandpackNode } from '../nodes/Sandpack'
+import {
+  $isAdmonitionNode,
+  $isFrontmatterNode,
+  $isImageNode,
+  $isSandpackNode,
+  AdmonitionNode,
+  FrontmatterNode,
+  ImageNode,
+  IS_BOLD,
+  IS_CODE,
+  IS_ITALIC,
+  IS_UNDERLINE,
+  SandpackNode,
+} from '../'
 export type { Options as ToMarkdownOptions } from 'mdast-util-to-markdown'
 
 type MdastNode = Mdast.Content
@@ -124,6 +134,15 @@ export const LexicalQuoteVisitor: LexicalExportVisitor<QuoteNode, Mdast.Blockquo
       children: [{ type: 'paragraph' as const, children: [] }],
     }) as Mdast.Blockquote
     actions.visitChildren(lexicalNode, blockquote.children[0] as Mdast.Paragraph)
+  },
+}
+
+export const AdmonitionVisitor: LexicalExportVisitor<AdmonitionNode, ContainerDirective> = {
+  testLexicalNode: $isAdmonitionNode,
+  visitLexicalNode: ({ lexicalNode, actions }) => {
+    actions.addAndStepInto('containerDirective', {
+      name: lexicalNode.getKind(),
+    })
   },
 }
 
@@ -268,6 +287,7 @@ export const LexicalVisitors = [
   SandpackNodeVisitor,
   CodeBlockVisitor,
   LexicalThematicBreakVisitor,
+  AdmonitionVisitor,
   LexicalImageVisitor,
 ]
 

@@ -2,56 +2,29 @@
 /**
  * @typedef {import('mdast-util-mdx')}
  */
-import './rawContents.d.ts'
-import React from 'react'
 import { $getRoot, EditorState } from 'lexical'
-import { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
+import './rawContents.d.ts'
 
 import { LexicalComposer } from '@lexical/react/LexicalComposer'
-import { LinkPlugin as LexicalLinkPlugin } from '@lexical/react/LexicalLinkPlugin'
-import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
+import { LinkPlugin as LexicalLinkPlugin } from '@lexical/react/LexicalLinkPlugin'
+import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin'
 
-import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin'
-import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary'
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { TRANSFORMERS } from '@lexical/markdown'
-import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin'
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary'
 import { ListPlugin } from '@lexical/react/LexicalListPlugin'
+import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin'
+import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin'
 
-import { exportMarkdownFromLexical, importMarkdownToLexical, UsedLexicalNodes, SandpackConfigContext } from '../'
+import { exportMarkdownFromLexical, SandpackConfigContext } from '../'
 
-import initialMarkdown from './assets/kitchen-sink-markdown.md?raw'
 import codeBlocksMarkdown from './assets/code-blocks-markdown.md?raw'
-import { sandpackConfig } from './boilerplate'
-
-const theme = {
-  text: {
-    bold: 'PlaygroundEditorTheme__textBold',
-    code: 'PlaygroundEditorTheme__textCode',
-    italic: 'PlaygroundEditorTheme__textItalic',
-    strikethrough: 'PlaygroundEditorTheme__textStrikethrough',
-    subscript: 'PlaygroundEditorTheme__textSubscript',
-    superscript: 'PlaygroundEditorTheme__textSuperscript',
-    underline: 'PlaygroundEditorTheme__textUnderline',
-    underlineStrikethrough: 'PlaygroundEditorTheme__textUnderlineStrikethrough',
-  },
-
-  list: {
-    nested: {
-      listitem: 'PlaygroundEditorTheme__nestedListItem',
-    },
-  },
-}
-
-// Catch any errors that occur during Lexical updates and log them
-// or throw them as needed. If you don't throw them, Lexical will
-// try to recover gracefully without losing user data.
-function onError(error: Error) {
-  console.error(error)
-}
+import initialMarkdown from './assets/kitchen-sink-markdown.md?raw'
+import { sandpackConfig, standardConfig } from './boilerplate'
 
 function convertLexicalStateToMarkdown(state: EditorState) {
   return new Promise<string>((resolve) => {
@@ -103,18 +76,8 @@ function MarkdownResult({ initialCode }: { initialCode: string }) {
 }
 
 export function BasicEditor() {
-  const initialConfig = {
-    editorState: () => {
-      importMarkdownToLexical($getRoot(), initialMarkdown)
-    },
-    namespace: 'MyEditor',
-    theme,
-    nodes: UsedLexicalNodes,
-    onError,
-  }
-
   return (
-    <LexicalComposer initialConfig={initialConfig}>
+    <LexicalComposer initialConfig={standardConfig(initialMarkdown)}>
       <RichTextPlugin
         contentEditable={<ContentEditable className="EditorContentEditable" />}
         placeholder={<div></div>}
@@ -131,19 +94,9 @@ export function BasicEditor() {
 }
 
 export function CodeBlocks() {
-  const initialConfig = {
-    editorState: () => {
-      importMarkdownToLexical($getRoot(), codeBlocksMarkdown)
-    },
-    namespace: 'MyEditor',
-    theme,
-    nodes: UsedLexicalNodes,
-    onError,
-  }
-
   return (
     <SandpackConfigContext.Provider value={sandpackConfig}>
-      <LexicalComposer initialConfig={initialConfig}>
+      <LexicalComposer initialConfig={standardConfig(initialMarkdown)}>
         <RichTextPlugin contentEditable={<ContentEditable />} placeholder={<div></div>} ErrorBoundary={LexicalErrorBoundary} />
         <LexicalLinkPlugin />
         <ListPlugin />

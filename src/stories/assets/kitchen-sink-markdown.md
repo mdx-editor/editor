@@ -2,6 +2,10 @@
 title: Hello World
 ---
 
+:::info
+Some informative text
+:::
+
 [A link](https://google.com/ "Googl Title")
 
 horizontal rule
