@@ -14,7 +14,7 @@ import { LinkDialogPlugin, SandpackConfigContext, ToolbarPlugin } from '../'
 import { HorizontalRulePlugin } from '@lexical/react/LexicalHorizontalRulePlugin'
 import initialMarkdown from './assets/kitchen-sink-markdown.md?raw'
 import codeBlocksMarkdown from './assets/code-blocks-markdown.md?raw'
-import { sandpackConfig, standardConfig } from './boilerplate'
+import { MarkdownResult, sandpackConfig, standardConfig } from './boilerplate'
 import { registerCodeHighlighting } from '@lexical/code'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { useEffect } from 'react'
@@ -44,6 +44,7 @@ export function ToolbarKitchenSink() {
       <HorizontalRulePlugin />
       <ListPlugin />
       <LinkDialogPlugin />
+      <MarkdownResult initialCode={initialMarkdown} />
     </LexicalComposer>
   )
 }
@@ -60,6 +61,7 @@ export function ToolbarWithCode() {
         <CodeHighlightPlugin />
         <LinkDialogPlugin />
         <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
+        <MarkdownResult initialCode={codeBlocksMarkdown} />
       </LexicalComposer>
     </SandpackConfigContext.Provider>
   )

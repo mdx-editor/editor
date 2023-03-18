@@ -1,6 +1,10 @@
-import { UsedLexicalNodes, importMarkdownToLexical, SandpackConfig } from '../'
-import { $getRoot } from 'lexical'
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import React from 'react'
+import { UsedLexicalNodes, importMarkdownToLexical, SandpackConfig, exportMarkdownFromLexical } from '..'
+import { $getRoot, EditorState } from 'lexical'
 import dataCode from './assets/dataCode.ts?raw'
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin'
 
 const theme = {
   code: 'PlaygroundEditorTheme__code',
@@ -96,4 +100,53 @@ export const sandpackConfig: SandpackConfig = {
       },
     },
   ],
+}
+
+export function convertLexicalStateToMarkdown(state: EditorState) {
+  return new Promise<string>((resolve) => {
+    state.read(() => {
+      resolve(exportMarkdownFromLexical($getRoot()))
+    })
+  })
+}
+
+export function MarkdownResult({ initialCode }: { initialCode: string }) {
+  const [editor] = useLexicalComposerContext()
+  const [outMarkdown, setOutMarkdown] = React.useState('')
+  React.useEffect(() => {
+    convertLexicalStateToMarkdown(editor.getEditorState())
+      .then((markdown) => {
+        setOutMarkdown(markdown)
+      })
+      .catch((rejection) => console.warn({ rejection }))
+  })
+
+  const onChange = React.useCallback(() => {
+    convertLexicalStateToMarkdown(editor.getEditorState())
+      .then((markdown) => {
+        setOutMarkdown(markdown)
+      })
+      .catch((rejection) => console.warn({ rejection }))
+  }, [editor])
+
+  return (
+    <>
+      <div style={{ display: 'flex', height: 400, overflow: 'auto' }}>
+        <div style={{ flex: 1 }}>
+          <h3>Result markdown</h3>
+          <OnChangePlugin onChange={onChange} />
+
+          <code>
+            <pre>{outMarkdown.trim()}</pre>
+          </code>
+        </div>
+        <div style={{ flex: 1 }}>
+          <h3>Initial markdown</h3>
+          <code>
+            <pre>{initialCode.trim()}</pre>
+          </code>
+        </div>
+      </div>
+    </>
+  )
 }

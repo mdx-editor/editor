@@ -26,7 +26,7 @@ import {
 } from 'lexical'
 import React from 'react'
 import { OPEN_LINK_DIALOG } from '../LinkDialogPlugin/'
-import { formatCode, formatHeading, formatParagraph, formatQuote } from './BlockTypeSelect/blockFormatters'
+import { formatAdmonition, formatCode, formatHeading, formatParagraph, formatQuote } from './BlockTypeSelect/blockFormatters'
 import { BlockType, BlockTypeSelect } from './BlockTypeSelect/'
 import { ReactComponent as BoldIcon } from './icons/format_bold.svg'
 import { ReactComponent as ItalicIcon } from './icons/format_italic.svg'
@@ -42,6 +42,7 @@ import { ActiveSandpackPayload, ACTIVE_SANDPACK_COMMAND } from '../../nodes/Sand
 
 import { DEFAULT_FORMAT, IS_BOLD, IS_ITALIC, IS_UNDERLINE, IS_CODE } from '../../FormatConstants'
 import { $createCodeNode } from '@lexical/code'
+import { $isAdmonitionNode, AdmonitionKind } from '../../nodes'
 
 const ListTypeCommandMap = new Map<ListType | '', LexicalCommand<void>>([
   ['number', INSERT_ORDERED_LIST_COMMAND],
@@ -54,7 +55,7 @@ export const ToolbarPlugin = () => {
   const [activeEditor, setActiveEditor] = React.useState(editor)
   const [format, setFormat] = React.useState<number>(DEFAULT_FORMAT)
   const [listType, setListType] = React.useState('' as ListType | '')
-  const [blockType, setBlockType] = React.useState('' as BlockType | '')
+  const [blockType, setBlockType] = React.useState('' as BlockType | AdmonitionKind | '')
   const [activeCodeBlock, setActiveCodeBlock] = React.useState<string | null>(null)
   const [activeSandpack, setActiveSandpack] = React.useState<ActiveSandpackPayload | null>(null)
 
@@ -108,7 +109,12 @@ export const ToolbarPlugin = () => {
           setListType('')
         }
 
-        const type = $isHeadingNode(element) ? element.getTag() : (element.getType() as BlockType)
+        const type = $isHeadingNode(element)
+          ? element.getTag()
+          : $isAdmonitionNode(element)
+          ? element.getKind()
+          : (element.getType() as BlockType)
+
         setBlockType(type)
       }
     }
@@ -196,7 +202,7 @@ export const ToolbarPlugin = () => {
   )
 
   const handleBlockTypeChange = React.useCallback(
-    (type: BlockType) => {
+    (type: BlockType | AdmonitionKind) => {
       switch (type) {
         case 'paragraph': {
           formatParagraph(activeEditor)
@@ -208,6 +214,14 @@ export const ToolbarPlugin = () => {
         }
         case 'code': {
           formatCode(activeEditor)
+          break
+        }
+        case 'note':
+        case 'tip':
+        case 'danger':
+        case 'caution':
+        case 'info': {
+          formatAdmonition(activeEditor, type)
           break
         }
         default: {

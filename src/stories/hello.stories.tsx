@@ -2,8 +2,7 @@
 /**
  * @typedef {import('mdast-util-mdx')}
  */
-import { $getRoot, EditorState } from 'lexical'
-import React, { useCallback, useEffect, useState } from 'react'
+import React from 'react'
 import './rawContents.d.ts'
 
 import { LexicalComposer } from '@lexical/react/LexicalComposer'
@@ -14,66 +13,15 @@ import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin'
 
 import { TRANSFORMERS } from '@lexical/markdown'
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary'
 import { ListPlugin } from '@lexical/react/LexicalListPlugin'
 import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin'
-import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin'
 
-import { exportMarkdownFromLexical, SandpackConfigContext } from '../'
+import { SandpackConfigContext } from '../'
 
 import codeBlocksMarkdown from './assets/code-blocks-markdown.md?raw'
 import initialMarkdown from './assets/kitchen-sink-markdown.md?raw'
-import { sandpackConfig, standardConfig } from './boilerplate'
-
-function convertLexicalStateToMarkdown(state: EditorState) {
-  return new Promise<string>((resolve) => {
-    state.read(() => {
-      resolve(exportMarkdownFromLexical($getRoot()))
-    })
-  })
-}
-
-function MarkdownResult({ initialCode }: { initialCode: string }) {
-  const [editor] = useLexicalComposerContext()
-  const [outMarkdown, setOutMarkdown] = useState('')
-  useEffect(() => {
-    convertLexicalStateToMarkdown(editor.getEditorState())
-      .then((markdown) => {
-        setOutMarkdown(markdown)
-      })
-      .catch((rejection) => console.warn({ rejection }))
-  })
-
-  const onChange = useCallback(() => {
-    convertLexicalStateToMarkdown(editor.getEditorState())
-      .then((markdown) => {
-        setOutMarkdown(markdown)
-      })
-      .catch((rejection) => console.warn({ rejection }))
-  }, [editor])
-
-  return (
-    <>
-      <div style={{ display: 'flex', height: 400, overflow: 'auto' }}>
-        <div style={{ flex: 1 }}>
-          <h3>Result markdown</h3>
-          <OnChangePlugin onChange={onChange} />
-
-          <code>
-            <pre>{outMarkdown.trim()}</pre>
-          </code>
-        </div>
-        <div style={{ flex: 1 }}>
-          <h3>Initial markdown</h3>
-          <code>
-            <pre>{initialCode.trim()}</pre>
-          </code>
-        </div>
-      </div>
-    </>
-  )
-}
+import { MarkdownResult, sandpackConfig, standardConfig } from './boilerplate'
 
 export function BasicEditor() {
   return (

@@ -2,7 +2,6 @@ import { addClassNamesToElement } from '@lexical/utils'
 import {
   $applyNodeReplacement,
   $createParagraphNode,
-  DOMConversionMap,
   EditorConfig,
   ElementNode,
   LexicalNode,

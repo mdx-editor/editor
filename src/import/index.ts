@@ -16,7 +16,7 @@ import { directive } from 'micromark-extension-directive'
 import { frontmatter } from 'micromark-extension-frontmatter'
 import { mdxjs } from 'micromark-extension-mdxjs'
 import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from '../FormatConstants'
-import { $createAdmonitionNode, AdmonitionNode, AdmonitionKind } from '../nodes/Admonition'
+import { $createAdmonitionNode, AdmonitionNode, AdmonitionKind, $isAdmonitionNode } from '../nodes/Admonition'
 import { $createFrontmatterNode, FrontmatterNode } from '../nodes/Frontmatter'
 import { $createImageNode, ImageNode } from '../nodes/Image'
 import { $createSandpackNode, SandpackNode } from '../nodes/Sandpack'
@@ -53,7 +53,7 @@ export const MdastParagraphVisitor: MdastImportVisitor<Mdast.Paragraph> = {
   testNode: 'paragraph',
   visitNode: function ({ mdastNode, lexicalParent, actions }): void {
     // markdown inserts paragraphs in lists. lexical does not.
-    if ($isListItemNode(lexicalParent) || $isQuoteNode(lexicalParent)) {
+    if ($isListItemNode(lexicalParent) || $isQuoteNode(lexicalParent) || $isAdmonitionNode(lexicalParent)) {
       actions.visitChildren(mdastNode, lexicalParent)
     } else {
       actions.addAndStepInto($createParagraphNode())
@@ -237,7 +237,6 @@ export function importMarkdownToLexical(
       return visitor.testNode(mdastNode)
     })
     if (!visitor) {
-      debugger
       throw new Error(`no unist visitor found for ${mdastNode.type}`, {
         cause: mdastNode,
       })
