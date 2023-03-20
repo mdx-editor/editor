@@ -21,7 +21,7 @@ import { SandpackConfigContext } from '../'
 
 import codeBlocksMarkdown from './assets/code-blocks-markdown.md?raw'
 import initialMarkdown from './assets/kitchen-sink-markdown.md?raw'
-import { MarkdownResult, sandpackConfig, standardConfig } from './boilerplate'
+import { CodeHighlightPlugin, MarkdownResult, sandpackConfig, standardConfig } from './boilerplate'
 
 export function BasicEditor() {
   return (
@@ -36,6 +36,8 @@ export function BasicEditor() {
       <TabIndentationPlugin />
       <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
       <HistoryPlugin />
+
+      <CodeHighlightPlugin />
       <MarkdownResult initialCode={initialMarkdown} />
     </LexicalComposer>
   )
@@ -52,6 +54,7 @@ export function CodeBlocks() {
         <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
         <HistoryPlugin />
         <MarkdownResult initialCode={codeBlocksMarkdown} />
+        <CodeHighlightPlugin />
       </LexicalComposer>
     </SandpackConfigContext.Provider>
   )
