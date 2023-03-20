@@ -38,11 +38,14 @@ import { ReactComponent as HorizontalRuleIcon } from './icons/horizontal_rule.sv
 import { ReactComponent as LinkIcon } from './icons/link.svg'
 import { ReactComponent as FrameSourceIcon } from './icons/frame_source.svg'
 import { ReactComponent as LiveCodeIcon } from './icons/deployed_code.svg'
+import { ReactComponent as DiffIcon } from './icons/difference.svg'
+import { ReactComponent as MarkdownIcon } from './icons/markdown.svg'
 import { ActiveSandpackPayload, ACTIVE_SANDPACK_COMMAND } from '../../nodes/Sandpack'
 
 import { DEFAULT_FORMAT, IS_BOLD, IS_ITALIC, IS_UNDERLINE, IS_CODE } from '../../FormatConstants'
 import { $createCodeNode } from '@lexical/code'
 import { $isAdmonitionNode, AdmonitionKind } from '../../nodes'
+import { useDiffViewOn } from '../DiffViewerPlugin'
 
 const ListTypeCommandMap = new Map<ListType | '', LexicalCommand<void>>([
   ['number', INSERT_ORDERED_LIST_COMMAND],
@@ -58,6 +61,8 @@ export const ToolbarPlugin = () => {
   const [blockType, setBlockType] = React.useState('' as BlockType | AdmonitionKind | '')
   const [activeCodeBlock, setActiveCodeBlock] = React.useState<string | null>(null)
   const [activeSandpack, setActiveSandpack] = React.useState<ActiveSandpackPayload | null>(null)
+  const [diffViewOn, setDiffViewOn] = useDiffViewOn()
+  const [markdownOn, setMarkdownOn] = React.useState(false)
 
   const updateToolbar = React.useCallback(() => {
     const selection = $getSelection()
@@ -331,6 +336,29 @@ export const ToolbarPlugin = () => {
       <ToolbarButton>
         <LiveCodeIcon />
       </ToolbarButton>
+
+      <ToolbarSeparator />
+      <RadixToolbar.ToggleGroup
+        type="single"
+        aria-label="View diff"
+        onValueChange={() => setDiffViewOn((v) => !v)}
+        value={diffViewOn ? 'on' : ''}
+      >
+        <ToolbarToggleItem value="on" aria-label="View diff">
+          <DiffIcon />
+        </ToolbarToggleItem>
+      </RadixToolbar.ToggleGroup>
+
+      <RadixToolbar.ToggleGroup
+        type="single"
+        aria-label="View Markdown"
+        onValueChange={() => setMarkdownOn((v) => !v)}
+        value={markdownOn ? 'on' : ''}
+      >
+        <ToolbarToggleItem value="on" aria-label="View Markdown">
+          <MarkdownIcon />
+        </ToolbarToggleItem>
+      </RadixToolbar.ToggleGroup>
     </RadixToolbar.Root>
   )
 }

@@ -6,6 +6,7 @@ import dataCode from './assets/dataCode.ts?raw'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin'
 import { registerCodeHighlighting } from '@lexical/code'
+import ReactDiffViewer from 'react-diff-viewer'
 
 export function standardConfig(markdown: string) {
   return {
@@ -53,41 +54,24 @@ export function convertLexicalStateToMarkdown(state: EditorState) {
 
 export function MarkdownResult({ initialCode }: { initialCode: string }) {
   const [editor] = useLexicalComposerContext()
-  const [outMarkdown, setOutMarkdown] = React.useState('')
+  const [currentMarkdown, setCurrentMarkdown] = React.useState('')
+
   React.useEffect(() => {
     convertLexicalStateToMarkdown(editor.getEditorState())
-      .then((markdown) => {
-        setOutMarkdown(markdown)
-      })
+      .then(setCurrentMarkdown)
       .catch((rejection) => console.warn({ rejection }))
-  })
+  }, [editor])
 
   const onChange = React.useCallback(() => {
     convertLexicalStateToMarkdown(editor.getEditorState())
-      .then((markdown) => {
-        setOutMarkdown(markdown)
-      })
+      .then(setCurrentMarkdown)
       .catch((rejection) => console.warn({ rejection }))
   }, [editor])
 
   return (
     <>
-      <div style={{ display: 'flex', height: 400, overflow: 'auto' }}>
-        <div style={{ flex: 1 }}>
-          <h3>Result markdown</h3>
-          <OnChangePlugin onChange={onChange} />
-
-          <code>
-            <pre>{outMarkdown.trim()}</pre>
-          </code>
-        </div>
-        <div style={{ flex: 1 }}>
-          <h3>Initial markdown</h3>
-          <code>
-            <pre>{initialCode.trim()}</pre>
-          </code>
-        </div>
-      </div>
+      <OnChangePlugin onChange={onChange} />
+      <ReactDiffViewer oldValue={initialCode} newValue={currentMarkdown} splitView={true} />
     </>
   )
 }

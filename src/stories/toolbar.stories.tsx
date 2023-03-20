@@ -17,21 +17,21 @@ import codeBlocksMarkdown from './assets/code-blocks-markdown.md?raw'
 import { CodeHighlightPlugin, MarkdownResult, sandpackConfig, standardConfig } from './boilerplate'
 import { TRANSFORMERS } from '@lexical/markdown'
 import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin'
+import { DiffViewContextProvider, DiffViewerToggle } from '../ui/DiffViewerPlugin'
 
 export function ToolbarKitchenSink() {
   return (
     <LexicalComposer initialConfig={standardConfig(initialMarkdown)}>
-      <ToolbarPlugin />
-      <RichTextPlugin
-        contentEditable={<ContentEditable className="EditorContentEditable" />}
-        placeholder={<div></div>}
-        ErrorBoundary={LexicalErrorBoundary}
-      />
-      <LexicalLinkPlugin />
-      <HorizontalRulePlugin />
-      <ListPlugin />
-      <LinkDialogPlugin />
-      <MarkdownResult initialCode={initialMarkdown} />
+      <DiffViewContextProvider>
+        <ToolbarPlugin />
+        <DiffViewerToggle initialCode={initialMarkdown}>
+          <RichTextPlugin contentEditable={<ContentEditable />} placeholder={<div></div>} ErrorBoundary={LexicalErrorBoundary} />
+        </DiffViewerToggle>
+        <LexicalLinkPlugin />
+        <HorizontalRulePlugin />
+        <ListPlugin />
+        <LinkDialogPlugin />
+      </DiffViewContextProvider>
     </LexicalComposer>
   )
 }
@@ -48,7 +48,6 @@ export function ToolbarWithCode() {
         <CodeHighlightPlugin />
         <LinkDialogPlugin />
         <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
-        <MarkdownResult initialCode={codeBlocksMarkdown} />
       </LexicalComposer>
     </SandpackConfigContext.Provider>
   )

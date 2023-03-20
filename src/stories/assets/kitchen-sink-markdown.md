@@ -45,4 +45,4 @@ And *some italic with nested **bold** text*.
 
 Image:
 
-![Shiprock](https://web-dev.imgix.net/image/admin/OIF2VcXp8P6O7tQvw53B.jpg)
+![Shiprock](https://virtuoso.dev/img/logo.svg)

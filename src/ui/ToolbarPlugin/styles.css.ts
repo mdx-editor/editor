@@ -22,7 +22,7 @@ const itemStyles = {
   alignItems: 'center',
   justifyContent: 'center',
   ':hover': { backgroundImage: themeVars.backgroundHover },
-  ':focus': { transform: 'translate(2px, 2px)' },
+  ':active': { transform: 'translate(1px, 1px)' },
   selectors: {
     '&:active:hover': { backgroundColor: themeVars.toolbar.toggleButtonOnBackground },
   },

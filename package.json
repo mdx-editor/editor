@@ -121,7 +121,8 @@
     "mdast-util-to-markdown": "1.5.0",
     "micromark-extension-directive": "2.1.2",
     "micromark-extension-frontmatter": "1.0.1",
-    "micromark-extension-mdxjs": "1.0.0"
+    "micromark-extension-mdxjs": "1.0.0",
+    "react-diff-viewer": "^3.1.1"
   },
   "publishConfig": {
     "access": "public"
