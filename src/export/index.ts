@@ -153,6 +153,7 @@ export const SandpackNodeVisitor: LexicalExportVisitor<SandpackNode, Mdast.Code>
   visitLexicalNode: ({ lexicalNode, actions }) => {
     actions.addAndStepInto('code', {
       value: lexicalNode.getCode(),
+      lang: lexicalNode.getLanguage(),
       meta: lexicalNode.getMeta(),
     })
   },

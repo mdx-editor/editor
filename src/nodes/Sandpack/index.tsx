@@ -1,19 +1,34 @@
 import { SandpackCodeEditor, SandpackLayout, SandpackPreview, SandpackProvider, useSandpack } from '@codesandbox/sandpack-react'
 import { CodeMirrorRef } from '@codesandbox/sandpack-react/dist/components/CodeEditor/CodeMirror'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { createCommand, DecoratorNode, EditorConfig, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
+import { $moveCaretSelection } from '@lexical/selection'
+import {
+  $createParagraphNode,
+  $getNodeByKey,
+  createCommand,
+  DecoratorNode,
+  EditorConfig,
+  FOCUS_COMMAND,
+  LexicalNode,
+  NodeKey,
+  RangeSelection,
+  SerializedLexicalNode,
+  Spread,
+} from 'lexical'
 import React, { useContext } from 'react'
 import { parseCodeBlockMeta } from './parseCodeBlockMeta'
 
 export interface SandpackPayload {
   code: string
   meta: string
+  language: string
 }
 
 export type SerializedSandpackNode = Spread<
   {
     code: string
     meta: string
+    language: string
     type: 'sandpack'
     version: 1
   },
@@ -105,19 +120,66 @@ const CodeEditor = ({ nodeKey, code, meta, onChange }: CodeEditorProps) => {
     editor.dispatchCommand(ACTIVE_SANDPACK_COMMAND, { nodeKey })
   }, [editor, nodeKey])
 
+  const onKeyDownHandler = React.useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === 'ArrowDown') {
+        const state = codeMirrorRef?.current?.getCodemirror()?.state
+        if (state) {
+          const docLength = state.doc.length
+          const selectionEnd = state.selection.ranges[0].to
+
+          if (docLength === selectionEnd) {
+            editor.update(() => {
+              const node = $getNodeByKey(nodeKey)!
+              const nextSibling = node.getNextSibling()
+              if (nextSibling) {
+                codeMirrorRef?.current?.getCodemirror()?.contentDOM.blur()
+                node.selectNext()
+              } else {
+                node.insertAfter($createParagraphNode())
+                // TODO: insert a paragraph after the sandpack node
+              }
+            })
+          }
+        }
+      } else if (e.key === 'ArrowUp') {
+        const state = codeMirrorRef?.current?.getCodemirror()?.state
+        if (state) {
+          const selectionStart = state.selection.ranges[0].from
+
+          if (selectionStart === 0) {
+            editor.update(() => {
+              const node = $getNodeByKey(nodeKey)!
+              const previousSibling = node.getPreviousSibling()
+              if (previousSibling) {
+                codeMirrorRef?.current?.getCodemirror()?.contentDOM.blur()
+                node.selectPrevious()
+              } else {
+                // TODO: insert a paragraph before the sandpack node
+              }
+            })
+          }
+        }
+      }
+    },
+    [editor, nodeKey]
+  )
+
   React.useEffect(() => {
     const codeMirror = codeMirrorRef.current
 
     // TODO: This is a hack to get around the fact that the CodeMirror instance
-    // is not available immediately after the component is mounted. We should we should what?
+    // is not available immediately after the component is mounted.
     setTimeout(() => {
       codeMirror?.getCodemirror()?.contentDOM?.addEventListener('focus', onFocusHandler)
+      codeMirror?.getCodemirror()?.contentDOM?.addEventListener('keydown', onKeyDownHandler)
     }, 100)
 
     return () => {
       codeMirror?.getCodemirror()?.contentDOM.removeEventListener('focus', onFocusHandler)
+      codeMirror?.getCodemirror()?.contentDOM.removeEventListener('keydown', onKeyDownHandler)
     }
-  }, [codeMirrorRef, onFocusHandler])
+  }, [codeMirrorRef, onFocusHandler, onKeyDownHandler])
 
   return (
     <SandpackProvider
@@ -146,33 +208,37 @@ const CodeEditor = ({ nodeKey, code, meta, onChange }: CodeEditorProps) => {
 export class SandpackNode extends DecoratorNode<JSX.Element> {
   __code: string
   __meta: string
+  __language: string
 
   static getType(): string {
     return 'sandpack'
   }
 
   static clone(node: SandpackNode): SandpackNode {
-    return new SandpackNode(node.__code, node.__meta, node.__key)
+    return new SandpackNode(node.__code, node.__language, node.__meta, node.__key)
   }
 
   static importJSON(serializedNode: SerializedSandpackNode): SandpackNode {
-    const { code, meta } = serializedNode
+    const { code, meta, language } = serializedNode
     const node = $createSandpackNode({
       code,
+      language,
       meta,
     })
     return node
   }
 
-  constructor(code: string, meta: string, key?: NodeKey) {
+  constructor(code: string, language: string, meta: string, key?: NodeKey) {
     super(key)
     this.__code = code
     this.__meta = meta
+    this.__language = language
   }
 
   exportJSON(): SerializedSandpackNode {
     return {
       code: this.getCode(),
+      language: this.getLanguage(),
       meta: this.getMeta(),
       type: 'sandpack',
       version: 1,
@@ -196,6 +262,10 @@ export class SandpackNode extends DecoratorNode<JSX.Element> {
     return this.getLatest().__meta
   }
 
+  getLanguage(): string {
+    return this.getLatest().__language
+  }
+
   setCode(code: string) {
     if (code !== this.__code) {
       this.getWritable().__code = code
@@ -205,6 +275,12 @@ export class SandpackNode extends DecoratorNode<JSX.Element> {
   setMeta(meta: string) {
     if (meta !== this.__meta) {
       this.getWritable().__meta = meta
+    }
+  }
+
+  setLanguage(language: string) {
+    if (language !== this.__language) {
+      this.getWritable().__language = language
     }
   }
 
@@ -220,8 +296,8 @@ interface CodeEditorProps {
   onChange: (code: string) => void
 }
 
-export function $createSandpackNode({ code, meta }: SandpackPayload): SandpackNode {
-  return new SandpackNode(code, meta)
+export function $createSandpackNode({ code, language, meta }: SandpackPayload): SandpackNode {
+  return new SandpackNode(code, language, meta)
 }
 
 export function $isSandpackNode(node: LexicalNode | null | undefined): node is SandpackNode {

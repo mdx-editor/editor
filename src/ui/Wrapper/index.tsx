@@ -20,6 +20,7 @@ import {
   ViewModeContextProvider,
   ViewModeToggler,
 } from '../../'
+import * as styles from './styles.css'
 
 export function standardConfig(markdown: string) {
   return {
@@ -45,7 +46,11 @@ export const Wrapper: React.FC<WrappedEditorProps> = ({ markdown, sandpackConfig
         <ViewModeContextProvider>
           <ToolbarPlugin />
           <ViewModeToggler initialCode={markdown}>
-            <RichTextPlugin contentEditable={<ContentEditable />} placeholder={<div></div>} ErrorBoundary={LexicalErrorBoundary} />
+            <RichTextPlugin
+              contentEditable={<ContentEditable className={styles.ContentEditable} />}
+              placeholder={<div></div>}
+              ErrorBoundary={LexicalErrorBoundary}
+            />
           </ViewModeToggler>
           <LexicalLinkPlugin />
           <CodeHighlightPlugin />
