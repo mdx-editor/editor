@@ -1,12 +1,26 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import React from 'react'
-import { UsedLexicalNodes, importMarkdownToLexical, SandpackConfig, exportMarkdownFromLexical, contentTheme } from '..'
-import { $getRoot, EditorState } from 'lexical'
-import dataCode from './assets/dataCode.ts?raw'
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin'
 import { registerCodeHighlighting } from '@lexical/code'
-import ReactDiffViewer from 'react-diff-viewer'
+import { LexicalComposer } from '@lexical/react/LexicalComposer'
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import { ContentEditable } from '@lexical/react/LexicalContentEditable'
+import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary'
+import { HorizontalRulePlugin } from '@lexical/react/LexicalHorizontalRulePlugin'
+import { LinkPlugin as LexicalLinkPlugin } from '@lexical/react/LexicalLinkPlugin'
+import { ListPlugin } from '@lexical/react/LexicalListPlugin'
+import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
+import { $getRoot, EditorState } from 'lexical'
+import React from 'react'
+import {
+  contentTheme,
+  exportMarkdownFromLexical,
+  importMarkdownToLexical,
+  SandpackConfig,
+  SandpackConfigContext,
+  UsedLexicalNodes,
+} from '..'
+import { LinkDialogPlugin, ToolbarPlugin } from '../'
+import { ViewModeContextProvider, ViewModeToggler } from '../ui/SourcePlugin'
+import dataCode from './assets/dataCode.ts?raw'
 
 export function standardConfig(markdown: string) {
   return {
@@ -19,7 +33,7 @@ export function standardConfig(markdown: string) {
     onError: (error: Error) => console.error(error),
   }
 }
-export const sandpackConfig: SandpackConfig = {
+export const virtuosoSampleSandpackConfig: SandpackConfig = {
   defaultPreset: 'react',
   presets: [
     {
@@ -52,30 +66,6 @@ export function convertLexicalStateToMarkdown(state: EditorState) {
   })
 }
 
-export function MarkdownResult({ initialCode }: { initialCode: string }) {
-  const [editor] = useLexicalComposerContext()
-  const [currentMarkdown, setCurrentMarkdown] = React.useState('')
-
-  React.useEffect(() => {
-    convertLexicalStateToMarkdown(editor.getEditorState())
-      .then(setCurrentMarkdown)
-      .catch((rejection) => console.warn({ rejection }))
-  }, [editor])
-
-  const onChange = React.useCallback(() => {
-    convertLexicalStateToMarkdown(editor.getEditorState())
-      .then(setCurrentMarkdown)
-      .catch((rejection) => console.warn({ rejection }))
-  }, [editor])
-
-  return (
-    <>
-      <OnChangePlugin onChange={onChange} />
-      <ReactDiffViewer oldValue={initialCode} newValue={currentMarkdown} splitView={true} />
-    </>
-  )
-}
-
 export function CodeHighlightPlugin(): JSX.Element | null {
   const [editor] = useLexicalComposerContext()
 
@@ -84,4 +74,28 @@ export function CodeHighlightPlugin(): JSX.Element | null {
   }, [editor])
 
   return null
+}
+
+interface WrappedEditorProps {
+  markdown: string
+}
+
+export const WrappedLexicalEditor: React.FC<WrappedEditorProps> = ({ markdown }) => {
+  return (
+    <SandpackConfigContext.Provider value={virtuosoSampleSandpackConfig}>
+      <LexicalComposer initialConfig={standardConfig(markdown)}>
+        <ViewModeContextProvider>
+          <ToolbarPlugin />
+          <ViewModeToggler initialCode={markdown}>
+            <RichTextPlugin contentEditable={<ContentEditable />} placeholder={<div></div>} ErrorBoundary={LexicalErrorBoundary} />
+          </ViewModeToggler>
+          <LexicalLinkPlugin />
+          <CodeHighlightPlugin />
+          <HorizontalRulePlugin />
+          <ListPlugin />
+          <LinkDialogPlugin />
+        </ViewModeContextProvider>
+      </LexicalComposer>
+    </SandpackConfigContext.Provider>
+  )
 }

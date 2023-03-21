@@ -38,9 +38,12 @@ export function MarkdownPlainTextEditor() {
 
   const updateCurrentMarkdown = React.useCallback(() => {
     convertLexicalStateToMarkdown(editor.getEditorState())
-      .then(setCurrentMarkdown)
+      .then((value) => {
+        setCurrentMarkdown(value)
+        updateMarkdown(value)
+      })
       .catch((rejection) => console.warn({ rejection }))
-  }, [editor])
+  }, [editor, updateMarkdown])
 
   React.useEffect(updateCurrentMarkdown, [editor, updateCurrentMarkdown])
 

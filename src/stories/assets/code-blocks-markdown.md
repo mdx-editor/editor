@@ -1,12 +1,13 @@
-## Block of code:
+# Block of code:
 
+## JS
 ```js
 export default function App() {
   return <h1>Hello world from a markdown</h1>
 }
 ```
 
-----
+## CSS
 
 ```css
 body {

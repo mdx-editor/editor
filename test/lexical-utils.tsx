@@ -33,9 +33,7 @@ import * as React from 'react'
 import { createRef } from 'react'
 import { createRoot } from 'react-dom/client'
 import * as ReactTestUtils from 'react-dom/test-utils'
-import { ImageNode } from '../src/nodes/Image'
-import { SandpackNode } from '../src/nodes/Sandpack'
-import { FrontmatterNode } from '../src/nodes/Frontmatter'
+import { SandpackNode, ImageNode, FrontmatterNode } from '../src/'
 
 let _keyCounter = 1
 
