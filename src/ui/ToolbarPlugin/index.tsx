@@ -14,6 +14,7 @@ import { $findMatchingParent, $getNearestNodeOfType, $insertNodeToNearestRoot, m
 import * as RadixToolbar from '@radix-ui/react-toolbar'
 import * as styles from './styles.css'
 import {
+  $getRoot,
   $getSelection,
   $isRangeSelection,
   $isRootOrShadowRoot,
@@ -45,7 +46,8 @@ import { ActiveSandpackPayload, ACTIVE_SANDPACK_COMMAND } from '../../nodes/Sand
 import { DEFAULT_FORMAT, IS_BOLD, IS_ITALIC, IS_UNDERLINE, IS_CODE } from '../../FormatConstants'
 import { $createCodeNode } from '@lexical/code'
 import { $isAdmonitionNode, AdmonitionKind } from '../../nodes'
-import { useDiffViewOn } from '../DiffViewerPlugin'
+import { useMarkdownSource, useViewMode, ViewMode } from '../'
+import { importMarkdownToLexical } from '../..'
 
 const ListTypeCommandMap = new Map<ListType | '', LexicalCommand<void>>([
   ['number', INSERT_ORDERED_LIST_COMMAND],
@@ -61,8 +63,8 @@ export const ToolbarPlugin = () => {
   const [blockType, setBlockType] = React.useState('' as BlockType | AdmonitionKind | '')
   const [activeCodeBlock, setActiveCodeBlock] = React.useState<string | null>(null)
   const [activeSandpack, setActiveSandpack] = React.useState<ActiveSandpackPayload | null>(null)
-  const [diffViewOn, setDiffViewOn] = useDiffViewOn()
-  const [markdownOn, setMarkdownOn] = React.useState(false)
+  const [viewMode, setViewMode] = useViewMode()
+  const [markdownValueRef] = useMarkdownSource()
 
   const updateToolbar = React.useCallback(() => {
     const selection = $getSelection()
@@ -245,7 +247,7 @@ export const ToolbarPlugin = () => {
       <div style={{ height: 64 }}>
         <select
           value={activeCodeBlock}
-          onChange={(e) => {
+          onChange={(_e) => {
             // editor.dispatchCommand(SET_CODE_BLOCK_LANGUAGE_COMMAND, { language: e.target.value, nodeKey: activeCodeBlock.nodeKey })
           }}
         >
@@ -340,28 +342,37 @@ export const ToolbarPlugin = () => {
       <ToolbarSeparator />
       <RadixToolbar.ToggleGroup
         type="single"
-        aria-label="View diff"
-        onValueChange={() => setDiffViewOn((v) => !v)}
-        value={diffViewOn ? 'on' : ''}
+        aria-label="View Mode"
+        onValueChange={(newViewMode) =>
+          setViewMode((current) => {
+            if (current === 'markdown') {
+              activeEditor.update(() => {
+                $getRoot().clear()
+                importMarkdownToLexical($getRoot(), markdownValueRef.current)
+              })
+            }
+
+            return ViewModeMap.get(newViewMode)!
+          })
+        }
+        value={viewMode === 'editor' ? '' : viewMode}
       >
-        <ToolbarToggleItem value="on" aria-label="View diff">
+        <ToolbarToggleItem value="diff" aria-label="View diff">
           <DiffIcon />
         </ToolbarToggleItem>
-      </RadixToolbar.ToggleGroup>
-
-      <RadixToolbar.ToggleGroup
-        type="single"
-        aria-label="View Markdown"
-        onValueChange={() => setMarkdownOn((v) => !v)}
-        value={markdownOn ? 'on' : ''}
-      >
-        <ToolbarToggleItem value="on" aria-label="View Markdown">
+        <ToolbarToggleItem value="markdown" aria-label="View Markdown">
           <MarkdownIcon />
         </ToolbarToggleItem>
       </RadixToolbar.ToggleGroup>
     </RadixToolbar.Root>
   )
 }
+
+const ViewModeMap = new Map<string, ViewMode>([
+  ['diff', 'diff'],
+  ['markdown', 'markdown'],
+  ['', 'editor'],
+])
 
 function ToolbarToggleItem(props: RadixToolbar.ToolbarToggleItemProps) {
   return <RadixToolbar.ToggleItem {...props} className={styles.ToggleItem} />

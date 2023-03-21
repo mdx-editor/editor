@@ -17,21 +17,21 @@ import codeBlocksMarkdown from './assets/code-blocks-markdown.md?raw'
 import { CodeHighlightPlugin, MarkdownResult, sandpackConfig, standardConfig } from './boilerplate'
 import { TRANSFORMERS } from '@lexical/markdown'
 import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin'
-import { DiffViewContextProvider, DiffViewerToggle } from '../ui/DiffViewerPlugin'
+import { ViewModeContextProvider, ViewModeToggler } from '../ui/SourcePlugin'
 
 export function ToolbarKitchenSink() {
   return (
     <LexicalComposer initialConfig={standardConfig(initialMarkdown)}>
-      <DiffViewContextProvider>
+      <ViewModeContextProvider>
         <ToolbarPlugin />
-        <DiffViewerToggle initialCode={initialMarkdown}>
+        <ViewModeToggler initialCode={initialMarkdown}>
           <RichTextPlugin contentEditable={<ContentEditable />} placeholder={<div></div>} ErrorBoundary={LexicalErrorBoundary} />
-        </DiffViewerToggle>
+        </ViewModeToggler>
         <LexicalLinkPlugin />
         <HorizontalRulePlugin />
         <ListPlugin />
         <LinkDialogPlugin />
-      </DiffViewContextProvider>
+      </ViewModeContextProvider>
     </LexicalComposer>
   )
 }
