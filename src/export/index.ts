@@ -5,11 +5,13 @@ import { $isHorizontalRuleNode, HorizontalRuleNode } from '@lexical/react/Lexica
 import { $isHeadingNode, $isQuoteNode, HeadingNode, QuoteNode } from '@lexical/rich-text'
 import {
   $isElementNode,
+  $isLineBreakNode,
   $isParagraphNode,
   $isRootNode,
   $isTextNode,
   ElementNode as LexicalElementNode,
   LexicalNode,
+  LineBreakNode,
   ParagraphNode,
   RootNode as LexicalRootNode,
   TextNode,
@@ -170,6 +172,13 @@ function isMdastText(mdastNode: Mdast.Content): mdastNode is Mdast.Text {
   return mdastNode.type === 'text'
 }
 
+export const LexicalLinebreakVisitor: LexicalExportVisitor<LineBreakNode, Mdast.Text> = {
+  testLexicalNode: $isLineBreakNode,
+  visitLexicalNode: ({ mdastParent, actions }) => {
+    actions.appendToParent(mdastParent, { type: 'text', value: '\n' })
+  },
+}
+
 export const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text> = {
   shouldJoin: (prevNode, currentNode) => {
     return ['text', 'emphasis', 'strong', 'mdxJsxTextElement'].includes(prevNode.type) && prevNode.type === currentNode.type
@@ -279,6 +288,7 @@ export const LexicalVisitors = [
   LexicalParagraphVisitor,
   LexicalFrontmatterVisitor,
   LexicalTextVisitor,
+  LexicalLinebreakVisitor,
   LexicalLinkVisitor,
   LexicalHeadingVisitor,
   LexicalListVisitor,
