@@ -18,8 +18,6 @@ export function CodeBlocks() {
   return <WrappedLexicalEditor markdown={codeBlocksMarkdown} />
 }
 
-console.log(jsxMarkdown)
-
 export function JSX() {
   return <WrappedLexicalEditor markdown={jsxMarkdown} />
 }

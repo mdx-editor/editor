@@ -7,6 +7,7 @@ export const [themeClassName, themeVars] = createTokenizedTheme({
     background: slate.slate2,
     border: slate.slate12,
     foreground: slate.slate12,
+    pill: slate.slate4,
     accent: sky.sky9,
     glow: makeHslTransparent(sky.sky9, 0.8),
     transitionStartGlow: makeHslTransparent(sky.sky9, 0.2),

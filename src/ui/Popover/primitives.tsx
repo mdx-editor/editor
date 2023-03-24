@@ -12,3 +12,9 @@ export const PopoverContent = React.forwardRef<any, React.ComponentProps<typeof 
     return <Popover.Content {...props} className={`${themeClassName} ${styles.Content}`} ref={ref} />
   }
 )
+
+export const PopoverTrigger = React.forwardRef<any, React.ComponentProps<typeof Popover.Trigger>>(
+  (props: React.ComponentProps<typeof Popover.Trigger>, ref) => {
+    return <Popover.Trigger {...props} className={styles.Trigger} ref={ref} />
+  }
+)

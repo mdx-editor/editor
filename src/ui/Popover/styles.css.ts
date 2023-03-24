@@ -89,3 +89,10 @@ export const IconButton = style({
   ':hover': { backgroundColor: 'blue' },
   ':focus': { boxShadow: `0 0 0 2px black` },
 })
+
+export const Trigger = style({
+  all: 'unset',
+  padding: 0,
+  display: 'inline-flex',
+  alignItems: 'center',
+})

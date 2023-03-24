@@ -1,18 +1,13 @@
+import type { LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
 import React from 'react'
-import type {
-  DOMConversionMap,
-  DOMConversionOutput,
-  DOMExportOutput,
-  EditorConfig,
-  LexicalEditor,
-  LexicalNode,
-  NodeKey,
-  SerializedLexicalNode,
-  Spread,
-} from 'lexical'
 
 import { DecoratorNode } from 'lexical'
 import { MdxJsxAttribute } from 'mdast-util-mdx'
+import { ReactComponent as SettingsIcon } from './icons/settings.svg'
+// import { ReactComponent as ExtensionIcon } from './icons/extension.svg'
+import * as styles from './styles.css'
+import * as RadixPopover from '@radix-ui/react-popover'
+import { PopoverContent, PopoverTrigger } from '../../ui/Popover/primitives'
 
 type JsxKind = 'text' | 'flow'
 export interface JsxPayload {
@@ -60,7 +55,6 @@ export class JsxNode extends DecoratorNode<JSX.Element> {
     if (!attributes) {
       debugger
     }
-    console.log('q', attributes)
     this.__name = name
     this.__kind = kind
     this.__attributes = attributes
@@ -101,19 +95,58 @@ export class JsxNode extends DecoratorNode<JSX.Element> {
   }
 
   decorate(): JSX.Element {
-    if (this.getKey() === 'flow') {
+    if (this.getKind() === 'flow') {
       return (
-        <div>
-          Flow -{this.getName()} - {JSON.stringify(this.getAttributes())}
+        <div className={styles.blockComponent}>
+          <div>{this.getName()}</div>
+          <JsxPropertyPanel attributes={this.getAttributes()} />
         </div>
       )
     }
     return (
-      <code>
-        {this.getName()} - {JSON.stringify(this.getAttributes())}
-      </code>
+      <span className={styles.inlineComponent}>
+        <span>
+          <RadixPopover.Root>
+            <PopoverTrigger>
+              <SettingsIcon />
+            </PopoverTrigger>
+            <RadixPopover.Portal>
+              <PopoverContent>
+                <JsxPropertyPanel attributes={this.getAttributes()} />
+              </PopoverContent>
+            </RadixPopover.Portal>
+          </RadixPopover.Root>
+        </span>
+        <span>{this.getName()}</span>
+      </span>
     )
   }
+}
+
+interface JsxPropertyPanelProps {
+  attributes: Array<MdxJsxAttribute>
+}
+
+const JsxPropertyPanel: React.FC<JsxPropertyPanelProps> = ({ attributes }) => {
+  // iterate over the attributes and render a two column table with the name and value
+  return (
+    <table>
+      <thead>
+        <tr>
+          <th>Attribute</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        {attributes.map((attribute) => (
+          <tr key={attribute.name}>
+            <td>{attribute.name}</td>
+            <td>{attribute.value as any}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )
 }
 
 export function $createJsxNode({ name, kind, attributes }: JsxPayload): JsxNode {
