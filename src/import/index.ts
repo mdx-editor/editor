@@ -143,7 +143,7 @@ export const MdastCodeVisitor: MdastImportVisitor<Mdast.Code> = {
   testNode: 'code',
   visitNode({ mdastNode, actions }) {
     if (mdastNode.meta?.startsWith('live')) {
-      actions.addAndStepInto($createSandpackNode({ code: mdastNode.value, language: mdastNode.lang, meta: mdastNode.meta }))
+      actions.addAndStepInto($createSandpackNode({ code: mdastNode.value, language: mdastNode.lang!, meta: mdastNode.meta }))
     } else {
       actions.addAndStepInto($createCodeNode(mdastNode.lang).append($createTextNode(mdastNode.value)))
     }

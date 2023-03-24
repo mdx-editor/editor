@@ -13,8 +13,8 @@ import {
   contentTheme,
   importMarkdownToLexical,
   LinkDialogPlugin,
-  SandpackConfig,
   SandpackConfigContext,
+  SandpackConfigValue,
   ToolbarPlugin,
   UsedLexicalNodes,
   ViewModeContextProvider,
@@ -36,7 +36,7 @@ export function standardConfig(markdown: string) {
 
 interface WrappedEditorProps {
   markdown: string
-  sandpackConfig: SandpackConfig
+  sandpackConfig: SandpackConfigValue
 }
 
 export const Wrapper: React.FC<WrappedEditorProps> = ({ markdown, sandpackConfig }) => {

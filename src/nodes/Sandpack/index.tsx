@@ -1,22 +1,21 @@
 import { SandpackCodeEditor, SandpackLayout, SandpackPreview, SandpackProvider, useSandpack } from '@codesandbox/sandpack-react'
 import { CodeMirrorRef } from '@codesandbox/sandpack-react/dist/components/CodeEditor/CodeMirror'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { $moveCaretSelection } from '@lexical/selection'
 import {
   $createParagraphNode,
   $getNodeByKey,
   createCommand,
   DecoratorNode,
   EditorConfig,
-  FOCUS_COMMAND,
   LexicalNode,
   NodeKey,
-  RangeSelection,
   SerializedLexicalNode,
   Spread,
 } from 'lexical'
 import React, { useContext } from 'react'
-import { parseCodeBlockMeta } from './parseCodeBlockMeta'
+import { CodeBlockMeta, parseCodeBlockMeta } from './parseCodeBlockMeta'
+
+export type { CodeBlockMeta } from './parseCodeBlockMeta'
 
 export interface SandpackPayload {
   code: string
@@ -77,7 +76,9 @@ const DefaultSandpackConfig: SandpackConfig = {
   ],
 }
 
-export const SandpackConfigContext = React.createContext<SandpackConfig>(DefaultSandpackConfig)
+export type SandpackConfigValue = SandpackConfig | ((meta: CodeBlockMeta) => SandpackPreset)
+
+export const SandpackConfigContext = React.createContext<SandpackConfigValue>(DefaultSandpackConfig)
 
 interface CodeUpdateEmitterProps {
   snippetFileName: string
@@ -98,13 +99,19 @@ export const ACTIVE_SANDPACK_COMMAND = createCommand<ActiveSandpackPayload | nul
 
 const CodeEditor = ({ nodeKey, code, meta, onChange }: CodeEditorProps) => {
   const [editor] = useLexicalComposerContext()
-  const config = useContext(SandpackConfigContext)
   const codeMirrorRef = React.useRef<CodeMirrorRef>(null)
+
+  let preset: SandpackPreset | undefined
+  const config = useContext(SandpackConfigContext)
   const metaObj = parseCodeBlockMeta(meta)
-  const presetName = metaObj.preset || config.defaultPreset
-  const preset = config.presets.find((p) => p.name === presetName)
-  if (!preset) {
-    throw new Error(`Unknown preset: ${presetName}`)
+  if (typeof config === 'function') {
+    preset = config(metaObj)
+  } else {
+    const presetName = metaObj.preset || config.defaultPreset
+    preset = config.presets.find((p) => p.name === presetName)
+    if (!preset) {
+      throw new Error(`No preset found for name ${presetName}`)
+    }
   }
 
   const wrappedOnChange = React.useCallback(

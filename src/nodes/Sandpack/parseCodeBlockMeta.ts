@@ -20,3 +20,5 @@ export function parseCodeBlockMeta(meta: string) {
   }
   return result
 }
+
+export type CodeBlockMeta = ReturnType<typeof parseCodeBlockMeta>
