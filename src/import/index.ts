@@ -19,6 +19,7 @@ import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from '../FormatConstants'
 import { $createAdmonitionNode, AdmonitionNode, AdmonitionKind, $isAdmonitionNode } from '../nodes/Admonition'
 import { $createFrontmatterNode, FrontmatterNode } from '../nodes/Frontmatter'
 import { $createImageNode, ImageNode } from '../nodes/Image'
+import { $createJsxNode, JsxNode } from '../nodes/Jsx'
 import { $createSandpackNode, SandpackNode } from '../nodes/Sandpack'
 
 type MdastNode = Mdast.Content
@@ -188,6 +189,31 @@ export const MdastFrontmatterVisitor: MdastImportVisitor<Mdast.YAML> = {
   },
 }
 
+export const MdastMdxJsEsmVisitor: MdastImportVisitor<Mdast.YAML> = {
+  testNode: 'mdxjsEsm',
+  visitNode() {
+    // nothing - we will reconstruct the necessary import statements in the export based on the used elements.
+    void 0
+  },
+}
+
+export const MdastMdxJsxElementVisitor: MdastImportVisitor<MdxJsxTextElement> = {
+  testNode: (node) => {
+    return node.type === 'mdxJsxTextElement' || node.type === 'mdxJsxFlowElement'
+  },
+  visitNode({ mdastNode, actions }) {
+    actions.addAndStepInto(
+      $createJsxNode({
+        name: mdastNode.name!,
+        kind: mdastNode.type === 'mdxJsxTextElement' ? 'text' : 'flow',
+        //TODO: expressions are nto supported yet
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        attributes: mdastNode.attributes as any,
+      })
+    )
+  },
+}
+
 export const MdastVisitors = [
   MdastRootVisitor,
   MdastParagraphVisitor,
@@ -204,6 +230,8 @@ export const MdastVisitors = [
   MdastImageVisitor,
   MdastFrontmatterVisitor,
   MdastAdmonitionVisitor,
+  MdastMdxJsEsmVisitor,
+  MdastMdxJsxElementVisitor,
 ]
 
 function isParent(node: unknown): node is Mdast.Parent {
@@ -237,6 +265,8 @@ export function importMarkdownToLexical(
       return visitor.testNode(mdastNode)
     })
     if (!visitor) {
+      console.log(JSON.stringify(mdastNode, null, 2))
+
       throw new Error(`no unist visitor found for ${mdastNode.type}`, {
         cause: mdastNode,
       })
@@ -281,4 +311,5 @@ export const UsedLexicalNodes = [
   CodeHighlightNode,
   FrontmatterNode,
   AdmonitionNode,
+  JsxNode,
 ]

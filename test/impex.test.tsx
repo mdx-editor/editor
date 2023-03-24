@@ -206,11 +206,24 @@ title: My Favorite page
   })
 })
 
+describe('mdx jsx components', () => {
+  initializeUnitTest((testEnv) => {
+    it.only('understands imports and jsx', () => {
+      const md = `
+import {A1, A2} from './some/place.js'
+
+An <A1>external</A1> <A2 /> component.
+    `.trim()
+
+      testIdenticalMarkdownAfterImportExport(testEnv.editor!, md)
+    })
+  })
+})
+
 describe('markdown export options', () => {
   initializeUnitTest((testEnv) => {
     it('accepts toMarkdown options', () => {
-      const md = `
-- Bullet 1
+      const md = ` - Bullet 1
 - Bullet 2
       `
       testIdenticalMarkdownAfterImportExport(testEnv.editor!, md, { bullet: '-' })
