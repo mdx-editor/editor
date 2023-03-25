@@ -33,7 +33,7 @@ import * as React from 'react'
 import { createRef } from 'react'
 import { createRoot } from 'react-dom/client'
 import * as ReactTestUtils from 'react-dom/test-utils'
-import { SandpackNode, ImageNode, FrontmatterNode } from '../src/'
+import { UsedLexicalNodes } from '../src/'
 
 let _keyCounter = 1
 
@@ -387,26 +387,27 @@ export function $createTestDecoratorNode(): TestDecoratorNode {
   return new TestDecoratorNode()
 }
 
-const DEFAULT_NODES = [
-  HeadingNode,
-  ListNode,
-  ListItemNode,
-  QuoteNode,
-  CodeNode,
-  CodeHighlightNode,
-  AutoLinkNode,
-  LinkNode,
-  TestElementNode,
-  TestSegmentedNode,
-  TestExcludeFromCopyElementNode,
-  TestDecoratorNode,
-  TestInlineElementNode,
-  TestTextNode,
-  HorizontalRuleNode,
-  ImageNode,
-  SandpackNode,
-  FrontmatterNode,
-]
+// poor man's array unique
+const DEFAULT_NODES = Array.from(
+  new Set([
+    HeadingNode,
+    ListNode,
+    ListItemNode,
+    QuoteNode,
+    CodeNode,
+    CodeHighlightNode,
+    AutoLinkNode,
+    LinkNode,
+    TestElementNode,
+    TestSegmentedNode,
+    TestExcludeFromCopyElementNode,
+    TestDecoratorNode,
+    TestInlineElementNode,
+    TestTextNode,
+    HorizontalRuleNode,
+    ...UsedLexicalNodes,
+  ])
+)
 
 export function createTestEditor(
   config: {

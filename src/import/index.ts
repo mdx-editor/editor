@@ -11,7 +11,7 @@ import * as Mdast from 'mdast'
 import { ContainerDirective, directiveFromMarkdown } from 'mdast-util-directive'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { frontmatterFromMarkdown } from 'mdast-util-frontmatter'
-import { mdxFromMarkdown, MdxJsxTextElement } from 'mdast-util-mdx'
+import { mdxFromMarkdown, MdxjsEsm, MdxJsxTextElement } from 'mdast-util-mdx'
 import { directive } from 'micromark-extension-directive'
 import { frontmatter } from 'micromark-extension-frontmatter'
 import { mdxjs } from 'micromark-extension-mdxjs'
@@ -189,7 +189,7 @@ export const MdastFrontmatterVisitor: MdastImportVisitor<Mdast.YAML> = {
   },
 }
 
-export const MdastMdxJsEsmVisitor: MdastImportVisitor<Mdast.YAML> = {
+export const MdastMdxJsEsmVisitor: MdastImportVisitor<MdxjsEsm> = {
   testNode: 'mdxjsEsm',
   visitNode() {
     // nothing - we will reconstruct the necessary import statements in the export based on the used elements.
