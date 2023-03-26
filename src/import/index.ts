@@ -201,14 +201,17 @@ export const MdastMdxJsxElementVisitor: MdastImportVisitor<MdxJsxTextElement> = 
   testNode: (node) => {
     return node.type === 'mdxJsxTextElement' || node.type === 'mdxJsxFlowElement'
   },
-  visitNode({ mdastNode, actions }) {
-    actions.addAndStepInto(
+  visitNode({ lexicalParent, mdastNode, actions }) {
+    ;(lexicalParent as ElementNode).append(
       $createJsxNode({
         name: mdastNode.name!,
         kind: mdastNode.type === 'mdxJsxTextElement' ? 'text' : 'flow',
         //TODO: expressions are nto supported yet
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         attributes: mdastNode.attributes as any,
+        updateFn: (lexicalParent) => {
+          actions.visitChildren(mdastNode, lexicalParent)
+        },
       })
     )
   },
