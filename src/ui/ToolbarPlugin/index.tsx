@@ -41,11 +41,10 @@ import { ReactComponent as FrameSourceIcon } from './icons/frame_source.svg'
 import { ReactComponent as LiveCodeIcon } from './icons/deployed_code.svg'
 import { ReactComponent as DiffIcon } from './icons/difference.svg'
 import { ReactComponent as MarkdownIcon } from './icons/markdown.svg'
-import { ActiveSandpackPayload, ACTIVE_SANDPACK_COMMAND } from '../../nodes/Sandpack'
 
-import { DEFAULT_FORMAT, IS_BOLD, IS_ITALIC, IS_UNDERLINE, IS_CODE } from '../../FormatConstants'
+import { DEFAULT_FORMAT, IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from '../../FormatConstants'
 import { $createCodeNode } from '@lexical/code'
-import { $isAdmonitionNode, AdmonitionKind } from '../../nodes'
+import { $isAdmonitionNode, AdmonitionKind, ACTIVE_SANDPACK_COMMAND, ActiveSandpackPayload } from '../../nodes'
 import { useMarkdownSource, useViewMode, ViewMode } from '../'
 import { importMarkdownToLexical } from '../..'
 
@@ -346,7 +345,8 @@ export const ToolbarPlugin = () => {
         onValueChange={(newViewMode) =>
           setViewMode((current) => {
             if (current === 'markdown') {
-              activeEditor.update(() => {
+              // don't use active editor - we do it on the root level always.
+              editor.update(() => {
                 $getRoot().clear()
                 importMarkdownToLexical($getRoot(), markdownValueRef.current)
               })

@@ -112,7 +112,7 @@ export const LexicalListItemVisitor: LexicalExportVisitor<ListItemNode, Mdast.Li
     const firstChild = children[0]
 
     if (children.length === 1 && $isListNode(firstChild)) {
-      // append the list ater the paragraph of the previous list item
+      // append the list after the paragraph of the previous list item
       const prevListItemNode = mdastParent.children.at(-1) as Mdast.ListItem
       actions.visitChildren(lexicalNode, prevListItemNode)
     } else {
@@ -285,13 +285,22 @@ export const LexicalImageVisitor: LexicalExportVisitor<ImageNode, Mdast.Image> =
 
 export const JsxVisitor: LexicalExportVisitor<JsxNode, MdxJsxFlowElement | MdxJsxTextElement> = {
   testLexicalNode: $isJsxNode,
-  visitLexicalNode({ lexicalNode, actions }) {
+  visitLexicalNode({ mdastParent, lexicalNode, actions }) {
     const nodeType = lexicalNode.getKind() === 'text' ? 'mdxJsxTextElement' : 'mdxJsxFlowElement'
 
     actions.registerReferredComponent(lexicalNode.getName())
-    actions.addAndStepInto(nodeType, {
+
+    const node = {
+      type: nodeType,
       name: lexicalNode.getName(),
       attributes: lexicalNode.getAttributes(),
+      children: [],
+    } as MdxJsxFlowElement | MdxJsxTextElement
+
+    actions.appendToParent(mdastParent, node)
+
+    lexicalNode.inNestedEditor(() => {
+      actions.visitChildren(lexicalNode, node)
     })
   },
 }

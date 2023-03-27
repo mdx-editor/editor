@@ -156,6 +156,22 @@ export class JsxNode extends DecoratorNode<JSX.Element> {
     }
   }
 
+  inNestedEditor(callback: () => void) {
+    this.__editor.getEditorState().read(callback)
+  }
+
+  getChildren(): Array<LexicalNode> {
+    if (this.getKey() === 'flow') {
+      return $getRoot().getChildren() || []
+    } else {
+      const firstChild = $getRoot().getFirstChild()
+      if (!firstChild) {
+        return []
+      }
+      return (firstChild as ParagraphNode).getChildren() || []
+    }
+  }
+
   createDOM(): HTMLElement {
     if (this.getKey() === 'flow') {
       return document.createElement('div')
