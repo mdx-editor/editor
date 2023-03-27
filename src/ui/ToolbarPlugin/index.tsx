@@ -127,12 +127,8 @@ export const ToolbarPlugin = () => {
   }, [activeEditor])
 
   React.useEffect(() => {
-    activeEditor.getEditorState().read(() => {
-      updateToolbar()
-    })
-
     return mergeRegister(
-      activeEditor.registerCommand(
+      editor.registerCommand(
         SELECTION_CHANGE_COMMAND,
         (_payload, newEditor) => {
           updateToolbar()
@@ -140,15 +136,16 @@ export const ToolbarPlugin = () => {
           return false
         },
         COMMAND_PRIORITY_CRITICAL
-      ),
-      //       activeEditor.registerCommand(
-      //         CODE_BLOCK_ACTIVE_COMMAND,
-      //         (codeBlockActive) => {
-      //           setActiveCodeBlock(codeBlockActive)
-      //           return true
-      //         },
-      //         COMMAND_PRIORITY_CRITICAL
-      //       ),
+      )
+    )
+  }, [editor, updateToolbar])
+
+  React.useEffect(() => {
+    activeEditor.getEditorState().read(() => {
+      updateToolbar()
+    })
+
+    return mergeRegister(
       activeEditor.registerCommand(
         ACTIVE_SANDPACK_COMMAND,
         (activeSandpack) => {
