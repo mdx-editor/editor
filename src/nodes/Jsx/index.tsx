@@ -2,6 +2,7 @@
 import {
   $getRoot,
   createEditor,
+  DecoratorNode,
   LexicalEditor,
   LexicalNode,
   NodeKey,
@@ -13,8 +14,6 @@ import {
   Spread,
 } from 'lexical'
 import React from 'react'
-
-import { DecoratorNode } from 'lexical'
 import { MdxJsxAttribute } from 'mdast-util-mdx'
 import { ReactComponent as SettingsIcon } from './icons/settings.svg'
 // import { ReactComponent as ExtensionIcon } from './icons/extension.svg'
@@ -28,12 +27,14 @@ import { ContentEditable } from '@lexical/react/LexicalContentEditable'
 import { contentTheme } from '../../'
 
 type JsxKind = 'text' | 'flow'
+
+type updateFn = (node: LexicalNode) => void
 export interface JsxPayload {
   name: string
   kind: JsxKind
   attributes: Array<MdxJsxAttribute>
   state?: SerializedEditorState
-  updateFn?: (node: ParagraphNode) => void
+  updateFn?: updateFn
 }
 
 export type SerializedJsxNode = Spread<
@@ -54,8 +55,34 @@ interface JsxNodeConstructorParams {
   attributes: Array<MdxJsxAttribute>
   state?: SerializedEditorState
   key?: NodeKey
-  updateFn?: (node: ParagraphNode) => void
+  updateFn?: updateFn
 }
+const EmptySerializedTextEditorState = {
+  type: 'root',
+  format: 'left',
+  indent: 0,
+  direction: 'ltr',
+  version: 1,
+  children: [
+    {
+      type: 'paragraph',
+      version: 1,
+      direction: 'ltr',
+      format: 'left',
+      indent: 0,
+      children: [],
+    } as SerializedParagraphNode,
+  ],
+} as SerializedRootNode
+
+const EmptySerializedFlowEditorState = {
+  type: 'root',
+  format: 'left',
+  indent: 0,
+  direction: 'ltr',
+  version: 1,
+  children: [],
+} as SerializedRootNode
 
 export class JsxNode extends DecoratorNode<JSX.Element> {
   __kind: JsxKind
@@ -78,13 +105,12 @@ export class JsxNode extends DecoratorNode<JSX.Element> {
 
   static importJSON(serializedNode: SerializedJsxNode): JsxNode {
     const { name, kind, attributes, state } = serializedNode
-    const node = $createJsxNode({
+    return $createJsxNode({
       kind,
       name,
       attributes,
       state,
     })
-    return node
   }
 
   constructor({ name, kind, attributes, state, updateFn, key }: JsxNodeConstructorParams) {
@@ -102,28 +128,17 @@ export class JsxNode extends DecoratorNode<JSX.Element> {
         this.__editor.setEditorState(parsedState)
       }
     } else if (updateFn) {
-      const json = {
-        type: 'root',
-        format: 'left',
-        indent: 0,
-        direction: 'ltr',
-        version: 1,
-        children: [
-          {
-            type: 'paragraph',
-            version: 1,
-            direction: 'ltr',
-            format: 'left',
-            indent: 0,
-            children: [],
-          } as SerializedParagraphNode,
-        ],
-      } as SerializedRootNode
-
-      const parsedState = this.__editor.parseEditorState({ root: json }, () => {
-        const rootParagraph: ParagraphNode = $getRoot().getFirstChildOrThrow()
-        updateFn(rootParagraph)
-      })
+      const parsedState = this.__editor.parseEditorState(
+        { root: this.getKind() === 'text' ? EmptySerializedTextEditorState : EmptySerializedFlowEditorState },
+        () => {
+          if (this.getKind() === 'text') {
+            const rootParagraph: ParagraphNode = $getRoot().getFirstChildOrThrow()
+            updateFn(rootParagraph)
+          } else {
+            updateFn($getRoot())
+          }
+        }
+      )
       if (!parsedState.isEmpty()) {
         this.__editor.setEditorState(parsedState)
       }
@@ -170,7 +185,13 @@ export class JsxNode extends DecoratorNode<JSX.Element> {
       return (
         <div className={styles.blockComponent}>
           <div>{this.getName()}</div>
-          <JsxPropertyPanel attributes={this.getAttributes()} />
+          <LexicalNestedComposer initialEditor={this.__editor} initialTheme={contentTheme}>
+            <RichTextPlugin
+              contentEditable={<ContentEditable style={{ padding: 5, border: '1px solid red' }} />}
+              placeholder={<div>Type here..</div>}
+              ErrorBoundary={LexicalErrorBoundary}
+            />
+          </LexicalNestedComposer>
         </div>
       )
     }

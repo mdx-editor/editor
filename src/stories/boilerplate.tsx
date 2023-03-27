@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import React from 'react'
-import { SandpackConfig, Wrapper } from '..'
+import { AvailableJsxImports, SandpackConfig, Wrapper } from '..'
 import dataCode from './assets/dataCode.ts?raw'
 
-export const virtuosoSampleSandpackConfig: SandpackConfig = {
+const virtuosoSampleSandpackConfig: SandpackConfig = {
   defaultPreset: 'react',
   presets: [
     {
@@ -28,10 +28,12 @@ export const virtuosoSampleSandpackConfig: SandpackConfig = {
   ],
 }
 
+const availableImports: AvailableJsxImports = [{ source: './external', componentNames: ['MyLeaf', 'BlockNode'] }]
+
 interface WrappedEditorProps {
   markdown: string
 }
 
 export const WrappedLexicalEditor: React.FC<WrappedEditorProps> = ({ markdown }) => {
-  return <Wrapper markdown={markdown} sandpackConfig={virtuosoSampleSandpackConfig} />
+  return <Wrapper markdown={markdown} sandpackConfig={virtuosoSampleSandpackConfig} availableImports={availableImports} />
 }

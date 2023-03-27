@@ -18,4 +18,5 @@ export const blockComponent = style({
   gap: 5,
   padding: '5px',
   borderRadius: 5,
+  margin: '1rem 0',
 })

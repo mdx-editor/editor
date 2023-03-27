@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import React, { ReactNode } from 'react'
-import { exportMarkdownFromLexical } from '../..'
+import { AvailableJsxImports, exportMarkdownFromLexical } from '../..'
 import { $getRoot, EditorState } from 'lexical'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import ReactDiffViewer from 'react-diff-viewer'
@@ -8,10 +8,10 @@ export type ViewMode = 'editor' | 'markdown' | 'diff'
 import { AutogrowTextarea, AutoGrowTextareaWrapper } from './styles.css'
 import { themeClassName } from '../theme.css'
 
-export function convertLexicalStateToMarkdown(state: EditorState) {
+export function convertLexicalStateToMarkdown(state: EditorState, availableImports?: AvailableJsxImports) {
   return new Promise<string>((resolve) => {
     state.read(() => {
-      resolve(exportMarkdownFromLexical($getRoot()))
+      resolve(exportMarkdownFromLexical({ root: $getRoot(), availableImports: availableImports }))
     })
   })
 }
@@ -35,9 +35,10 @@ export function MarkdownPlainTextEditor() {
   const [editor] = useLexicalComposerContext()
   const [currentMarkdown, setCurrentMarkdown] = React.useState('')
   const [, updateMarkdown] = React.useContext(MarkdownSourceContext)
+  const { availableImports } = React.useContext(MarkdownExportConfigContext)!
 
   const updateCurrentMarkdown = React.useCallback(() => {
-    convertLexicalStateToMarkdown(editor.getEditorState())
+    convertLexicalStateToMarkdown(editor.getEditorState(), availableImports)
       .then((value) => {
         setCurrentMarkdown(value)
         updateMarkdown(value)
@@ -74,21 +75,26 @@ const ViewModeContext = React.createContext<ViewModeContextValue>([
 export interface ViewModeProps {
   children: React.ReactNode
   initialCode: string
+  availableImports: AvailableJsxImports
 }
 
 export const useViewMode = () => {
   return React.useContext(ViewModeContext)
 }
 
-export const ViewModeToggler: React.FC<ViewModeProps> = ({ children, initialCode }) => {
+const MarkdownExportConfigContext = React.createContext<{ availableImports: AvailableJsxImports } | null>(null)
+
+export const ViewModeToggler: React.FC<ViewModeProps> = ({ availableImports, children, initialCode }) => {
   const [viewMode] = useViewMode()
   // keep the RTE always mounted, otherwise the state is lost
   return (
-    <div className={themeClassName}>
-      <div style={{ display: viewMode === 'editor' ? 'block' : 'none' }}>{children}</div>
-      {viewMode === 'diff' ? <MarkdownDiffView initialCode={initialCode} /> : null}
-      {viewMode === 'markdown' ? <MarkdownPlainTextEditor /> : null}
-    </div>
+    <MarkdownExportConfigContext.Provider value={{ availableImports }}>
+      <div className={themeClassName}>
+        <div style={{ display: viewMode === 'editor' ? 'block' : 'none' }}>{children}</div>
+        {viewMode === 'diff' ? <MarkdownDiffView initialCode={initialCode} /> : null}
+        {viewMode === 'markdown' ? <MarkdownPlainTextEditor /> : null}
+      </div>
+    </MarkdownExportConfigContext.Provider>
   )
 }
 

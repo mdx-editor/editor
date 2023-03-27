@@ -55,7 +55,7 @@ To export markdown, read the editor state, and call the function with the root n
 ```jsx
 //...
 state.read(() => {
-  console.log(exportMarkdownFromLexical($getRoot()))
+  console.log(exportMarkdownFromLexical({root : $getRoot()}))
 })
 //
 ```

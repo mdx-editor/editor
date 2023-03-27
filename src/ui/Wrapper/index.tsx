@@ -9,6 +9,7 @@ import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import { $getRoot } from 'lexical'
 import React from 'react'
 import {
+  AvailableJsxImports,
   CodeHighlightPlugin,
   contentTheme,
   importMarkdownToLexical,
@@ -37,15 +38,16 @@ export function standardConfig(markdown: string) {
 interface WrappedEditorProps {
   markdown: string
   sandpackConfig: SandpackConfigValue
+  availableImports: AvailableJsxImports
 }
 
-export const Wrapper: React.FC<WrappedEditorProps> = ({ markdown, sandpackConfig }) => {
+export const Wrapper: React.FC<WrappedEditorProps> = ({ markdown, availableImports, sandpackConfig }) => {
   return (
     <SandpackConfigContext.Provider value={sandpackConfig}>
       <LexicalComposer initialConfig={standardConfig(markdown)}>
         <ViewModeContextProvider>
           <ToolbarPlugin />
-          <ViewModeToggler initialCode={markdown}>
+          <ViewModeToggler initialCode={markdown} availableImports={availableImports}>
             <RichTextPlugin
               contentEditable={<ContentEditable className={styles.ContentEditable} />}
               placeholder={<div></div>}

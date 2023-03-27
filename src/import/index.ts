@@ -1,7 +1,7 @@
 /**
- * @typedef {import('mdast-util-directive')}
+ * @typedef {import("mdast-util-directive")}
  */
-import { CodeNode, $createCodeNode, CodeHighlightNode } from '@lexical/code'
+import { $createCodeNode, CodeHighlightNode, CodeNode } from '@lexical/code'
 import { $createLinkNode, LinkNode } from '@lexical/link'
 import { $createListItemNode, $createListNode, $isListItemNode, ListItemNode, ListNode } from '@lexical/list'
 import { $createHorizontalRuleNode, HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode'
@@ -16,18 +16,30 @@ import { directive } from 'micromark-extension-directive'
 import { frontmatter } from 'micromark-extension-frontmatter'
 import { mdxjs } from 'micromark-extension-mdxjs'
 import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from '../FormatConstants'
-import { $createAdmonitionNode, AdmonitionNode, AdmonitionKind, $isAdmonitionNode } from '../nodes/Admonition'
-import { $createFrontmatterNode, FrontmatterNode } from '../nodes/Frontmatter'
-import { $createImageNode, ImageNode } from '../nodes/Image'
-import { $createJsxNode, JsxNode } from '../nodes/Jsx'
-import { $createSandpackNode, SandpackNode } from '../nodes/Sandpack'
+import {
+  $createAdmonitionNode,
+  $createFrontmatterNode,
+  $createImageNode,
+  $createJsxNode,
+  $createSandpackNode,
+  $isAdmonitionNode,
+  AdmonitionKind,
+  AdmonitionNode,
+  FrontmatterNode,
+  ImageNode,
+  JsxNode,
+  SandpackNode,
+} from '../nodes'
 
 type MdastNode = Mdast.Content
 
 export interface MdastVisitActions {
   visitChildren(node: Mdast.Parent, lexicalParent: LexicalNode): void
+
   addAndStepInto(lexicalNode: LexicalNode): void
+
   addFormatting(format: typeof IS_BOLD | typeof IS_ITALIC | typeof IS_UNDERLINE): void
+
   getParentFormatting(): number
 }
 
@@ -39,6 +51,7 @@ export interface MdastVisitParams<T extends MdastNode> {
 
 export interface MdastImportVisitor<UN extends MdastNode> {
   testNode: ((mdastNode: MdastNode | Mdast.Root) => boolean) | string
+
   visitNode(params: MdastVisitParams<UN>): void
 }
 
@@ -144,7 +157,13 @@ export const MdastCodeVisitor: MdastImportVisitor<Mdast.Code> = {
   testNode: 'code',
   visitNode({ mdastNode, actions }) {
     if (mdastNode.meta?.startsWith('live')) {
-      actions.addAndStepInto($createSandpackNode({ code: mdastNode.value, language: mdastNode.lang!, meta: mdastNode.meta }))
+      actions.addAndStepInto(
+        $createSandpackNode({
+          code: mdastNode.value,
+          language: mdastNode.lang!,
+          meta: mdastNode.meta,
+        })
+      )
     } else {
       actions.addAndStepInto($createCodeNode(mdastNode.lang).append($createTextNode(mdastNode.value)))
     }

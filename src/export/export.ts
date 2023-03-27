@@ -143,12 +143,19 @@ function traverseLexicalTree(
   return typedRoot
 }
 
-export function exportMarkdownFromLexical(
-  root: LexicalRootNode,
-  options?: ToMarkdownOptions,
-  visitors: Array<LexicalExportVisitor<LexicalNode, Mdast.Content>> = LexicalVisitors,
-  availableImports: AvailableJsxImports = []
-): string {
+interface ExportMarkdownFromLexicalParams {
+  root: LexicalRootNode
+  options?: ToMarkdownOptions
+  visitors?: Array<LexicalExportVisitor<LexicalNode, Mdast.Content>>
+  availableImports?: AvailableJsxImports
+}
+
+export function exportMarkdownFromLexical({
+  root,
+  options,
+  visitors = LexicalVisitors,
+  availableImports = [],
+}: ExportMarkdownFromLexicalParams): string {
   return toMarkdown(traverseLexicalTree(root, visitors, availableImports), {
     extensions: [mdxToMarkdown(), frontmatterToMarkdown('yaml'), directiveToMarkdown],
     listItemIndent: 'one',

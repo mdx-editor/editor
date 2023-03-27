@@ -50,7 +50,7 @@ describe('converting', () => {
     it('generates root node from a Lexical RootNode', () => {
       const { editor } = testEnv
       editor!.update(() => {
-        expect(exportMarkdownFromLexical($getRoot())).toEqual('')
+        expect(exportMarkdownFromLexical({root : $getRoot()})).toEqual('')
       })
     })
 
@@ -60,7 +60,7 @@ describe('converting', () => {
         const paragraph = $createParagraphNode()
         paragraph.append($createTextNode('Hello World'))
         $getRoot().append(paragraph)
-        expect(exportMarkdownFromLexical($getRoot())).toEqual('Hello World\n')
+        expect(exportMarkdownFromLexical({root : $getRoot()})).toEqual('Hello World\n')
       })
     })
   })
@@ -74,7 +74,7 @@ function testIdenticalMarkdownAfterImportExport(
 ) {
   editor.registerUpdateListener(({ editorState }) => {
     editorState.read(() => {
-      expect(exportMarkdownFromLexical($getRoot(), exportOptions, undefined, availableImports).trim()).toEqual(markdown.trim())
+      expect(exportMarkdownFromLexical({root : $getRoot(), options : exportOptions, visitors : undefined, availableImports : availableImports}).trim()).toEqual(markdown.trim())
     })
   })
 
