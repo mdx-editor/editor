@@ -187,24 +187,24 @@ export function realmFactoryToComponent<
   const Context = GurxContext as unknown as React.Context<ReactContextRealm | undefined>
 
   function applyPropsToRealm(realm: ReactContextRealm, props: CompProps) {
-    const toBePubilshed: SystemDict<Sys> = {}
+    const toBePublished: SystemDict<Sys> = {}
 
     for (const requiredPropName of requiredPropNames) {
       const nodeName = map.required![requiredPropName]
-      toBePubilshed[nodeName] = props[requiredPropName]
+      toBePublished[nodeName] = props[requiredPropName]
     }
 
     for (const optionalPropName of optionalPropNames) {
       const value = props[optionalPropName]
       if (value !== undefined) {
         const nodeName = map.optional![optionalPropName]
-        toBePubilshed[nodeName] = value
+        toBePublished[nodeName] = value
       }
     }
 
     // this prevents flushSync warnings
     realm.suppressFlushSync = true
-    realm.pubKeys(toBePubilshed)
+    realm.pubKeys(toBePublished)
     realm.suppressFlushSync = false
   }
 
