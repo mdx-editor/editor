@@ -280,6 +280,7 @@ export function realmFactoryToComponent<
         realm?.subKeys(keys, (newValues) => {
           const setter = () => {
             // this fixes the dual behavior in sub where subSingle and subMultiple fight
+            // console.log('setting values', keys.length === 1 ? [newValues] : newValues)
             // @ts-expect-error the duality should be fixed with correct subscription mode
             setValues(keys.length === 1 ? [newValues] : newValues)
           }
@@ -289,7 +290,8 @@ export function realmFactoryToComponent<
             setter()
           } else {
             // console.log('flushing sync like a boss')
-            flushSync(setter)
+            setter()
+            // flushSync(setter)
           }
         }),
       [keys]

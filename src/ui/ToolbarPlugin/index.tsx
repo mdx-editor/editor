@@ -42,11 +42,12 @@ import { ReactComponent as LiveCodeIcon } from './icons/deployed_code.svg'
 import { ReactComponent as DiffIcon } from './icons/difference.svg'
 import { ReactComponent as MarkdownIcon } from './icons/markdown.svg'
 
-import { DEFAULT_FORMAT, IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from '../../FormatConstants'
+import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from '../../FormatConstants'
 import { $createCodeNode } from '@lexical/code'
-import { $isAdmonitionNode, AdmonitionKind, ACTIVE_SANDPACK_COMMAND, ActiveSandpackPayload } from '../../nodes'
+import { $isAdmonitionNode, ACTIVE_SANDPACK_COMMAND, ActiveSandpackPayload, AdmonitionKind } from '../../nodes'
 import { useMarkdownSource, useViewMode, ViewMode } from '../'
 import { importMarkdownToLexical } from '../..'
+import { useEmitterValues } from '../System'
 
 const ListTypeCommandMap = new Map<ListType | '', LexicalCommand<void>>([
   ['number', INSERT_ORDERED_LIST_COMMAND],
@@ -55,9 +56,10 @@ const ListTypeCommandMap = new Map<ListType | '', LexicalCommand<void>>([
 ])
 
 export const ToolbarPlugin = () => {
+  const [format] = useEmitterValues('currentFormat')
   const [editor] = useLexicalComposerContext()
   const [activeEditor, setActiveEditor] = React.useState(editor)
-  const [format, setFormat] = React.useState<number>(DEFAULT_FORMAT)
+  // const [format, setFormat] = React.useState<number>(DEFAULT_FORMAT)
   const [listType, setListType] = React.useState('' as ListType | '')
   const [blockType, setBlockType] = React.useState('' as BlockType | AdmonitionKind | '')
   const [activeCodeBlock, setActiveCodeBlock] = React.useState<string | null>(null)
@@ -81,26 +83,6 @@ export const ToolbarPlugin = () => {
       if (element === null) {
         element = anchorNode.getTopLevelElementOrThrow()
       }
-
-      let newFormat = DEFAULT_FORMAT
-
-      if (selection.hasFormat('bold')) {
-        newFormat |= IS_BOLD
-      }
-
-      if (selection.hasFormat('italic')) {
-        newFormat |= IS_ITALIC
-      }
-
-      if (selection.hasFormat('underline')) {
-        newFormat |= IS_UNDERLINE
-      }
-
-      if (selection.hasFormat('code')) {
-        newFormat |= IS_CODE
-      }
-
-      setFormat(newFormat)
 
       const elementKey = element.getKey()
       const elementDOM = activeEditor.getElementByKey(elementKey)

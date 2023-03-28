@@ -1,5 +1,6 @@
 export * from './LinkDialogPlugin'
 export * from './SourcePlugin'
+export * from './System'
 export * from './ToolbarPlugin'
 export * from './CodeHighlightPlugin'
 export * from './Wrapper'
