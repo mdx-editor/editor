@@ -1,4 +1,4 @@
-import { style, keyframes } from '@vanilla-extract/css'
+import { style } from '@vanilla-extract/css'
 
 export const paragraph = style({
   margin: '0',

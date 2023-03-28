@@ -44,7 +44,7 @@ export function MarkdownPlainTextEditor() {
         updateMarkdown(value)
       })
       .catch((rejection) => console.warn({ rejection }))
-  }, [editor, updateMarkdown])
+  }, [editor, updateMarkdown, availableImports])
 
   React.useEffect(updateCurrentMarkdown, [editor, updateCurrentMarkdown])
 

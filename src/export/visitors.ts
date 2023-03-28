@@ -16,7 +16,7 @@ import {
 } from 'lexical'
 import * as Mdast from 'mdast'
 import { ContainerDirective } from 'mdast-util-directive'
-import { MdxJsxFlowElement, MdxJsxTextElement } from 'mdast-util-mdx'
+import type { MdxJsxFlowElement, MdxJsxTextElement } from 'mdast-util-mdx-jsx'
 import {
   $isAdmonitionNode,
   $isFrontmatterNode,

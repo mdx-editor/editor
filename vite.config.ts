@@ -21,8 +21,10 @@ const IN_LADLE = process.env['LADLE']
 const externalPackages = [
   ...Object.keys(packageJson.dependencies),
   ...Object.keys(packageJson.peerDependencies),
-  '@lexical/react/LexicalHorizontalRuleNode',
-  '@lexical/react/LexicalComposerContext',
+  /@lexical\/react\/.*/,
+  // '@lexical/react/LexicalHorizontalRuleNode',
+  // '@lexical/react/LexicalHorizontalRulePlugin',
+  // '@lexical/react/LexicalComposerContext',
 ]
 
 // https://vitejs.dev/config/
@@ -50,7 +52,8 @@ export default defineConfig({
     },
   },
   test: {
-    include: ['test/**/*.test.{ts,tsx}'],
+    include: ['src/test/**/*.test.{ts,tsx}'],
     environment: 'jsdom',
+    setupFiles: ['src/test/setup.ts'],
   },
 })

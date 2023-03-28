@@ -14,7 +14,7 @@ import {
   Spread,
 } from 'lexical'
 import React from 'react'
-import { MdxJsxAttribute } from 'mdast-util-mdx'
+import { MdxJsxAttribute } from 'mdast-util-mdx-jsx'
 import { ReactComponent as SettingsIcon } from './icons/settings.svg'
 // import { ReactComponent as ExtensionIcon } from './icons/extension.svg'
 import * as styles from './styles.css'

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { initializeUnitTest } from './lexical-utils'
 import { $getRoot, $createParagraphNode, $createTextNode, LexicalEditor } from 'lexical'
-import { importMarkdownToLexical, exportMarkdownFromLexical, ToMarkdownOptions, AvailableJsxImports } from '../src/'
+import { importMarkdownToLexical, exportMarkdownFromLexical, ToMarkdownOptions, AvailableJsxImports } from '../index'
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 ;(globalThis as any).IS_REACT_ACT_ENVIRONMENT = true
@@ -50,7 +50,7 @@ describe('converting', () => {
     it('generates root node from a Lexical RootNode', () => {
       const { editor } = testEnv
       editor!.update(() => {
-        expect(exportMarkdownFromLexical({root : $getRoot()})).toEqual('')
+        expect(exportMarkdownFromLexical({ root: $getRoot() })).toEqual('')
       })
     })
 
@@ -60,7 +60,7 @@ describe('converting', () => {
         const paragraph = $createParagraphNode()
         paragraph.append($createTextNode('Hello World'))
         $getRoot().append(paragraph)
-        expect(exportMarkdownFromLexical({root : $getRoot()})).toEqual('Hello World\n')
+        expect(exportMarkdownFromLexical({ root: $getRoot() })).toEqual('Hello World\n')
       })
     })
   })
@@ -74,7 +74,14 @@ function testIdenticalMarkdownAfterImportExport(
 ) {
   editor.registerUpdateListener(({ editorState }) => {
     editorState.read(() => {
-      expect(exportMarkdownFromLexical({root : $getRoot(), options : exportOptions, visitors : undefined, availableImports : availableImports}).trim()).toEqual(markdown.trim())
+      expect(
+        exportMarkdownFromLexical({
+          root: $getRoot(),
+          options: exportOptions,
+          visitors: undefined,
+          availableImports: availableImports,
+        }).trim()
+      ).toEqual(markdown.trim())
     })
   })
 

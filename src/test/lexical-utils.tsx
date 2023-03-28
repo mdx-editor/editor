@@ -33,7 +33,7 @@ import * as React from 'react'
 import { createRef } from 'react'
 import { createRoot } from 'react-dom/client'
 import * as ReactTestUtils from 'react-dom/test-utils'
-import { UsedLexicalNodes } from '../src/'
+import { UsedLexicalNodes } from '../index'
 
 let _keyCounter = 1
 

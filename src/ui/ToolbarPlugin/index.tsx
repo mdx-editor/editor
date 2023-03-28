@@ -141,6 +141,7 @@ export const ToolbarPlugin = () => {
   }, [editor, updateToolbar])
 
   React.useEffect(() => {
+    // something
     activeEditor.getEditorState().read(() => {
       updateToolbar()
     })

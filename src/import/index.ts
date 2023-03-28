@@ -287,8 +287,6 @@ export function importMarkdownToLexical(
       return visitor.testNode(mdastNode)
     })
     if (!visitor) {
-      console.log(JSON.stringify(mdastNode, null, 2))
-
       throw new Error(`no unist visitor found for ${mdastNode.type}`, {
         cause: mdastNode,
       })

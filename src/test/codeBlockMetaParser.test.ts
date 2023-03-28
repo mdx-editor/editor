@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parseCodeBlockMeta } from '../src/nodes/Sandpack/parseCodeBlockMeta'
+import { parseCodeBlockMeta } from '../nodes/Sandpack/parseCodeBlockMeta'
 
 describe('parsing code block meta string', () => {
   it('parses a simple token to boolean=true', () => {
