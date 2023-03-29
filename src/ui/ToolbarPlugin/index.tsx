@@ -1,17 +1,10 @@
 /// <reference types="vite-plugin-svgr/client" />
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontalRuleNode'
-import { $insertNodeToNearestRoot, mergeRegister } from '@lexical/utils'
+import { mergeRegister } from '@lexical/utils'
 import * as RadixToolbar from '@radix-ui/react-toolbar'
 import * as styles from './styles.css'
-import {
-  $getSelection,
-  $isRangeSelection,
-  COMMAND_PRIORITY_CRITICAL,
-  COMMAND_PRIORITY_LOW,
-  FOCUS_COMMAND,
-  SELECTION_CHANGE_COMMAND,
-} from 'lexical'
+import { COMMAND_PRIORITY_CRITICAL, COMMAND_PRIORITY_LOW, FOCUS_COMMAND, SELECTION_CHANGE_COMMAND } from 'lexical'
 import React from 'react'
 import { OPEN_LINK_DIALOG } from '../LinkDialogPlugin/'
 import { BlockTypeSelect } from './BlockTypeSelect/'
@@ -29,26 +22,24 @@ import { ReactComponent as DiffIcon } from './icons/difference.svg'
 import { ReactComponent as MarkdownIcon } from './icons/markdown.svg'
 
 import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from '../../FormatConstants'
-import { $createCodeNode } from '@lexical/code'
-import { ACTIVE_SANDPACK_COMMAND, ActiveSandpackPayload } from '../../nodes'
 import { ViewMode } from '../'
-import { useEmitterValues, usePublisher } from '../System'
+import { useEmitterValues, usePublisher } from '../../system'
 
 export const ToolbarPlugin = () => {
-  const [format, currentListType, currentBlockType, viewMode] = useEmitterValues(
+  const [format, currentListType, currentBlockType, viewMode, activeSandpackNode] = useEmitterValues(
     'currentFormat',
     'currentListType',
     'currentBlockType',
-    'viewMode'
+    'viewMode',
+    'activeSandpackNode'
   )
   const applyFormat = usePublisher('applyFormat')
   const applyListType = usePublisher('applyListType')
   const applyBlockType = usePublisher('applyBlockType')
   const setViewMode = usePublisher('viewMode')
+  const insertCodeBlock = usePublisher('insertCodeBlock')
   const [editor] = useLexicalComposerContext()
   const [activeEditor, setActiveEditor] = React.useState(editor)
-  const [activeCodeBlock, setActiveCodeBlock] = React.useState<string | null>(null)
-  const [activeSandpack, setActiveSandpack] = React.useState<ActiveSandpackPayload | null>(null)
 
   React.useEffect(() => {
     return mergeRegister(
@@ -63,67 +54,8 @@ export const ToolbarPlugin = () => {
     )
   }, [editor])
 
-  React.useEffect(() => {
-    return mergeRegister(
-      activeEditor.registerCommand(
-        ACTIVE_SANDPACK_COMMAND,
-        (activeSandpack) => {
-          setActiveSandpack(activeSandpack)
-          return true
-        },
-        COMMAND_PRIORITY_CRITICAL
-      ),
-      activeEditor.registerCommand(
-        FOCUS_COMMAND,
-        () => {
-          setActiveCodeBlock(null)
-          setActiveSandpack(null)
-          return false
-        },
-        COMMAND_PRIORITY_LOW
-      )
-    )
-  }, [activeEditor])
-
-  const insertCodeBlock = React.useCallback(() => {
-    activeEditor.getEditorState().read(() => {
-      const selection = $getSelection()
-
-      if (!$isRangeSelection(selection)) {
-        return false
-      }
-
-      const focusNode = selection.focus.getNode()
-
-      if (focusNode !== null) {
-        activeEditor.update(() => {
-          const codeBlockNode = $createCodeNode()
-          $insertNodeToNearestRoot(codeBlockNode)
-        })
-      }
-    })
-  }, [activeEditor])
-
-  if (activeSandpack !== null) {
-    return <div style={{ height: 64 }}>Sandpack</div>
-  }
-  if (activeCodeBlock !== null) {
-    return (
-      <div style={{ height: 64 }}>
-        <select
-          value={activeCodeBlock}
-          onChange={(_e) => {
-            // editor.dispatchCommand(SET_CODE_BLOCK_LANGUAGE_COMMAND, { language: e.target.value, nodeKey: activeCodeBlock.nodeKey })
-          }}
-        >
-          <option value="js">JavaScript</option>
-          <option value="jsx">JavaScript (React)</option>
-          <option value="ts">TypeScript</option>
-          <option value="tsx">TypeScript (React)</option>
-          <option value="css">CSS</option>
-        </select>
-      </div>
-    )
+  if (activeSandpackNode !== null) {
+    return <div style={{ height: 64 }}>Sandpack (node: {activeSandpackNode.nodeKey})</div>
   }
 
   return (
@@ -196,7 +128,7 @@ export const ToolbarPlugin = () => {
       </ToolbarButton>
       <ToolbarSeparator />
 
-      <ToolbarButton onClick={insertCodeBlock}>
+      <ToolbarButton onClick={insertCodeBlock.bind(null, true)}>
         <FrameSourceIcon />
       </ToolbarButton>
 

@@ -1,10 +1,12 @@
-import { getRealmFactory, realmFactoryToComponent, system } from '../../gurx'
+import { getRealmFactory, realmFactoryToComponent, system } from '../gurx'
 import {
   $getRoot,
   $getSelection,
   $isRangeSelection,
   $isRootOrShadowRoot,
   COMMAND_PRIORITY_CRITICAL,
+  COMMAND_PRIORITY_LOW,
+  FOCUS_COMMAND,
   FORMAT_TEXT_COMMAND,
   LexicalCommand,
   LexicalEditor,
@@ -14,7 +16,7 @@ import {
 } from 'lexical'
 import React, { PropsWithChildren } from 'react'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { $findMatchingParent, $getNearestNodeOfType } from '@lexical/utils'
+import { $findMatchingParent, $getNearestNodeOfType, $insertNodeToNearestRoot } from '@lexical/utils'
 import {
   $isListNode,
   INSERT_ORDERED_LIST_COMMAND,
@@ -23,14 +25,22 @@ import {
   ListType,
   REMOVE_LIST_COMMAND,
 } from '@lexical/list'
-import { BlockType, HeadingType } from '../ToolbarPlugin/BlockTypeSelect'
-import { $isAdmonitionNode, AdmonitionKind, AdmonitionNode } from '../../nodes'
+import { BlockType, HeadingType } from '../ui/ToolbarPlugin/BlockTypeSelect'
+import { $isAdmonitionNode, AdmonitionKind, AdmonitionNode } from '../nodes'
 import { $isHeadingNode } from '@lexical/rich-text'
-import { formatAdmonition, formatCode, formatHeading, formatParagraph, formatQuote } from '../ToolbarPlugin/BlockTypeSelect/blockFormatters'
-import { ViewMode } from '../SourcePlugin'
-import { AvailableJsxImports, exportMarkdownFromLexical } from '../../export'
-import { tap } from '../../utils'
-import { importMarkdownToLexical } from '../../import'
+import {
+  formatAdmonition,
+  formatCode,
+  formatHeading,
+  formatParagraph,
+  formatQuote,
+} from '../ui/ToolbarPlugin/BlockTypeSelect/blockFormatters'
+import { ViewMode } from '../ui/SourcePlugin'
+import { AvailableJsxImports, exportMarkdownFromLexical } from '../export'
+import { tap } from '../utils'
+import { importMarkdownToLexical } from '../import'
+import { $createCodeNode } from '@lexical/code'
+import { create } from 'domain'
 
 type Teardowns = Array<() => void>
 
@@ -48,6 +58,8 @@ export function getStateAsMarkdown(editor: LexicalEditor, availableImports?: Ava
   }).markdown
 }
 
+type EditorSubscription = (editor: LexicalEditor) => () => void
+
 export const [EditorSystem, EditorSystemType] = system((r) => {
   const editor = r.node<LexicalEditor | null>(null, true)
   const availableJsxImports = r.node({} as AvailableJsxImports, true)
@@ -57,10 +69,39 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
   const currentSelection = r.node<RangeSelection | null>(null)
   const currentListType = r.node<ListType | null>(null)
   const currentBlockType = r.node<BlockType | AdmonitionKind | null>(null)
-
   const applyFormat = r.node<TextFormatType>()
   const applyListType = r.node<ListType | ''>()
   const applyBlockType = r.node<BlockType | AdmonitionNode>()
+  const insertCodeBlock = r.node<true>()
+
+  const createEditorSubscription = r.node<EditorSubscription>()
+  const editorSubscriptions = r.node<EditorSubscription[]>([])
+
+  r.sub(createEditorSubscription, (createSubscription) => {
+    // avoid cyclical dependencies
+    const newSubscriptions = [...(r.getValue(editorSubscriptions) as EditorSubscription[]), createSubscription]
+    r.pub(editorSubscriptions, newSubscriptions)
+  })
+
+  r.sub(editor, (e) => r.pub(activeEditor, e))
+
+  r.sub(r.pipe(insertCodeBlock, r.o.withLatestFrom(activeEditor)), ([, theEditor]) => {
+    theEditor?.getEditorState().read(() => {
+      const selection = $getSelection()
+
+      if ($isRangeSelection(selection)) {
+        const focusNode = selection.focus.getNode()
+
+        if (focusNode !== null) {
+          theEditor.update(() => {
+            const codeBlockNode = $createCodeNode()
+            $insertNodeToNearestRoot(codeBlockNode)
+            codeBlockNode.select()
+          })
+        }
+      }
+    })
+  })
 
   r.sub(r.pipe(applyListType, r.o.withLatestFrom(activeEditor)), ([listType, theEditor]) => {
     theEditor?.dispatchCommand(ListTypeCommandMap.get(listType)!, undefined)
@@ -175,22 +216,20 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
   })
 
   r.pipe(
-    activeEditor,
-    r.o.scan((teardowns, newEditor) => {
+    r.combine(editorSubscriptions, activeEditor),
+    r.o.scan((teardowns, [editorSubscriptions, editor]) => {
       teardowns.forEach((u) => u())
-      const newTeardowns: Teardowns = []
-      if (newEditor) {
-        newTeardowns.push(
-          newEditor.registerUpdateListener(({ editorState }) => {
-            editorState.read(() => {
-              handleSelectionChange()
-            })
-          })
-        )
-      }
-      return newTeardowns
+      return editor ? editorSubscriptions.map((s) => s(editor)) : []
     }, [] as Teardowns)
   )
+
+  r.pub(createEditorSubscription, (editor) => {
+    editor.registerUpdateListener(({ editorState }) => {
+      editorState.read(() => {
+        handleSelectionChange()
+      })
+    })
+  })
 
   return {
     editor,
@@ -203,6 +242,9 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
     applyListType,
     applyBlockType,
     availableJsxImports,
+    insertCodeBlock,
+    createEditorSubscription,
+    editorSubscriptions,
   }
 }, [])
 
@@ -247,12 +289,35 @@ const [ViewModeSystem] = system(
   [EditorSystemType]
 )
 
+const [SandpackSystem] = system(
+  (r, [{ editor, createEditorSubscription }]) => {
+    const activeSandpackNode = r.node<{ nodeKey: string } | null>(null)
+
+    // clear the node when the regular editor is focused.
+    r.pub(createEditorSubscription, (editor) => {
+      return editor.registerCommand(
+        FOCUS_COMMAND,
+        () => {
+          r.pub(activeSandpackNode, null)
+          return false
+        },
+        COMMAND_PRIORITY_LOW
+      )
+    })
+
+    return {
+      activeSandpackNode,
+    }
+  },
+  [EditorSystemType]
+)
+
 export const {
   Component: EditorSystemComponent,
   usePublisher,
   useEmitterValues,
 } = realmFactoryToComponent(
-  getRealmFactory(EditorSystem, ViewModeSystem),
+  getRealmFactory(EditorSystem, ViewModeSystem, SandpackSystem),
   {
     required: {
       markdownSource: 'markdownSource',

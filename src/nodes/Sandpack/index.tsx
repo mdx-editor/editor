@@ -4,7 +4,6 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import {
   $createParagraphNode,
   $getNodeByKey,
-  createCommand,
   DecoratorNode,
   EditorConfig,
   LexicalNode,
@@ -14,6 +13,7 @@ import {
 } from 'lexical'
 import React, { useContext } from 'react'
 import { CodeBlockMeta, parseCodeBlockMeta } from './parseCodeBlockMeta'
+import { usePublisher } from '../../ui'
 
 export type { CodeBlockMeta } from './parseCodeBlockMeta'
 
@@ -95,10 +95,9 @@ export interface ActiveSandpackPayload {
   nodeKey: NodeKey
 }
 
-export const ACTIVE_SANDPACK_COMMAND = createCommand<ActiveSandpackPayload | null>('ACTIVE_SANDPACK_COMMAND')
-
 const CodeEditor = ({ nodeKey, code, meta, onChange }: CodeEditorProps) => {
   const [editor] = useLexicalComposerContext()
+  const setActiveSandpackNode = usePublisher('activeSandpackNode')
   const codeMirrorRef = React.useRef<CodeMirrorRef>(null)
 
   let preset: SandpackPreset | undefined
@@ -124,8 +123,8 @@ const CodeEditor = ({ nodeKey, code, meta, onChange }: CodeEditorProps) => {
   )
 
   const onFocusHandler = React.useCallback(() => {
-    editor.dispatchCommand(ACTIVE_SANDPACK_COMMAND, { nodeKey })
-  }, [editor, nodeKey])
+    setActiveSandpackNode({ nodeKey })
+  }, [nodeKey, setActiveSandpackNode])
 
   const onKeyDownHandler = React.useCallback(
     (e: KeyboardEvent) => {
@@ -144,7 +143,6 @@ const CodeEditor = ({ nodeKey, code, meta, onChange }: CodeEditorProps) => {
                 node.selectNext()
               } else {
                 node.insertAfter($createParagraphNode())
-                // TODO: insert a paragraph after the sandpack node
               }
             })
           }
@@ -227,12 +225,11 @@ export class SandpackNode extends DecoratorNode<JSX.Element> {
 
   static importJSON(serializedNode: SerializedSandpackNode): SandpackNode {
     const { code, meta, language } = serializedNode
-    const node = $createSandpackNode({
+    return $createSandpackNode({
       code,
       language,
       meta,
     })
-    return node
   }
 
   constructor(code: string, language: string, meta: string, key?: NodeKey) {

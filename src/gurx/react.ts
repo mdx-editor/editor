@@ -3,7 +3,7 @@
  * It wraps urx systems in to UI **logic provider components**,
  * mapping the system input and output streams to the component input / output points.
  *
- * ### Simple System wrapped as React Component
+ * ### Simple system wrapped as React Component
  *
  * ```tsx
  * const sys = system(() => {
@@ -28,7 +28,7 @@
  * @packageDocumentation
  */
 import * as React from 'react'
-import { flushSync } from 'react-dom'
+// import { flushSync } from 'react-dom'
 import {
   ComponentType,
   createContext,

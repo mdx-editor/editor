@@ -25,7 +25,7 @@ export type SystemFromType<T extends AnySystemType> = T extends SystemType<infer
 type SR<T extends AnySystemType> = SystemFromType<T>
 
 /**
- * a SystemSpec is the result from a [[system]] call. To obtain the [[System]], pass the spec to [[init]].
+ * a SystemSpec is the result from a [[system]] call. To obtain the [[system]], pass the spec to [[init]].
  */
 export interface SystemSpec<Dependencies extends SystemTypes, Constructor extends SystemConstructor<Dependencies>> {
   id: string
@@ -47,7 +47,7 @@ type SpecsFromTypesRec<ST extends unknown[], Acc extends unknown[]> = ST extends
   : Acc
 
 /**
- * The system constructor is a function which initializes and connects nodes and returns them as a [[System]].
+ * The system constructor is a function which initializes and connects nodes and returns them as a [[system]].
  * If the [[system]] call specifies system dependencies, the constructor receives the dependencies as an array argument.
  */
 export type SystemConstructor<D extends SystemTypes> = (r: Realm, dependencies: SpecsFromTypes<D>) => System

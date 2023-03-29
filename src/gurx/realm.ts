@@ -614,6 +614,10 @@ export function realm() {
     return state.get(labels[key].key)
   }
 
+  function getValue(node: RN) {
+    return state.get(node.key)
+  }
+
   function getKeyValues(keys: string[]) {
     return keys.map((key) => state.get(labels[key].key))
   }
@@ -624,6 +628,7 @@ export function realm() {
     debug,
     derive,
     getKeyValue,
+    getValue,
     getKeyValues,
     label,
     labels,

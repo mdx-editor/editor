@@ -22,7 +22,7 @@ import {
   ViewModeToggler,
 } from '../../'
 import * as styles from './styles.css'
-import { CaptureLexicalEditor, EditorSystemComponent } from '../System'
+import { CaptureLexicalEditor, EditorSystemComponent } from '../../system'
 
 export function standardConfig(markdown: string) {
   return {
