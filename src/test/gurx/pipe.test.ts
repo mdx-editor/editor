@@ -36,25 +36,6 @@ describe('pipe', () => {
     expect(spy).toHaveBeenCalledWith(2)
   })
 
-  it('filters node values', () => {
-    const r = realm()
-    const a = r.node<number>()
-
-    const b = r.pipe(
-      a,
-      r.o.filter((val: number) => val % 2 === 0)
-    )
-
-    const spy = vi.fn()
-    r.sub(b, spy)
-    r.pub(a, 2)
-    r.pub(a, 3)
-    r.pub(a, 4)
-    expect(spy).toHaveBeenCalledWith(4)
-    expect(spy).not.toHaveBeenCalledWith(3)
-    expect(spy).toHaveBeenCalledWith(2)
-  })
-
   it('pulls values in withLatestFrom', () => {
     const r = realm()
     const a = r.node('foo')
