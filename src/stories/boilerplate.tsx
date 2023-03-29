@@ -35,5 +35,5 @@ interface WrappedEditorProps {
 }
 
 export const WrappedLexicalEditor: React.FC<WrappedEditorProps> = ({ markdown }) => {
-  return <Wrapper markdown={markdown} sandpackConfig={virtuosoSampleSandpackConfig} availableImports={availableImports} />
+  return <Wrapper markdown={markdown} sandpackConfig={virtuosoSampleSandpackConfig} availableJsxImports={availableImports} />
 }

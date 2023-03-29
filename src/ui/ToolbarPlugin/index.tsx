@@ -5,7 +5,6 @@ import { $insertNodeToNearestRoot, mergeRegister } from '@lexical/utils'
 import * as RadixToolbar from '@radix-ui/react-toolbar'
 import * as styles from './styles.css'
 import {
-  $getRoot,
   $getSelection,
   $isRangeSelection,
   COMMAND_PRIORITY_CRITICAL,
@@ -32,21 +31,24 @@ import { ReactComponent as MarkdownIcon } from './icons/markdown.svg'
 import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from '../../FormatConstants'
 import { $createCodeNode } from '@lexical/code'
 import { ACTIVE_SANDPACK_COMMAND, ActiveSandpackPayload } from '../../nodes'
-import { useMarkdownSource, useViewMode, ViewMode } from '../'
-import { importMarkdownToLexical } from '../..'
+import { ViewMode } from '../'
 import { useEmitterValues, usePublisher } from '../System'
 
 export const ToolbarPlugin = () => {
-  const [format, currentListType, currentBlockType] = useEmitterValues('currentFormat', 'currentListType', 'currentBlockType')
+  const [format, currentListType, currentBlockType, viewMode] = useEmitterValues(
+    'currentFormat',
+    'currentListType',
+    'currentBlockType',
+    'viewMode'
+  )
   const applyFormat = usePublisher('applyFormat')
   const applyListType = usePublisher('applyListType')
   const applyBlockType = usePublisher('applyBlockType')
+  const setViewMode = usePublisher('viewMode')
   const [editor] = useLexicalComposerContext()
   const [activeEditor, setActiveEditor] = React.useState(editor)
   const [activeCodeBlock, setActiveCodeBlock] = React.useState<string | null>(null)
   const [activeSandpack, setActiveSandpack] = React.useState<ActiveSandpackPayload | null>(null)
-  const [viewMode, setViewMode] = useViewMode()
-  const [markdownValueRef] = useMarkdownSource()
 
   React.useEffect(() => {
     return mergeRegister(
@@ -206,19 +208,7 @@ export const ToolbarPlugin = () => {
       <RadixToolbar.ToggleGroup
         type="single"
         aria-label="View Mode"
-        onValueChange={(newViewMode) =>
-          setViewMode((current) => {
-            if (current === 'markdown') {
-              // don't use active editor - we do it on the root level always.
-              editor.update(() => {
-                $getRoot().clear()
-                importMarkdownToLexical($getRoot(), markdownValueRef.current)
-              })
-            }
-
-            return ViewModeMap.get(newViewMode)!
-          })
-        }
+        onValueChange={(newViewMode) => setViewMode(ViewModeMap.get(newViewMode)!)}
         value={viewMode === 'editor' ? '' : viewMode}
       >
         <ToolbarToggleItem value="diff" aria-label="View diff">
