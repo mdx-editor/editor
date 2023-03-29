@@ -44,8 +44,12 @@ interface WrappedEditorProps {
 }
 
 const SimpleFormatDisplay = () => {
-  const format = useEmitterValues('currentFormat')
-  return <div>{format}</div>
+  const [format, listType, blockType] = useEmitterValues('currentFormat', 'currentListType', 'currentBlockType')
+  return (
+    <div>
+      {format} - {listType} - {blockType}
+    </div>
+  )
 }
 
 export const Wrapper: React.FC<WrappedEditorProps> = ({ markdown, availableImports, sandpackConfig }) => {

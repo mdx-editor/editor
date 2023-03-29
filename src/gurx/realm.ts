@@ -438,7 +438,7 @@ export function realm() {
     }) as Operator<I, I>
   }
 
-  function scan<I, O>(accumulator: (acc: O, value: I) => O, seed: O) {
+  function scan<I, O>(accumulator: (current: O, value: I) => O, seed: O) {
     return ((source: RealmNode<I>) => {
       const sink = node<O>()
       connect({ map: (done) => (value) => done((seed = accumulator(seed, value as I))), sink, sources: [source] })

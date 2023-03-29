@@ -7,7 +7,8 @@ import * as styles from './styles.css'
 import { themeClassName } from '../../theme.css'
 import { AdmonitionKind } from '../../../nodes'
 
-export type BlockType = 'paragraph' | 'code' | 'quote' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
+export type HeadingType = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
+export type BlockType = 'paragraph' | 'code' | 'quote' | HeadingType
 export interface BLockTypeSelectProps {
   value: BlockType | AdmonitionKind | ''
   onValueChange: (value: BlockType) => void

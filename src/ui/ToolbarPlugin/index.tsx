@@ -1,34 +1,21 @@
 /// <reference types="vite-plugin-svgr/client" />
-import {
-  $isListNode,
-  INSERT_ORDERED_LIST_COMMAND,
-  INSERT_UNORDERED_LIST_COMMAND,
-  ListNode,
-  ListType,
-  REMOVE_LIST_COMMAND,
-} from '@lexical/list'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontalRuleNode'
-import { $isHeadingNode } from '@lexical/rich-text'
-import { $findMatchingParent, $getNearestNodeOfType, $insertNodeToNearestRoot, mergeRegister } from '@lexical/utils'
+import { $insertNodeToNearestRoot, mergeRegister } from '@lexical/utils'
 import * as RadixToolbar from '@radix-ui/react-toolbar'
 import * as styles from './styles.css'
 import {
   $getRoot,
   $getSelection,
   $isRangeSelection,
-  $isRootOrShadowRoot,
   COMMAND_PRIORITY_CRITICAL,
   COMMAND_PRIORITY_LOW,
   FOCUS_COMMAND,
-  FORMAT_TEXT_COMMAND,
-  LexicalCommand,
   SELECTION_CHANGE_COMMAND,
 } from 'lexical'
 import React from 'react'
 import { OPEN_LINK_DIALOG } from '../LinkDialogPlugin/'
-import { formatAdmonition, formatCode, formatHeading, formatParagraph, formatQuote } from './BlockTypeSelect/blockFormatters'
-import { BlockType, BlockTypeSelect } from './BlockTypeSelect/'
+import { BlockTypeSelect } from './BlockTypeSelect/'
 import { ReactComponent as BoldIcon } from './icons/format_bold.svg'
 import { ReactComponent as ItalicIcon } from './icons/format_italic.svg'
 import { ReactComponent as UnderlinedIcon } from './icons/format_underlined.svg'
@@ -44,90 +31,37 @@ import { ReactComponent as MarkdownIcon } from './icons/markdown.svg'
 
 import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from '../../FormatConstants'
 import { $createCodeNode } from '@lexical/code'
-import { $isAdmonitionNode, ACTIVE_SANDPACK_COMMAND, ActiveSandpackPayload, AdmonitionKind } from '../../nodes'
+import { ACTIVE_SANDPACK_COMMAND, ActiveSandpackPayload } from '../../nodes'
 import { useMarkdownSource, useViewMode, ViewMode } from '../'
 import { importMarkdownToLexical } from '../..'
-import { useEmitterValues } from '../System'
-
-const ListTypeCommandMap = new Map<ListType | '', LexicalCommand<void>>([
-  ['number', INSERT_ORDERED_LIST_COMMAND],
-  ['bullet', INSERT_UNORDERED_LIST_COMMAND],
-  ['', REMOVE_LIST_COMMAND],
-])
+import { useEmitterValues, usePublisher } from '../System'
 
 export const ToolbarPlugin = () => {
-  const [format] = useEmitterValues('currentFormat')
+  const [format, currentListType, currentBlockType] = useEmitterValues('currentFormat', 'currentListType', 'currentBlockType')
+  const applyFormat = usePublisher('applyFormat')
+  const applyListType = usePublisher('applyListType')
+  const applyBlockType = usePublisher('applyBlockType')
   const [editor] = useLexicalComposerContext()
   const [activeEditor, setActiveEditor] = React.useState(editor)
-  // const [format, setFormat] = React.useState<number>(DEFAULT_FORMAT)
-  const [listType, setListType] = React.useState('' as ListType | '')
-  const [blockType, setBlockType] = React.useState('' as BlockType | AdmonitionKind | '')
   const [activeCodeBlock, setActiveCodeBlock] = React.useState<string | null>(null)
   const [activeSandpack, setActiveSandpack] = React.useState<ActiveSandpackPayload | null>(null)
   const [viewMode, setViewMode] = useViewMode()
   const [markdownValueRef] = useMarkdownSource()
-
-  const updateToolbar = React.useCallback(() => {
-    const selection = $getSelection()
-
-    if ($isRangeSelection(selection)) {
-      const anchorNode = selection.anchor.getNode()
-      let element =
-        anchorNode.getKey() === 'root'
-          ? anchorNode
-          : $findMatchingParent(anchorNode, (e) => {
-              const parent = e.getParent()
-              return parent !== null && $isRootOrShadowRoot(parent)
-            })
-
-      if (element === null) {
-        element = anchorNode.getTopLevelElementOrThrow()
-      }
-
-      const elementKey = element.getKey()
-      const elementDOM = activeEditor.getElementByKey(elementKey)
-
-      // block type
-      if (elementDOM !== null) {
-        if ($isListNode(element)) {
-          const parentList = $getNearestNodeOfType<ListNode>(anchorNode, ListNode)
-          const type = parentList ? parentList.getListType() : element.getListType()
-          setListType(type)
-        } else {
-          setListType('')
-        }
-
-        const type = $isHeadingNode(element)
-          ? element.getTag()
-          : $isAdmonitionNode(element)
-          ? element.getKind()
-          : (element.getType() as BlockType)
-
-        setBlockType(type)
-      }
-    }
-  }, [activeEditor])
 
   React.useEffect(() => {
     return mergeRegister(
       editor.registerCommand(
         SELECTION_CHANGE_COMMAND,
         (_payload, newEditor) => {
-          updateToolbar()
           setActiveEditor(newEditor)
           return false
         },
         COMMAND_PRIORITY_CRITICAL
       )
     )
-  }, [editor, updateToolbar])
+  }, [editor])
 
   React.useEffect(() => {
-    // something
-    activeEditor.getEditorState().read(() => {
-      updateToolbar()
-    })
-
     return mergeRegister(
       activeEditor.registerCommand(
         ACTIVE_SANDPACK_COMMAND,
@@ -145,21 +79,9 @@ export const ToolbarPlugin = () => {
           return false
         },
         COMMAND_PRIORITY_LOW
-      ),
-      activeEditor.registerUpdateListener(({ editorState }) => {
-        editorState.read(() => {
-          updateToolbar()
-        })
-      })
+      )
     )
-  }, [activeEditor, updateToolbar])
-
-  const handleFormatChange = React.useCallback(
-    (format: 'bold' | 'italic' | 'underline' | 'code') => {
-      activeEditor.dispatchCommand(FORMAT_TEXT_COMMAND, format)
-    },
-    [activeEditor]
-  )
+  }, [activeEditor])
 
   const insertCodeBlock = React.useCallback(() => {
     activeEditor.getEditorState().read(() => {
@@ -179,44 +101,6 @@ export const ToolbarPlugin = () => {
       }
     })
   }, [activeEditor])
-
-  const handleListTypeChange = React.useCallback(
-    (type: ListType | '') => {
-      activeEditor.dispatchCommand(ListTypeCommandMap.get(type)!, undefined)
-    },
-    [activeEditor]
-  )
-
-  const handleBlockTypeChange = React.useCallback(
-    (type: BlockType | AdmonitionKind) => {
-      switch (type) {
-        case 'paragraph': {
-          formatParagraph(activeEditor)
-          break
-        }
-        case 'quote': {
-          formatQuote(activeEditor)
-          break
-        }
-        case 'code': {
-          formatCode(activeEditor)
-          break
-        }
-        case 'note':
-        case 'tip':
-        case 'danger':
-        case 'caution':
-        case 'info': {
-          formatAdmonition(activeEditor, type)
-          break
-        }
-        default: {
-          formatHeading(activeEditor, type)
-        }
-      }
-    },
-    [activeEditor]
-  )
 
   if (activeSandpack !== null) {
     return <div style={{ height: 64 }}>Sandpack</div>
@@ -246,7 +130,7 @@ export const ToolbarPlugin = () => {
         type="single"
         aria-label="Text formatting"
         value={format & IS_BOLD ? 'on' : 'off'}
-        onValueChange={handleFormatChange.bind(null, 'bold')}
+        onValueChange={applyFormat.bind(null, 'bold')}
       >
         <ToolbarToggleItem value="on" aria-label="Bold">
           <BoldIcon />
@@ -256,7 +140,7 @@ export const ToolbarPlugin = () => {
         type="single"
         aria-label="Text formatting"
         value={format & IS_ITALIC ? 'on' : 'off'}
-        onValueChange={handleFormatChange.bind(null, 'italic')}
+        onValueChange={applyFormat.bind(null, 'italic')}
       >
         <ToolbarToggleItem value="on" aria-label="Italic">
           <ItalicIcon />
@@ -266,7 +150,7 @@ export const ToolbarPlugin = () => {
         type="single"
         aria-label="Text formatting"
         value={format & IS_UNDERLINE ? 'on' : 'off'}
-        onValueChange={handleFormatChange.bind(null, 'underline')}
+        onValueChange={applyFormat.bind(null, 'underline')}
       >
         <ToolbarToggleItem value="on" aria-label="Underlined">
           <UnderlinedIcon style={{ transform: 'translateY(2px)' }} />
@@ -277,7 +161,7 @@ export const ToolbarPlugin = () => {
         type="single"
         aria-label="Inline Code"
         value={format & IS_CODE ? 'on' : 'off'}
-        onValueChange={handleFormatChange.bind(null, 'code')}
+        onValueChange={applyFormat.bind(null, 'code')}
       >
         <ToolbarToggleItem value="on" aria-label="Inline Code">
           <CodeIcon />
@@ -285,7 +169,7 @@ export const ToolbarPlugin = () => {
       </RadixToolbar.ToggleGroup>
       <ToolbarSeparator />
 
-      <RadixToolbar.ToggleGroup type="single" aria-label="List type" onValueChange={handleListTypeChange} value={listType}>
+      <RadixToolbar.ToggleGroup type="single" aria-label="List type" onValueChange={applyListType} value={currentListType || ''}>
         <ToolbarToggleItem value="bullet" aria-label="Bulleted list">
           <BulletedListIcon />
         </ToolbarToggleItem>
@@ -295,7 +179,7 @@ export const ToolbarPlugin = () => {
       </RadixToolbar.ToggleGroup>
 
       <ToolbarSeparator />
-      <BlockTypeSelect value={blockType} onValueChange={handleBlockTypeChange} />
+      <BlockTypeSelect value={currentBlockType || ''} onValueChange={applyBlockType} />
       <ToolbarSeparator />
 
       <ToolbarButton onClick={() => activeEditor.dispatchCommand(OPEN_LINK_DIALOG, undefined)}>

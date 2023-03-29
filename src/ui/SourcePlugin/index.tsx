@@ -9,26 +9,19 @@ import { AutogrowTextarea, AutoGrowTextareaWrapper } from './styles.css'
 import { themeClassName } from '../theme.css'
 
 export function convertLexicalStateToMarkdown(state: EditorState, availableImports?: AvailableJsxImports) {
-  return new Promise<string>((resolve) => {
-    state.read(() => {
-      resolve(exportMarkdownFromLexical({ root: $getRoot(), availableImports: availableImports }))
-    })
+  let markdown = ''
+
+  state.read(() => {
+    markdown = exportMarkdownFromLexical({ root: $getRoot(), availableImports: availableImports })
   })
+
+  return markdown
 }
 
 export function MarkdownDiffView({ initialCode }: { initialCode: string }) {
   const [editor] = useLexicalComposerContext()
-  const [currentMarkdown, setCurrentMarkdown] = React.useState('')
-
-  const updateCurrentMarkdown = React.useCallback(() => {
-    convertLexicalStateToMarkdown(editor.getEditorState())
-      .then(setCurrentMarkdown)
-      .catch((rejection) => console.warn({ rejection }))
-  }, [editor])
-
-  React.useEffect(updateCurrentMarkdown, [editor, updateCurrentMarkdown])
-
-  return <ReactDiffViewer oldValue={initialCode} newValue={currentMarkdown} splitView={true} />
+  const markdown = React.useMemo(() => convertLexicalStateToMarkdown(editor.getEditorState()), [editor])
+  return <ReactDiffViewer oldValue={initialCode} newValue={markdown} splitView={true} />
 }
 
 export function MarkdownPlainTextEditor() {
