@@ -26,16 +26,14 @@ import { ViewMode } from '../'
 import { useEmitterValues, usePublisher } from '../../system'
 
 export const ToolbarPlugin = () => {
-  const [format, currentListType, currentBlockType, viewMode, activeSandpackNode] = useEmitterValues(
+  const [format, currentListType, viewMode, activeSandpackNode] = useEmitterValues(
     'currentFormat',
     'currentListType',
-    'currentBlockType',
     'viewMode',
     'activeSandpackNode'
   )
   const applyFormat = usePublisher('applyFormat')
   const applyListType = usePublisher('applyListType')
-  const applyBlockType = usePublisher('applyBlockType')
   const setViewMode = usePublisher('viewMode')
   const insertCodeBlock = usePublisher('insertCodeBlock')
   const [editor] = useLexicalComposerContext()
@@ -113,7 +111,7 @@ export const ToolbarPlugin = () => {
       </RadixToolbar.ToggleGroup>
 
       <ToolbarSeparator />
-      <BlockTypeSelect value={currentBlockType || ''} onValueChange={applyBlockType} />
+      <BlockTypeSelect />
       <ToolbarSeparator />
 
       <ToolbarButton onClick={() => activeEditor.dispatchCommand(OPEN_LINK_DIALOG, undefined)}>

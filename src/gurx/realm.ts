@@ -614,8 +614,8 @@ export function realm() {
     return state.get(labels[key].key)
   }
 
-  function getValue(node: RN) {
-    return state.get(node.key)
+  function getValue<T>(node: RN<T>): T {
+    return state.get(node.key) as T
   }
 
   function getKeyValues(keys: string[]) {

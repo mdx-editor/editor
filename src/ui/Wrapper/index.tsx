@@ -14,15 +14,14 @@ import {
   contentTheme,
   importMarkdownToLexical,
   LinkDialogPlugin,
-  SandpackConfigContext,
-  SandpackConfigValue,
   ToolbarPlugin,
   UsedLexicalNodes,
   useEmitterValues,
   ViewModeToggler,
 } from '../../'
 import * as styles from './styles.css'
-import { CaptureLexicalEditor, EditorSystemComponent } from '../../system'
+import { EditorSystemComponent } from '../../system'
+import { SandpackConfigValue } from '../../system/Sandpack'
 
 export function standardConfig(markdown: string) {
   return {
@@ -53,26 +52,23 @@ const SimpleFormatDisplay = () => {
 
 export const Wrapper: React.FC<WrappedEditorProps> = ({ markdown, availableJsxImports, sandpackConfig }) => {
   return (
-    <SandpackConfigContext.Provider value={sandpackConfig}>
-      <EditorSystemComponent markdownSource={markdown} availableJsxImports={availableJsxImports}>
-        <LexicalComposer initialConfig={standardConfig(markdown)}>
-          <CaptureLexicalEditor />
-          <SimpleFormatDisplay />
-          <ToolbarPlugin />
-          <ViewModeToggler initialCode={markdown}>
-            <RichTextPlugin
-              contentEditable={<ContentEditable className={styles.ContentEditable} />}
-              placeholder={<div></div>}
-              ErrorBoundary={LexicalErrorBoundary}
-            />
-          </ViewModeToggler>
-          <LexicalLinkPlugin />
-          <CodeHighlightPlugin />
-          <HorizontalRulePlugin />
-          <ListPlugin />
-          <LinkDialogPlugin />
-        </LexicalComposer>
+    <LexicalComposer initialConfig={standardConfig(markdown)}>
+      <EditorSystemComponent markdownSource={markdown} availableJsxImports={availableJsxImports} sandpackConfig={sandpackConfig}>
+        <SimpleFormatDisplay />
+        <ToolbarPlugin />
+        <ViewModeToggler initialCode={markdown}>
+          <RichTextPlugin
+            contentEditable={<ContentEditable className={styles.ContentEditable} />}
+            placeholder={<div></div>}
+            ErrorBoundary={LexicalErrorBoundary}
+          />
+        </ViewModeToggler>
+        <LexicalLinkPlugin />
+        <CodeHighlightPlugin />
+        <HorizontalRulePlugin />
+        <ListPlugin />
+        <LinkDialogPlugin />
       </EditorSystemComponent>
-    </SandpackConfigContext.Provider>
+    </LexicalComposer>
   )
 }

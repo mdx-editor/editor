@@ -11,9 +11,10 @@ import {
   SerializedLexicalNode,
   Spread,
 } from 'lexical'
-import React, { useContext } from 'react'
+import React from 'react'
 import { CodeBlockMeta, parseCodeBlockMeta } from './parseCodeBlockMeta'
-import { usePublisher } from '../../ui'
+import { useEmitterValues, usePublisher } from '../../system'
+import { SandpackPreset } from '../../system/Sandpack'
 
 export type { CodeBlockMeta } from './parseCodeBlockMeta'
 
@@ -34,52 +35,6 @@ export type SerializedSandpackNode = Spread<
   SerializedLexicalNode
 >
 
-type SandpackProviderProps = React.ComponentProps<typeof SandpackProvider>
-
-export type Dependencies = Record<string, string>
-
-export type DependencySet = {
-  name: string
-  dependencies: Dependencies
-}
-
-export type FileSet = {
-  name: string
-  files: Record<string, string>
-}
-
-export interface SandpackPreset {
-  name: string
-  sandpackTemplate: SandpackProviderProps['template']
-  sandpackTheme: SandpackProviderProps['theme']
-  snippetFileName: string
-  dependencies?: Dependencies
-  files?: Record<string, string>
-  additionalDependencySets?: Array<DependencySet>
-  additionalFileSets?: Array<FileSet>
-}
-
-export interface SandpackConfig {
-  defaultPreset: string
-  presets: Array<SandpackPreset>
-}
-
-const DefaultSandpackConfig: SandpackConfig = {
-  defaultPreset: 'react',
-  presets: [
-    {
-      name: 'react',
-      sandpackTemplate: 'react',
-      sandpackTheme: 'light',
-      snippetFileName: '/App.js',
-    },
-  ],
-}
-
-export type SandpackConfigValue = SandpackConfig | ((meta: CodeBlockMeta) => SandpackPreset)
-
-export const SandpackConfigContext = React.createContext<SandpackConfigValue>(DefaultSandpackConfig)
-
 interface CodeUpdateEmitterProps {
   snippetFileName: string
   onChange: (code: string) => void
@@ -91,23 +46,19 @@ const CodeUpdateEmitter = ({ onChange, snippetFileName }: CodeUpdateEmitterProps
   return null
 }
 
-export interface ActiveSandpackPayload {
-  nodeKey: NodeKey
-}
-
 const CodeEditor = ({ nodeKey, code, meta, onChange }: CodeEditorProps) => {
   const [editor] = useLexicalComposerContext()
   const setActiveSandpackNode = usePublisher('activeSandpackNode')
+  const [config] = useEmitterValues('sandpackConfig')
   const codeMirrorRef = React.useRef<CodeMirrorRef>(null)
 
   let preset: SandpackPreset | undefined
-  const config = useContext(SandpackConfigContext)
   const metaObj = parseCodeBlockMeta(meta)
   if (typeof config === 'function') {
     preset = config(metaObj)
   } else {
-    const presetName = metaObj.preset || config.defaultPreset
-    preset = config.presets.find((p) => p.name === presetName)
+    const presetName = metaObj.preset || config?.defaultPreset
+    preset = config?.presets.find((p) => p.name === presetName)
     if (!preset) {
       throw new Error(`No preset found for name ${presetName}`)
     }
