@@ -4,7 +4,7 @@ import { INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontal
 import { mergeRegister } from '@lexical/utils'
 import * as RadixToolbar from '@radix-ui/react-toolbar'
 import * as styles from './styles.css'
-import { COMMAND_PRIORITY_CRITICAL, COMMAND_PRIORITY_LOW, FOCUS_COMMAND, SELECTION_CHANGE_COMMAND } from 'lexical'
+import { COMMAND_PRIORITY_CRITICAL, SELECTION_CHANGE_COMMAND } from 'lexical'
 import React from 'react'
 import { OPEN_LINK_DIALOG } from '../LinkDialogPlugin/'
 import { BlockTypeSelect } from './BlockTypeSelect/'
@@ -36,6 +36,7 @@ export const ToolbarPlugin = () => {
   const applyListType = usePublisher('applyListType')
   const setViewMode = usePublisher('viewMode')
   const insertCodeBlock = usePublisher('insertCodeBlock')
+  const openLinkEditDialog = usePublisher('openLinkEditDialog')
   const [editor] = useLexicalComposerContext()
   const [activeEditor, setActiveEditor] = React.useState(editor)
 
@@ -114,7 +115,7 @@ export const ToolbarPlugin = () => {
       <BlockTypeSelect />
       <ToolbarSeparator />
 
-      <ToolbarButton onClick={() => activeEditor.dispatchCommand(OPEN_LINK_DIALOG, undefined)}>
+      <ToolbarButton onClick={() => openLinkEditDialog(true)}>
         <LinkIcon />
       </ToolbarButton>
       <ToolbarButton

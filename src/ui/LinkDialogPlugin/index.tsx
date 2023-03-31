@@ -3,24 +3,15 @@ import * as Popover from '@radix-ui/react-popover'
 import * as Tooltip from '@radix-ui/react-tooltip'
 
 import {
-  $getSelection,
-  $isRangeSelection,
   COMMAND_PRIORITY_HIGH,
   COMMAND_PRIORITY_LOW,
-  ElementNode,
-  KEY_MODIFIER_COMMAND,
-  KEY_ESCAPE_COMMAND,
-  LexicalEditor,
-  RangeSelection,
-  SELECTION_CHANGE_COMMAND,
-  TextNode,
-  LexicalCommand,
   createCommand,
+  KEY_ESCAPE_COMMAND,
+  KEY_MODIFIER_COMMAND,
+  LexicalCommand,
 } from 'lexical'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { $isAtNodeEnd } from '@lexical/selection'
 import { mergeRegister } from '@lexical/utils'
-import { $isLinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link'
 import { LinkTextContainer, LinkUIInput, PopoverButton, TooltipArrow, TooltipContent, WorkingLink } from './primitives'
 import { PopoverAnchor, PopoverContent } from '../Popover/primitives'
 import { ReactComponent as LinkOffIcon } from './icons/link_off.svg'
@@ -29,99 +20,30 @@ import { ReactComponent as CloseIcon } from './icons/close.svg'
 import { ReactComponent as CopyIcon } from './icons/content_copy.svg'
 import { ReactComponent as EditIcon } from './icons/edit.svg'
 import { ReactComponent as OpenInNewIcon } from './icons/open_in_new.svg'
-
-export function getSelectedNode(selection: RangeSelection): TextNode | ElementNode {
-  const anchor = selection.anchor
-  const focus = selection.focus
-  const anchorNode = selection.anchor.getNode()
-  const focusNode = selection.focus.getNode()
-  if (anchorNode === focusNode) {
-    return anchorNode
-  }
-  const isBackward = selection.isBackward()
-  if (isBackward) {
-    return $isAtNodeEnd(focus) ? anchorNode : focusNode
-  } else {
-    return $isAtNodeEnd(anchor) ? anchorNode : focusNode
-  }
-}
+import { useEmitterValues, usePublisher } from '../../system'
 
 export const OPEN_LINK_DIALOG: LexicalCommand<undefined> = createCommand()
 
-function getSelectionRectangle(editor: LexicalEditor) {
-  const selection = $getSelection()
-  const nativeSelection = window.getSelection()
-  const activeElement = document.activeElement
-
-  const rootElement = editor.getRootElement()
-
-  if (
-    selection !== null &&
-    nativeSelection !== null &&
-    rootElement !== null &&
-    rootElement.contains(nativeSelection.anchorNode) &&
-    editor.isEditable()
-  ) {
-    const domRange = nativeSelection.getRangeAt(0)
-    let rect
-    if (nativeSelection.anchorNode === rootElement) {
-      let inner = rootElement
-      while (inner.firstElementChild != null) {
-        inner = inner.firstElementChild as HTMLElement
-      }
-      rect = inner.getBoundingClientRect()
-    } else {
-      rect = domRange.getBoundingClientRect()
-    }
-
-    return rect
-  } else if (!activeElement || activeElement.className !== 'link-input') {
-    return null
-  }
-  return null
-}
-
 export function LinkDialogPlugin() {
+  const publishWindowChange = usePublisher('onWindowChange')
   const [editor] = useLexicalComposerContext()
-  const [open, setOpen] = React.useState(false)
-  const [url, setUrl] = React.useState<string | null>(null)
-  const [initialUrl, setInitialUrl] = React.useState<string | null>(null)
-  const [rect, setRect] = React.useState<DOMRect | null>(null)
-  const [editMode, setEditMode] = React.useState(false)
-  const [popoverKey, setPopoverKey] = React.useState('0')
-
-  const applyUrlChanges = React.useCallback(
-    (input: HTMLInputElement) => {
-      const url = input.value
-      if (url.trim() !== '') {
-        setEditMode(false)
-        editor.dispatchCommand(TOGGLE_LINK_COMMAND, url)
-      } else {
-        editor.dispatchCommand(TOGGLE_LINK_COMMAND, null)
-      }
-    },
-    [editor]
-  )
-
-  const cancelChange = React.useCallback(() => {
-    setEditMode(false)
-    setUrl(initialUrl)
-    if (initialUrl === null) {
-      setOpen(false)
-      editor.focus()
-    }
-  }, [initialUrl, editor])
+  const [linkDialogState] = useEmitterValues('linkDialogState')
+  const updateLinkUrl = usePublisher('updateLinkUrl')
+  const cancelLinkEdit = usePublisher('cancelLinkEdit')
+  const switchFromPreviewToLinkEdit = usePublisher('switchFromPreviewToLinkEdit')
+  const removeLink = usePublisher('removeLink')
+  const applyLinkChanges = usePublisher('applyLinkChanges')
 
   const onKeyDown = React.useCallback(
     (e: KeyboardEvent) => {
       if (e.key === 'Enter') {
         e.preventDefault()
-        applyUrlChanges(e.target as HTMLInputElement)
+        applyLinkChanges(true)
       } else if (e.key === 'Escape') {
-        cancelChange()
+        cancelLinkEdit(true)
       }
     },
-    [applyUrlChanges, cancelChange]
+    [applyLinkChanges, cancelLinkEdit]
   )
 
   const inputElRef = React.useRef<HTMLInputElement | null>(null)
@@ -138,41 +60,9 @@ export function LinkDialogPlugin() {
     [onKeyDown]
   )
 
-  const updateLinkUI = React.useCallback(() => {
-    const selection = $getSelection()
-    if ($isRangeSelection(selection)) {
-      const node = getSelectedNode(selection)
-      const parent = node.getParent()
-      if ($isLinkNode(parent)) {
-        setRect(getSelectionRectangle(editor))
-        setUrl(parent.getURL())
-        setPopoverKey(parent.getKey())
-        setInitialUrl(parent.getURL())
-        setEditMode(false)
-        setOpen(true)
-      } else if ($isLinkNode(node)) {
-        setRect(getSelectionRectangle(editor))
-        setPopoverKey(node.getKey())
-        setUrl(node.getURL())
-        setInitialUrl(node.getURL())
-        setEditMode(false)
-        setOpen(true)
-      } else {
-        setUrl(null)
-        setEditMode(false)
-        setRect(null)
-      }
-    } else {
-      setUrl(null)
-      setEditMode(false)
-    }
-  }, [editor])
-
   React.useEffect(() => {
     const update = () => {
-      editor.getEditorState().read(() => {
-        updateLinkUI()
-      })
+      publishWindowChange(true)
     }
 
     window.addEventListener('resize', update)
@@ -183,120 +73,46 @@ export function LinkDialogPlugin() {
       window.removeEventListener('resize', update)
       window.removeEventListener('scroll', update)
     }
-  }, [editor, updateLinkUI])
-
-  React.useEffect(() => {
-    return mergeRegister(
-      editor.registerUpdateListener(({ editorState }) => {
-        editorState.read(() => {
-          updateLinkUI()
-        })
-      }),
-
-      editor.registerCommand(
-        SELECTION_CHANGE_COMMAND,
-        () => {
-          updateLinkUI()
-          return true
-        },
-        COMMAND_PRIORITY_LOW
-      ),
-      editor.registerCommand(
-        KEY_ESCAPE_COMMAND,
-        () => {
-          // this is kinda hacky, relying on a sync state update to return a value
-          let shouldHandle = false
-          setOpen((value) => {
-            shouldHandle = value
-            return false
-          })
-          return shouldHandle
-        },
-        COMMAND_PRIORITY_LOW
-      ),
-      editor.registerCommand(
-        OPEN_LINK_DIALOG,
-        () => {
-          const selection = $getSelection()
-          if ($isRangeSelection(selection)) {
-            const node = getSelectedNode(selection)
-            const parent = node.getParent()
-            if ($isLinkNode(parent)) {
-              setEditMode(true)
-            } else if ($isLinkNode(node)) {
-              setRect(getSelectionRectangle(editor))
-              setUrl(node.getURL())
-              setInitialUrl(node.getURL())
-              setEditMode(true)
-              setOpen(true)
-            } else {
-              setRect(getSelectionRectangle(editor))
-              setUrl('')
-              setInitialUrl(null)
-              setEditMode(true)
-              setOpen(true)
-            }
-          }
-          return true
-        },
-        COMMAND_PRIORITY_HIGH
-      ),
-      editor.registerCommand(
-        KEY_MODIFIER_COMMAND,
-        (event) => {
-          // TODO: handle windows
-          if (event.key === 'k' && event.metaKey) {
-            editor.dispatchCommand(OPEN_LINK_DIALOG, undefined)
-            return true
-          }
-          return false
-        },
-        COMMAND_PRIORITY_HIGH
-      )
-    )
-  }, [editor, updateLinkUI])
-
-  React.useEffect(() => {
-    editor.getEditorState().read(() => {
-      updateLinkUI()
-    })
-  }, [editor, updateLinkUI])
+  }, [editor, publishWindowChange])
 
   const [copyUrlTooltipOpen, setCopyUrlTooltipOpen] = React.useState(false)
 
+  const theRect = linkDialogState?.rectangle
   return (
-    <Popover.Root open={open && !!rect}>
+    <Popover.Root open={linkDialogState.type !== 'inactive'}>
       <PopoverAnchor
         style={{
-          visibility: open && editMode ? 'visible' : 'hidden',
-          top: rect?.top,
-          left: rect?.left,
-          width: rect?.width,
-          height: rect?.height,
+          visibility: linkDialogState.type === 'edit' ? 'visible' : 'hidden',
+          top: theRect?.top,
+          left: theRect?.left,
+          width: theRect?.width,
+          height: theRect?.height,
         }}
       />
 
       <Popover.Portal>
-        <PopoverContent sideOffset={5} onOpenAutoFocus={(e) => e.preventDefault()} key={popoverKey}>
+        <PopoverContent sideOffset={5} onOpenAutoFocus={(e) => e.preventDefault()} key={linkDialogState.linkNodeKey}>
           <div style={{ display: 'flex', gap: 8, alignContent: 'center', padding: 8 }}>
-            {editMode ? (
+            {linkDialogState.type === 'edit' && (
               <>
-                <LinkUIInput value={url || ''} ref={inputRef} onChange={(e) => setUrl(e.target.value)} autoFocus />
-                <PopoverButton onClick={() => applyUrlChanges(inputElRef.current!)} title="Set URL" aria-label="Set URL">
+                <LinkUIInput value={linkDialogState.url || ''} ref={inputRef} onChange={(e) => updateLinkUrl(e.target.value)} autoFocus />
+                <PopoverButton onClick={() => applyLinkChanges(true)} title="Set URL" aria-label="Set URL">
                   <CheckIcon />
                 </PopoverButton>
 
-                <PopoverButton onClick={cancelChange} title="Cancel change" aria-label="Cancel change">
+                <PopoverButton onClick={() => cancelLinkEdit(true)} title="Cancel change" aria-label="Cancel change">
                   <CloseIcon />
                 </PopoverButton>
               </>
-            ) : (
+            )}
+
+            {linkDialogState.type === 'preview' && (
               <>
-                <WorkingLink href={url!} target="_blank" rel="noreferrer" title={url!}>
-                  <LinkTextContainer>{url}</LinkTextContainer>
+                <WorkingLink href={linkDialogState.url} target="_blank" rel="noreferrer" title={linkDialogState.url}>
+                  <LinkTextContainer>{linkDialogState.url}</LinkTextContainer>
                   <OpenInNewIcon />
                 </WorkingLink>
-                <PopoverButton onClick={() => setEditMode((v) => !v)} title="Edit link URL" aria-label="Edit link URL">
+                <PopoverButton onClick={() => switchFromPreviewToLinkEdit(true)} title="Edit link URL" aria-label="Edit link URL">
                   <EditIcon />
                 </PopoverButton>
                 <Tooltip.Provider>
@@ -306,7 +122,7 @@ export function LinkDialogPlugin() {
                         title="Copy to clipboard"
                         aria-label="Copy link URL"
                         onClick={() => {
-                          void window.navigator.clipboard.writeText(url!).then(() => {
+                          void window.navigator.clipboard.writeText(linkDialogState.url).then(() => {
                             setCopyUrlTooltipOpen(true)
                             setTimeout(() => setCopyUrlTooltipOpen(false), 1000)
                           })
@@ -324,13 +140,7 @@ export function LinkDialogPlugin() {
                   </Tooltip.Root>
                 </Tooltip.Provider>
 
-                <PopoverButton
-                  title="Remove link"
-                  aria-label="Remove link"
-                  onClick={() => {
-                    editor.dispatchCommand(TOGGLE_LINK_COMMAND, null)
-                  }}
-                >
+                <PopoverButton title="Remove link" aria-label="Remove link" onClick={() => removeLink(true)}>
                   <LinkOffIcon />
                 </PopoverButton>
               </>

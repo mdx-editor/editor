@@ -43,7 +43,7 @@ import {
   useCallback,
   useMemo,
 } from 'react'
-import { always, tap } from '../utils'
+import { always, tap } from '../utils/fp'
 import { RealmNode } from './realm'
 
 import { TypedRealm, System, RealmFactory, ValueForKey, SystemKeys, SystemDict } from './realmFactory'

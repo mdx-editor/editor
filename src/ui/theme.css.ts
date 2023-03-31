@@ -1,6 +1,6 @@
-import { createTokenizedTheme } from './utils/createTokenizedTheme'
+import { createTokenizedTheme } from '../utils/createTokenizedTheme'
 import { sky, slate } from '@radix-ui/colors'
-import { makeHslTransparent } from './utils/makeHslTransparent'
+import { makeHslTransparent } from '../utils/makeHslTransparent'
 
 export const [themeClassName, themeVars] = createTokenizedTheme({
   colors: {

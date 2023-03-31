@@ -2,7 +2,7 @@ import { system } from '../gurx'
 import { $getRoot, LexicalEditor } from 'lexical'
 import { ViewMode } from '../ui'
 import { AvailableJsxImports, exportMarkdownFromLexical } from '../export'
-import { tap } from '../utils'
+import { tap } from '../utils/fp'
 import { importMarkdownToLexical } from '../import'
 import { EditorSystemType } from './Editor'
 

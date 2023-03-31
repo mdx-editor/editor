@@ -1,4 +1,4 @@
-import { tap } from '../utils'
+import { tap } from '../utils/fp'
 import { LongTuple } from './realmFactory'
 
 export type NodeKey = string
