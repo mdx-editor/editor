@@ -115,7 +115,7 @@ export const ToolbarPlugin = () => {
       <BlockTypeSelect />
       <ToolbarSeparator />
 
-      <ToolbarButton onClick={() => openLinkEditDialog(true)}>
+      <ToolbarButton onClick={openLinkEditDialog.bind(null, true)}>
         <LinkIcon />
       </ToolbarButton>
       <ToolbarButton
