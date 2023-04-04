@@ -1,5 +1,4 @@
-import { system } from '../gurx'
-import { EditorSystemType } from './Editor'
+import { $isLinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link'
 import {
   $isRangeSelection,
   COMMAND_PRIORITY_HIGH,
@@ -8,9 +7,9 @@ import {
   KEY_MODIFIER_COMMAND,
   RangeSelection,
 } from 'lexical'
-import { fromWithinEditorRead, getSelectedNode, getSelectionRectangle } from '../utils/lexicalHelpers'
-import { $isLinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link'
-import { create } from 'domain'
+import { system } from '../gurx'
+import { getSelectedNode, getSelectionRectangle } from '../utils/lexicalHelpers'
+import { EditorSystemType } from './Editor'
 
 interface InactiveLinkDialog {
   type: 'inactive'
@@ -43,6 +42,7 @@ function getLinkNodeInSelection(selection: RangeSelection) {
   }
   return null
 }
+
 export const [LinkDialogSystem, LinkDialogSystemType] = system(
   (r, [{ activeEditor, currentSelection, createEditorSubscription }]) => {
     const dialogState = r.node(false)

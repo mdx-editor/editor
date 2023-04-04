@@ -12,7 +12,7 @@ import {
   Spread,
 } from 'lexical'
 import React from 'react'
-import { CodeBlockMeta, parseCodeBlockMeta } from './parseCodeBlockMeta'
+import { parseCodeBlockMeta } from './parseCodeBlockMeta'
 import { useEmitterValues, usePublisher } from '../../system'
 import { SandpackPreset } from '../../system/Sandpack'
 

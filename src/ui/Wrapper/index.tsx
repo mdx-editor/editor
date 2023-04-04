@@ -42,12 +42,7 @@ interface WrappedEditorProps {
 }
 
 const SimpleFormatDisplay = () => {
-  const [format, listType, blockType, linkDialogState] = useEmitterValues(
-    'currentFormat',
-    'currentListType',
-    'currentBlockType',
-    'linkDialogState'
-  )
+  const [format, listType, blockType] = useEmitterValues('currentFormat', 'currentListType', 'currentBlockType')
   return (
     <div>
       {format} - {listType} - {blockType}
