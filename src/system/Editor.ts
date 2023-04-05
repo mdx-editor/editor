@@ -1,4 +1,14 @@
-import { system } from '../gurx'
+import { $createCodeNode } from '@lexical/code'
+import {
+  $isListNode,
+  INSERT_ORDERED_LIST_COMMAND,
+  INSERT_UNORDERED_LIST_COMMAND,
+  ListNode,
+  ListType,
+  REMOVE_LIST_COMMAND,
+} from '@lexical/list'
+import { $isHeadingNode } from '@lexical/rich-text'
+import { $findMatchingParent, $getNearestNodeOfType, $insertNodeToNearestRoot } from '@lexical/utils'
 import {
   $getSelection,
   $isRangeSelection,
@@ -11,18 +21,9 @@ import {
   SELECTION_CHANGE_COMMAND,
   TextFormatType,
 } from 'lexical'
-import { $findMatchingParent, $getNearestNodeOfType, $insertNodeToNearestRoot } from '@lexical/utils'
-import {
-  $isListNode,
-  INSERT_ORDERED_LIST_COMMAND,
-  INSERT_UNORDERED_LIST_COMMAND,
-  ListNode,
-  ListType,
-  REMOVE_LIST_COMMAND,
-} from '@lexical/list'
+import { system } from '../gurx'
+import { $isAdmonitionNode, AdmonitionKind } from '../nodes'
 import { BlockType, HeadingType } from '../ui/ToolbarPlugin/BlockTypeSelect'
-import { $isAdmonitionNode, AdmonitionKind, AdmonitionNode } from '../nodes'
-import { $isHeadingNode } from '@lexical/rich-text'
 import {
   formatAdmonition,
   formatCode,
@@ -30,8 +31,6 @@ import {
   formatParagraph,
   formatQuote,
 } from '../ui/ToolbarPlugin/BlockTypeSelect/blockFormatters'
-import { AvailableJsxImports } from '../export'
-import { $createCodeNode } from '@lexical/code'
 
 type Teardowns = Array<() => void>
 
@@ -45,7 +44,6 @@ type EditorSubscription = (editor: LexicalEditor) => () => void
 
 export const [EditorSystem, EditorSystemType] = system((r) => {
   const editor = r.node<LexicalEditor | null>(null, true)
-  const availableJsxImports = r.node({} as AvailableJsxImports, true)
 
   const activeEditor = r.node<LexicalEditor | null>(null, true)
   const currentFormat = r.node(0, true)
@@ -54,7 +52,7 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
   const currentBlockType = r.node<BlockType | AdmonitionKind | null>(null)
   const applyFormat = r.node<TextFormatType>()
   const applyListType = r.node<ListType | ''>()
-  const applyBlockType = r.node<BlockType | AdmonitionNode>()
+  const applyBlockType = r.node<BlockType | AdmonitionKind>()
   const insertCodeBlock = r.node<true>()
 
   const createEditorSubscription = r.node<EditorSubscription>()
@@ -224,7 +222,6 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
     applyFormat,
     applyListType,
     applyBlockType,
-    availableJsxImports,
     insertCodeBlock,
     createEditorSubscription,
     editorSubscriptions,

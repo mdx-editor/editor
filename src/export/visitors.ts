@@ -19,20 +19,19 @@ import { ContainerDirective } from 'mdast-util-directive'
 import type { MdxJsxFlowElement, MdxJsxTextElement } from 'mdast-util-mdx-jsx'
 import {
   $isAdmonitionNode,
-  $isFrontmatterNode,
-  $isImageNode,
   $isSandpackNode,
   AdmonitionNode,
-  FrontmatterNode,
-  ImageNode,
-  IS_BOLD,
-  IS_CODE,
-  IS_ITALIC,
-  IS_UNDERLINE,
   SandpackNode,
   JsxNode,
   $isJsxNode,
-} from '../'
+  $isImageNode,
+  ImageNode,
+  $isFrontmatterNode,
+  FrontmatterNode,
+} from '../nodes'
+
+import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from '../FormatConstants'
+
 export type { Options as ToMarkdownOptions } from 'mdast-util-to-markdown'
 
 type MdastNode = Mdast.Content

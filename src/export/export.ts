@@ -5,19 +5,8 @@ import { frontmatterToMarkdown } from 'mdast-util-frontmatter'
 import { MdxjsEsm, mdxToMarkdown } from 'mdast-util-mdx'
 import { Options as ToMarkdownOptions, toMarkdown } from 'mdast-util-to-markdown'
 import { LexicalExportVisitor, LexicalVisitors } from './visitors'
+import { JsxComponentDescriptors } from '../system/Jsx'
 export type { Options as ToMarkdownOptions } from 'mdast-util-to-markdown'
-
-interface JsxImport {
-  componentNames: string[]
-  source: string
-}
-
-interface JsxDefaultImport {
-  componentName: string
-  source: string
-}
-
-export type AvailableJsxImports = Array<JsxImport | JsxDefaultImport>
 
 function isParent(node: unknown): node is Mdast.Parent {
   return (node as { children?: Array<any> }).children instanceof Array
@@ -26,7 +15,7 @@ function isParent(node: unknown): node is Mdast.Parent {
 function traverseLexicalTree(
   root: LexicalRootNode,
   visitors: Array<LexicalExportVisitor<LexicalNode, Mdast.Content>>,
-  availableImports: AvailableJsxImports
+  jsxComponentDescriptors: JsxComponentDescriptors
 ): Mdast.Root {
   let unistRoot: Mdast.Root | null = null
   const referredComponents = new Set<string>()
@@ -103,32 +92,42 @@ function traverseLexicalTree(
   }
 
   // iterate over all referred components and construct import statements, then append them to the root
-  const imports: MdxjsEsm[] = []
-  availableImports.forEach((importStatement) => {
-    if ('componentNames' in importStatement) {
-      const componentNames = importStatement.componentNames.filter((componentName) => referredComponents.has(componentName))
-      if (componentNames.length) {
-        imports.push({
-          type: 'mdxjsEsm',
-          value: `import { ${componentNames.join(', ')} } from '${importStatement.source}'`,
-        })
-      }
-    } else {
-      const componentName = importStatement.componentName
-      if (referredComponents.has(componentName)) {
-        imports.push({
-          type: 'mdxjsEsm',
-          value: `import ${componentName} from '${importStatement.source}'`,
-        })
-      }
-    }
-  })
+  const importsMap = new Map<string, string[]>()
+  const defaultImportsMap = new Map<string, string>()
 
-  for (const ref of referredComponents) {
-    if (!availableImports.some((importStatement) => 'componentNames' in importStatement && importStatement.componentNames.includes(ref))) {
-      throw new Error(`Component ${ref} is used but not imported`)
+  for (const componentName of referredComponents) {
+    const descriptor = jsxComponentDescriptors.find((descriptor) => descriptor.name === componentName)
+    if (!descriptor) {
+      throw new Error(`Component ${componentName} is used but not imported`)
+    }
+    if (descriptor.defaultExport) {
+      defaultImportsMap.set(componentName, descriptor.source)
+    } else {
+      const { source } = descriptor
+      const existing = importsMap.get(source)
+      if (existing) {
+        existing.push(componentName)
+      } else {
+        importsMap.set(source, [componentName])
+      }
     }
   }
+
+  const imports = Array.from(importsMap).map(([source, componentNames]) => {
+    return {
+      type: 'mdxjsEsm',
+      value: `import { ${componentNames.join(', ')} } from '${source}'`,
+    } as MdxjsEsm
+  })
+
+  imports.push(
+    ...Array.from(defaultImportsMap).map(([componentName, source]) => {
+      return {
+        type: 'mdxjsEsm',
+        value: `import ${componentName} from '${source}'`,
+      } as MdxjsEsm
+    })
+  )
 
   const typedRoot = unistRoot as Mdast.Root
 
@@ -147,16 +146,16 @@ interface ExportMarkdownFromLexicalParams {
   root: LexicalRootNode
   options?: ToMarkdownOptions
   visitors?: Array<LexicalExportVisitor<LexicalNode, Mdast.Content>>
-  availableImports?: AvailableJsxImports
+  jsxComponentDescriptors?: JsxComponentDescriptors
 }
 
 export function exportMarkdownFromLexical({
   root,
   options,
   visitors = LexicalVisitors,
-  availableImports = [],
+  jsxComponentDescriptors = [],
 }: ExportMarkdownFromLexicalParams): string {
-  return toMarkdown(traverseLexicalTree(root, visitors, availableImports), {
+  return toMarkdown(traverseLexicalTree(root, visitors, jsxComponentDescriptors), {
     extensions: [mdxToMarkdown(), frontmatterToMarkdown('yaml'), directiveToMarkdown],
     listItemIndent: 'one',
     ...options,

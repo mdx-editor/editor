@@ -5,17 +5,18 @@ import { EditorSystem } from './Editor'
 import { ViewModeSystem } from './ViewMode'
 import { SandpackSystem } from './Sandpack'
 import { LinkDialogSystem } from './LinkDialog'
+import { JsxSystem } from './Jsx'
 
 export const {
   Component: EditorSystemComponent,
   usePublisher,
   useEmitterValues,
 } = realmFactoryToComponent(
-  getRealmFactory(EditorSystem, ViewModeSystem, SandpackSystem, LinkDialogSystem),
+  getRealmFactory(EditorSystem, ViewModeSystem, SandpackSystem, LinkDialogSystem, JsxSystem),
   {
     required: {
       markdownSource: 'markdownSource',
-      availableJsxImports: 'availableJsxImports',
+      jsxComponentDescriptors: 'jsxComponentDescriptors',
       sandpackConfig: 'sandpackConfig',
     },
   },
@@ -35,3 +36,9 @@ const CaptureLexicalEditor = () => {
   React.useEffect(() => setEditor(lexicalEditor), [lexicalEditor, setEditor])
   return null
 }
+
+export * from './Editor'
+export * from './Jsx'
+export * from './LinkDialog'
+export * from './Sandpack'
+export * from './ViewMode'

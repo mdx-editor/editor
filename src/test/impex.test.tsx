@@ -1,7 +1,8 @@
+import { $createParagraphNode, $createTextNode, $getRoot, LexicalEditor } from 'lexical'
 import { describe, expect, it } from 'vitest'
+import { ToMarkdownOptions, exportMarkdownFromLexical, importMarkdownToLexical } from '../index'
 import { initializeUnitTest } from './lexical-utils'
-import { $getRoot, $createParagraphNode, $createTextNode, LexicalEditor } from 'lexical'
-import { importMarkdownToLexical, exportMarkdownFromLexical, ToMarkdownOptions, AvailableJsxImports } from '../index'
+import { JsxComponentDescriptors } from '../system/Jsx'
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 ;(globalThis as any).IS_REACT_ACT_ENVIRONMENT = true
@@ -70,7 +71,7 @@ function testIdenticalMarkdownAfterImportExport(
   editor: LexicalEditor,
   markdown: string,
   exportOptions?: ToMarkdownOptions,
-  availableImports: AvailableJsxImports = []
+  jsxComponentDescriptors: JsxComponentDescriptors = []
 ) {
   editor.registerUpdateListener(({ editorState }) => {
     editorState.read(() => {
@@ -79,7 +80,7 @@ function testIdenticalMarkdownAfterImportExport(
           root: $getRoot(),
           options: exportOptions,
           visitors: undefined,
-          availableImports: availableImports,
+          jsxComponentDescriptors,
         }).trim()
       ).toEqual(markdown.trim())
     })
@@ -219,7 +220,21 @@ title: My Favorite page
 })
 
 describe('mdx jsx components', () => {
-  const availableImports: AvailableJsxImports = [{ componentNames: ['A1', 'A2'], source: './some/place.js' }]
+  const jsxDescriptors: JsxComponentDescriptors = [
+    {
+      name: 'A1',
+      kind: 'text',
+      source: './some/place.js',
+      props: [],
+    },
+    {
+      name: 'A2',
+      kind: 'text',
+      source: './some/place.js',
+      props: [],
+    },
+  ]
+
   initializeUnitTest((testEnv) => {
     it('understands imports and jsx', () => {
       const md = `
@@ -228,7 +243,7 @@ import { A1, A2 } from './some/place.js'
 An <A1 /> <A2 /> component.
     `.trim()
 
-      testIdenticalMarkdownAfterImportExport(testEnv.editor!, md, undefined, availableImports)
+      testIdenticalMarkdownAfterImportExport(testEnv.editor!, md, undefined, jsxDescriptors)
     })
     it('puts imports below frontmatter', () => {
       const md = `
@@ -241,7 +256,7 @@ import { A1, A2 } from './some/place.js'
 An <A1 /> <A2 /> component.
     `.trim()
 
-      testIdenticalMarkdownAfterImportExport(testEnv.editor!, md, undefined, availableImports)
+      testIdenticalMarkdownAfterImportExport(testEnv.editor!, md, undefined, jsxDescriptors)
     })
   })
   it.todo('supports nested content in jsx components')

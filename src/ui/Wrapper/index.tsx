@@ -9,19 +9,19 @@ import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import { $getRoot } from 'lexical'
 import React from 'react'
 import {
-  AvailableJsxImports,
   CodeHighlightPlugin,
   contentTheme,
   importMarkdownToLexical,
+  JsxComponentDescriptors,
   LinkDialogPlugin,
   ToolbarPlugin,
   UsedLexicalNodes,
   useEmitterValues,
   ViewModeToggler,
 } from '../../'
-import * as styles from './styles.css'
 import { EditorSystemComponent } from '../../system'
 import { SandpackConfigValue } from '../../system/Sandpack'
+import * as styles from './styles.css'
 
 export function standardConfig(markdown: string) {
   return {
@@ -38,7 +38,7 @@ export function standardConfig(markdown: string) {
 interface WrappedEditorProps {
   markdown: string
   sandpackConfig: SandpackConfigValue
-  availableJsxImports: AvailableJsxImports
+  jsxComponentDescriptors: JsxComponentDescriptors
 }
 
 const SimpleFormatDisplay = () => {
@@ -50,10 +50,10 @@ const SimpleFormatDisplay = () => {
   )
 }
 
-export const Wrapper: React.FC<WrappedEditorProps> = ({ markdown, availableJsxImports, sandpackConfig }) => {
+export const Wrapper: React.FC<WrappedEditorProps> = ({ markdown, jsxComponentDescriptors, sandpackConfig }) => {
   return (
     <LexicalComposer initialConfig={standardConfig(markdown)}>
-      <EditorSystemComponent markdownSource={markdown} availableJsxImports={availableJsxImports} sandpackConfig={sandpackConfig}>
+      <EditorSystemComponent markdownSource={markdown} jsxComponentDescriptors={jsxComponentDescriptors} sandpackConfig={sandpackConfig}>
         <SimpleFormatDisplay />
         <ToolbarPlugin />
         <ViewModeToggler initialCode={markdown}>

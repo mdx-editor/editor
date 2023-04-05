@@ -11,20 +11,20 @@ import { system } from '../gurx'
 import { getSelectedNode, getSelectionRectangle } from '../utils/lexicalHelpers'
 import { EditorSystemType } from './Editor'
 
-interface InactiveLinkDialog {
+export interface InactiveLinkDialog {
   type: 'inactive'
   rectangle?: undefined
   linkNodeKey?: undefined
 }
 
-interface PreviewLinkDialog {
+export interface PreviewLinkDialog {
   type: 'preview'
   url: string
   linkNodeKey: string
   rectangle: DOMRect
 }
 
-interface EditLinkDialog {
+export interface EditLinkDialog {
   type: 'edit'
   initialUrl: string
   url: string

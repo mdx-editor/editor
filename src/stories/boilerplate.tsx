@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import React from 'react'
-import { AvailableJsxImports, SandpackConfig, Wrapper } from '..'
+import { JsxComponentDescriptors, SandpackConfig, Wrapper } from '..'
 import dataCode from './assets/dataCode.ts?raw'
 
 const virtuosoSampleSandpackConfig: SandpackConfig = {
@@ -28,12 +28,25 @@ const virtuosoSampleSandpackConfig: SandpackConfig = {
   ],
 }
 
-const availableImports: AvailableJsxImports = [{ source: './external', componentNames: ['MyLeaf', 'BlockNode'] }]
+const jsxDescriptors: JsxComponentDescriptors = [
+  {
+    name: 'MyLeaf',
+    kind: 'text',
+    source: './external',
+    props: [],
+  },
+  {
+    name: 'BlockNode',
+    kind: 'flow',
+    source: './external',
+    props: [],
+  },
+]
 
 interface WrappedEditorProps {
   markdown: string
 }
 
 export const WrappedLexicalEditor: React.FC<WrappedEditorProps> = ({ markdown }) => {
-  return <Wrapper markdown={markdown} sandpackConfig={virtuosoSampleSandpackConfig} availableJsxImports={availableImports} />
+  return <Wrapper markdown={markdown} sandpackConfig={virtuosoSampleSandpackConfig} jsxComponentDescriptors={jsxDescriptors} />
 }
