@@ -24,7 +24,9 @@ import { LexicalNestedComposer } from '@lexical/react/LexicalNestedComposer'
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
-import { contentTheme } from '../../'
+import { contentTheme, useEmitterValues } from '../../'
+import { useForm } from 'react-hook-form'
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 
 type JsxKind = 'text' | 'flow'
 
@@ -196,6 +198,12 @@ export class JsxNode extends DecoratorNode<JSX.Element> {
     return this.__attributes
   }
 
+  updateAttributes(attributeValues: Record<string, string>) {
+    this.getWritable().__attributes = Object.entries(attributeValues).map(([name, value]) => {
+      return { name, value } as MdxJsxAttribute
+    })
+  }
+
   decorate(): JSX.Element {
     if (this.getKind() === 'flow') {
       return (
@@ -214,16 +222,11 @@ export class JsxNode extends DecoratorNode<JSX.Element> {
     return (
       <span className={styles.inlineComponent}>
         <span>
-          <RadixPopover.Root>
-            <PopoverTrigger>
-              <SettingsIcon />
-            </PopoverTrigger>
-            <RadixPopover.Portal>
-              <PopoverContent>
-                <JsxPropertyPanel attributes={this.getAttributes()} />
-              </PopoverContent>
-            </RadixPopover.Portal>
-          </RadixPopover.Root>
+          <InlineJsxComponent
+            attributes={this.getAttributes()}
+            componentName={this.getName()}
+            onSubmit={(attributeValues) => this.updateAttributes(attributeValues)}
+          />
         </span>
         <span>
           {this.getName()}
@@ -240,30 +243,85 @@ export class JsxNode extends DecoratorNode<JSX.Element> {
     )
   }
 }
-
-interface JsxPropertyPanelProps {
-  attributes: Array<MdxJsxAttribute>
+interface InlineJsxComponentProps {
+  attributes: MdxJsxAttribute[]
+  componentName: string
+  onSubmit: (values: Record<string, string>) => void
 }
 
-const JsxPropertyPanel: React.FC<JsxPropertyPanelProps> = ({ attributes }) => {
+const InlineJsxComponent = ({ attributes, componentName, onSubmit }: InlineJsxComponentProps) => {
+  const [open, setOpen] = React.useState(false)
+
+  const decoratedOnSubmit = React.useCallback(
+    (values: Record<string, string>) => {
+      onSubmit(values)
+      setOpen(false)
+    },
+    [onSubmit]
+  )
+
+  return (
+    <RadixPopover.Root open={open} onOpenChange={(v) => setOpen(v)}>
+      <PopoverTrigger>
+        <SettingsIcon />
+      </PopoverTrigger>
+      <RadixPopover.Portal>
+        <PopoverContent>
+          <JsxPropertyPanel attributes={attributes} componentName={componentName} onSubmit={decoratedOnSubmit} />
+        </PopoverContent>
+      </RadixPopover.Portal>
+    </RadixPopover.Root>
+  )
+}
+
+interface JsxPropertyPanelProps {
+  componentName: string
+  attributes: Array<MdxJsxAttribute>
+  onSubmit: (values: Record<string, string>) => void
+}
+
+const JsxPropertyPanel: React.FC<JsxPropertyPanelProps> = ({ attributes, componentName, onSubmit }) => {
+  const [jsxComponentDescriptors] = useEmitterValues('jsxComponentDescriptors')
+  const descriptor = jsxComponentDescriptors.find((descriptor) => descriptor.name === componentName)!
+  const [editor] = useLexicalComposerContext()
+
+  const { register, handleSubmit } = useForm({
+    defaultValues: attributes.reduce((acc, attribute) => {
+      // TODO: handle mdxjs expressions
+      acc[attribute.name] = attribute.value as string
+      return acc
+    }, {} as Record<string, string>),
+  })
+
   // iterate over the attributes and render a two column table with the name and value
   return (
-    <table>
-      <thead>
-        <tr>
-          <th>Attribute</th>
-          <th>Value</th>
-        </tr>
-      </thead>
-      <tbody>
-        {attributes.map((attribute) => (
-          <tr key={attribute.name}>
-            <td>{attribute.name}</td>
-            <td>{attribute.value as any}</td>
+    <form
+      onSubmit={handleSubmit((data) => {
+        editor.update(() => {
+          onSubmit(data)
+        })
+      })}
+    >
+      <table>
+        <thead>
+          <tr>
+            <th>Attribute</th>
+            <th>Value</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {descriptor.props.map((propDescriptor) => (
+            <tr key={propDescriptor.name}>
+              <td> {propDescriptor.name} </td>
+              <td>
+                <input {...register(propDescriptor.name)} />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <button type="submit">Submit</button>
+    </form>
   )
 }
 

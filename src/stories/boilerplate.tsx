@@ -33,7 +33,10 @@ const jsxDescriptors: JsxComponentDescriptors = [
     name: 'MyLeaf',
     kind: 'text',
     source: './external',
-    props: [],
+    props: [
+      { name: 'foo', type: 'string' },
+      { name: 'bar', type: 'string' },
+    ],
   },
   {
     name: 'BlockNode',
