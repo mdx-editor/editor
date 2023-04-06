@@ -26,6 +26,7 @@
   "scripts": {
     "build": "vite build",
     "start": "LADLE=true ladle dev",
+    "dev": "LADLE=true ladle dev",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext .ts,.tsx",
     "test": "vitest"

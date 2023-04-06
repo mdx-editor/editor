@@ -94,7 +94,7 @@ export const [LinkDialogSystem, LinkDialogSystemType] = system(
     })
 
     r.pub(createEditorSubscription, (editor) => {
-      editor.registerCommand(
+      return editor.registerCommand(
         KEY_ESCAPE_COMMAND,
         () => {
           const state = r.getValue(linkDialogState)
@@ -109,7 +109,7 @@ export const [LinkDialogSystem, LinkDialogSystemType] = system(
     })
 
     r.pub(createEditorSubscription, (editor) => {
-      editor.registerCommand(
+      return editor.registerCommand(
         KEY_MODIFIER_COMMAND,
         (event) => {
           // TODO: handle windows

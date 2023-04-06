@@ -48,8 +48,16 @@ const jsxDescriptors: JsxComponentDescriptors = [
 
 interface WrappedEditorProps {
   markdown: string
+  onChange?: (markdown: string) => void
 }
 
-export const WrappedLexicalEditor: React.FC<WrappedEditorProps> = ({ markdown }) => {
-  return <Wrapper markdown={markdown} sandpackConfig={virtuosoSampleSandpackConfig} jsxComponentDescriptors={jsxDescriptors} />
+export const WrappedLexicalEditor: React.FC<WrappedEditorProps> = ({ markdown, onChange }) => {
+  return (
+    <Wrapper
+      markdown={markdown}
+      sandpackConfig={virtuosoSampleSandpackConfig}
+      jsxComponentDescriptors={jsxDescriptors}
+      onChange={onChange}
+    />
+  )
 }

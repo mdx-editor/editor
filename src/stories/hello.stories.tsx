@@ -19,5 +19,5 @@ export function CodeBlocks() {
 }
 
 export function JSX() {
-  return <WrappedLexicalEditor markdown={jsxMarkdown} />
+  return <WrappedLexicalEditor onChange={(markdown) => console.log(markdown)} markdown={jsxMarkdown} />
 }

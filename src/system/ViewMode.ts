@@ -1,19 +1,10 @@
-import { $getRoot, LexicalEditor } from 'lexical'
-import { exportMarkdownFromLexical } from '../export'
+import { $getRoot } from 'lexical'
 import { system } from '../gurx'
 import { importMarkdownToLexical } from '../import'
 import { ViewMode } from '../ui'
-import { tap } from '../utils/fp'
+import { getStateAsMarkdown } from '../utils/lexicalHelpers'
 import { EditorSystemType } from './Editor'
-import { JsxComponentDescriptors, JsxSystemType } from './Jsx'
-
-function getStateAsMarkdown(editor: LexicalEditor, jsxComponentDescriptors?: JsxComponentDescriptors) {
-  return tap({ markdown: '' }, (result) => {
-    editor.getEditorState().read(() => {
-      result.markdown = exportMarkdownFromLexical({ root: $getRoot(), jsxComponentDescriptors })
-    })
-  }).markdown
-}
+import { JsxSystemType } from './Jsx'
 
 export const [ViewModeSystem] = system(
   (r, [{ editor }, { jsxComponentDescriptors }]) => {

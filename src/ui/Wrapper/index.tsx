@@ -39,6 +39,7 @@ interface WrappedEditorProps {
   markdown: string
   sandpackConfig: SandpackConfigValue
   jsxComponentDescriptors: JsxComponentDescriptors
+  onChange?: (markdown: string) => void
 }
 
 const SimpleFormatDisplay = () => {
@@ -50,10 +51,15 @@ const SimpleFormatDisplay = () => {
   )
 }
 
-export const Wrapper: React.FC<WrappedEditorProps> = ({ markdown, jsxComponentDescriptors, sandpackConfig }) => {
+export const Wrapper: React.FC<WrappedEditorProps> = ({ markdown, jsxComponentDescriptors, sandpackConfig, onChange }) => {
   return (
     <LexicalComposer initialConfig={standardConfig(markdown)}>
-      <EditorSystemComponent markdownSource={markdown} jsxComponentDescriptors={jsxComponentDescriptors} sandpackConfig={sandpackConfig}>
+      <EditorSystemComponent
+        markdownSource={markdown}
+        jsxComponentDescriptors={jsxComponentDescriptors}
+        sandpackConfig={sandpackConfig}
+        onChange={onChange}
+      >
         <SimpleFormatDisplay />
         <ToolbarPlugin />
         <ViewModeToggler initialCode={markdown}>

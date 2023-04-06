@@ -205,7 +205,7 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
   )
 
   r.pub(createEditorSubscription, (editor) => {
-    editor.registerUpdateListener(({ editorState }) => {
+    return editor.registerUpdateListener(({ editorState }) => {
       editorState.read(() => {
         handleSelectionChange()
       })
