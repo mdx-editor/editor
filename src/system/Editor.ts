@@ -13,7 +13,9 @@ import {
   $getSelection,
   $isRangeSelection,
   $isRootOrShadowRoot,
+  BLUR_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
+  COMMAND_PRIORITY_LOW,
   FORMAT_TEXT_COMMAND,
   LexicalCommand,
   LexicalEditor,
@@ -54,9 +56,9 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
   const applyListType = r.node<ListType | ''>()
   const applyBlockType = r.node<BlockType | AdmonitionKind>()
   const insertCodeBlock = r.node<true>()
-
   const createEditorSubscription = r.node<EditorSubscription>()
   const editorSubscriptions = r.node<EditorSubscription[]>([])
+  const inFocus = r.node(false, true)
 
   r.sub(createEditorSubscription, (createSubscription) => {
     // avoid cyclical dependencies
@@ -143,10 +145,6 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
     const elementKey = element.getKey()
     const elementDOM = theEditor.getElementByKey(elementKey)
 
-    // Update links
-    // const node = getSelectedNode(selection);
-    // const parent = node.getParent();
-
     if (elementDOM !== null) {
       if ($isListNode(element)) {
         const parentList = $getNearestNodeOfType<ListNode>(anchorNode, ListNode)
@@ -187,8 +185,12 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
       theEditor.registerCommand(
         SELECTION_CHANGE_COMMAND,
         (_, editor) => {
-          r.pub(activeEditor, editor)
+          r.pubIn({
+            [activeEditor.key]: editor,
+            [inFocus.key]: true,
+          })
           handleSelectionChange()
+
           return false
         },
         COMMAND_PRIORITY_CRITICAL
@@ -212,6 +214,21 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
     })
   })
 
+  r.pub(createEditorSubscription, (theEditor) => {
+    return theEditor.registerCommand(
+      BLUR_COMMAND,
+      (payload) => {
+        const rootEditor = r.getValue(editor)
+        const movingOutside = !rootEditor!.getRootElement()?.contains(payload.relatedTarget as Node)
+        if (movingOutside) {
+          r.pub(inFocus, false)
+        }
+        return false
+      },
+      COMMAND_PRIORITY_LOW
+    )
+  })
+
   return {
     editor,
     activeEditor,
@@ -225,5 +242,6 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
     insertCodeBlock,
     createEditorSubscription,
     editorSubscriptions,
+    inFocus,
   }
 }, [])

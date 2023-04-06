@@ -46,7 +46,27 @@ const CodeUpdateEmitter = ({ onChange, snippetFileName }: CodeUpdateEmitterProps
   return null
 }
 
-const CodeEditor = ({ nodeKey, code, meta, onChange }: CodeEditorProps) => {
+function voidEmitter() {
+  let subscription = () => {}
+  return {
+    publish: () => {
+      subscription()
+    },
+    subscribe: (cb: () => void) => {
+      subscription = cb
+    },
+  }
+}
+
+interface CodeEditorProps {
+  code: string
+  nodeKey: string
+  meta: string
+  onChange: (code: string) => void
+  focusEmitter: ReturnType<typeof voidEmitter>
+}
+
+const CodeEditor = ({ nodeKey, code, meta, onChange, focusEmitter }: CodeEditorProps) => {
   const [editor] = useLexicalComposerContext()
   const setActiveSandpackNode = usePublisher('activeSandpackNode')
   const [config] = useEmitterValues('sandpackConfig')
@@ -63,6 +83,13 @@ const CodeEditor = ({ nodeKey, code, meta, onChange }: CodeEditorProps) => {
       throw new Error(`No preset found for name ${presetName}`)
     }
   }
+
+  React.useEffect(() => {
+    console.log('focusEmitter', focusEmitter)
+    focusEmitter.subscribe(() => {
+      codeMirrorRef?.current?.getCodemirror()?.focus()
+    })
+  }, [focusEmitter, codeMirrorRef])
 
   const wrappedOnChange = React.useCallback(
     (code: string) => {
@@ -165,6 +192,7 @@ export class SandpackNode extends DecoratorNode<JSX.Element> {
   __code: string
   __meta: string
   __language: string
+  __focusEmitter = voidEmitter()
 
   static getType(): string {
     return 'sandpack'
@@ -239,16 +267,21 @@ export class SandpackNode extends DecoratorNode<JSX.Element> {
     }
   }
 
-  decorate(): JSX.Element {
-    return <CodeEditor nodeKey={this.getKey()} code={this.getCode()} meta={this.getMeta()} onChange={(code) => this.setCode(code)} />
+  select() {
+    this.__focusEmitter.publish()
   }
-}
 
-interface CodeEditorProps {
-  code: string
-  nodeKey: string
-  meta: string
-  onChange: (code: string) => void
+  decorate(): JSX.Element {
+    return (
+      <CodeEditor
+        nodeKey={this.getKey()}
+        code={this.getCode()}
+        meta={this.getMeta()}
+        onChange={(code) => this.setCode(code)}
+        focusEmitter={this.__focusEmitter}
+      />
+    )
+  }
 }
 
 export function $createSandpackNode({ code, language, meta }: SandpackPayload): SandpackNode {

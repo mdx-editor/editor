@@ -3,6 +3,17 @@ import React from 'react'
 import { JsxComponentDescriptors, SandpackConfig, Wrapper } from '..'
 import dataCode from './assets/dataCode.ts?raw'
 
+const defaultSnippetContent = `
+export default function App() {
+  return (
+    <div className="App">
+      <h1>Hello CodeSandbox</h1>
+      <h2>Start editing to see some magic happen!</h2>
+    </div>
+  );
+}
+`
+
 const virtuosoSampleSandpackConfig: SandpackConfig = {
   defaultPreset: 'react',
   presets: [
@@ -11,6 +22,8 @@ const virtuosoSampleSandpackConfig: SandpackConfig = {
       sandpackTemplate: 'react',
       sandpackTheme: 'light',
       snippetFileName: '/App.js',
+      defaultSnippetLanguage: 'jsx',
+      defaultSnippetContent,
     },
     {
       name: 'virtuoso',

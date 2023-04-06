@@ -35,6 +35,7 @@ export const ToolbarPlugin = () => {
   const applyListType = usePublisher('applyListType')
   const setViewMode = usePublisher('viewMode')
   const insertCodeBlock = usePublisher('insertCodeBlock')
+  const insertSandpack = usePublisher('insertSandpack')
   const openLinkEditDialog = usePublisher('openLinkEditDialog')
   const [editor] = useLexicalComposerContext()
   const [activeEditor, setActiveEditor] = React.useState(editor)
@@ -101,7 +102,13 @@ export const ToolbarPlugin = () => {
       </RadixToolbar.ToggleGroup>
       <ToolbarSeparator />
 
-      <RadixToolbar.ToggleGroup type="single" aria-label="List type" onValueChange={applyListType} value={currentListType || ''}>
+      <RadixToolbar.ToggleGroup
+        type="single"
+        aria-label="List type"
+        onValueChange={applyListType}
+        value={currentListType || ''}
+        onFocus={(e) => e.preventDefault()}
+      >
         <ToolbarToggleItem value="bullet" aria-label="Bulleted list">
           <BulletedListIcon />
         </ToolbarToggleItem>
@@ -131,7 +138,7 @@ export const ToolbarPlugin = () => {
       </ToolbarButton>
 
       <ToolbarButton>
-        <LiveCodeIcon />
+        <LiveCodeIcon onClick={insertSandpack.bind(null, true)} />
       </ToolbarButton>
 
       <ToolbarSeparator />

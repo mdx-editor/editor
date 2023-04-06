@@ -19,7 +19,7 @@ export const BlockTypeSelect = () => {
   const [currentBlockType] = useEmitterValues('currentBlockType')
   const applyBlockType = usePublisher('applyBlockType')
   return (
-    <Select.Root value={currentBlockType || ''} onValueChange={applyBlockType as (value: string) => void}>
+    <Select.Root value={currentBlockType || ('' as const)} onValueChange={applyBlockType as (value: string) => void}>
       <Select.Trigger aria-label="Block type" className={styles.SelectTrigger}>
         <Select.Value placeholder="Block type" />
         <Select.Icon className={styles.SelectIcon}>
@@ -27,7 +27,7 @@ export const BlockTypeSelect = () => {
         </Select.Icon>
       </Select.Trigger>
       <Select.Portal className={themeClassName}>
-        <Select.Content className={`${styles.SelectContent}`}>
+        <Select.Content className={styles.SelectContent} onCloseAutoFocus={(e) => e.preventDefault()}>
           <Select.ScrollUpButton className={styles.SelectScrollUpButton}>
             <ChevronUpIcon />
           </Select.ScrollUpButton>

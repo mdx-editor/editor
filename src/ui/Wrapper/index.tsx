@@ -6,6 +6,7 @@ import { HorizontalRulePlugin } from '@lexical/react/LexicalHorizontalRulePlugin
 import { LinkPlugin as LexicalLinkPlugin } from '@lexical/react/LexicalLinkPlugin'
 import { ListPlugin } from '@lexical/react/LexicalListPlugin'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
+import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
 import { $getRoot } from 'lexical'
 import React from 'react'
 import {
@@ -42,7 +43,8 @@ interface WrappedEditorProps {
   onChange?: (markdown: string) => void
 }
 
-const SimpleFormatDisplay = () => {
+const Debugger = () => {
+  return null
   const [format, listType, blockType] = useEmitterValues('currentFormat', 'currentListType', 'currentBlockType')
   return (
     <div>
@@ -60,7 +62,7 @@ export const Wrapper: React.FC<WrappedEditorProps> = ({ markdown, jsxComponentDe
         sandpackConfig={sandpackConfig}
         onChange={onChange}
       >
-        <SimpleFormatDisplay />
+        <Debugger />
         <ToolbarPlugin />
         <ViewModeToggler initialCode={markdown}>
           <RichTextPlugin
@@ -74,6 +76,7 @@ export const Wrapper: React.FC<WrappedEditorProps> = ({ markdown, jsxComponentDe
         <HorizontalRulePlugin />
         <ListPlugin />
         <LinkDialogPlugin />
+        <HistoryPlugin />
       </EditorSystemComponent>
     </LexicalComposer>
   )
