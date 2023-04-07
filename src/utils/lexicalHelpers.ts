@@ -53,7 +53,19 @@ export function getSelectionRectangle(editor: LexicalEditor) {
       rect = domRange.getBoundingClientRect()
     }
 
-    return rect
+    console.log({
+      top: rect.top + window.scrollY,
+      left: rect.left + window.scrollX,
+      width: rect.width,
+      height: rect.height,
+    })
+
+    return {
+      top: rect.top + window.scrollY,
+      left: rect.left + window.scrollX,
+      width: rect.width,
+      height: rect.height,
+    }
   } else if (!activeElement || activeElement.className !== 'link-input') {
     return null
   }

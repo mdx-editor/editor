@@ -48,7 +48,7 @@ export const [LinkDialogSystem, LinkDialogSystemType] = system(
     const dialogState = r.node(false)
     // node that publishes signals when the window gets resized or scrolled
     const onWindowChange = r.node<true>()
-    const linkDialogState = r.node<InactiveLinkDialog | PreviewLinkDialog | EditLinkDialog>({ type: 'inactive' })
+    const linkDialogState = r.node<InactiveLinkDialog | PreviewLinkDialog | EditLinkDialog>({ type: 'inactive' }, true)
 
     // actions
     const updateLinkUrl = r.node<string>()
@@ -216,16 +216,17 @@ export const [LinkDialogSystem, LinkDialogSystemType] = system(
     r.link(
       r.pipe(
         r.combine(currentSelection, onWindowChange),
-        r.o.withLatestFrom(activeEditor),
-        r.o.map(([[selection], editor]) => {
-          if ($isRangeSelection(selection) && editor) {
+        r.o.withLatestFrom(activeEditor, linkDialogState),
+        r.o.map(([[selection], activeEditor, linkDialogState]) => {
+          if ($isRangeSelection(selection) && activeEditor) {
             const node = getLinkNodeInSelection(selection)
+
             if (node) {
               return {
                 type: 'preview' as const,
                 url: node.getURL(),
                 linkNodeKey: node.getKey(),
-                rectangle: getSelectionRectangle(editor),
+                rectangle: getSelectionRectangle(activeEditor),
               }
             } else {
               return {

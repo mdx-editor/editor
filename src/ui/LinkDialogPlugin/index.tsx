@@ -2,7 +2,6 @@ import * as Popover from '@radix-ui/react-popover'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import React from 'react'
 
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { createCommand, LexicalCommand } from 'lexical'
 import { useEmitterValues, usePublisher } from '../../system'
 import { PopoverAnchor, PopoverContent } from '../Popover/primitives'
@@ -57,8 +56,7 @@ function LinkEditForm({ initialUrl, onSubmit, onCancel }: LinkEditFormProps) {
 
 export function LinkDialogPlugin() {
   const publishWindowChange = usePublisher('onWindowChange')
-  const [editor] = useLexicalComposerContext()
-  const [linkDialogState] = useEmitterValues('linkDialogState')
+  const [linkDialogState, activeEditor] = useEmitterValues('linkDialogState', 'activeEditor')
   const updateLinkUrl = usePublisher('updateLinkUrl')
   const cancelLinkEdit = usePublisher('cancelLinkEdit')
   const switchFromPreviewToLinkEdit = usePublisher('switchFromPreviewToLinkEdit')
@@ -66,8 +64,11 @@ export function LinkDialogPlugin() {
   const applyLinkChanges = usePublisher('applyLinkChanges')
 
   React.useEffect(() => {
-    const update = () => {
-      publishWindowChange(true)
+    const update = (e) => {
+      console.log(e)
+      activeEditor?.getEditorState().read(() => {
+        publishWindowChange(true)
+      })
     }
 
     window.addEventListener('resize', update)
@@ -78,7 +79,7 @@ export function LinkDialogPlugin() {
       window.removeEventListener('resize', update)
       window.removeEventListener('scroll', update)
     }
-  }, [editor, publishWindowChange])
+  }, [activeEditor, publishWindowChange])
 
   const [copyUrlTooltipOpen, setCopyUrlTooltipOpen] = React.useState(false)
 
