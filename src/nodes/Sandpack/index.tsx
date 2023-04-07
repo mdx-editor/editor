@@ -85,7 +85,6 @@ const CodeEditor = ({ nodeKey, code, meta, onChange, focusEmitter }: CodeEditorP
   }
 
   React.useEffect(() => {
-    console.log('focusEmitter', focusEmitter)
     focusEmitter.subscribe(() => {
       codeMirrorRef?.current?.getCodemirror()?.focus()
     })

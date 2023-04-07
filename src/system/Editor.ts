@@ -42,12 +42,12 @@ const ListTypeCommandMap = new Map<ListType | '', LexicalCommand<void>>([
   ['', REMOVE_LIST_COMMAND],
 ])
 
-type EditorSubscription = (editor: LexicalEditor) => () => void
+type EditorSubscription = (activeEditor: LexicalEditor, rootEditor: LexicalEditor) => () => void
 
 export const [EditorSystem, EditorSystemType] = system((r) => {
   const editor = r.node<LexicalEditor | null>(null, true)
+  const activeEditor = r.derive(editor, null)
 
-  const activeEditor = r.node<LexicalEditor | null>(null, true)
   const currentFormat = r.node(0, true)
   const currentSelection = r.node<RangeSelection | null>(null)
   const currentListType = r.node<ListType | null>(null)
@@ -60,13 +60,16 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
   const editorSubscriptions = r.node<EditorSubscription[]>([])
   const inFocus = r.node(false, true)
 
-  r.sub(createEditorSubscription, (createSubscription) => {
-    // avoid cyclical dependencies
-    const newSubscriptions = [...r.getValue(editorSubscriptions), createSubscription]
-    r.pub(editorSubscriptions, newSubscriptions)
-  })
-
-  r.sub(editor, (e) => r.pub(activeEditor, e))
+  r.link(
+    r.pipe(
+      createEditorSubscription,
+      r.o.withLatestFrom(editorSubscriptions),
+      r.o.map(([createSubscription, subscriptions]) => {
+        return [...subscriptions, createSubscription]
+      })
+    ),
+    editorSubscriptions
+  )
 
   r.sub(r.pipe(insertCodeBlock, r.o.withLatestFrom(activeEditor)), ([, theEditor]) => {
     theEditor?.getEditorState().read(() => {
@@ -200,9 +203,9 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
 
   r.pipe(
     r.combine(editorSubscriptions, activeEditor),
-    r.o.scan((teardowns, [editorSubscriptions, editor]) => {
+    r.o.scan((teardowns, [editorSubscriptions, activeEditorValue]) => {
       teardowns.forEach((u) => u())
-      return editor ? editorSubscriptions.map((s) => s(editor)) : []
+      return activeEditorValue ? editorSubscriptions.map((s) => s(activeEditorValue, r.getValue(editor)!)) : []
     }, [] as Teardowns)
   )
 
