@@ -1,6 +1,6 @@
 import { $getRoot, $getSelection, ElementNode, LexicalEditor, RangeSelection, TextNode } from 'lexical'
 import { $isAtNodeEnd } from '@lexical/selection'
-import { JsxComponentDescriptors } from '../system/Jsx'
+import { JsxComponentDescriptors } from '../types/JsxComponentDescriptors'
 import { tap } from './fp'
 import { exportMarkdownFromLexical } from '../export'
 

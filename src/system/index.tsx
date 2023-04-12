@@ -7,18 +7,20 @@ import { SandpackSystem } from './Sandpack'
 import { LinkDialogSystem } from './LinkDialog'
 import { JsxSystem } from './Jsx'
 import { OnChangeSystem } from './OnChange'
+import { NodeDecoratorsSystem } from './NodeDecorators'
 
 export const {
   Component: EditorSystemComponent,
   usePublisher,
   useEmitterValues,
 } = realmFactoryToComponent(
-  getRealmFactory(EditorSystem, ViewModeSystem, SandpackSystem, LinkDialogSystem, JsxSystem, OnChangeSystem),
+  getRealmFactory(EditorSystem, ViewModeSystem, SandpackSystem, LinkDialogSystem, JsxSystem, OnChangeSystem, NodeDecoratorsSystem),
   {
     required: {
       markdownSource: 'markdownSource',
       jsxComponentDescriptors: 'jsxComponentDescriptors',
       sandpackConfig: 'sandpackConfig',
+      nodeDecorators: 'nodeDecorators',
     },
     events: {
       onChange: 'onChange',

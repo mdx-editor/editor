@@ -1,6 +1,5 @@
 export * from './Image'
 export * from './Sandpack'
-export * from './CodeBlock'
 export * from './Frontmatter'
 export * from './Admonition'
 export * from './Jsx'

@@ -5,7 +5,7 @@ import { frontmatterToMarkdown } from 'mdast-util-frontmatter'
 import { MdxjsEsm, mdxToMarkdown } from 'mdast-util-mdx'
 import { Options as ToMarkdownOptions, toMarkdown } from 'mdast-util-to-markdown'
 import { LexicalExportVisitor, LexicalVisitors } from './visitors'
-import { JsxComponentDescriptors } from '../system/Jsx'
+import { JsxComponentDescriptors } from '../types/JsxComponentDescriptors'
 export type { Options as ToMarkdownOptions } from 'mdast-util-to-markdown'
 
 function isParent(node: unknown): node is Mdast.Parent {

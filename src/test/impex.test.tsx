@@ -1,8 +1,7 @@
 import { $createParagraphNode, $createTextNode, $getRoot, LexicalEditor } from 'lexical'
 import { describe, expect, it } from 'vitest'
-import { ToMarkdownOptions, exportMarkdownFromLexical, importMarkdownToLexical } from '../index'
+import { JsxComponentDescriptors, ToMarkdownOptions, exportMarkdownFromLexical, importMarkdownToLexical } from '../'
 import { initializeUnitTest } from './lexical-utils'
-import { JsxComponentDescriptors } from '../system/Jsx'
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 ;(globalThis as any).IS_REACT_ACT_ENVIRONMENT = true

@@ -1,6 +1,3 @@
-/**
- * @typedef {import("mdast-util-directive")}
- */
 import { $createCodeNode, CodeHighlightNode, CodeNode } from '@lexical/code'
 import { $createLinkNode, LinkNode } from '@lexical/link'
 import { $createListItemNode, $createListNode, $isListItemNode, ListItemNode, ListNode } from '@lexical/list'

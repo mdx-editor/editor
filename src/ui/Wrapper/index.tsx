@@ -23,6 +23,8 @@ import {
 import { EditorSystemComponent } from '../../system'
 import { SandpackConfigValue } from '../../system/Sandpack'
 import * as styles from './styles.css'
+import { NodeDecorators } from '../../system/NodeDecorators'
+import { FrontmatterEditor } from '../NodeDecorators/FrontmatterEditor'
 
 export function standardConfig(markdown: string) {
   return {
@@ -43,6 +45,10 @@ interface WrappedEditorProps {
   onChange?: (markdown: string) => void
 }
 
+const nodeDecorators: NodeDecorators = {
+  FrontmatterEditor: FrontmatterEditor,
+}
+
 const Debugger = () => {
   return null
   const [format, listType, blockType] = useEmitterValues('currentFormat', 'currentListType', 'currentBlockType')
@@ -61,6 +67,7 @@ export const Wrapper: React.FC<WrappedEditorProps> = ({ markdown, jsxComponentDe
         jsxComponentDescriptors={jsxComponentDescriptors}
         sandpackConfig={sandpackConfig}
         onChange={onChange}
+        nodeDecorators={nodeDecorators}
       >
         <Debugger />
         <ToolbarPlugin />
