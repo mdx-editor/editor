@@ -26,6 +26,7 @@ import * as styles from './styles.css'
 import { NodeDecorators } from '../../system/NodeDecorators'
 import { FrontmatterEditor } from '../NodeDecorators/FrontmatterEditor'
 import { JsxEditor } from '../NodeDecorators/JsxEditor'
+import { SandpackEditor } from '../NodeDecorators/SandpackEditor'
 
 export function standardConfig(markdown: string) {
   return {
@@ -49,6 +50,7 @@ interface WrappedEditorProps {
 const nodeDecorators: NodeDecorators = {
   FrontmatterEditor: FrontmatterEditor,
   JsxEditor: JsxEditor,
+  SandpackEditor: SandpackEditor,
 }
 
 const Debugger = () => {

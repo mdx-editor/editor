@@ -16,3 +16,16 @@ export interface JsxEditorProps {
   theme: EditorThemeClasses
   editor: LexicalEditor
 }
+
+export interface VoidEmitter {
+  publish: () => void
+  subscribe: (callback: () => void) => void
+}
+
+export interface SandpackEditorProps {
+  code: string
+  nodeKey: string
+  meta: string
+  onChange: (code: string) => void
+  focusEmitter: VoidEmitter
+}

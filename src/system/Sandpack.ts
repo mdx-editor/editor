@@ -3,9 +3,9 @@ import { $getSelection, $isRangeSelection, COMMAND_PRIORITY_LOW, FOCUS_COMMAND }
 import { EditorSystemType } from './Editor'
 import React from 'react'
 import { SandpackProvider } from '@codesandbox/sandpack-react'
-import { CodeBlockMeta } from '../nodes/Sandpack/parseCodeBlockMeta'
 import { $createSandpackNode } from '../nodes/Sandpack'
 import { $insertNodeToNearestRoot } from '@lexical/utils'
+import { CodeBlockMeta } from '../types/CodeBlockMeta'
 
 export type Dependencies = Record<string, string>
 type SandpackProviderProps = React.ComponentProps<typeof SandpackProvider>

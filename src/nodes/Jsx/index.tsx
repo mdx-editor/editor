@@ -19,6 +19,7 @@ import { contentTheme, useEmitterValues } from '../../'
 import { JsxEditorProps, JsxKind } from '../../types/NodeDecoratorsProps'
 
 type updateFn = (node: LexicalNode) => void
+
 export interface JsxPayload {
   name: string
   kind: JsxKind
@@ -28,25 +29,17 @@ export interface JsxPayload {
 }
 
 export type SerializedJsxNode = Spread<
-  {
-    name: string
-    kind: JsxKind
-    attributes: Array<MdxJsxAttribute>
-    state?: SerializedEditorState
-    type: 'jsx'
+  Omit<JsxPayload, 'updateFn'> & {
     version: 1
+    type: 'jsx'
   },
   SerializedLexicalNode
 >
 
-interface JsxNodeConstructorParams {
-  name: string
-  kind: JsxKind
-  attributes: Array<MdxJsxAttribute>
-  state?: SerializedEditorState
+interface JsxNodeConstructorParams extends JsxPayload {
   key?: NodeKey
-  updateFn?: updateFn
 }
+
 const EmptySerializedTextEditorState = {
   type: 'root',
   format: 'left',
