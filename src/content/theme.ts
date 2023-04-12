@@ -1,6 +1,7 @@
+import { EditorThemeClasses } from 'lexical'
 import * as styles from './styles.css'
 
-export const theme = {
+export const theme: EditorThemeClasses = {
   code: styles.codeBlock,
   codeHighlight: {
     atrule: styles.tokenAttr,

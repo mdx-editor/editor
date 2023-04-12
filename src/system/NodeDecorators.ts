@@ -1,6 +1,6 @@
 import { system } from '../gurx'
 import React from 'react'
-import { FrontmatterEditorProps } from '../types/NodeDecoratorsProps'
+import { FrontmatterEditorProps, JsxEditorProps } from '../types/NodeDecoratorsProps'
 
 function ComponentStub(componentName: string) {
   return () => {
@@ -11,11 +11,13 @@ function ComponentStub(componentName: string) {
 
 export interface NodeDecorators {
   FrontmatterEditor: React.FC<FrontmatterEditorProps>
+  JsxEditor: React.FC<JsxEditorProps>
 }
 
 export const [NodeDecoratorsSystem, NodeDecoratorsSystemType] = system((r) => {
   const nodeDecorators = r.node<NodeDecorators>({
     FrontmatterEditor: ComponentStub('FrontmatterEditor'),
+    JsxEditor: ComponentStub('JsxEditor'),
   })
 
   return {
