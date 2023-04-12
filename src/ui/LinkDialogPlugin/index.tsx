@@ -64,8 +64,7 @@ export function LinkDialogPlugin() {
   const applyLinkChanges = usePublisher('applyLinkChanges')
 
   React.useEffect(() => {
-    const update = (e) => {
-      console.log(e)
+    const update = () => {
       activeEditor?.getEditorState().read(() => {
         publishWindowChange(true)
       })

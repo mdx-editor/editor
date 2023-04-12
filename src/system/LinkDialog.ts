@@ -17,11 +17,13 @@ export interface InactiveLinkDialog {
   linkNodeKey?: undefined
 }
 
+type RectData = Pick<DOMRect, 'height' | 'width' | 'top' | 'left'>
+
 export interface PreviewLinkDialog {
   type: 'preview'
   url: string
   linkNodeKey: string
-  rectangle: DOMRect
+  rectangle: RectData
 }
 
 export interface EditLinkDialog {
@@ -29,7 +31,7 @@ export interface EditLinkDialog {
   initialUrl: string
   url: string
   linkNodeKey: string
-  rectangle: DOMRect
+  rectangle: RectData
 }
 
 function getLinkNodeInSelection(selection: RangeSelection) {

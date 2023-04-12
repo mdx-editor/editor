@@ -2,16 +2,17 @@ import { addClassNamesToElement } from '@lexical/utils'
 import {
   $applyNodeReplacement,
   $createParagraphNode,
-  EditorConfig,
   ElementNode,
   LexicalNode,
   NodeKey,
   RangeSelection,
   SerializedElementNode,
   Spread,
+  AdmonitionKind,
+  EditorConfig,
 } from 'lexical'
 
-export type AdmonitionKind = 'note' | 'tip' | 'danger' | 'info' | 'caution'
+export { AdmonitionKind }
 
 export type SerializedAdmonitionNode = Spread<
   {
@@ -52,8 +53,7 @@ export class AdmonitionNode extends ElementNode {
 
   createDOM(config: EditorConfig): HTMLElement {
     const element = document.createElement('div')
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    addClassNamesToElement(element, config.theme.admonition[this.__kind] as string)
+    addClassNamesToElement(element, config.theme.admonition[this.__kind])
 
     return element
   }

@@ -10,7 +10,8 @@
     "strict": true,
     "skipLibCheck": true,
     "rootDir": "./src",
-    "types": ["@testing-library/jest-dom"]
+    "typeRoots": ["./node_modules/@types", "./src/@types"],
+    "types": ["@testing-library/jest-dom", "lexical"]
   },
   "include": ["src"]
 }

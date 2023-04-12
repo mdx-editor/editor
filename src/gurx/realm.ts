@@ -60,7 +60,6 @@ type NodesFromValuesRec<T extends unknown[], Acc extends unknown[]> = T extends 
   ? NodesFromValuesRec<Tail, [...Acc, Head extends unknown ? RealmNode<Head> : never]>
   : Acc
 
-/** @internal **/
 export type NodesFromValues<T extends unknown[]> = T extends unknown[] ? NodesFromValuesRec<T, []> : never
 
 export function defaultComparator<T>(current: T, next: T) {
