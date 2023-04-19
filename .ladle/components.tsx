@@ -1,2 +1,1 @@
-import './styles.css'
-import './EditorTheme.css'
+import '../src/style.css'

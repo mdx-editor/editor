@@ -3,8 +3,6 @@ import * as Select from '@radix-ui/react-select'
 import { ReactComponent as DropDownIcon } from '../icons/arrow_drop_down.svg'
 import { ReactComponent as SelectedIcon } from '../icons/check_small.svg'
 import { ChevronDownIcon, ChevronUpIcon } from '@radix-ui/react-icons'
-import * as styles from './styles.css'
-import { themeClassName } from '../../theme.css'
 import { AdmonitionKind } from '../../../nodes'
 import { useEmitterValues, usePublisher } from '../../../system'
 
@@ -20,18 +18,18 @@ export const BlockTypeSelect = () => {
   const applyBlockType = usePublisher('applyBlockType')
   return (
     <Select.Root value={currentBlockType || ('' as const)} onValueChange={applyBlockType as (value: string) => void}>
-      <Select.Trigger aria-label="Block type" className={styles.SelectTrigger}>
+      <Select.Trigger aria-label="Block type" className="">
         <Select.Value placeholder="Block type" />
-        <Select.Icon className={styles.SelectIcon}>
+        <Select.Icon className="">
           <DropDownIcon />
         </Select.Icon>
       </Select.Trigger>
-      <Select.Portal className={themeClassName}>
-        <Select.Content className={styles.SelectContent} onCloseAutoFocus={(e) => e.preventDefault()}>
-          <Select.ScrollUpButton className={styles.SelectScrollUpButton}>
+      <Select.Portal className="">
+        <Select.Content className="" onCloseAutoFocus={(e) => e.preventDefault()}>
+          <Select.ScrollUpButton className="">
             <ChevronUpIcon />
           </Select.ScrollUpButton>
-          <Select.Viewport className={styles.SelectViewport}>
+          <Select.Viewport className="">
             <SelectItem value="paragraph">Paragraph</SelectItem>
             <SelectItem value="code">Code Block</SelectItem>
             <SelectItem value="quote">Quote</SelectItem>
@@ -45,7 +43,7 @@ export const BlockTypeSelect = () => {
             <Select.Separator />
             <SelectItem value="info">Info</SelectItem>
           </Select.Viewport>
-          <Select.ScrollDownButton className={styles.SelectScrollDownButton}>
+          <Select.ScrollDownButton className="">
             <ChevronDownIcon />
           </Select.ScrollDownButton>
         </Select.Content>
@@ -57,9 +55,9 @@ export const BlockTypeSelect = () => {
 const SelectItem = React.forwardRef<HTMLDivElement | null, { children: React.ReactNode; value: string }>(
   ({ children, ...props }, forwardedRef) => {
     return (
-      <Select.Item {...props} ref={forwardedRef} className={styles.SelectItem}>
+      <Select.Item {...props} ref={forwardedRef} className="">
         <Select.ItemText>{children}</Select.ItemText>
-        <Select.ItemIndicator className={styles.ItemIndicator}>
+        <Select.ItemIndicator className="">
           <SelectedIcon />
         </Select.ItemIndicator>
       </Select.Item>

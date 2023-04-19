@@ -20,7 +20,12 @@ module.exports = {
     'prettier',
     'plugin:prettier/recommended',
   ],
-  overrides: [],
+  overrides: [
+    {
+      "files": ["./postcss.config.js", "./vite.config.ts", "./tailwind.config.ts"],
+      parserOptions: { project: null }
+    }
+  ],
   rules: {
     '@typescript-eslint/no-non-null-assertion': 'off',
     '@typescript-eslint/no-explicit-any': 'off',

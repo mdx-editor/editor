@@ -18,7 +18,6 @@ import { ReactComponent as FrameSourceIcon } from './icons/frame_source.svg'
 import { ReactComponent as HorizontalRuleIcon } from './icons/horizontal_rule.svg'
 import { ReactComponent as LinkIcon } from './icons/link.svg'
 import { ReactComponent as MarkdownIcon } from './icons/markdown.svg'
-import * as styles from './styles.css'
 
 import { ViewMode } from '../'
 import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from '../../FormatConstants'
@@ -58,7 +57,7 @@ export const ToolbarPlugin = () => {
   }
 
   return (
-    <RadixToolbar.Root className={styles.Root} aria-label="Formatting options">
+    <RadixToolbar.Root className="bg-slate-100" aria-label="Formatting options">
       <RadixToolbar.ToggleGroup
         type="single"
         aria-label="Text formatting"
@@ -166,13 +165,13 @@ const ViewModeMap = new Map<string, ViewMode>([
 ])
 
 function ToolbarToggleItem(props: RadixToolbar.ToolbarToggleItemProps) {
-  return <RadixToolbar.ToggleItem {...props} className={styles.ToggleItem} />
+  return <RadixToolbar.ToggleItem {...props} className="" />
 }
 
 function ToolbarButton(props: RadixToolbar.ToolbarButtonProps) {
-  return <RadixToolbar.Button {...props} className={styles.Button} />
+  return <RadixToolbar.Button {...props} className="" />
 }
 
 function ToolbarSeparator() {
-  return <RadixToolbar.Separator className={styles.Separator} />
+  return <RadixToolbar.Separator className="" />
 }

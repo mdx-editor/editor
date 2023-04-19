@@ -1,7 +1,10 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    "lib": ["dom", "esnext"],
+    "lib": [
+      "dom",
+      "esnext"
+    ],
     "jsx": "react",
     "module": "esnext",
     "moduleResolution": "node",
@@ -10,8 +13,19 @@
     "strict": true,
     "skipLibCheck": true,
     "rootDir": "./src",
-    "typeRoots": ["./node_modules/@types", "./src/@types"],
-    "types": ["@testing-library/jest-dom", "lexical"]
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/@types"
+    ],
+    "types": [
+      "@testing-library/jest-dom",
+      "lexical"
+    ]
   },
-  "include": ["src"]
+  "include": [
+    "src"
+    // "tailwind.config.ts",
+    // "postcss.config.js",
+    // "vite.config.ts"
+  ]
 }

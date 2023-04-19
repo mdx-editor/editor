@@ -22,7 +22,6 @@ import {
 } from '../../'
 import { EditorSystemComponent } from '../../system'
 import { SandpackConfigValue } from '../../system/Sandpack'
-import * as styles from './styles.css'
 import { NodeDecorators } from '../../system/NodeDecorators'
 import { FrontmatterEditor } from '../NodeDecorators/FrontmatterEditor'
 import { JsxEditor } from '../NodeDecorators/JsxEditor'
@@ -77,7 +76,7 @@ export const Wrapper: React.FC<WrappedEditorProps> = ({ markdown, jsxComponentDe
         <ToolbarPlugin />
         <ViewModeToggler initialCode={markdown}>
           <RichTextPlugin
-            contentEditable={<ContentEditable className={styles.ContentEditable} />}
+            contentEditable={<ContentEditable className="" />}
             placeholder={<div></div>}
             ErrorBoundary={LexicalErrorBoundary}
           />
