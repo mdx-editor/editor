@@ -2,6 +2,7 @@
 import React from 'react'
 import { useEmitterValues, usePublisher } from '../..'
 import ReactDiffViewer from 'react-diff-viewer'
+import classNames from 'classnames'
 
 export type ViewMode = 'editor' | 'markdown' | 'diff'
 
@@ -15,10 +16,41 @@ export function MarkdownPlainTextEditor() {
   const updateMarkdown = usePublisher('markdownSource')
 
   return (
-    <div className="" data-value={markdown}>
+    <div
+      className={`
+grid 
+relative 
+font-mono
+after:w-auto
+after:min-w-[1em]
+after:font-mono
+after:resize-none
+after:whitespace-pre-wrap
+after:content-[attr(data-value)_"_"]
+after:row-start-1
+after:row-end-1
+after:col-start-1
+after:col-end-1
+after:text-sm
+after:invisible
+`}
+      data-value={markdown}
+    >
       <textarea
         value={markdown}
-        className=""
+        className={`outline-none
+border-0
+p-0
+text-sm
+w-auto
+min-w-[1em]
+font-mono
+resize-none
+whitespace-pre-wrap
+row-start-1
+row-end-1
+col-start-1
+col-end-1`}
         onInput={({ target }) => {
           const value = (target as HTMLTextAreaElement).value
           updateMarkdown(value)
