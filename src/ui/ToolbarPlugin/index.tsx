@@ -22,9 +22,11 @@ import { ReactComponent as MarkdownIcon } from './icons/markdown.svg'
 import { ViewMode } from '../'
 import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from '../../FormatConstants'
 import { useEmitterValues, usePublisher } from '../../system'
+import classnames from 'classnames'
+import { buttonClasses, childSvgClasses, toggleItemClasses } from '../commonCssClasses'
 
 export const ToolbarPlugin = () => {
-  const [format, currentListType, viewMode, activeSandpackNode] = useEmitterValues(
+  const [currentFormat, currentListType, viewMode, activeSandpackNode] = useEmitterValues(
     'currentFormat',
     'currentListType',
     'viewMode',
@@ -57,64 +59,66 @@ export const ToolbarPlugin = () => {
   }
 
   return (
-    <RadixToolbar.Root className="bg-slate-100" aria-label="Formatting options">
-      <RadixToolbar.ToggleGroup
-        type="single"
-        aria-label="Text formatting"
-        value={format & IS_BOLD ? 'on' : 'off'}
-        onValueChange={applyFormat.bind(null, 'bold')}
-      >
-        <ToolbarToggleItem value="on" aria-label="Bold">
+    <RadixToolbar.Root
+      className="mb-6 flex flex-row gap-2 rounded-md border-2 border-solid border-surface-50 p-2"
+      aria-label="Formatting options"
+    >
+      <GroupGroup>
+        <ToggleSingleGroupWithItem
+          className="[&_button]:rounded-l-md"
+          aria-label="Bold"
+          on={(currentFormat & IS_BOLD) !== 0}
+          onValueChange={applyFormat.bind(null, 'bold')}
+        >
           <BoldIcon />
-        </ToolbarToggleItem>
-      </RadixToolbar.ToggleGroup>
-      <RadixToolbar.ToggleGroup
-        type="single"
-        aria-label="Text formatting"
-        value={format & IS_ITALIC ? 'on' : 'off'}
-        onValueChange={applyFormat.bind(null, 'italic')}
-      >
-        <ToolbarToggleItem value="on" aria-label="Italic">
+        </ToggleSingleGroupWithItem>
+        <ToggleSingleGroupWithItem
+          aria-label="Italic"
+          on={(currentFormat & IS_ITALIC) !== 0}
+          onValueChange={applyFormat.bind(null, 'italic')}
+        >
           <ItalicIcon />
-        </ToolbarToggleItem>
-      </RadixToolbar.ToggleGroup>
-      <RadixToolbar.ToggleGroup
-        type="single"
-        aria-label="Text formatting"
-        value={format & IS_UNDERLINE ? 'on' : 'off'}
-        onValueChange={applyFormat.bind(null, 'underline')}
-      >
-        <ToolbarToggleItem value="on" aria-label="Underlined">
+        </ToggleSingleGroupWithItem>
+        <ToggleSingleGroupWithItem
+          aria-label="Underline"
+          className="[&_button]:rounded-r-md"
+          on={(currentFormat & IS_UNDERLINE) !== 0}
+          onValueChange={applyFormat.bind(null, 'underline')}
+        >
           <UnderlinedIcon style={{ transform: 'translateY(2px)' }} />
-        </ToolbarToggleItem>
-      </RadixToolbar.ToggleGroup>
-      <ToolbarSeparator />
-      <RadixToolbar.ToggleGroup
-        type="single"
-        aria-label="Inline Code"
-        value={format & IS_CODE ? 'on' : 'off'}
-        onValueChange={applyFormat.bind(null, 'code')}
-      >
-        <ToolbarToggleItem value="on" aria-label="Inline Code">
-          <CodeIcon />
-        </ToolbarToggleItem>
-      </RadixToolbar.ToggleGroup>
+        </ToggleSingleGroupWithItem>
+      </GroupGroup>
+
       <ToolbarSeparator />
 
-      <RadixToolbar.ToggleGroup
-        type="single"
-        aria-label="List type"
-        onValueChange={applyListType}
-        value={currentListType || ''}
-        onFocus={(e) => e.preventDefault()}
-      >
-        <ToolbarToggleItem value="bullet" aria-label="Bulleted list">
-          <BulletedListIcon />
-        </ToolbarToggleItem>
-        <ToolbarToggleItem value="number" aria-label="Numbered list">
-          <NumberedListIcon />
-        </ToolbarToggleItem>
-      </RadixToolbar.ToggleGroup>
+      <GroupGroup>
+        <ToggleSingleGroupWithItem
+          aria-label="Inline code"
+          className="[&_button]:rounded-md"
+          on={(currentFormat & IS_CODE) !== 0}
+          onValueChange={applyFormat.bind(null, 'code')}
+        >
+          <CodeIcon />
+        </ToggleSingleGroupWithItem>
+      </GroupGroup>
+
+      <ToolbarSeparator />
+
+      <GroupGroup>
+        <ToggleSingleGroup
+          aria-label="List type"
+          onValueChange={applyListType}
+          value={currentListType || ''}
+          onFocus={(e) => e.preventDefault()}
+        >
+          <ToggleItem value="bullet" aria-label="Bulleted list" className="rounded-l-md">
+            <BulletedListIcon />
+          </ToggleItem>
+          <ToggleItem value="number" aria-label="Numbered list" className="rounded-r-md">
+            <NumberedListIcon />
+          </ToggleItem>
+        </ToggleSingleGroup>
+      </GroupGroup>
 
       <ToolbarSeparator />
       <BlockTypeSelect />
@@ -141,19 +145,19 @@ export const ToolbarPlugin = () => {
       </ToolbarButton>
 
       <ToolbarSeparator />
-      <RadixToolbar.ToggleGroup
-        type="single"
+      <ToggleSingleGroup
         aria-label="View Mode"
         onValueChange={(newViewMode) => setViewMode(ViewModeMap.get(newViewMode)!)}
         value={viewMode === 'editor' ? '' : viewMode}
       >
-        <ToolbarToggleItem value="diff" aria-label="View diff">
+        <ToggleItem value="diff" aria-label="View diff" className="rounded-l-md">
           <DiffIcon />
-        </ToolbarToggleItem>
-        <ToolbarToggleItem value="markdown" aria-label="View Markdown">
+        </ToggleItem>
+
+        <ToggleItem value="markdown" aria-label="View Markdown" className="rounded-r-md">
           <MarkdownIcon />
-        </ToolbarToggleItem>
-      </RadixToolbar.ToggleGroup>
+        </ToggleItem>
+      </ToggleSingleGroup>
     </RadixToolbar.Root>
   )
 }
@@ -164,14 +168,41 @@ const ViewModeMap = new Map<string, ViewMode>([
   ['', 'editor'],
 ])
 
-function ToolbarToggleItem(props: RadixToolbar.ToolbarToggleItemProps) {
-  return <RadixToolbar.ToggleItem {...props} className="" />
+const ToggleItem = React.forwardRef<HTMLButtonElement, RadixToolbar.ToolbarToggleItemProps>(
+  ({ className: passedClassName, ...props }, forwardedRef) => {
+    return <RadixToolbar.ToggleItem className={classnames(passedClassName, toggleItemClasses)} {...props} ref={forwardedRef} />
+  }
+)
+
+const ToolbarButton = React.forwardRef<HTMLButtonElement, RadixToolbar.ToolbarButtonProps>((props, forwardedRef) => {
+  return <RadixToolbar.Button className={buttonClasses} {...props} ref={forwardedRef} />
+})
+
+const ToggleSingleGroup = React.forwardRef<HTMLDivElement, Omit<RadixToolbar.ToolbarToggleGroupSingleProps, 'type'>>(
+  ({ children, ...props }, forwardedRef) => {
+    return (
+      <RadixToolbar.ToggleGroup {...props} type="single" ref={forwardedRef}>
+        {children}
+      </RadixToolbar.ToggleGroup>
+    )
+  }
+)
+
+const ToggleSingleGroupWithItem = React.forwardRef<
+  HTMLDivElement,
+  Omit<RadixToolbar.ToolbarToggleGroupSingleProps, 'type'> & { on: boolean }
+>(({ on, children, ...props }, forwardedRef) => {
+  return (
+    <ToggleSingleGroup {...props} value={on ? 'on' : 'off'} ref={forwardedRef}>
+      <ToggleItem value="on">{children}</ToggleItem>
+    </ToggleSingleGroup>
+  )
+})
+
+const GroupGroup: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return <div className="group flex flex-row gap-[1px] rounded-md">{children}</div>
 }
 
-function ToolbarButton(props: RadixToolbar.ToolbarButtonProps) {
-  return <RadixToolbar.Button {...props} className="" />
-}
-
-function ToolbarSeparator() {
-  return <RadixToolbar.Separator className="" />
-}
+const ToolbarSeparator = React.forwardRef<HTMLDivElement, RadixToolbar.SeparatorProps>(() => {
+  return <RadixToolbar.Separator className="mx-1" />
+})

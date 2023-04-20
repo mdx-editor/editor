@@ -7,7 +7,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primary: colors.sky,
+        primary: colors.slate,
         blue: colors.blue,
         surface: colors.slate,
         transparent: colors.transparent,

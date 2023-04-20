@@ -29,7 +29,7 @@ const externalPackages = [
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    react(IN_LADLE ? {} : { jsxRuntime: 'classic' }),
+    react(IN_LADLE ? {} : { jsxRuntime: 'classic' } as const),
     dts({
       rollupTypes: true,
       compilerOptions: {

@@ -17,16 +17,15 @@ import {
   $createAdmonitionNode,
   $createFrontmatterNode,
   $createImageNode,
-  $createJsxNode,
   $createSandpackNode,
   $isAdmonitionNode,
   AdmonitionKind,
   AdmonitionNode,
   FrontmatterNode,
   ImageNode,
-  JsxNode,
   SandpackNode,
 } from '../nodes'
+import { $createJsxNode, JsxNode } from '../nodes/Jsx'
 
 type MdastNode = Mdast.Content
 

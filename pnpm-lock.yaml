@@ -22,6 +22,9 @@ importers:
       '@radix-ui/react-tooltip':
         specifier: ^1.0.5
         version: 1.0.5(@types/react@18.0.37)(react-dom@18.2.0)(react@18.2.0)
+      classnames:
+        specifier: ^2.3.2
+        version: 2.3.2
       js-yaml:
         specifier: 4.1.0
         version: 4.1.0
