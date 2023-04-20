@@ -19,11 +19,11 @@ import { ReactComponent as HorizontalRuleIcon } from './icons/horizontal_rule.sv
 import { ReactComponent as LinkIcon } from './icons/link.svg'
 import { ReactComponent as MarkdownIcon } from './icons/markdown.svg'
 
+import classnames from 'classnames'
 import { ViewMode } from '../'
 import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from '../../FormatConstants'
 import { useEmitterValues, usePublisher } from '../../system'
-import classnames from 'classnames'
-import { buttonClasses, childSvgClasses, toggleItemClasses } from '../commonCssClasses'
+import { buttonClasses, toggleItemClasses } from '../commonCssClasses'
 
 export const ToolbarPlugin = () => {
   const [currentFormat, currentListType, viewMode, activeSandpackNode] = useEmitterValues(
@@ -60,7 +60,7 @@ export const ToolbarPlugin = () => {
 
   return (
     <RadixToolbar.Root
-      className="mb-6 flex flex-row gap-2 rounded-md border-2 border-solid border-surface-50 p-2"
+      className="m-2 mb-6 flex flex-row gap-2 rounded-md border-2 border-solid border-surface-50 p-2 min-w-max"
       aria-label="Formatting options"
     >
       <GroupGroup>
@@ -181,7 +181,7 @@ const ToolbarButton = React.forwardRef<HTMLButtonElement, RadixToolbar.ToolbarBu
 const ToggleSingleGroup = React.forwardRef<HTMLDivElement, Omit<RadixToolbar.ToolbarToggleGroupSingleProps, 'type'>>(
   ({ children, ...props }, forwardedRef) => {
     return (
-      <RadixToolbar.ToggleGroup {...props} type="single" ref={forwardedRef}>
+      <RadixToolbar.ToggleGroup {...props} type="single" ref={forwardedRef} className="whitespace-nowrap">
         {children}
       </RadixToolbar.ToggleGroup>
     )
