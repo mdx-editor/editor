@@ -10,6 +10,7 @@ export const [ViewModeSystem] = system(
   (r, [{ editor }, { jsxComponentDescriptors }]) => {
     const viewMode = r.node<ViewMode>('editor')
     const markdownSource = r.node('')
+    const headMarkdown = r.node('')
 
     r.sub(
       r.pipe(
@@ -41,6 +42,7 @@ export const [ViewModeSystem] = system(
 
     return {
       viewMode,
+      headMarkdown,
       markdownSource,
     }
   },

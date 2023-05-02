@@ -68,6 +68,7 @@ export const WrappedLexicalEditor: React.FC<WrappedEditorProps> = ({ markdown, o
   return (
     <Wrapper
       markdown={markdown}
+      headMarkdown={markdown}
       sandpackConfig={virtuosoSampleSandpackConfig}
       jsxComponentDescriptors={jsxDescriptors}
       onChange={onChange}

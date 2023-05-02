@@ -41,6 +41,7 @@ export function standardConfig(markdown: string) {
 
 interface WrappedEditorProps {
   markdown: string
+  headMarkdown: string
   sandpackConfig: SandpackConfigValue
   jsxComponentDescriptors: JsxComponentDescriptors
   onChange?: (markdown: string) => void
@@ -52,29 +53,19 @@ const nodeDecorators: NodeDecorators = {
   SandpackEditor: SandpackEditor,
 }
 
-const Debugger = () => {
-  return null
-  const [format, listType, blockType] = useEmitterValues('currentFormat', 'currentListType', 'currentBlockType')
-  return (
-    <div>
-      {format} - {listType} - {blockType}
-    </div>
-  )
-}
-
-export const Wrapper: React.FC<WrappedEditorProps> = ({ markdown, jsxComponentDescriptors, sandpackConfig, onChange }) => {
+export const Wrapper: React.FC<WrappedEditorProps> = ({ markdown, headMarkdown, jsxComponentDescriptors, sandpackConfig, onChange }) => {
   return (
     <LexicalComposer initialConfig={standardConfig(markdown)}>
       <EditorSystemComponent
+        headMarkdown={headMarkdown}
         markdownSource={markdown}
         jsxComponentDescriptors={jsxComponentDescriptors}
         sandpackConfig={sandpackConfig}
         onChange={onChange}
         nodeDecorators={nodeDecorators}
       >
-        <Debugger />
         <ToolbarPlugin />
-        <ViewModeToggler initialCode={markdown}>
+        <ViewModeToggler>
           <RichTextPlugin
             contentEditable={<ContentEditable className="" />}
             placeholder={<div></div>}

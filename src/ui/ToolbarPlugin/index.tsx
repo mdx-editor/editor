@@ -60,7 +60,7 @@ export const ToolbarPlugin = () => {
 
   return (
     <RadixToolbar.Root
-      className="m-2 mb-6 flex flex-row gap-2 rounded-md border-2 border-solid border-surface-50 p-2 min-w-max"
+      className="m-2 mb-6 flex flex-row gap-2 rounded-md border-2 border-solid border-surface-50 p-2 min-w-max max-w-[84rem] items-center"
       aria-label="Formatting options"
     >
       <GroupGroup>
@@ -145,17 +145,17 @@ export const ToolbarPlugin = () => {
       </ToolbarButton>
 
       <ToolbarSeparator />
-      <ToggleSingleGroup
-        aria-label="View Mode"
-        onValueChange={(newViewMode) => setViewMode(ViewModeMap.get(newViewMode)!)}
-        value={viewMode === 'editor' ? '' : viewMode}
-      >
-        <ToggleItem value="diff" aria-label="View diff" className="rounded-l-md">
-          <DiffIcon />
+      <ToggleSingleGroup aria-label="View Mode" onValueChange={setViewMode} value={viewMode} className="ml-auto">
+        <ToggleItem value="editor" aria-label="Rich text" className="rounded-l-md">
+          Rich Text
+        </ToggleItem>
+
+        <ToggleItem value="diff" aria-label="View diff" className="">
+          Diff View
         </ToggleItem>
 
         <ToggleItem value="markdown" aria-label="View Markdown" className="rounded-r-md">
-          <MarkdownIcon />
+          Markdown
         </ToggleItem>
       </ToggleSingleGroup>
     </RadixToolbar.Root>
@@ -179,9 +179,9 @@ const ToolbarButton = React.forwardRef<HTMLButtonElement, RadixToolbar.ToolbarBu
 })
 
 const ToggleSingleGroup = React.forwardRef<HTMLDivElement, Omit<RadixToolbar.ToolbarToggleGroupSingleProps, 'type'>>(
-  ({ children, ...props }, forwardedRef) => {
+  ({ children, className, ...props }, forwardedRef) => {
     return (
-      <RadixToolbar.ToggleGroup {...props} type="single" ref={forwardedRef} className="whitespace-nowrap">
+      <RadixToolbar.ToggleGroup {...props} type="single" ref={forwardedRef} className={classnames('whitespace-nowrap', className)}>
         {children}
       </RadixToolbar.ToggleGroup>
     )

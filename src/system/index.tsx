@@ -18,6 +18,7 @@ export const {
   {
     required: {
       markdownSource: 'markdownSource',
+      headMarkdown: 'headMarkdown',
       jsxComponentDescriptors: 'jsxComponentDescriptors',
       sandpackConfig: 'sandpackConfig',
       nodeDecorators: 'nodeDecorators',
