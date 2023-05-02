@@ -1,14 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import React from 'react'
 import { useEmitterValues, usePublisher } from '../..'
-import ReactDiffViewer from 'react-diff-viewer'
-import classNames from 'classnames'
+import { DiffViewer } from './DiffViewer'
 
 export type ViewMode = 'editor' | 'markdown' | 'diff'
 
 export function MarkdownDiffView() {
   const [markdown, headMarkdown] = useEmitterValues('markdownSource', 'headMarkdown')
-  return <ReactDiffViewer oldValue={headMarkdown} newValue={markdown} splitView={true} />
+  return <DiffViewer oldText={headMarkdown} newText={markdown} />
 }
 
 export function MarkdownPlainTextEditor() {
