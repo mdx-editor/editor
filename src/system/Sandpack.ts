@@ -109,6 +109,7 @@ export const [SandpackSystem] = system(
               // TODO: hack, decoration is not synchronous ;(
               setTimeout(() => {
                 sandpackNode.select()
+                r.pub(activeSandpackNode, { nodeKey: sandpackNode.getKey() })
               }, 100)
             })
           }

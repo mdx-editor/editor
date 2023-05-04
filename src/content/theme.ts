@@ -1,7 +1,7 @@
 import { EditorThemeClasses } from 'lexical'
 
 export const theme: EditorThemeClasses = {
-  code: 'codeBlock',
+  code: 'not-prose codeBlock',
   codeHighlight: {
     atrule: 'tokenAttr',
     attr: 'tokenAttr',

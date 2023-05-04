@@ -26,6 +26,8 @@ import { NodeDecorators } from '../../system/NodeDecorators'
 import { FrontmatterEditor } from '../NodeDecorators/FrontmatterEditor'
 import { JsxEditor } from '../NodeDecorators/JsxEditor'
 import { SandpackEditor } from '../NodeDecorators/SandpackEditor'
+import { TRANSFORMERS } from '@lexical/markdown'
+import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin'
 
 export function standardConfig(markdown: string) {
   return {
@@ -55,30 +57,33 @@ const nodeDecorators: NodeDecorators = {
 
 export const Wrapper: React.FC<WrappedEditorProps> = ({ markdown, headMarkdown, jsxComponentDescriptors, sandpackConfig, onChange }) => {
   return (
-    <LexicalComposer initialConfig={standardConfig(markdown)}>
-      <EditorSystemComponent
-        headMarkdown={headMarkdown}
-        markdownSource={markdown}
-        jsxComponentDescriptors={jsxComponentDescriptors}
-        sandpackConfig={sandpackConfig}
-        onChange={onChange}
-        nodeDecorators={nodeDecorators}
-      >
-        <ToolbarPlugin />
-        <ViewModeToggler>
-          <RichTextPlugin
-            contentEditable={<ContentEditable className="" />}
-            placeholder={<div></div>}
-            ErrorBoundary={LexicalErrorBoundary}
-          />
-        </ViewModeToggler>
-        <LexicalLinkPlugin />
-        <CodeHighlightPlugin />
-        <HorizontalRulePlugin />
-        <ListPlugin />
-        <LinkDialogPlugin />
-        <HistoryPlugin />
-      </EditorSystemComponent>
-    </LexicalComposer>
+    <div className="p-3 max-w-[90rem] border-slate-100 border-solid border-2">
+      <LexicalComposer initialConfig={standardConfig(markdown)}>
+        <EditorSystemComponent
+          headMarkdown={headMarkdown}
+          markdownSource={markdown}
+          jsxComponentDescriptors={jsxComponentDescriptors}
+          sandpackConfig={sandpackConfig}
+          onChange={onChange}
+          nodeDecorators={nodeDecorators}
+        >
+          <ToolbarPlugin />
+          <ViewModeToggler>
+            <RichTextPlugin
+              contentEditable={<ContentEditable className="prose font-sans max-w-none w-full focus:outline-none" />}
+              placeholder={<div></div>}
+              ErrorBoundary={LexicalErrorBoundary}
+            />
+          </ViewModeToggler>
+          <LexicalLinkPlugin />
+          <CodeHighlightPlugin />
+          <HorizontalRulePlugin />
+          <ListPlugin />
+          <LinkDialogPlugin />
+          <HistoryPlugin />
+          <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
+        </EditorSystemComponent>
+      </LexicalComposer>
+    </div>
   )
 }

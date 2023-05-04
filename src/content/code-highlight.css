@@ -1,0 +1,48 @@
+.codeBlock {
+  @apply block relative p-2 pl-16 m-0 my-2 font-normal overflow-auto;
+  tab-size: 2;
+}
+
+.codeBlock::before {
+  content: attr(data-gutter);
+  position: absolute;
+  background-color: #eee;
+  left: 0;
+  top: 0;
+  border-right: 1px solid #ccc;
+  padding: 8px;
+  color: #777;
+  white-space: pre-wrap;
+  text-align: right;
+  min-width: 25px;
+}
+
+.codeBlock::after {
+  content: '';
+}
+
+.tokenPunctuation {
+  @apply text-gray-400;
+}
+
+.tokenProperty {
+  @apply text-fuchsia-800;
+}
+.tokenSelector {
+  @apply text-emerald-600;
+}
+
+.tokenOperator {
+  @apply text-orange-800;
+}
+
+.tokenAttr {
+  @apply text-sky-700;
+}
+
+.tokenVariable {
+  @apply text-yellow-600;
+}
+.tokenFunction {
+  @apply text-rose-600;
+}

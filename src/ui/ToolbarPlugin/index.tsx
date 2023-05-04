@@ -1,14 +1,9 @@
 /// <reference types="vite-plugin-svgr/client" />
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontalRuleNode'
-import { mergeRegister } from '@lexical/utils'
 import * as RadixToolbar from '@radix-ui/react-toolbar'
-import { COMMAND_PRIORITY_CRITICAL, SELECTION_CHANGE_COMMAND } from 'lexical'
 import React from 'react'
 import { BlockTypeSelect } from './BlockTypeSelect/'
 import { ReactComponent as CodeIcon } from './icons/code.svg'
 import { ReactComponent as LiveCodeIcon } from './icons/deployed_code.svg'
-import { ReactComponent as DiffIcon } from './icons/difference.svg'
 import { ReactComponent as BoldIcon } from './icons/format_bold.svg'
 import { ReactComponent as ItalicIcon } from './icons/format_italic.svg'
 import { ReactComponent as BulletedListIcon } from './icons/format_list_bulleted.svg'
@@ -17,52 +12,91 @@ import { ReactComponent as UnderlinedIcon } from './icons/format_underlined.svg'
 import { ReactComponent as FrameSourceIcon } from './icons/frame_source.svg'
 import { ReactComponent as HorizontalRuleIcon } from './icons/horizontal_rule.svg'
 import { ReactComponent as LinkIcon } from './icons/link.svg'
-import { ReactComponent as MarkdownIcon } from './icons/markdown.svg'
 
 import classnames from 'classnames'
-import { ViewMode } from '../'
 import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from '../../FormatConstants'
 import { useEmitterValues, usePublisher } from '../../system'
 import { buttonClasses, toggleItemClasses } from '../commonCssClasses'
 
 export const ToolbarPlugin = () => {
-  const [currentFormat, currentListType, viewMode, activeSandpackNode] = useEmitterValues(
-    'currentFormat',
-    'currentListType',
-    'viewMode',
-    'activeSandpackNode'
-  )
-  const applyFormat = usePublisher('applyFormat')
-  const applyListType = usePublisher('applyListType')
+  const [viewMode, activeSandpackNode] = useEmitterValues('viewMode', 'activeSandpackNode')
   const setViewMode = usePublisher('viewMode')
-  const insertCodeBlock = usePublisher('insertCodeBlock')
-  const insertSandpack = usePublisher('insertSandpack')
-  const openLinkEditDialog = usePublisher('openLinkEditDialog')
-  const [editor] = useLexicalComposerContext()
-  const [activeEditor, setActiveEditor] = React.useState(editor)
-
-  React.useEffect(() => {
-    return mergeRegister(
-      editor.registerCommand(
-        SELECTION_CHANGE_COMMAND,
-        (_payload, newEditor) => {
-          setActiveEditor(newEditor)
-          return false
-        },
-        COMMAND_PRIORITY_CRITICAL
-      )
-    )
-  }, [editor])
-
-  if (activeSandpackNode !== null) {
-    return <div style={{ height: 64 }}>Sandpack (node: {activeSandpackNode.nodeKey})</div>
-  }
 
   return (
     <RadixToolbar.Root
-      className="m-2 mb-6 flex flex-row gap-2 rounded-md border-2 border-solid border-surface-50 p-2 min-w-max max-w-[84rem] items-center"
+      className="mb-6 flex flex-row gap-2 rounded-md border-2 border-solid border-surface-50 p-2 items-center"
       aria-label="Formatting options"
     >
+      {activeSandpackNode !== null ? null : <RichTextButtonSet />}
+
+      <ToolbarSeparator />
+      <ToggleSingleGroup aria-label="View Mode" onValueChange={setViewMode} value={viewMode} className="ml-auto">
+        <ToggleItem value="editor" aria-label="Rich text" className="rounded-l-md">
+          Rich Text
+        </ToggleItem>
+
+        <ToggleItem value="diff" aria-label="View diff" className="">
+          Diff View
+        </ToggleItem>
+
+        <ToggleItem value="markdown" aria-label="View Markdown" className="rounded-r-md">
+          Markdown
+        </ToggleItem>
+      </ToggleSingleGroup>
+    </RadixToolbar.Root>
+  )
+}
+
+const ToggleItem = React.forwardRef<HTMLButtonElement, RadixToolbar.ToolbarToggleItemProps>(
+  ({ className: passedClassName, ...props }, forwardedRef) => {
+    return <RadixToolbar.ToggleItem className={classnames(passedClassName, toggleItemClasses)} {...props} ref={forwardedRef} />
+  }
+)
+
+const ToolbarButton = React.forwardRef<HTMLButtonElement, RadixToolbar.ToolbarButtonProps>((props, forwardedRef) => {
+  return <RadixToolbar.Button className={buttonClasses} {...props} ref={forwardedRef} />
+})
+
+const ToggleSingleGroup = React.forwardRef<HTMLDivElement, Omit<RadixToolbar.ToolbarToggleGroupSingleProps, 'type'>>(
+  ({ children, className, ...props }, forwardedRef) => {
+    return (
+      <RadixToolbar.ToggleGroup {...props} type="single" ref={forwardedRef} className={classnames('whitespace-nowrap', className)}>
+        {children}
+      </RadixToolbar.ToggleGroup>
+    )
+  }
+)
+
+const ToggleSingleGroupWithItem = React.forwardRef<
+  HTMLDivElement,
+  Omit<RadixToolbar.ToolbarToggleGroupSingleProps, 'type'> & { on: boolean }
+>(({ on, children, ...props }, forwardedRef) => {
+  return (
+    <ToggleSingleGroup {...props} value={on ? 'on' : 'off'} ref={forwardedRef}>
+      <ToggleItem value="on">{children}</ToggleItem>
+    </ToggleSingleGroup>
+  )
+})
+
+const GroupGroup: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return <div className="group flex flex-row gap-[1px] rounded-md">{children}</div>
+}
+
+const ToolbarSeparator = React.forwardRef<HTMLDivElement, RadixToolbar.SeparatorProps>(() => {
+  return <RadixToolbar.Separator className="mx-1" />
+})
+
+function RichTextButtonSet() {
+  const [currentFormat, currentListType] = useEmitterValues('currentFormat', 'currentListType')
+  const applyFormat = usePublisher('applyFormat')
+  const applyListType = usePublisher('applyListType')
+  const insertCodeBlock = usePublisher('insertCodeBlock')
+  const insertSandpack = usePublisher('insertSandpack')
+  const openLinkEditDialog = usePublisher('openLinkEditDialog')
+  const insertHorizontalRule = usePublisher('insertHorizontalRule')
+
+  return (
+    <>
       <GroupGroup>
         <ToggleSingleGroupWithItem
           className="[&_button]:rounded-l-md"
@@ -127,11 +161,7 @@ export const ToolbarPlugin = () => {
       <ToolbarButton onClick={openLinkEditDialog.bind(null, true)}>
         <LinkIcon />
       </ToolbarButton>
-      <ToolbarButton
-        onClick={() => {
-          activeEditor.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, undefined)
-        }}
-      >
+      <ToolbarButton onClick={insertHorizontalRule.bind(null, true)}>
         <HorizontalRuleIcon />
       </ToolbarButton>
       <ToolbarSeparator />
@@ -143,66 +173,6 @@ export const ToolbarPlugin = () => {
       <ToolbarButton>
         <LiveCodeIcon onClick={insertSandpack.bind(null, true)} />
       </ToolbarButton>
-
-      <ToolbarSeparator />
-      <ToggleSingleGroup aria-label="View Mode" onValueChange={setViewMode} value={viewMode} className="ml-auto">
-        <ToggleItem value="editor" aria-label="Rich text" className="rounded-l-md">
-          Rich Text
-        </ToggleItem>
-
-        <ToggleItem value="diff" aria-label="View diff" className="">
-          Diff View
-        </ToggleItem>
-
-        <ToggleItem value="markdown" aria-label="View Markdown" className="rounded-r-md">
-          Markdown
-        </ToggleItem>
-      </ToggleSingleGroup>
-    </RadixToolbar.Root>
+    </>
   )
 }
-
-const ViewModeMap = new Map<string, ViewMode>([
-  ['diff', 'diff'],
-  ['markdown', 'markdown'],
-  ['', 'editor'],
-])
-
-const ToggleItem = React.forwardRef<HTMLButtonElement, RadixToolbar.ToolbarToggleItemProps>(
-  ({ className: passedClassName, ...props }, forwardedRef) => {
-    return <RadixToolbar.ToggleItem className={classnames(passedClassName, toggleItemClasses)} {...props} ref={forwardedRef} />
-  }
-)
-
-const ToolbarButton = React.forwardRef<HTMLButtonElement, RadixToolbar.ToolbarButtonProps>((props, forwardedRef) => {
-  return <RadixToolbar.Button className={buttonClasses} {...props} ref={forwardedRef} />
-})
-
-const ToggleSingleGroup = React.forwardRef<HTMLDivElement, Omit<RadixToolbar.ToolbarToggleGroupSingleProps, 'type'>>(
-  ({ children, className, ...props }, forwardedRef) => {
-    return (
-      <RadixToolbar.ToggleGroup {...props} type="single" ref={forwardedRef} className={classnames('whitespace-nowrap', className)}>
-        {children}
-      </RadixToolbar.ToggleGroup>
-    )
-  }
-)
-
-const ToggleSingleGroupWithItem = React.forwardRef<
-  HTMLDivElement,
-  Omit<RadixToolbar.ToolbarToggleGroupSingleProps, 'type'> & { on: boolean }
->(({ on, children, ...props }, forwardedRef) => {
-  return (
-    <ToggleSingleGroup {...props} value={on ? 'on' : 'off'} ref={forwardedRef}>
-      <ToggleItem value="on">{children}</ToggleItem>
-    </ToggleSingleGroup>
-  )
-})
-
-const GroupGroup: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  return <div className="group flex flex-row gap-[1px] rounded-md">{children}</div>
-}
-
-const ToolbarSeparator = React.forwardRef<HTMLDivElement, RadixToolbar.SeparatorProps>(() => {
-  return <RadixToolbar.Separator className="mx-1" />
-})

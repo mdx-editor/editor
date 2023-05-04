@@ -33,6 +33,7 @@ import {
   formatParagraph,
   formatQuote,
 } from '../ui/ToolbarPlugin/BlockTypeSelect/blockFormatters'
+import { INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontalRuleNode'
 
 type Teardowns = Array<() => void>
 
@@ -56,6 +57,7 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
   const applyListType = r.node<ListType | ''>()
   const applyBlockType = r.node<BlockType | AdmonitionKind>()
   const insertCodeBlock = r.node<true>()
+  const insertHorizontalRule = r.node<true>()
   const createEditorSubscription = r.node<EditorSubscription>()
   const editorSubscriptions = r.node<EditorSubscription[]>([])
   const inFocus = r.node(false, true)
@@ -95,6 +97,10 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
 
   r.sub(r.pipe(applyFormat, r.o.withLatestFrom(activeEditor)), ([format, theEditor]) => {
     theEditor?.dispatchCommand(FORMAT_TEXT_COMMAND, format)
+  })
+
+  r.sub(r.pipe(insertHorizontalRule, r.o.withLatestFrom(activeEditor)), ([, theEditor]) => {
+    theEditor?.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, undefined)
   })
 
   r.sub(r.pipe(applyBlockType, r.o.withLatestFrom(activeEditor)), ([type, theEditor]) => {
@@ -243,6 +249,7 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
     applyListType,
     applyBlockType,
     insertCodeBlock,
+    insertHorizontalRule,
     createEditorSubscription,
     editorSubscriptions,
     inFocus,
