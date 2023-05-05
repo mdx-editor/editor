@@ -1,4 +1,3 @@
-import { $createCodeNode } from '@lexical/code'
 import {
   $isListNode,
   INSERT_ORDERED_LIST_COMMAND,

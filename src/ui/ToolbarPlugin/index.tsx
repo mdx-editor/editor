@@ -12,11 +12,17 @@ import { ReactComponent as UnderlinedIcon } from './icons/format_underlined.svg'
 import { ReactComponent as FrameSourceIcon } from './icons/frame_source.svg'
 import { ReactComponent as HorizontalRuleIcon } from './icons/horizontal_rule.svg'
 import { ReactComponent as LinkIcon } from './icons/link.svg'
+import { ReactComponent as DeleteIcon } from './icons/delete.svg'
+import { CodeBlockLanguageSelect } from './CodeBlockLanguageSelect'
 
 import classnames from 'classnames'
 import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from '../../FormatConstants'
 import { useEmitterValues, usePublisher } from '../../system'
 import { buttonClasses, toggleItemClasses } from '../commonCssClasses'
+import { $getNodeByKey } from 'lexical'
+import { CodeBlockEditorType, SandpackEditorType } from '../../types/ActiveEditorType'
+import { CodeBlockNode } from '../../nodes/CodeBlock'
+import { SandpackNode } from '../../nodes'
 
 export const ToolbarPlugin = () => {
   const [viewMode, activeEditorType] = useEmitterValues('viewMode', 'activeEditorType')
@@ -27,7 +33,13 @@ export const ToolbarPlugin = () => {
       className="mb-6 flex flex-row gap-2 rounded-md border-2 border-solid border-surface-50 p-2 items-center"
       aria-label="Formatting options"
     >
-      {activeEditorType.type == 'lexical' ? <RichTextButtonSet /> : null}
+      {activeEditorType.type === 'lexical' ? (
+        <RichTextButtonSet />
+      ) : activeEditorType.type === 'codeblock' ? (
+        <CodeBlockButtonSet />
+      ) : (
+        <SandpackButtonSet />
+      )}
 
       <ToolbarSeparator />
       <ToggleSingleGroup aria-label="View Mode" onValueChange={setViewMode} value={viewMode} className="ml-auto">
@@ -85,6 +97,46 @@ const GroupGroup: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 const ToolbarSeparator = React.forwardRef<HTMLDivElement, RadixToolbar.SeparatorProps>(() => {
   return <RadixToolbar.Separator className="mx-1" />
 })
+
+function CodeBlockButtonSet() {
+  const [activeEditor, activeEditorType] = useEmitterValues('activeEditor', 'activeEditorType')
+  return (
+    <>
+      <CodeBlockLanguageSelect />
+
+      <ToolbarButton>
+        <DeleteIcon
+          onClick={() => {
+            activeEditor!.update(() => {
+              const node = $getNodeByKey((activeEditorType as CodeBlockEditorType).nodeKey) as CodeBlockNode
+              node.selectNext()
+              node.remove()
+            })
+          }}
+        />
+      </ToolbarButton>
+    </>
+  )
+}
+
+function SandpackButtonSet() {
+  const [activeEditor, activeEditorType] = useEmitterValues('activeEditor', 'activeEditorType')
+  return (
+    <>
+      <ToolbarButton>
+        <DeleteIcon
+          onClick={() => {
+            activeEditor!.update(() => {
+              const node = $getNodeByKey((activeEditorType as SandpackEditorType).nodeKey) as SandpackNode
+              node.selectNext()
+              node.remove()
+            })
+          }}
+        />
+      </ToolbarButton>
+    </>
+  )
+}
 
 function RichTextButtonSet() {
   const [currentFormat, currentListType] = useEmitterValues('currentFormat', 'currentListType')
@@ -170,8 +222,8 @@ function RichTextButtonSet() {
         <FrameSourceIcon />
       </ToolbarButton>
 
-      <ToolbarButton>
-        <LiveCodeIcon onClick={insertSandpack.bind(null, true)} />
+      <ToolbarButton onClick={insertSandpack.bind(null, true)}>
+        <LiveCodeIcon />
       </ToolbarButton>
     </>
   )

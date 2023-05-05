@@ -108,10 +108,7 @@ export const [SandpackSystem] = system(
 
               $insertNodeToNearestRoot(sandpackNode)
               // TODO: hack, decoration is not synchronous ;(
-              setTimeout(() => {
-                sandpackNode.select()
-                r.pub(activeEditorType, { type: 'sandpack', nodeKey: sandpackNode.getKey() })
-              }, 100)
+              setTimeout(() => sandpackNode.select(), 80)
             })
           }
         }
@@ -135,10 +132,7 @@ export const [SandpackSystem] = system(
 
               $insertNodeToNearestRoot(codeBlockNode)
               // TODO: hack, decoration is not synchronous ;(
-              setTimeout(() => {
-                codeBlockNode.select()
-                r.pub(activeEditorType, { type: 'codeblock', nodeKey: codeBlockNode.getKey() })
-              }, 100)
+              setTimeout(() => codeBlockNode.select(), 80)
             })
           }
         }

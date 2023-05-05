@@ -1,7 +1,7 @@
 import { SandpackCodeEditor, SandpackLayout, SandpackPreview, SandpackProvider, useSandpack } from '@codesandbox/sandpack-react'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import React from 'react'
-import { useEmitterValues } from '../../system'
+import { useEmitterValues, usePublisher } from '../../system'
 import { SandpackConfigValue, SandpackPreset } from '../../system/Sandpack'
 import { SandpackEditorProps } from '../../types/NodeDecoratorsProps'
 import { parseCodeBlockMeta } from './parseCodeBlockMeta'
@@ -36,13 +36,15 @@ function getPreset(meta: string, config: SandpackConfigValue) {
 export const SandpackEditor = ({ nodeKey, code, meta, onChange, focusEmitter }: SandpackEditorProps) => {
   const [editor] = useLexicalComposerContext()
   const [config] = useEmitterValues('sandpackConfig')
-  const codeMirrorRef = useCodeMirrorRef(nodeKey, 'sandpack')
+  const codeMirrorRef = useCodeMirrorRef(nodeKey, 'sandpack', 'jsx')
+  const setActiveEditorType = usePublisher('activeEditorType')
 
   React.useEffect(() => {
     focusEmitter.subscribe(() => {
       codeMirrorRef?.current?.getCodemirror()?.focus()
+      setActiveEditorType({ type: 'sandpack', nodeKey })
     })
-  }, [focusEmitter, codeMirrorRef])
+  }, [focusEmitter, codeMirrorRef, setActiveEditorType, nodeKey])
 
   const wrappedOnChange = React.useCallback(
     (code: string) => {

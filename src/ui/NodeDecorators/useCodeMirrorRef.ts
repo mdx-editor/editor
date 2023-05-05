@@ -2,10 +2,10 @@ import { CodeMirrorRef } from '@codesandbox/sandpack-react/dist/components/CodeE
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { $createParagraphNode, $getNodeByKey } from 'lexical'
 import React from 'react'
-import { usePublisher } from '../../system'
+import { useEmitterValues, usePublisher } from '../../system'
 
-export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'sandpack') {
-  const [editor] = useLexicalComposerContext()
+export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'sandpack', language: string) {
+  const [activeEditor] = useEmitterValues('activeEditor')
   const setActiveEditorType = usePublisher('activeEditorType')
   const codeMirrorRef = React.useRef<CodeMirrorRef>(null)
 
@@ -22,7 +22,7 @@ export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'san
           const selectionEnd = state.selection.ranges[0].to
 
           if (docLength === selectionEnd) {
-            editor.update(() => {
+            activeEditor.update(() => {
               const node = $getNodeByKey(nodeKey)!
               const nextSibling = node.getNextSibling()
               if (nextSibling) {
@@ -40,7 +40,7 @@ export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'san
           const selectionStart = state.selection.ranges[0].from
 
           if (selectionStart === 0) {
-            editor.update(() => {
+            activeEditor.update(() => {
               const node = $getNodeByKey(nodeKey)!
               const previousSibling = node.getPreviousSibling()
               if (previousSibling) {
@@ -56,7 +56,7 @@ export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'san
         e.stopPropagation()
       }
     },
-    [editor, nodeKey]
+    [activeEditor, nodeKey]
   )
 
   React.useEffect(() => {
@@ -73,7 +73,7 @@ export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'san
       codeMirror?.getCodemirror()?.contentDOM.removeEventListener('focus', onFocusHandler)
       codeMirror?.getCodemirror()?.contentDOM.removeEventListener('keydown', onKeyDownHandler)
     }
-  }, [codeMirrorRef, onFocusHandler, onKeyDownHandler])
+  }, [codeMirrorRef, onFocusHandler, onKeyDownHandler, language])
 
   return codeMirrorRef
 }

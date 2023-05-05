@@ -1,13 +1,13 @@
-type LexicalEditorType = {
+export type LexicalEditorType = {
   type: 'lexical'
 }
 
-type CodeBlockEditorType = {
+export type CodeBlockEditorType = {
   type: 'codeblock'
   nodeKey: string
 }
 
-type SandpackEditorType = {
+export type SandpackEditorType = {
   type: 'sandpack'
   nodeKey: string
 }

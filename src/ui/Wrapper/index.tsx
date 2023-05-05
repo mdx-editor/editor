@@ -1,33 +1,33 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { CODE, ElementTransformer, Transformer, TRANSFORMERS } from '@lexical/markdown'
 import { LexicalComposer } from '@lexical/react/LexicalComposer'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary'
+import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
 import { HorizontalRulePlugin } from '@lexical/react/LexicalHorizontalRulePlugin'
 import { LinkPlugin as LexicalLinkPlugin } from '@lexical/react/LexicalLinkPlugin'
 import { ListPlugin } from '@lexical/react/LexicalListPlugin'
+import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
-import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
 import { $getRoot } from 'lexical'
 import React from 'react'
 import {
+  $createCodeBlockNode,
   contentTheme,
   importMarkdownToLexical,
   JsxComponentDescriptors,
   LinkDialogPlugin,
   ToolbarPlugin,
   UsedLexicalNodes,
-  useEmitterValues,
   ViewModeToggler,
 } from '../../'
 import { EditorSystemComponent } from '../../system'
-import { SandpackConfigValue } from '../../system/Sandpack'
 import { NodeDecorators } from '../../system/NodeDecorators'
+import { SandpackConfigValue } from '../../system/Sandpack'
+import { CodeBlockEditor } from '../NodeDecorators/CodeBlockEditor'
 import { FrontmatterEditor } from '../NodeDecorators/FrontmatterEditor'
 import { JsxEditor } from '../NodeDecorators/JsxEditor'
 import { SandpackEditor } from '../NodeDecorators/SandpackEditor'
-import { TRANSFORMERS } from '@lexical/markdown'
-import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin'
-import { CodeBlockEditor } from '../NodeDecorators/CodeBlockEditor'
 
 export function standardConfig(markdown: string) {
   return {
@@ -56,6 +56,19 @@ const nodeDecorators: NodeDecorators = {
   CodeBlockEditor,
 }
 
+// insert CM code block type rather than the default one
+function patchMarkdownTransformers(transformers: Transformer[]) {
+  const codeTransformer = transformers.find((t) => t === CODE) as ElementTransformer
+
+  codeTransformer.replace = (parentNode, _children, match) => {
+    const codeBlockNode = $createCodeBlockNode({ code: '', language: match ? match[1] : '', meta: '' })
+    parentNode.replace(codeBlockNode)
+    setTimeout(() => codeBlockNode.select(), 80)
+  }
+
+  return transformers
+}
+
 export const Wrapper: React.FC<WrappedEditorProps> = ({ markdown, headMarkdown, jsxComponentDescriptors, sandpackConfig, onChange }) => {
   return (
     <div className="p-3 max-w-[90rem] border-slate-100 border-solid border-2">
@@ -81,7 +94,7 @@ export const Wrapper: React.FC<WrappedEditorProps> = ({ markdown, headMarkdown, 
           <ListPlugin />
           <LinkDialogPlugin />
           <HistoryPlugin />
-          <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
+          <MarkdownShortcutPlugin transformers={patchMarkdownTransformers(TRANSFORMERS)} />
         </EditorSystemComponent>
       </LexicalComposer>
     </div>

@@ -3,24 +3,27 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import React from 'react'
 import { CodeBlockEditorProps } from '../../types/NodeDecoratorsProps'
 import { useCodeMirrorRef } from './useCodeMirrorRef'
+import { useEmitterValues, usePublisher } from '../../system'
 
 export const CodeBlockEditor = ({ nodeKey, code, language, onChange, focusEmitter }: CodeBlockEditorProps) => {
-  const [editor] = useLexicalComposerContext()
-  const codeMirrorRef = useCodeMirrorRef(nodeKey, 'codeblock')
+  const [activeEditor] = useEmitterValues('activeEditor')
+  const codeMirrorRef = useCodeMirrorRef(nodeKey, 'codeblock', language)
+  const setActiveEditorType = usePublisher('activeEditorType')
 
   React.useEffect(() => {
     focusEmitter.subscribe(() => {
       codeMirrorRef?.current?.getCodemirror()?.focus()
+      setActiveEditorType({ type: 'codeblock', nodeKey })
     })
-  }, [focusEmitter, codeMirrorRef])
+  }, [focusEmitter, codeMirrorRef, setActiveEditorType, nodeKey])
 
   const wrappedOnChange = React.useCallback(
     (code: string) => {
-      editor.update(() => {
+      activeEditor.update(() => {
         onChange(code)
       })
     },
-    [onChange, editor]
+    [onChange, activeEditor]
   )
 
   return (
