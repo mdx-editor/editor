@@ -1,5 +1,5 @@
-import { $createCodeNode, CodeHighlightNode, CodeNode } from '@lexical/code'
 import { $createLinkNode, LinkNode } from '@lexical/link'
+import { CodeNode } from '@lexical/code'
 import { $createListItemNode, $createListNode, $isListItemNode, ListItemNode, ListNode } from '@lexical/list'
 import { $createHorizontalRuleNode, HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode'
 import { $createHeadingNode, $createQuoteNode, $isQuoteNode, HeadingNode, QuoteNode } from '@lexical/rich-text'
@@ -26,6 +26,7 @@ import {
   SandpackNode,
 } from '../nodes'
 import { $createJsxNode, JsxNode } from '../nodes/Jsx'
+import { CodeBlockNode, $createCodeBlockNode } from '../nodes/CodeBlock'
 
 type MdastNode = Mdast.Content
 
@@ -152,17 +153,15 @@ export const MdastInlineCodeVisitor: MdastImportVisitor<Mdast.InlineCode> = {
 export const MdastCodeVisitor: MdastImportVisitor<Mdast.Code> = {
   testNode: 'code',
   visitNode({ mdastNode, actions }) {
-    if (mdastNode.meta?.startsWith('live')) {
-      actions.addAndStepInto(
-        $createSandpackNode({
-          code: mdastNode.value,
-          language: mdastNode.lang!,
-          meta: mdastNode.meta,
-        })
-      )
-    } else {
-      actions.addAndStepInto($createCodeNode(mdastNode.lang).append($createTextNode(mdastNode.value)))
-    }
+    const constructor = mdastNode.meta?.startsWith('live') ? $createSandpackNode : $createCodeBlockNode
+
+    actions.addAndStepInto(
+      constructor({
+        code: mdastNode.value,
+        language: mdastNode.lang!,
+        meta: mdastNode.meta!,
+      })
+    )
   },
 }
 
@@ -221,7 +220,7 @@ export const MdastMdxJsxElementVisitor: MdastImportVisitor<MdxJsxTextElement> = 
       $createJsxNode({
         name: mdastNode.name!,
         kind: mdastNode.type === 'mdxJsxTextElement' ? 'text' : 'flow',
-        //TODO: expressions are nto supported yet
+        //TODO: expressions are not supported yet
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         attributes: mdastNode.attributes as any,
         updateFn: (lexicalParent) => {
@@ -323,9 +322,14 @@ export const UsedLexicalNodes = [
   HorizontalRuleNode,
   ImageNode,
   SandpackNode,
-  CodeNode,
-  CodeHighlightNode,
+  CodeBlockNode,
   FrontmatterNode,
   AdmonitionNode,
   JsxNode,
+  {
+    replace: CodeNode,
+    with: (node: CodeNode) => {
+      return new CodeBlockNode('Replaced?', 'js', '')
+    },
+  },
 ]

@@ -19,7 +19,7 @@ import { useEmitterValues, usePublisher } from '../../system'
 import { buttonClasses, toggleItemClasses } from '../commonCssClasses'
 
 export const ToolbarPlugin = () => {
-  const [viewMode, activeSandpackNode] = useEmitterValues('viewMode', 'activeSandpackNode')
+  const [viewMode, activeEditorType] = useEmitterValues('viewMode', 'activeEditorType')
   const setViewMode = usePublisher('viewMode')
 
   return (
@@ -27,7 +27,7 @@ export const ToolbarPlugin = () => {
       className="mb-6 flex flex-row gap-2 rounded-md border-2 border-solid border-surface-50 p-2 items-center"
       aria-label="Formatting options"
     >
-      {activeSandpackNode !== null ? null : <RichTextButtonSet />}
+      {activeEditorType.type == 'lexical' ? <RichTextButtonSet /> : null}
 
       <ToolbarSeparator />
       <ToggleSingleGroup aria-label="View Mode" onValueChange={setViewMode} value={viewMode} className="ml-auto">

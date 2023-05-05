@@ -10,7 +10,6 @@ import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
 import { $getRoot } from 'lexical'
 import React from 'react'
 import {
-  CodeHighlightPlugin,
   contentTheme,
   importMarkdownToLexical,
   JsxComponentDescriptors,
@@ -28,6 +27,7 @@ import { JsxEditor } from '../NodeDecorators/JsxEditor'
 import { SandpackEditor } from '../NodeDecorators/SandpackEditor'
 import { TRANSFORMERS } from '@lexical/markdown'
 import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin'
+import { CodeBlockEditor } from '../NodeDecorators/CodeBlockEditor'
 
 export function standardConfig(markdown: string) {
   return {
@@ -50,9 +50,10 @@ interface WrappedEditorProps {
 }
 
 const nodeDecorators: NodeDecorators = {
-  FrontmatterEditor: FrontmatterEditor,
-  JsxEditor: JsxEditor,
-  SandpackEditor: SandpackEditor,
+  FrontmatterEditor,
+  JsxEditor,
+  SandpackEditor,
+  CodeBlockEditor,
 }
 
 export const Wrapper: React.FC<WrappedEditorProps> = ({ markdown, headMarkdown, jsxComponentDescriptors, sandpackConfig, onChange }) => {
@@ -76,7 +77,6 @@ export const Wrapper: React.FC<WrappedEditorProps> = ({ markdown, headMarkdown, 
             />
           </ViewModeToggler>
           <LexicalLinkPlugin />
-          <CodeHighlightPlugin />
           <HorizontalRulePlugin />
           <ListPlugin />
           <LinkDialogPlugin />

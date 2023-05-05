@@ -8,7 +8,7 @@ import {
   REMOVE_LIST_COMMAND,
 } from '@lexical/list'
 import { $isHeadingNode } from '@lexical/rich-text'
-import { $findMatchingParent, $getNearestNodeOfType, $insertNodeToNearestRoot } from '@lexical/utils'
+import { $findMatchingParent, $getNearestNodeOfType } from '@lexical/utils'
 import {
   $getSelection,
   $isRangeSelection,
@@ -34,6 +34,7 @@ import {
   formatQuote,
 } from '../ui/ToolbarPlugin/BlockTypeSelect/blockFormatters'
 import { INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontalRuleNode'
+import { ActiveEditorType } from '../types/ActiveEditorType'
 
 type Teardowns = Array<() => void>
 
@@ -56,11 +57,11 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
   const applyFormat = r.node<TextFormatType>()
   const applyListType = r.node<ListType | ''>()
   const applyBlockType = r.node<BlockType | AdmonitionKind>()
-  const insertCodeBlock = r.node<true>()
   const insertHorizontalRule = r.node<true>()
   const createEditorSubscription = r.node<EditorSubscription>()
   const editorSubscriptions = r.node<EditorSubscription[]>([])
   const inFocus = r.node(false, true)
+  const activeEditorType = r.node<ActiveEditorType>({ type: 'lexical' })
 
   r.link(
     r.pipe(
@@ -72,24 +73,6 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
     ),
     editorSubscriptions
   )
-
-  r.sub(r.pipe(insertCodeBlock, r.o.withLatestFrom(activeEditor)), ([, theEditor]) => {
-    theEditor?.getEditorState().read(() => {
-      const selection = $getSelection()
-
-      if ($isRangeSelection(selection)) {
-        const focusNode = selection.focus.getNode()
-
-        if (focusNode !== null) {
-          theEditor.update(() => {
-            const codeBlockNode = $createCodeNode()
-            $insertNodeToNearestRoot(codeBlockNode)
-            codeBlockNode.select()
-          })
-        }
-      }
-    })
-  })
 
   r.sub(r.pipe(applyListType, r.o.withLatestFrom(activeEditor)), ([listType, theEditor]) => {
     theEditor?.dispatchCommand(ListTypeCommandMap.get(listType)!, undefined)
@@ -248,10 +231,10 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
     applyFormat,
     applyListType,
     applyBlockType,
-    insertCodeBlock,
     insertHorizontalRule,
     createEditorSubscription,
     editorSubscriptions,
+    activeEditorType,
     inFocus,
   }
 }, [])

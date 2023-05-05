@@ -1,4 +1,3 @@
-import { $isCodeNode, CodeNode } from '@lexical/code'
 import { $isLinkNode, LinkNode } from '@lexical/link'
 import { $isListItemNode, $isListNode, ListItemNode, ListNode } from '@lexical/list'
 import { $isHorizontalRuleNode, HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode'
@@ -28,6 +27,8 @@ import {
   ImageNode,
   $isFrontmatterNode,
   FrontmatterNode,
+  $isCodeBlockNode,
+  CodeBlockNode,
 } from '../nodes'
 
 import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from '../FormatConstants'
@@ -157,12 +158,13 @@ export const SandpackNodeVisitor: LexicalExportVisitor<SandpackNode, Mdast.Code>
   },
 }
 
-export const CodeBlockVisitor: LexicalExportVisitor<CodeNode, Mdast.Code> = {
-  testLexicalNode: $isCodeNode,
+export const CodeBlockVisitor: LexicalExportVisitor<CodeBlockNode, Mdast.Code> = {
+  testLexicalNode: $isCodeBlockNode,
   visitLexicalNode: ({ lexicalNode, actions }) => {
     actions.addAndStepInto('code', {
+      value: lexicalNode.getCode(),
       lang: lexicalNode.getLanguage(),
-      value: lexicalNode.getTextContent(),
+      meta: lexicalNode.getMeta(),
     })
   },
 }

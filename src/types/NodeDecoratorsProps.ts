@@ -29,3 +29,7 @@ export interface SandpackEditorProps {
   onChange: (code: string) => void
   focusEmitter: VoidEmitter
 }
+
+export interface CodeBlockEditorProps extends SandpackEditorProps {
+  language: string
+}

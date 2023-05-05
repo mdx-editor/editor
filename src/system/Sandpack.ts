@@ -6,6 +6,7 @@ import { SandpackProvider } from '@codesandbox/sandpack-react'
 import { $createSandpackNode } from '../nodes/Sandpack'
 import { $insertNodeToNearestRoot } from '@lexical/utils'
 import { CodeBlockMeta } from '../types/CodeBlockMeta'
+import { $createCodeBlockNode } from '../nodes'
 
 export type Dependencies = Record<string, string>
 type SandpackProviderProps = React.ComponentProps<typeof SandpackProvider>
@@ -65,17 +66,17 @@ const defaultSandpackConfig: SandpackConfig = {
   ],
 }
 export const [SandpackSystem] = system(
-  (r, [{ activeEditor, createEditorSubscription }]) => {
-    const activeSandpackNode = r.node<{ nodeKey: string } | null>(null)
+  (r, [{ activeEditor, activeEditorType, createEditorSubscription }]) => {
     const sandpackConfig = r.node<SandpackConfigValue>(defaultSandpackConfig)
     const insertSandpack = r.node<true>()
+    const insertCodeBlock = r.node<true>()
 
     // clear the node when the regular editor is focused.
     r.pub(createEditorSubscription, (editor) => {
       return editor.registerCommand(
         FOCUS_COMMAND,
         () => {
-          r.pub(activeSandpackNode, null)
+          r.pub(activeEditorType, { type: 'lexical' })
           return false
         },
         COMMAND_PRIORITY_LOW
@@ -109,7 +110,34 @@ export const [SandpackSystem] = system(
               // TODO: hack, decoration is not synchronous ;(
               setTimeout(() => {
                 sandpackNode.select()
-                r.pub(activeSandpackNode, { nodeKey: sandpackNode.getKey() })
+                r.pub(activeEditorType, { type: 'sandpack', nodeKey: sandpackNode.getKey() })
+              }, 100)
+            })
+          }
+        }
+      })
+    })
+
+    r.sub(r.pipe(insertCodeBlock, r.o.withLatestFrom(activeEditor)), ([, theEditor]) => {
+      theEditor?.getEditorState().read(() => {
+        const selection = $getSelection()
+
+        if ($isRangeSelection(selection)) {
+          const focusNode = selection.focus.getNode()
+
+          if (focusNode !== null) {
+            theEditor.update(() => {
+              const codeBlockNode = $createCodeBlockNode({
+                code: '',
+                language: 'jsx',
+                meta: '',
+              })
+
+              $insertNodeToNearestRoot(codeBlockNode)
+              // TODO: hack, decoration is not synchronous ;(
+              setTimeout(() => {
+                codeBlockNode.select()
+                r.pub(activeEditorType, { type: 'codeblock', nodeKey: codeBlockNode.getKey() })
               }, 100)
             })
           }
@@ -118,8 +146,8 @@ export const [SandpackSystem] = system(
     })
 
     return {
-      activeSandpackNode,
       insertSandpack,
+      insertCodeBlock,
       sandpackConfig,
     }
   },
