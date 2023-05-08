@@ -80,7 +80,7 @@ export const Wrapper: React.FC<WrappedEditorProps> = ({
   viewMode,
 }) => {
   return (
-    <div className="p-3 max-w-[90rem] border-slate-100 border-solid border-2">
+    <div className="p-3">
       <LexicalComposer initialConfig={standardConfig(markdown)}>
         <EditorSystemComponent
           headMarkdown={headMarkdown}

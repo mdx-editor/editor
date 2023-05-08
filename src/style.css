@@ -1,4 +1,4 @@
 @import url('./content/code-highlight.css') layer(components);
-
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
