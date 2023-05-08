@@ -21,3 +21,7 @@ export function CodeBlocks() {
 export function JSX() {
   return <WrappedLexicalEditor onChange={(markdown) => console.log(markdown)} markdown={jsxMarkdown} />
 }
+
+export function DiffMode() {
+  return <WrappedLexicalEditor markdown={initialMarkdown} viewMode="diff" />
+}

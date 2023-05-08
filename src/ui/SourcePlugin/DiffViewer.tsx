@@ -8,6 +8,7 @@ import 'react-diff-view/style/index.css'
 
 export function DiffViewer({ oldText, newText }: { oldText: string; newText: string }) {
   const diffText = formatLines(diffLines(oldText, newText), { context: 3 })
+  if (diffText.trim() === '') return <div className="font-sans">No changes</div>
   const [diff] = parseDiff(diffText, { nearbySequences: 'zip' })
 
   return (

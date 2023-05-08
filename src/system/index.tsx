@@ -23,6 +23,9 @@ export const {
       sandpackConfig: 'sandpackConfig',
       nodeDecorators: 'nodeDecorators',
     },
+    optional: {
+      viewMode: 'viewMode',
+    },
     events: {
       onChange: 'onChange',
     },

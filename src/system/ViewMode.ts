@@ -29,7 +29,9 @@ export const [ViewModeSystem] = system(
       ([{ current }, editor, markdownValue, jsxComponentDescriptors]) => {
         // we're switching away from the editor, update the source.
         if (current === 'editor') {
-          r.pub(markdownSource, getStateAsMarkdown(editor!, jsxComponentDescriptors))
+          if (editor) {
+            r.pub(markdownSource, getStateAsMarkdown(editor, jsxComponentDescriptors))
+          }
         } else if (current === 'markdown') {
           // we're switching away from the markdown editor, convert the source back to lexical nodes.
           editor?.update(() => {

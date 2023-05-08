@@ -19,6 +19,7 @@ import {
   LinkDialogPlugin,
   ToolbarPlugin,
   UsedLexicalNodes,
+  ViewMode,
   ViewModeToggler,
 } from '../../'
 import { EditorSystemComponent } from '../../system'
@@ -46,6 +47,7 @@ interface WrappedEditorProps {
   headMarkdown: string
   sandpackConfig: SandpackConfigValue
   jsxComponentDescriptors: JsxComponentDescriptors
+  viewMode?: ViewMode
   onChange?: (markdown: string) => void
 }
 
@@ -69,7 +71,14 @@ function patchMarkdownTransformers(transformers: Transformer[]) {
   return transformers
 }
 
-export const Wrapper: React.FC<WrappedEditorProps> = ({ markdown, headMarkdown, jsxComponentDescriptors, sandpackConfig, onChange }) => {
+export const Wrapper: React.FC<WrappedEditorProps> = ({
+  markdown,
+  headMarkdown,
+  jsxComponentDescriptors,
+  sandpackConfig,
+  onChange,
+  viewMode,
+}) => {
   return (
     <div className="p-3 max-w-[90rem] border-slate-100 border-solid border-2">
       <LexicalComposer initialConfig={standardConfig(markdown)}>
@@ -79,6 +88,7 @@ export const Wrapper: React.FC<WrappedEditorProps> = ({ markdown, headMarkdown, 
           jsxComponentDescriptors={jsxComponentDescriptors}
           sandpackConfig={sandpackConfig}
           onChange={onChange}
+          viewMode={viewMode}
           nodeDecorators={nodeDecorators}
         >
           <ToolbarPlugin />
