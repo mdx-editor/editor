@@ -267,6 +267,11 @@ export function importMarkdownToLexical(
     mdastExtensions: [mdxFromMarkdown(), frontmatterFromMarkdown('yaml'), directiveFromMarkdown],
   })
 
+  // add a frontmatter node if there is none
+  if (tree.children[0].type !== 'yaml') {
+    tree.children.unshift({ type: 'yaml', value: '' })
+  }
+
   function visitChildren(mdastNode: Mdast.Parent, lexicalParent: LexicalNode) {
     if (!isParent(mdastNode)) {
       throw new Error('Attempting to visit children of a non-parent')
@@ -326,10 +331,5 @@ export const UsedLexicalNodes = [
   FrontmatterNode,
   AdmonitionNode,
   JsxNode,
-  {
-    replace: CodeNode,
-    with: (node: CodeNode) => {
-      return new CodeBlockNode('Replaced?', 'js', '')
-    },
-  },
+  CodeNode, // this one should not be used, but markdown shortcuts complain about it
 ]

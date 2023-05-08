@@ -19,7 +19,7 @@ export const CodeBlockEditor = ({ nodeKey, code, language, onChange, focusEmitte
 
   const wrappedOnChange = React.useCallback(
     (code: string) => {
-      activeEditor.update(() => {
+      activeEditor?.update(() => {
         onChange(code)
       })
     },

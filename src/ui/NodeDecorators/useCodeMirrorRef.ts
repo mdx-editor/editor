@@ -22,7 +22,7 @@ export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'san
           const selectionEnd = state.selection.ranges[0].to
 
           if (docLength === selectionEnd) {
-            activeEditor.update(() => {
+            activeEditor?.update(() => {
               const node = $getNodeByKey(nodeKey)!
               const nextSibling = node.getNextSibling()
               if (nextSibling) {
@@ -40,7 +40,7 @@ export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'san
           const selectionStart = state.selection.ranges[0].from
 
           if (selectionStart === 0) {
-            activeEditor.update(() => {
+            activeEditor?.update(() => {
               const node = $getNodeByKey(nodeKey)!
               const previousSibling = node.getPreviousSibling()
               if (previousSibling) {

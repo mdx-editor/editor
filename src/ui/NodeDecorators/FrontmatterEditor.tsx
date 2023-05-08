@@ -7,6 +7,9 @@ type YamlConfig = Array<{ key: string; value: string }>
 
 export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) => {
   const yamlConfig = React.useMemo<YamlConfig>(() => {
+    if (!yaml) {
+      return []
+    }
     return Object.entries(YamlParser.load(yaml) as Record<string, string>).map(([key, value]) => ({ key, value }))
   }, [yaml])
 
