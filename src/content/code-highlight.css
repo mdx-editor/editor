@@ -22,6 +22,15 @@
   content: '';
 }
 
+.prose code {
+  @apply font-normal bg-primary-100 py-1 text-primary-800;
+
+  &::before,
+  &::after {
+    content: '' !important;
+  }
+}
+
 .tokenPunctuation {
   @apply text-gray-400;
 }
