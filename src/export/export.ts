@@ -6,6 +6,7 @@ import { MdxjsEsm, mdxToMarkdown } from 'mdast-util-mdx'
 import { Options as ToMarkdownOptions, toMarkdown } from 'mdast-util-to-markdown'
 import { LexicalExportVisitor, LexicalVisitors } from './visitors'
 import { JsxComponentDescriptors } from '../types/JsxComponentDescriptors'
+import { WHITESPACE_MARKER } from '../utils/whitespaceConversion'
 export type { Options as ToMarkdownOptions } from 'mdast-util-to-markdown'
 
 function isParent(node: unknown): node is Mdast.Parent {
@@ -159,5 +160,5 @@ export function exportMarkdownFromLexical({
     extensions: [mdxToMarkdown(), frontmatterToMarkdown('yaml'), directiveToMarkdown],
     listItemIndent: 'one',
     ...options,
-  })
+  }).replaceAll(WHITESPACE_MARKER, '&#x20;')
 }

@@ -32,6 +32,7 @@ import {
 } from '../nodes'
 
 import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from '../FormatConstants'
+import { replaceWhitespace } from '../utils/whitespaceConversion'
 
 export type { Options as ToMarkdownOptions } from 'mdast-util-to-markdown'
 
@@ -203,11 +204,13 @@ export const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text> = {
   visitLexicalNode: ({ lexicalNode, mdastParent, actions }) => {
     const previousSibling = lexicalNode.getPreviousSibling()
     const prevFormat = $isTextNode(previousSibling) ? previousSibling.getFormat() : 0
-    const format = lexicalNode.getFormat() ?? 0
+    let textContent = lexicalNode.getTextContent()
+    // if the node is only whitespace, ignore the format.
+    const format = /^\s+$/.test(textContent) ? 0 : lexicalNode.getFormat() ?? 0
 
     if (format & IS_CODE) {
       actions.addAndStepInto('inlineCode', {
-        value: lexicalNode.getTextContent(),
+        value: textContent,
       })
       return
     }
@@ -226,7 +229,6 @@ export const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text> = {
         children: [],
       }) as Mdast.Parent
     }
-
     if (prevFormat & format & IS_UNDERLINE) {
       localParentNode = actions.appendToParent(localParentNode, {
         type: 'mdxJsxTextElement',
@@ -259,9 +261,12 @@ export const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text> = {
       }) as Mdast.Parent
     }
 
+    if (format !== 0) {
+      textContent = replaceWhitespace(textContent)
+    }
     actions.appendToParent(localParentNode, {
       type: 'text',
-      value: lexicalNode.getTextContent(),
+      value: textContent,
     })
   },
 }
