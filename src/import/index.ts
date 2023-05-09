@@ -75,7 +75,11 @@ export const MdastParagraphVisitor: MdastImportVisitor<Mdast.Paragraph> = {
 export const MdastLinkVisitor: MdastImportVisitor<Mdast.Link> = {
   testNode: 'link',
   visitNode({ mdastNode, actions }) {
-    actions.addAndStepInto($createLinkNode(mdastNode.url))
+    actions.addAndStepInto(
+      $createLinkNode(mdastNode.url, {
+        title: mdastNode.title,
+      })
+    )
   },
 }
 

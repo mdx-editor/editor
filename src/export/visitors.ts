@@ -82,7 +82,7 @@ export const LexicalFrontmatterVisitor: LexicalExportVisitor<FrontmatterNode, Md
 const LexicalLinkVisitor: LexicalExportVisitor<LinkNode, Mdast.Link> = {
   testLexicalNode: $isLinkNode,
   visitLexicalNode: ({ lexicalNode, actions }) => {
-    actions.addAndStepInto('link', { url: lexicalNode.getURL() })
+    actions.addAndStepInto('link', { url: lexicalNode.getURL(), title: lexicalNode.getTitle() })
   },
 }
 
