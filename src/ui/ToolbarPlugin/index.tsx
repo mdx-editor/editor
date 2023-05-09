@@ -30,7 +30,7 @@ export const ToolbarPlugin = () => {
 
   return (
     <RadixToolbar.Root
-      className="mb-6 flex flex-row gap-2 rounded-md border-2 border-solid border-surface-50 p-2 items-center"
+      className="z-50 mb-6 flex flex-row gap-2 rounded-md border-2 border-solid border-surface-50 p-2 items-center overflow-x-auto sticky top-0 bg-white w-[inherit]"
       aria-label="Formatting options"
     >
       {activeEditorType.type === 'lexical' ? (
