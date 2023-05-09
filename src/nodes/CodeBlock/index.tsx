@@ -10,7 +10,7 @@ export interface CodeBlockPayload {
   language: string
 }
 
-export type SerializedCodeBlockNode = Spread<CodeBlockPayload & { type: 'sandpack'; version: 1 }, SerializedLexicalNode>
+export type SerializedCodeBlockNode = Spread<CodeBlockPayload & { type: 'codeblock'; version: 1 }, SerializedLexicalNode>
 
 function voidEmitter() {
   let subscription = noop
@@ -64,7 +64,7 @@ export class CodeBlockNode extends DecoratorNode<JSX.Element> {
       code: this.getCode(),
       language: this.getLanguage(),
       meta: this.getMeta(),
-      type: 'sandpack',
+      type: 'codeblock',
       version: 1,
     }
   }
