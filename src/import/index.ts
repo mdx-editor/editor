@@ -271,6 +271,10 @@ export function importMarkdownToLexical(
     mdastExtensions: [mdxFromMarkdown(), frontmatterFromMarkdown('yaml'), directiveFromMarkdown],
   })
 
+  if (tree.children.length === 0) {
+    tree.children.push({ type: 'paragraph', children: [] })
+  }
+
   function visitChildren(mdastNode: Mdast.Parent, lexicalParent: LexicalNode) {
     if (!isParent(mdastNode)) {
       throw new Error('Attempting to visit children of a non-parent')
