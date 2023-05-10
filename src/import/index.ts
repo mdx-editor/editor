@@ -27,6 +27,7 @@ import {
 } from '../nodes'
 import { $createJsxNode, JsxNode } from '../nodes/Jsx'
 import { CodeBlockNode, $createCodeBlockNode } from '../nodes/CodeBlock'
+import { WHITESPACE_MARKER } from '../utils/whitespaceConversion'
 
 type MdastNode = Mdast.Content
 

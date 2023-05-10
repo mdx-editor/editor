@@ -6,7 +6,6 @@ import { MdxjsEsm, mdxToMarkdown } from 'mdast-util-mdx'
 import { Options as ToMarkdownOptions, toMarkdown } from 'mdast-util-to-markdown'
 import { LexicalExportVisitor, LexicalVisitors } from './visitors'
 import { JsxComponentDescriptors } from '../types/JsxComponentDescriptors'
-import { WHITESPACE_MARKER } from '../utils/whitespaceConversion'
 export type { Options as ToMarkdownOptions } from 'mdast-util-to-markdown'
 
 function isParent(node: unknown): node is Mdast.Parent {
@@ -140,7 +139,51 @@ function traverseLexicalTree(
     typedRoot.children.unshift(...imports)
   }
 
+  fixWrappingWhitespace(typedRoot, [])
+
   return typedRoot
+}
+
+const TRAILING_WHITESPACE_REGEXP = /\s+$/
+const LEADING_WHITESPACE_REGEXP = /^\s+/
+function fixWrappingWhitespace(node: Mdast.Parent | Mdast.Content, parentChain: Array<Mdast.Parent>) {
+  if (node.type === 'strong' || node.type === 'emphasis') {
+    const lastChild = node.children.at(-1)
+    if (lastChild?.type === 'text') {
+      const trailingWhitespace = lastChild.value.match(TRAILING_WHITESPACE_REGEXP)
+      if (trailingWhitespace) {
+        lastChild.value = lastChild.value.replace(TRAILING_WHITESPACE_REGEXP, '')
+        const parent = parentChain.at(-1)
+        if (parent) {
+          parent.children.splice(parent.children.indexOf(node as unknown as Mdast.Content) + 1, 0, {
+            type: 'text',
+            value: trailingWhitespace[0],
+          })
+          fixWrappingWhitespace(parent, parentChain.slice(0, -1))
+        }
+      }
+    }
+    const firstChild = node.children.at(0)
+    if (firstChild?.type === 'text') {
+      const leadingWhitespace = firstChild.value.match(LEADING_WHITESPACE_REGEXP)
+      if (leadingWhitespace) {
+        firstChild.value = firstChild.value.replace(LEADING_WHITESPACE_REGEXP, '')
+
+        const parent = parentChain.at(-1)
+        if (parent) {
+          parent.children.splice(parent.children.indexOf(node as unknown as Mdast.Content), 0, {
+            type: 'text',
+            value: leadingWhitespace[0],
+          })
+          fixWrappingWhitespace(parent, parentChain.slice(0, -1))
+        }
+      }
+    }
+  }
+  if (Object.hasOwn(node, 'children')) {
+    const nodeAsParent = node as Mdast.Parent
+    nodeAsParent.children.forEach((child) => fixWrappingWhitespace(child, [...parentChain, nodeAsParent]))
+  }
 }
 
 interface ExportMarkdownFromLexicalParams {
@@ -156,9 +199,10 @@ export function exportMarkdownFromLexical({
   visitors = LexicalVisitors,
   jsxComponentDescriptors = [],
 }: ExportMarkdownFromLexicalParams): string {
-  return toMarkdown(traverseLexicalTree(root, visitors, jsxComponentDescriptors), {
+  const md = toMarkdown(traverseLexicalTree(root, visitors, jsxComponentDescriptors), {
     extensions: [mdxToMarkdown(), frontmatterToMarkdown('yaml'), directiveToMarkdown],
     listItemIndent: 'one',
     ...options,
-  }).replaceAll(WHITESPACE_MARKER, '&#x20;')
+  })
+  return md
 }

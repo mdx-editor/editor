@@ -64,7 +64,19 @@ describe('converting', () => {
       })
     })
 
-    it.skip('moves whitespace out of formatting markers', () => {
+    it('moves whitespace out of bold formatting markers', () => {
+      const { editor } = testEnv
+      editor!.update(() => {
+        const paragraph = $createParagraphNode()
+        const node = $createTextNode('Hello World ')
+        node.setFormat('bold')
+        paragraph.append(node)
+        $getRoot().append(paragraph)
+        expect(exportMarkdownFromLexical({ root: $getRoot() })).toEqual('**Hello World**&#x20;\n')
+      })
+    })
+
+    it('moves whitespace out of nested formatting markers', () => {
       const { editor } = testEnv
       editor!.update(() => {
         const paragraph = $createParagraphNode()
@@ -72,9 +84,35 @@ describe('converting', () => {
         node.setFormat(0b11)
         paragraph.append(node)
         $getRoot().append(paragraph)
-        expect(exportMarkdownFromLexical({ root: $getRoot() })).toEqual('**Hello World** \n')
+        expect(exportMarkdownFromLexical({ root: $getRoot() })).toEqual('***Hello World***&#x20;\n')
       })
     })
+
+    it('moves leading whitespace out of bold formatting markers', () => {
+      const { editor } = testEnv
+      editor!.update(() => {
+        const paragraph = $createParagraphNode()
+        const node = $createTextNode(' Hello World')
+        node.setFormat('bold')
+        paragraph.append(node)
+        $getRoot().append(paragraph)
+        expect(exportMarkdownFromLexical({ root: $getRoot() })).toEqual('&#x20;**Hello World**\n')
+      })
+    })
+
+    it('moves leading whitespace out of nested formatting markers', () => {
+      const { editor } = testEnv
+      editor!.update(() => {
+        const paragraph = $createParagraphNode()
+        const node = $createTextNode(' Hello World')
+        node.setFormat(0b11)
+        paragraph.append(node)
+        $getRoot().append(paragraph)
+        expect(exportMarkdownFromLexical({ root: $getRoot() })).toEqual('&#x20;***Hello World***\n')
+      })
+    })
+
+    it.todo('collapses whitespace only nodes')
   })
 })
 

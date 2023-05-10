@@ -25,3 +25,8 @@ export function JSX() {
 export function DiffMode() {
   return <WrappedLexicalEditor markdown={initialMarkdown} viewMode="diff" />
 }
+
+export function Whitespace() {
+  const markdown = '**so&#x20;**'
+  return <WrappedLexicalEditor markdown={markdown} />
+}
