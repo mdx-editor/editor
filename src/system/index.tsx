@@ -25,6 +25,7 @@ export const {
     },
     optional: {
       viewMode: 'viewMode',
+      linkAutocompleteSuggestions: 'linkAutocompleteSuggestions',
     },
     events: {
       onChange: 'onChange',

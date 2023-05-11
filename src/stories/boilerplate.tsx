@@ -74,6 +74,7 @@ export const WrappedLexicalEditor: React.FC<WrappedEditorProps> = ({ viewMode, m
       sandpackConfig={virtuosoSampleSandpackConfig}
       jsxComponentDescriptors={jsxDescriptors}
       onChange={onChange}
+      linkAutocompleteSuggestions={['https://google.com/', 'https://news.ycombinator.com/', 'https://reddit.com/']}
     />
   )
 }

@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import * as Popover from '@radix-ui/react-popover'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import React from 'react'
@@ -10,9 +13,10 @@ import { ReactComponent as CopyIcon } from './icons/content_copy.svg'
 import { ReactComponent as EditIcon } from './icons/edit.svg'
 import { ReactComponent as LinkOffIcon } from './icons/link_off.svg'
 import { ReactComponent as OpenInNewIcon } from './icons/open_in_new.svg'
-import { useForm } from 'react-hook-form'
+import { ReactComponent as DropDownIcon } from './icons/arrow_drop_down.svg'
 import classNames from 'classnames'
 import { buttonClasses } from '../commonCssClasses'
+import { useCombobox } from 'downshift'
 
 export const OPEN_LINK_DIALOG: LexicalCommand<undefined> = createCommand()
 
@@ -20,33 +24,99 @@ interface LinkEditFormProps {
   initialUrl: string
   onSubmit: (url: string) => void
   onCancel: () => void
+  linkAutocompleteSuggestions: string[]
 }
 
-function LinkEditForm({ initialUrl, onSubmit, onCancel }: LinkEditFormProps) {
-  const { register, handleSubmit } = useForm<{ url: string }>({
-    defaultValues: {
-      url: initialUrl,
+const MAX_SUGGESTIONS = 20
+
+export function LinkEditForm({ initialUrl, onSubmit, onCancel, linkAutocompleteSuggestions }: LinkEditFormProps) {
+  const [items, setItems] = React.useState(linkAutocompleteSuggestions.slice(0, MAX_SUGGESTIONS))
+
+  const { isOpen, getToggleButtonProps, getMenuProps, getInputProps, highlightedIndex, getItemProps, selectedItem } = useCombobox({
+    initialInputValue: initialUrl,
+    onInputValueChange({ inputValue }) {
+      inputValue = inputValue?.toLowerCase() || ''
+      const matchingItems = []
+      for (const url of linkAutocompleteSuggestions) {
+        if (url.toLowerCase().includes(inputValue)) {
+          matchingItems.push(url)
+          if (matchingItems.length >= MAX_SUGGESTIONS) {
+            break
+          }
+        }
+      }
+      setItems(matchingItems)
+    },
+    items,
+    itemToString(item) {
+      return item ?? ''
     },
   })
 
-  const onSubmitEH = handleSubmit((data) => {
-    onSubmit(data.url)
-  })
+  const onSubmitEH = (e: React.FormEvent) => {
+    e.preventDefault()
+    onSubmit(selectedItem || '')
+  }
 
-  const onKeyDownEH = React.useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Escape') {
-      ;(e.target as HTMLInputElement).form?.reset()
-    }
-  }, [])
+  const onKeyDownEH = React.useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Escape') {
+        ;(e.target as HTMLInputElement).form?.reset()
+      } else if (e.key === 'Enter' && (!isOpen || items.length === 0)) {
+        e.preventDefault()
+        onSubmit((e.target as HTMLInputElement).value)
+      }
+    },
+    [isOpen, items, onSubmit]
+  )
+
+  const downshiftInputProps = getInputProps()
+
+  const inputProps = {
+    ...downshiftInputProps,
+    onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => {
+      onKeyDownEH(e)
+      downshiftInputProps.onKeyDown(e)
+    },
+  }
+
+  const dropdownIsVisible = isOpen && items.length > 0
 
   return (
     <form onSubmit={onSubmitEH} onReset={onCancel} className="flex ">
-      <input
-        className="mr-3 py-1 px-2 rounded-md border-1 border-primary-100 border-solid text-sm font-sans"
-        {...register('url')}
-        onKeyDown={onKeyDownEH}
-        autoFocus
-      />
+      <div className="flex flex-col items-stretch">
+        <div
+          data-visible-dropdown={dropdownIsVisible}
+          className="rounded-md border-2 flex items-center border-primary-100 border-solid data-[visible-dropdown=true]:rounded-b-none data-[visible-dropdown=true]:border-b-0"
+        >
+          <input className="py-1 px-2 pr-1 text-sm font-sans focus:outline-none" {...inputProps} autoFocus size={25} />
+          <button aria-label="toggle menu" className="px-1" type="button" {...getToggleButtonProps()}>
+            <DropDownIcon />
+          </button>
+        </div>
+
+        <div className="relative">
+          <ul
+            {...getMenuProps()}
+            data-visible={dropdownIsVisible}
+            className={classNames(
+              'absolute text-sm w-full hidden data-[visible=true]:block rounded-b-md max-h-48 overflow-auto border-2 border-primary-100 border-t-0'
+            )}
+          >
+            {items.map((item, index: number) => (
+              <li
+                data-selected={selectedItem === item}
+                data-highlighted={highlightedIndex === index}
+                className="data-[selected=true]:bg-primary-200 data-[highlighted=true]:bg-primary-100 p-1 last:rounded-b-md"
+                key={`${item}${index}`}
+                {...getItemProps({ item, index })}
+              >
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
 
       <ActionButton type="submit" title="Set URL" aria-label="Set URL">
         <CheckIcon />
@@ -61,7 +131,11 @@ function LinkEditForm({ initialUrl, onSubmit, onCancel }: LinkEditFormProps) {
 
 export function LinkDialogPlugin() {
   const publishWindowChange = usePublisher('onWindowChange')
-  const [linkDialogState, activeEditor] = useEmitterValues('linkDialogState', 'activeEditor')
+  const [linkDialogState, linkAutocompleteSuggestions, activeEditor] = useEmitterValues(
+    'linkDialogState',
+    'linkAutocompleteSuggestions',
+    'activeEditor'
+  )
   const updateLinkUrl = usePublisher('updateLinkUrl')
   const cancelLinkEdit = usePublisher('cancelLinkEdit')
   const switchFromPreviewToLinkEdit = usePublisher('switchFromPreviewToLinkEdit')
@@ -118,7 +192,12 @@ export function LinkDialogPlugin() {
           key={linkDialogState.linkNodeKey}
         >
           {linkDialogState.type === 'edit' && (
-            <LinkEditForm initialUrl={linkDialogState.url} onSubmit={onSubmitEH} onCancel={cancelLinkEdit.bind(null, true)} />
+            <LinkEditForm
+              initialUrl={linkDialogState.url}
+              onSubmit={onSubmitEH}
+              onCancel={cancelLinkEdit.bind(null, true)}
+              linkAutocompleteSuggestions={linkAutocompleteSuggestions}
+            />
           )}
 
           {linkDialogState.type === 'preview' && (

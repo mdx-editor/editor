@@ -47,6 +47,7 @@ interface WrappedEditorProps {
   headMarkdown: string
   sandpackConfig: SandpackConfigValue
   jsxComponentDescriptors: JsxComponentDescriptors
+  linkAutocompleteSuggestions?: string[]
   viewMode?: ViewMode
   onChange?: (markdown: string) => void
 }
@@ -78,6 +79,7 @@ export const Wrapper: React.FC<WrappedEditorProps> = ({
   sandpackConfig,
   onChange,
   viewMode,
+  linkAutocompleteSuggestions,
 }) => {
   return (
     <div className="p-3">
@@ -90,6 +92,7 @@ export const Wrapper: React.FC<WrappedEditorProps> = ({
           onChange={onChange}
           viewMode={viewMode}
           nodeDecorators={nodeDecorators}
+          linkAutocompleteSuggestions={linkAutocompleteSuggestions}
         >
           <ToolbarPlugin />
           <ViewModeToggler>

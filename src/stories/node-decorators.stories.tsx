@@ -1,6 +1,8 @@
 import React from 'react'
 import { FrontmatterEditorProps } from '../types/NodeDecoratorsProps'
 import { FrontmatterEditor } from '../ui/NodeDecorators/FrontmatterEditor'
+import { LinkEditForm } from '../ui'
+import { randUrl } from '@ngneat/falso'
 
 export const Frontmatter = () => {
   const props: FrontmatterEditorProps = {
@@ -15,5 +17,20 @@ export const Frontmatter = () => {
       <h1>Frontmatter editor</h1>
       <FrontmatterEditor {...props} />
     </div>
+  )
+}
+
+export const LinkEditFormExample = () => {
+  return (
+    <LinkEditForm
+      initialUrl="https://google.com"
+      linkAutocompleteSuggestions={randUrl({ length: 100 })}
+      onSubmit={(e) => {
+        console.log(e)
+      }}
+      onCancel={(e) => {
+        console.log(e)
+      }}
+    />
   )
 }

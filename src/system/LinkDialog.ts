@@ -59,6 +59,7 @@ export const [LinkDialogSystem, LinkDialogSystemType] = system(
     const switchFromPreviewToLinkEdit = r.node<true>()
     const removeLink = r.node<true>()
     const openLinkEditDialog = r.node<true>()
+    const linkAutocompleteSuggestions = r.node<string[]>([])
 
     r.sub(
       r.pipe(
@@ -219,7 +220,7 @@ export const [LinkDialogSystem, LinkDialogSystemType] = system(
       r.pipe(
         r.combine(currentSelection, onWindowChange),
         r.o.withLatestFrom(activeEditor, linkDialogState),
-        r.o.map(([[selection], activeEditor, linkDialogState]) => {
+        r.o.map(([[selection], activeEditor]) => {
           if ($isRangeSelection(selection) && activeEditor) {
             const node = getLinkNodeInSelection(selection)
 
@@ -255,6 +256,7 @@ export const [LinkDialogSystem, LinkDialogSystemType] = system(
       removeLink,
       openLinkEditDialog,
       applyLinkChanges,
+      linkAutocompleteSuggestions,
     }
   },
   [EditorSystemType]

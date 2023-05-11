@@ -1,7 +1,6 @@
 import React from 'react'
 import * as Select from '@radix-ui/react-select'
 import { ReactComponent as DropDownIcon } from './icons/arrow_drop_down.svg'
-import { ChevronDownIcon, ChevronUpIcon } from '@radix-ui/react-icons'
 import classnames from 'classnames'
 
 export const SelectItem = React.forwardRef<HTMLDivElement | null, { className?: string; children: React.ReactNode; value: string }>(
@@ -36,15 +35,9 @@ export function SelectTrigger({ placeholder }: { placeholder: string }) {
 
 export function SelectContent({ children }: { children: React.ReactNode }) {
   return (
-    <Select.Portal className="font-sans">
+    <Select.Portal className="font-sans z-[60]">
       <Select.Content className="w-36 rounded-b-md bg-primary-100" onCloseAutoFocus={(e) => e.preventDefault()} position="popper">
-        <Select.ScrollUpButton className="">
-          <ChevronUpIcon />
-        </Select.ScrollUpButton>
         <Select.Viewport className="">{children}</Select.Viewport>
-        <Select.ScrollDownButton className="">
-          <ChevronDownIcon />
-        </Select.ScrollDownButton>
       </Select.Content>
     </Select.Portal>
   )
