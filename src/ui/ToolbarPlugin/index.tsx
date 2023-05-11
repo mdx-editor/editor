@@ -23,6 +23,7 @@ import { $getNodeByKey } from 'lexical'
 import { CodeBlockEditorType, SandpackEditorType } from '../../types/ActiveEditorType'
 import { CodeBlockNode } from '../../nodes/CodeBlock'
 import { SandpackNode } from '../../nodes'
+import { ViewMode } from '../SourcePlugin'
 
 export const ToolbarPlugin = () => {
   const [viewMode, activeEditorType] = useEmitterValues('viewMode', 'activeEditorType')
@@ -42,7 +43,16 @@ export const ToolbarPlugin = () => {
       )}
 
       <ToolbarSeparator />
-      <ToggleSingleGroup aria-label="View Mode" onValueChange={setViewMode} value={viewMode} className="ml-auto">
+      <ToggleSingleGroup
+        aria-label="View Mode"
+        onValueChange={(v) => {
+          if (v !== '') {
+            setViewMode(v as ViewMode)
+          }
+        }}
+        value={viewMode}
+        className="ml-auto"
+      >
         <ToggleItem value="editor" aria-label="Rich text" className="rounded-l-md">
           Rich Text
         </ToggleItem>
