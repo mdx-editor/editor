@@ -2,7 +2,7 @@ import React from 'react'
 import { FrontmatterEditorProps } from '../types/NodeDecoratorsProps'
 import { FrontmatterEditor } from '../ui/NodeDecorators/FrontmatterEditor'
 import { LinkEditForm } from '../ui'
-import { randUrl } from '@ngneat/falso'
+import { randGitCommitSha, randUrl } from '@ngneat/falso'
 
 export const Frontmatter = () => {
   const props: FrontmatterEditorProps = {
@@ -22,15 +22,18 @@ export const Frontmatter = () => {
 
 export const LinkEditFormExample = () => {
   return (
-    <LinkEditForm
-      initialUrl="https://google.com"
-      linkAutocompleteSuggestions={randUrl({ length: 100 })}
-      onSubmit={(e) => {
-        console.log(e)
-      }}
-      onCancel={(e) => {
-        console.log(e)
-      }}
-    />
+    <>
+      <LinkEditForm
+        initialUrl="https://google.com"
+        linkAutocompleteSuggestions={randUrl({ length: 100 }).map((url) => `${url}?${randGitCommitSha()}`)}
+        onSubmit={(e) => {
+          console.log(e)
+        }}
+        onCancel={(e) => {
+          console.log(e)
+        }}
+      />
+      <div className="w-10 h-10 bg-red-300">some contnet</div>
+    </>
   )
 }

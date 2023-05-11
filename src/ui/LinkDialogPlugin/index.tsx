@@ -87,9 +87,9 @@ export function LinkEditForm({ initialUrl, onSubmit, onCancel, linkAutocompleteS
       <div className="flex flex-col items-stretch">
         <div
           data-visible-dropdown={dropdownIsVisible}
-          className="rounded-md border-2 flex items-center border-primary-100 border-solid data-[visible-dropdown=true]:rounded-b-none data-[visible-dropdown=true]:border-b-0"
+          className="rounded-md border-2 flex items-center border-primary-100 border-solid data-[visible-dropdown=true]:rounded-b-none data-[visible-dropdown=true]:border-b-0 bg-white"
         >
-          <input className="py-1 px-2 pr-1 text-sm font-sans focus:outline-none" {...inputProps} autoFocus size={25} />
+          <input className="py-1 px-2 pr-1 text-sm font-sans focus:outline-none" {...inputProps} autoFocus size={30} />
           <button aria-label="toggle menu" className="px-1" type="button" {...getToggleButtonProps()}>
             <DropDownIcon />
           </button>
@@ -100,14 +100,14 @@ export function LinkEditForm({ initialUrl, onSubmit, onCancel, linkAutocompleteS
             {...getMenuProps()}
             data-visible={dropdownIsVisible}
             className={classNames(
-              'absolute text-sm w-full hidden data-[visible=true]:block rounded-b-md max-h-48 overflow-auto border-2 border-primary-100 border-t-0'
+              'absolute text-sm w-full hidden data-[visible=true]:block rounded-b-md max-h-48 overflow-x-hidden overflow-y-auto border-2 border-primary-100 border-t-0 bg-white'
             )}
           >
             {items.map((item, index: number) => (
               <li
                 data-selected={selectedItem === item}
                 data-highlighted={highlightedIndex === index}
-                className="data-[selected=true]:bg-primary-200 data-[highlighted=true]:bg-primary-100 p-1 last:rounded-b-md"
+                className="data-[selected=true]:bg-primary-200 data-[highlighted=true]:bg-primary-100 p-1 last:rounded-b-md whitespace-nowrap pl-1 mb-1 overflow-x-hidden text-ellipsis"
                 key={`${item}${index}`}
                 {...getItemProps({ item, index })}
               >
