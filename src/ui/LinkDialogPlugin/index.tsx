@@ -171,6 +171,8 @@ export function LinkDialogPlugin() {
     [applyLinkChanges, updateLinkUrl]
   )
 
+  const urlIsExternal = linkDialogState.type === 'preview' && linkDialogState.url.startsWith('http')
+
   return (
     <Popover.Root open={linkDialogState.type !== 'inactive'}>
       <Popover.Anchor
@@ -205,12 +207,11 @@ export function LinkDialogPlugin() {
               <a
                 className="mr-3 pl-2 flex flex-row items-center text-primary-600 no-underline [&_svg]:w-5 [&_svg]:h-5 border-transparent border-solid border-1"
                 href={linkDialogState.url}
-                target="_blank"
-                rel="noreferrer"
+                {...(urlIsExternal ? { target: '_blank', rel: 'noreferrer' } : {})}
                 title={linkDialogState.url}
               >
                 <span className="max-w-[10rem] overflow-hidden text-ellipsis whitespace-nowrap">{linkDialogState.url}</span>
-                <OpenInNewIcon className="ml-2" />
+                {urlIsExternal && <OpenInNewIcon className="ml-2" />}
               </a>
               <ActionButton onClick={() => switchFromPreviewToLinkEdit(true)} title="Edit link URL" aria-label="Edit link URL">
                 <EditIcon />
