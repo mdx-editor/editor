@@ -29,6 +29,8 @@ import { CodeBlockEditor } from '../NodeDecorators/CodeBlockEditor'
 import { FrontmatterEditor } from '../NodeDecorators/FrontmatterEditor'
 import { JsxEditor } from '../NodeDecorators/JsxEditor'
 import { SandpackEditor } from '../NodeDecorators/SandpackEditor'
+import ListMaxIndentLevelPlugin from '../ListIndentPlugin'
+import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin'
 
 export function standardConfig(markdown: string) {
   return {
@@ -105,6 +107,8 @@ export const Wrapper: React.FC<WrappedEditorProps> = ({
           <LexicalLinkPlugin />
           <HorizontalRulePlugin />
           <ListPlugin />
+          <ListMaxIndentLevelPlugin maxDepth={7} />
+          <TabIndentationPlugin />
           <LinkDialogPlugin />
           <HistoryPlugin />
           <MarkdownShortcutPlugin transformers={patchMarkdownTransformers(TRANSFORMERS)} />
