@@ -13,6 +13,7 @@ import { ReactComponent as FrameSourceIcon } from './icons/frame_source.svg'
 import { ReactComponent as HorizontalRuleIcon } from './icons/horizontal_rule.svg'
 import { ReactComponent as LinkIcon } from './icons/link.svg'
 import { ReactComponent as DeleteIcon } from './icons/delete.svg'
+import { ReactComponent as FrontmatterIcon } from './icons/frontmatter.svg'
 import { CodeBlockLanguageSelect } from './CodeBlockLanguageSelect'
 
 import classnames from 'classnames'
@@ -154,6 +155,7 @@ function RichTextButtonSet() {
   const applyListType = usePublisher('applyListType')
   const insertCodeBlock = usePublisher('insertCodeBlock')
   const insertSandpack = usePublisher('insertSandpack')
+  const insertFrontmatter = usePublisher('insertFrontmatter')
   const openLinkEditDialog = usePublisher('openLinkEditDialog')
   const insertHorizontalRule = usePublisher('insertHorizontalRule')
 
@@ -234,6 +236,10 @@ function RichTextButtonSet() {
 
       <ToolbarButton onClick={insertSandpack.bind(null, true)}>
         <LiveCodeIcon />
+      </ToolbarButton>
+
+      <ToolbarButton onClick={insertFrontmatter.bind(null, true)}>
+        <FrontmatterIcon />
       </ToolbarButton>
     </>
   )

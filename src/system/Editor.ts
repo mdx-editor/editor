@@ -9,6 +9,7 @@ import {
 import { $isHeadingNode } from '@lexical/rich-text'
 import { $findMatchingParent, $getNearestNodeOfType } from '@lexical/utils'
 import {
+  $getRoot,
   $getSelection,
   $isRangeSelection,
   $isRootOrShadowRoot,
@@ -23,7 +24,7 @@ import {
   TextFormatType,
 } from 'lexical'
 import { system } from '../gurx'
-import { $isAdmonitionNode, AdmonitionKind } from '../nodes'
+import { $createFrontmatterNode, $isAdmonitionNode, $isFrontmatterNode, AdmonitionKind } from '../nodes'
 import { BlockType, HeadingType } from '../ui/ToolbarPlugin/BlockTypeSelect'
 import {
   formatAdmonition,
@@ -57,6 +58,7 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
   const applyListType = r.node<ListType | ''>()
   const applyBlockType = r.node<BlockType | AdmonitionKind>()
   const insertHorizontalRule = r.node<true>()
+  const insertFrontmatter = r.node<true>()
   const createEditorSubscription = r.node<EditorSubscription>()
   const editorSubscriptions = r.node<EditorSubscription[]>([])
   const inFocus = r.node(false, true)
@@ -83,6 +85,20 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
 
   r.sub(r.pipe(insertHorizontalRule, r.o.withLatestFrom(activeEditor)), ([, theEditor]) => {
     theEditor?.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, undefined)
+  })
+
+  r.sub(r.pipe(insertFrontmatter, r.o.withLatestFrom(activeEditor)), ([, theEditor]) => {
+    theEditor?.update(() => {
+      const firstItem = $getRoot().getFirstChild()
+      if (!$isFrontmatterNode(firstItem)) {
+        const fmNode = $createFrontmatterNode({ yaml: '"": ""' })
+        if (firstItem) {
+          firstItem.insertBefore(fmNode)
+        } else {
+          $getRoot().append(fmNode)
+        }
+      }
+    })
   })
 
   r.sub(r.pipe(applyBlockType, r.o.withLatestFrom(activeEditor)), ([type, theEditor]) => {
@@ -231,6 +247,7 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
     applyListType,
     applyBlockType,
     insertHorizontalRule,
+    insertFrontmatter,
     createEditorSubscription,
     editorSubscriptions,
     activeEditorType,

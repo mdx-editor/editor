@@ -76,7 +76,7 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
                 return (
                   <tr key={item.id}>
                     <td>
-                      <TableInput {...register(`yamlConfig.${index}.key`, { required: true })} />
+                      <TableInput {...register(`yamlConfig.${index}.key`, { required: true })} autofocusIfEmpty />
                     </td>
                     <td>
                       <TableInput {...register(`yamlConfig.${index}.value`, { required: true })} />
@@ -116,6 +116,10 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
   )
 }
 
-const TableInput = React.forwardRef<HTMLInputElement, React.HTMLAttributes<HTMLInputElement>>(({ className, ...props }, ref) => {
+const TableInput = React.forwardRef<
+  HTMLInputElement,
+  React.HTMLAttributes<HTMLInputElement> & { autofocusIfEmpty?: boolean; autoFocus: boolean; value: string }
+>(({ className, autofocusIfEmpty, ...props }, ref) => {
+  props.autoFocus = Boolean(!props.value && autofocusIfEmpty)
   return <input className={classNames('w-full bg-primary-50 px-2 py-1 rounded-md font-mono', className)} {...props} ref={ref} />
 })
