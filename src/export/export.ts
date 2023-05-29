@@ -12,7 +12,7 @@ function isParent(node: unknown): node is Mdast.Parent {
   return (node as { children?: Array<any> }).children instanceof Array
 }
 
-function traverseLexicalTree(
+export function exportLexicalTreeToMdast(
   root: LexicalRootNode,
   visitors: Array<LexicalExportVisitor<LexicalNode, Mdast.Content>>,
   jsxComponentDescriptors: JsxComponentDescriptors
@@ -199,7 +199,7 @@ export function exportMarkdownFromLexical({
   visitors = LexicalVisitors,
   jsxComponentDescriptors = [],
 }: ExportMarkdownFromLexicalParams): string {
-  const md = toMarkdown(traverseLexicalTree(root, visitors, jsxComponentDescriptors), {
+  const md = toMarkdown(exportLexicalTreeToMdast(root, visitors, jsxComponentDescriptors), {
     extensions: [mdxToMarkdown(), frontmatterToMarkdown('yaml'), directiveToMarkdown],
     listItemIndent: 'one',
     ...options,

@@ -1,21 +1,8 @@
 import { tap } from '../utils/fp'
+import { uuidv4 } from '../utils/uuid4'
 import { LongTuple } from './realmFactory'
 
 export type NodeKey = string
-
-export function uuidv4() {
-  /*
-  if (typeof globalThis.counter === 'undefined') {
-    globalThis.counter = 0
-  }
-  return `key-${++globalThis.counter}`
-  */
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    const r = (Math.random() * 16) | 0
-    const v = c === 'x' ? r : (r & 0x3) | 0x8
-    return v.toString(16)
-  })
-}
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export interface RealmNode<T = unknown> {

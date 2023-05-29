@@ -1,16 +1,28 @@
-import { $createLinkNode, LinkNode } from '@lexical/link'
 import { CodeNode } from '@lexical/code'
+import { $createLinkNode, LinkNode } from '@lexical/link'
 import { $createListItemNode, $createListNode, $isListItemNode, ListItemNode, ListNode } from '@lexical/list'
 import { $createHorizontalRuleNode, HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode'
 import { $createHeadingNode, $createQuoteNode, $isQuoteNode, HeadingNode, QuoteNode } from '@lexical/rich-text'
-import { $createParagraphNode, $createTextNode, ElementNode, LexicalNode, ParagraphNode, RootNode as LexicalRootNode } from 'lexical'
+import {
+  $createParagraphNode,
+  $createTextNode,
+  $getRoot,
+  ElementNode,
+  LexicalNode,
+  RootNode as LexicalRootNode,
+  ParagraphNode,
+  RootNode,
+  createEditor,
+} from 'lexical'
 import * as Mdast from 'mdast'
 import { ContainerDirective, directiveFromMarkdown } from 'mdast-util-directive'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { frontmatterFromMarkdown } from 'mdast-util-frontmatter'
-import { mdxFromMarkdown, MdxjsEsm, MdxJsxTextElement } from 'mdast-util-mdx'
+import { gfmTableFromMarkdown } from 'mdast-util-gfm-table'
+import { MdxJsxTextElement, MdxjsEsm, mdxFromMarkdown } from 'mdast-util-mdx'
 import { directive } from 'micromark-extension-directive'
 import { frontmatter } from 'micromark-extension-frontmatter'
+import { gfmTable } from 'micromark-extension-gfm-table'
 import { mdxjs } from 'micromark-extension-mdxjs'
 import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from '../FormatConstants'
 import {
@@ -25,9 +37,10 @@ import {
   ImageNode,
   SandpackNode,
 } from '../nodes'
+import { $createCodeBlockNode, CodeBlockNode } from '../nodes/CodeBlock'
 import { $createJsxNode, JsxNode } from '../nodes/Jsx'
-import { CodeBlockNode, $createCodeBlockNode } from '../nodes/CodeBlock'
-import { WHITESPACE_MARKER } from '../utils/whitespaceConversion'
+import { $createTableNode, TableNode } from '../nodes/Table'
+import { theme } from '../content/theme'
 
 type MdastNode = Mdast.Content
 
@@ -126,6 +139,13 @@ export const MdastBlockQuoteVisitor: MdastImportVisitor<Mdast.Blockquote> = {
   testNode: 'blockquote',
   visitNode({ actions }) {
     actions.addAndStepInto($createQuoteNode())
+  },
+}
+
+export const MdastTableVisitor: MdastImportVisitor<Mdast.Table> = {
+  testNode: 'table',
+  visitNode({ mdastNode, lexicalParent }) {
+    ;(lexicalParent as ElementNode).append($createTableNode(mdastNode))
   },
 }
 
@@ -254,6 +274,7 @@ export const MdastVisitors = [
   MdastAdmonitionVisitor,
   MdastMdxJsEsmVisitor,
   MdastMdxJsxElementVisitor,
+  MdastTableVisitor,
 ]
 
 function isParent(node: unknown): node is Mdast.Parent {
@@ -265,16 +286,24 @@ export function importMarkdownToLexical(
   markdown: string,
   visitors: Array<MdastImportVisitor<Mdast.Content>> = MdastVisitors
 ): void {
-  const formattingMap = new WeakMap<object, number>()
-
-  const tree = fromMarkdown(markdown, {
-    extensions: [mdxjs(), frontmatter(), directive()],
-    mdastExtensions: [mdxFromMarkdown(), frontmatterFromMarkdown('yaml'), directiveFromMarkdown],
+  const mdastRoot = fromMarkdown(markdown, {
+    extensions: [mdxjs(), frontmatter(), directive(), gfmTable],
+    mdastExtensions: [mdxFromMarkdown(), frontmatterFromMarkdown('yaml'), directiveFromMarkdown, gfmTableFromMarkdown],
   })
 
-  if (tree.children.length === 0) {
-    tree.children.push({ type: 'paragraph', children: [] })
+  if (mdastRoot.children.length === 0) {
+    mdastRoot.children.push({ type: 'paragraph', children: [] })
   }
+
+  importMdastTreeToLexical(root, mdastRoot, visitors)
+}
+
+export function importMdastTreeToLexical(
+  root: LexicalRootNode,
+  mdastRoot: Mdast.Root,
+  visitors: Array<MdastImportVisitor<Mdast.Content>> = MdastVisitors
+) {
+  const formattingMap = new WeakMap<object, number>()
 
   function visitChildren(mdastNode: Mdast.Parent, lexicalParent: LexicalNode) {
     if (!isParent(mdastNode)) {
@@ -318,7 +347,7 @@ export function importMarkdownToLexical(
     })
   }
 
-  visit(tree, root, null)
+  visit(mdastRoot, root, null)
 }
 
 export const UsedLexicalNodes = [
@@ -336,4 +365,5 @@ export const UsedLexicalNodes = [
   AdmonitionNode,
   JsxNode,
   CodeNode, // this one should not be used, but markdown shortcuts complain about it
+  TableNode,
 ]

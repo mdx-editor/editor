@@ -3,7 +3,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable no-use-before-define, @typescript-eslint/no-explicit-any */
-import { Realm, realm, RealmNode, Subscription, UnsubscribeHandle, uuidv4 } from './realm'
+import { uuidv4 } from '../utils/uuid4'
+import { Realm, realm, RealmNode, Subscription, UnsubscribeHandle } from './realm'
 
 // eslint-disable-next-line
 export type System = Record<string, RealmNode<any>>

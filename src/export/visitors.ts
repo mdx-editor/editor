@@ -32,6 +32,7 @@ import {
 } from '../nodes'
 
 import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from '../FormatConstants'
+import { $isTableNode, TableNode } from '../nodes/Table'
 
 export type { Options as ToMarkdownOptions } from 'mdast-util-to-markdown'
 
@@ -285,6 +286,13 @@ export const LexicalImageVisitor: LexicalExportVisitor<ImageNode, Mdast.Image> =
   },
 }
 
+export const LexicalTableVisitor: LexicalExportVisitor<TableNode, Mdast.Table> = {
+  testLexicalNode: $isTableNode,
+  visitLexicalNode({ actions }) {
+    actions.addAndStepInto('thematicBreak')
+  },
+}
+
 export const JsxVisitor: LexicalExportVisitor<JsxNode, MdxJsxFlowElement | MdxJsxTextElement> = {
   testLexicalNode: $isJsxNode,
   visitLexicalNode({ mdastParent, lexicalNode, actions }) {
@@ -324,4 +332,5 @@ export const LexicalVisitors = [
   AdmonitionVisitor,
   LexicalImageVisitor,
   JsxVisitor,
+  LexicalTableVisitor,
 ]
