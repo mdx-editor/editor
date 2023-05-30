@@ -2,7 +2,7 @@
 title: Hello World
 ---
 
-| Syntax      | Description   |
-| ----------- | ------------- |
-| Header      | Title         |
-| Paragraph   | Text *italic*   |
+| Syntax      | Description   | Profit |
+| ----------- | ------------- | ------:|
+| Header      | Title         | 50     |
+| Paragraph   | Text *italic*   | 70     |

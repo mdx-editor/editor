@@ -2,6 +2,7 @@ import { $isElementNode, ElementNode as LexicalElementNode, LexicalNode, RootNod
 import * as Mdast from 'mdast'
 import { directiveToMarkdown } from 'mdast-util-directive'
 import { frontmatterToMarkdown } from 'mdast-util-frontmatter'
+import { gfmTableToMarkdown } from 'mdast-util-gfm-table'
 import { MdxjsEsm, mdxToMarkdown } from 'mdast-util-mdx'
 import { Options as ToMarkdownOptions, toMarkdown } from 'mdast-util-to-markdown'
 import { LexicalExportVisitor, LexicalVisitors } from './visitors'
@@ -200,7 +201,12 @@ export function exportMarkdownFromLexical({
   jsxComponentDescriptors = [],
 }: ExportMarkdownFromLexicalParams): string {
   const md = toMarkdown(exportLexicalTreeToMdast(root, visitors, jsxComponentDescriptors), {
-    extensions: [mdxToMarkdown(), frontmatterToMarkdown('yaml'), directiveToMarkdown],
+    extensions: [
+      mdxToMarkdown(),
+      frontmatterToMarkdown('yaml'),
+      directiveToMarkdown,
+      gfmTableToMarkdown({ tableCellPadding: true, tablePipeAlign: true }),
+    ],
     listItemIndent: 'one',
     ...options,
   })

@@ -89,7 +89,13 @@ export function LinkEditForm({ initialUrl, onSubmit, onCancel, linkAutocompleteS
           data-visible-dropdown={dropdownIsVisible}
           className="rounded-md border-2 flex items-center border-primary-100 border-solid data-[visible-dropdown=true]:rounded-b-none data-[visible-dropdown=true]:border-b-0 bg-white"
         >
-          <input className="py-1 px-2 pr-1 text-sm font-sans focus:outline-none" {...inputProps} autoFocus size={30} />
+          <input
+            className="py-1 px-2 pr-1 text-sm font-sans focus:outline-none"
+            {...inputProps}
+            autoFocus
+            size={30}
+            data-editor-dialog={true}
+          />
           <button aria-label="toggle menu" className="px-1" type="button" {...getToggleButtonProps()}>
             <DropDownIcon />
           </button>

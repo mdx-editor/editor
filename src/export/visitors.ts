@@ -288,8 +288,8 @@ export const LexicalImageVisitor: LexicalExportVisitor<ImageNode, Mdast.Image> =
 
 export const LexicalTableVisitor: LexicalExportVisitor<TableNode, Mdast.Table> = {
   testLexicalNode: $isTableNode,
-  visitLexicalNode({ actions }) {
-    actions.addAndStepInto('thematicBreak')
+  visitLexicalNode({ actions, mdastParent, lexicalNode }) {
+    actions.appendToParent(mdastParent, lexicalNode.getMdastNode())
   },
 }
 

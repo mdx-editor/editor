@@ -1,17 +1,13 @@
-/**
- * Copyright (c) Meta Platforms, Inc. and affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- */
-
 import {
   $getRoot,
+  BLUR_COMMAND,
+  COMMAND_PRIORITY_CRITICAL,
   DOMConversionMap,
   DOMConversionOutput,
   DOMExportOutput,
   EditorConfig,
+  KEY_ENTER_COMMAND,
+  KEY_TAB_COMMAND,
   LexicalEditor,
   LexicalNode,
   NodeKey,
@@ -167,6 +163,8 @@ export function exportTableCellsToHTML(rows: Rows, rect?: { startX: number; endX
   return table
 }
 
+const EMPTY_CELL: Mdast.TableCell = { type: 'tableCell', children: [] as Mdast.PhrasingContent[] }
+
 export class TableNode extends DecoratorNode<JSX.Element> {
   __rows: Rows = []
   __mdastNode: Mdast.Table
@@ -177,6 +175,15 @@ export class TableNode extends DecoratorNode<JSX.Element> {
 
   static clone(node: TableNode): TableNode {
     return new TableNode(Object.assign({}, node.__mdastNode), node.__key)
+  }
+
+  static importDOM(): DOMConversionMap | null {
+    return {
+      table: (_node: Node) => ({
+        conversion: convertTableElement,
+        priority: 0,
+      }),
+    }
   }
 
   static importJSON(serializedNode: SerializedTableNode): TableNode {
@@ -191,22 +198,25 @@ export class TableNode extends DecoratorNode<JSX.Element> {
     }
   }
 
-  static importDOM(): DOMConversionMap | null {
-    return {
-      table: (_node: Node) => ({
-        conversion: convertTableElement,
-        priority: 0,
-      }),
-    }
+  getMdastNode(): Mdast.Table {
+    return this.__mdastNode
   }
 
-  exportDOM(): DOMExportOutput {
-    return { element: exportTableCellsToHTML(this.__rows) }
+  getRowCount(): number {
+    return this.__mdastNode.children.length
+  }
+
+  getColCount(): number {
+    return this.__mdastNode.children[0]?.children.length || 0
   }
 
   constructor(mdastNode?: Mdast.Table, key?: NodeKey) {
     super(key)
     this.__mdastNode = mdastNode || { type: 'table', children: [] }
+  }
+
+  exportDOM(): DOMExportOutput {
+    return { element: exportTableCellsToHTML(this.__rows) }
   }
 
   createDOM(): HTMLElement {
@@ -217,113 +227,78 @@ export class TableNode extends DecoratorNode<JSX.Element> {
     return false
   }
 
-  updateCellJSON(x: number, y: number, json: string): void {
+  updateCellContents(colIndex: number, rowIndex: number, children: Mdast.PhrasingContent[]): void {
     const self = this.getWritable()
-    const rows = self.__rows
-    const row = rows[y]
-    const cells = row.cells
-    const cell = cells[x]
+    const table = self.__mdastNode
+    const row = table.children[rowIndex]
+    const cells = row.children
+    const cell = cells[colIndex]
     const cellsClone = Array.from(cells)
-    const cellClone = { ...cell, json }
-    const rowClone = { ...row, cells: cellsClone }
-    cellsClone[x] = cellClone
-    rows[y] = rowClone
+    const cellClone = { ...cell, children }
+    const rowClone = { ...row, children: cellsClone }
+    cellsClone[colIndex] = cellClone
+    table.children[rowIndex] = rowClone
   }
 
-  insertColumnAt(x: number): void {
+  insertColumnAt(colIndex: number): void {
     const self = this.getWritable()
-    const rows = self.__rows
-    for (let y = 0; y < rows.length; y++) {
-      const row = rows[y]
-      const cells = row.cells
+    const table = self.__mdastNode
+    for (let rowIndex = 0; rowIndex < table.children.length; rowIndex++) {
+      const row = table.children[rowIndex]
+      const cells = row.children
       const cellsClone = Array.from(cells)
-      const rowClone = { ...row, cells: cellsClone }
-      const type = (cells[x] || cells[x - 1]).type
-      cellsClone.splice(x, 0, createCell(type))
-      rows[y] = rowClone
+      const rowClone = { ...row, children: cellsClone }
+      cellsClone.splice(colIndex, 0, EMPTY_CELL)
+      table.children[rowIndex] = rowClone
     }
   }
 
-  deleteColumnAt(x: number): void {
+  deleteColumnAt(colIndex: number): void {
     const self = this.getWritable()
-    const rows = self.__rows
-    for (let y = 0; y < rows.length; y++) {
-      const row = rows[y]
-      const cells = row.cells
+    const table = self.__mdastNode
+    for (let rowIndex = 0; rowIndex < table.children.length; rowIndex++) {
+      const row = table.children[rowIndex]
+      const cells = row.children
       const cellsClone = Array.from(cells)
-      const rowClone = { ...row, cells: cellsClone }
-      cellsClone.splice(x, 1)
-      rows[y] = rowClone
-    }
-  }
-
-  addColumns(count: number): void {
-    const self = this.getWritable()
-    const rows = self.__rows
-    for (let y = 0; y < rows.length; y++) {
-      const row = rows[y]
-      const cells = row.cells
-      const cellsClone = Array.from(cells)
-      const rowClone = { ...row, cells: cellsClone }
-      const type = cells[cells.length - 1].type
-      for (let x = 0; x < count; x++) {
-        cellsClone.push(createCell(type))
-      }
-      rows[y] = rowClone
+      const rowClone = { ...row, children: cellsClone }
+      cellsClone.splice(colIndex, 1)
+      table.children[rowIndex] = rowClone
     }
   }
 
   insertRowAt(y: number): void {
     const self = this.getWritable()
-    const rows = self.__rows
-    const prevRow = rows[y] || rows[y - 1]
-    const cellCount = prevRow.cells.length
-    const row = createRow()
-    for (let x = 0; x < cellCount; x++) {
-      const cell = createCell(prevRow.cells[x].type)
-      row.cells.push(cell)
+    const table = self.__mdastNode
+    const newRow: Mdast.TableRow = {
+      type: 'tableRow',
+      children: Array.from({ length: this.getColCount() }, () => EMPTY_CELL),
     }
-    rows.splice(y, 0, row)
+    table.children.splice(y, 0, newRow)
   }
 
-  deleteRowAt(y: number): void {
-    const self = this.getWritable()
-    const rows = self.__rows
-    rows.splice(y, 1)
+  deleteRowAt(rowIndex: number): void {
+    this.getWritable().__mdastNode.children.splice(rowIndex, 1)
   }
 
-  addRows(count: number): void {
-    const self = this.getWritable()
-    const rows = self.__rows
-    const prevRow = rows[rows.length - 1]
-    const cellCount = prevRow.cells.length
+  addRowToBottom(): void {
+    this.insertRowAt(this.getRowCount())
+  }
 
-    for (let y = 0; y < count; y++) {
-      const row = createRow()
-      for (let x = 0; x < cellCount; x++) {
-        const cell = createCell(prevRow.cells[x].type)
-        row.cells.push(cell)
-      }
-      rows.push(row)
+  addColumnToRight(): void {
+    this.insertColumnAt(this.getColCount())
+  }
+
+  setColumnAlign(colIndex: number, align: Mdast.AlignType) {
+    const self = this.getWritable()
+    const table = self.__mdastNode
+    if (table.align == null) {
+      table.align = []
     }
+    table.align[colIndex] = align
   }
 
-  decorate(_: LexicalEditor, _config: EditorConfig): JSX.Element {
-    return (
-      <table className="whitespace-normal">
-        <tbody>
-          {this.__mdastNode.children.map((row, index) => {
-            return (
-              <tr key={index}>
-                {row.children.map((cell, index) => {
-                  return <Cell key={index} mdastNode={cell} />
-                })}
-              </tr>
-            )
-          })}
-        </tbody>
-      </table>
-    )
+  decorate(parentEditor: LexicalEditor, _config: EditorConfig): JSX.Element {
+    return <TableComponent lexicalTable={this} mdastNode={this.__mdastNode} parentEditor={parentEditor} />
   }
 
   isInline(): false {
@@ -331,60 +306,351 @@ export class TableNode extends DecoratorNode<JSX.Element> {
   }
 }
 
-function Cell({ mdastNode }: { mdastNode: Mdast.TableCell }) {
-  const [isEditing, setIsEditing] = React.useState(false)
-  const [cell, setCell] = React.useState(mdastNode)
-  const createLexicalEditor = React.useCallback(() => {
+interface TableProps {
+  parentEditor: LexicalEditor
+  lexicalTable: TableNode
+  mdastNode: Mdast.Table
+}
+
+const AlignToTailwindClassMap = {
+  center: 'text-center',
+  left: 'text-left',
+  right: 'text-right',
+}
+
+const TableComponent: React.FC<TableProps> = ({ mdastNode, parentEditor, lexicalTable }) => {
+  const [activeCell, setActiveCell] = React.useState<[number, number] | null>(null)
+
+  const setActiveCellWithBoundaries = React.useCallback(
+    (cell: [number, number] | null) => {
+      const colCount = lexicalTable.getColCount()
+      if (cell === null) {
+        setActiveCell(null)
+        return
+      }
+      let [colIndex, rowIndex] = cell
+
+      // overflow columns
+      if (colIndex > colCount - 1) {
+        colIndex = 0
+        rowIndex++
+      }
+
+      // underflow columns
+      if (colIndex < 0) {
+        colIndex = colCount - 1
+        rowIndex -= 1
+      }
+
+      if (rowIndex > lexicalTable.getRowCount() - 1) {
+        //TODO: focus on the next editor
+        return
+      }
+
+      if (rowIndex < 0) {
+        //TODO: focus on the previous editor
+        return
+      }
+
+      setActiveCell([colIndex, rowIndex])
+    },
+    [lexicalTable]
+  )
+
+  const addRowToBottom = React.useCallback(() => {
+    parentEditor.update(() => {
+      lexicalTable.addRowToBottom()
+    })
+    setActiveCellWithBoundaries([0, lexicalTable.getRowCount() - 1])
+  }, [parentEditor, lexicalTable, setActiveCellWithBoundaries])
+
+  // adds column to the right and focuses the top cell of it
+  const addColumnToRight = React.useCallback(() => {
+    parentEditor.update(() => {
+      lexicalTable.addColumnToRight()
+    })
+    setActiveCellWithBoundaries([lexicalTable.getColCount() - 1, 0])
+  }, [parentEditor, lexicalTable, setActiveCellWithBoundaries])
+
+  const insertColumnAt = React.useCallback(
+    (colIndex: number) => {
+      parentEditor.update(() => {
+        lexicalTable.insertColumnAt(colIndex)
+      })
+      setActiveCellWithBoundaries([colIndex, 0])
+    },
+    [parentEditor, lexicalTable, setActiveCellWithBoundaries]
+  )
+
+  const insertRowAt = React.useCallback(
+    (rowIndex: number) => {
+      parentEditor.update(() => {
+        lexicalTable.insertRowAt(rowIndex)
+      })
+      setActiveCellWithBoundaries([0, rowIndex])
+    },
+    [parentEditor, lexicalTable, setActiveCellWithBoundaries]
+  )
+
+  const deleteRowAt = React.useCallback(
+    (rowIndex: number) => {
+      parentEditor.update(() => {
+        lexicalTable.deleteRowAt(rowIndex)
+      })
+    },
+    [parentEditor, lexicalTable]
+  )
+
+  const deleteColumnAt = React.useCallback(
+    (colIndex: number) => {
+      parentEditor.update(() => {
+        lexicalTable.deleteColumnAt(colIndex)
+      })
+    },
+    [parentEditor, lexicalTable]
+  )
+
+  const setColumnAlign = React.useCallback(
+    (colIndex: number, align: Mdast.AlignType) => {
+      parentEditor.update(() => {
+        lexicalTable.setColumnAlign(colIndex, align)
+      })
+    },
+    [parentEditor, lexicalTable]
+  )
+
+  const [highlightedCoordinates, setHighlightedCoordinates] = React.useState<[number, number]>([-1, -1])
+
+  const onTableMouseOver = React.useCallback((e: React.MouseEvent<HTMLTableElement>) => {
+    let tableCell = e.target as HTMLElement
+
+    while (!['TH', 'TD'].includes(tableCell.tagName)) {
+      if (tableCell === e.currentTarget) {
+        return
+      }
+
+      tableCell = tableCell.parentElement!
+    }
+    const tableRow = tableCell.parentElement!
+    const tableContainer = tableRow.parentElement!
+    const colIndex = tableContainer.tagName === 'TFOOT' ? -1 : Array.from(tableRow.children).indexOf(tableCell)
+    const rowIndex = tableCell.tagName === 'TH' ? -1 : Array.from(tableRow.parentElement!.children).indexOf(tableRow)
+    setHighlightedCoordinates([colIndex, rowIndex])
+  }, [])
+
+  return (
+    <table
+      className="whitespace-normal my-0 table-fixed h-max not-prose"
+      onMouseOver={onTableMouseOver}
+      onMouseLeave={() => setHighlightedCoordinates([-1, -1])}
+    >
+      <colgroup>
+        <col />
+
+        {Array.from({ length: mdastNode.children[0].children.length }, (_, colIndex) => {
+          const align = mdastNode.align || []
+          const currentColumnAlign = align[colIndex] || 'left'
+          const className = AlignToTailwindClassMap[currentColumnAlign]
+          return <col key={colIndex} className={className} />
+        })}
+        <col />
+      </colgroup>
+
+      <thead>
+        <tr>
+          <th className="w-28"></th>
+          {Array.from({ length: mdastNode.children[0].children.length }, (_, colIndex) => {
+            return (
+              <th key={colIndex}>
+                <div className="flex gap-3 invisible data-[active=true]:visible" data-active={highlightedCoordinates[0] === colIndex + 1}>
+                  <button className="bg-slate-100" onClick={setColumnAlign.bind(null, colIndex, 'left')}>
+                    l
+                  </button>
+                  <button className="bg-slate-100" onClick={setColumnAlign.bind(null, colIndex, 'center')}>
+                    c
+                  </button>
+                  <button className="bg-slate-100" onClick={setColumnAlign.bind(null, colIndex, 'right')}>
+                    r
+                  </button>
+
+                  <button className="bg-slate-100" onClick={insertColumnAt.bind(null, colIndex)}>
+                    +o
+                  </button>
+                  <button className="bg-slate-100" onClick={deleteColumnAt.bind(null, colIndex)}>
+                    -
+                  </button>
+
+                  <button className="bg-slate-100" onClick={insertColumnAt.bind(null, colIndex + 1)}>
+                    o+
+                  </button>
+                </div>
+              </th>
+            )
+          })}
+          <th className="w-12"></th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {mdastNode.children.map((row, rowIndex) => {
+          return (
+            <tr key={rowIndex}>
+              <td>
+                <div className="flex gap-3 invisible data-[active=true]:visible" data-active={highlightedCoordinates[1] === rowIndex}>
+                  <button className="bg-slate-100" onClick={insertRowAt.bind(null, rowIndex)}>
+                    +o
+                  </button>
+                  <button className="bg-slate-100" onClick={deleteRowAt.bind(null, rowIndex)}>
+                    -
+                  </button>
+
+                  <button className="bg-slate-100" onClick={insertRowAt.bind(null, rowIndex + 1)}>
+                    o+
+                  </button>
+                </div>
+              </td>
+              {row.children.map((mdastCell, colIndex) => {
+                return (
+                  <Cell
+                    align={mdastNode.align?.[colIndex]}
+                    key={colIndex}
+                    contents={mdastCell.children}
+                    {...{ rowIndex, colIndex, lexicalTable, parentEditor, activeCellTuple: [activeCell, setActiveCellWithBoundaries] }}
+                  />
+                )
+              })}
+              {rowIndex === 0 && (
+                <td rowSpan={lexicalTable.getRowCount()}>
+                  <button className="bg-slate-100 h-full overflow-auto block p-4" onClick={addColumnToRight}>
+                    +
+                  </button>
+                </td>
+              )}
+            </tr>
+          )
+        })}
+      </tbody>
+      <tfoot>
+        <tr>
+          <th></th>
+          <th colSpan={lexicalTable.getColCount()}>
+            <button className="bg-slate-100 w-full block p-4" onClick={addRowToBottom}>
+              +
+            </button>
+          </th>
+          <th></th>
+        </tr>
+      </tfoot>
+    </table>
+  )
+}
+
+export interface CellProps {
+  parentEditor: LexicalEditor
+  lexicalTable: TableNode
+  contents: Mdast.PhrasingContent[]
+  colIndex: number
+  rowIndex: number
+  align?: Mdast.AlignType
+  activeCellTuple: [[number, number] | null, (cell: [number, number] | null) => void]
+}
+
+const Cell: React.FC<CellProps> = ({ align, ...props }) => {
+  const [activeCell, setActiveCell] = props.activeCellTuple
+  const isActive = activeCell && activeCell[0] === props.colIndex && activeCell[1] === props.rowIndex
+
+  const className = AlignToTailwindClassMap[align || 'left']
+  return (
+    <td
+      className={className}
+      onClick={() => {
+        setActiveCell([props.colIndex, props.rowIndex])
+      }}
+    >
+      {isActive ? <CellEditor {...props} /> : <MarkdownAstRenderer mdastChildren={props.contents} />}
+    </td>
+  )
+}
+
+const CellEditor: React.FC<CellProps> = ({ activeCellTuple, parentEditor, lexicalTable, contents, colIndex, rowIndex }) => {
+  const [editor] = React.useState(() => {
+    let disposed = false
     const editor = createEditor({
       nodes: UsedLexicalNodes,
       theme: theme,
     })
 
-    editor.update(() => {
-      importMdastTreeToLexical($getRoot(), { type: 'root', children: [{ type: 'paragraph', children: cell.children }] })
-    })
-
-    const unsub = editor.registerUpdateListener(() => {
-      unsub()
-      setTimeout(() => {
-        editor.update(() => {
-          console.log($getRoot()?.select())
-          // $getRoot()?.getFirstChild()?.select()
-        })
-      }, 100)
-    })
-
-    editor.registerRootListener((element) => {
-      element?.addEventListener('blur', () => {
-        editor.getEditorState().read(() => {
-          const mdast = exportLexicalTreeToMdast($getRoot(), LexicalVisitors, [])
-          setCell((cell) => ({ ...cell, children: (mdast.children[0] as Mdast.Paragraph).children }))
-          // setIsEditing(false)
+    function saveAndDispose(nextCell: [number, number] | null) {
+      if (disposed) {
+        return
+      }
+      disposed = true
+      editor.getEditorState().read(() => {
+        const mdast = exportLexicalTreeToMdast($getRoot(), LexicalVisitors, [])
+        parentEditor.update(() => {
+          lexicalTable.updateCellContents(colIndex, rowIndex, (mdast.children[0] as Mdast.Paragraph).children)
         })
       })
+
+      activeCellTuple[1](nextCell)
+    }
+
+    editor.registerCommand(
+      KEY_TAB_COMMAND,
+      (payload) => {
+        payload.preventDefault()
+        const nextCell: [number, number] = payload.shiftKey ? [colIndex - 1, rowIndex] : [colIndex + 1, rowIndex]
+        saveAndDispose(nextCell)
+        return true
+      },
+      COMMAND_PRIORITY_CRITICAL
+    )
+
+    editor.registerCommand(
+      KEY_ENTER_COMMAND,
+      (payload) => {
+        payload?.preventDefault()
+        const nextCell: [number, number] = payload?.shiftKey ? [colIndex, rowIndex - 1] : [colIndex, rowIndex + 1]
+        saveAndDispose(nextCell)
+        return true
+      },
+      COMMAND_PRIORITY_CRITICAL
+    )
+
+    editor.registerCommand(
+      BLUR_COMMAND,
+      (payload) => {
+        const relatedTarget = payload.relatedTarget as HTMLElement | null
+        if (relatedTarget?.dataset['editorDialog'] !== undefined) {
+          return false
+        }
+        saveAndDispose(null)
+        return true
+      },
+      COMMAND_PRIORITY_CRITICAL
+    )
+
+    editor.registerRootListener((element) => {
+      if (element) {
+        editor.focus()
+      }
+    })
+
+    editor.update(() => {
+      importMdastTreeToLexical($getRoot(), { type: 'root', children: [{ type: 'paragraph', children: contents }] })
     })
 
     return editor
-  }, [cell])
+  })
 
   return (
-    <td
-      onClick={() => {
-        setIsEditing(true)
-      }}
-    >
-      {isEditing ? (
-        <LexicalNestedComposer initialEditor={createLexicalEditor()}>
-          <RichTextPlugin
-            contentEditable={<ContentEditable className="prose font-sans max-w-none w-full focus:outline-none" autoFocus />}
-            placeholder={<div></div>}
-            ErrorBoundary={LexicalErrorBoundary}
-          />
-        </LexicalNestedComposer>
-      ) : (
-        <MarkdownAstRenderer mdastChildren={cell.children} />
-      )}
-    </td>
+    <LexicalNestedComposer initialEditor={editor}>
+      <RichTextPlugin
+        contentEditable={<ContentEditable className="prose font-sans max-w-none w-full focus:outline-none text-sm" autoFocus />}
+        placeholder={<div className="text-sm"></div>}
+        ErrorBoundary={LexicalErrorBoundary}
+      />
+    </LexicalNestedComposer>
   )
 }
 

@@ -10,5 +10,5 @@ export const MarkdownAstRenderer = (props: { mdastChildren: PhrasingContent[] })
   const hast = raw(toHast(root, { allowDangerousHtml: true })!)
   const safeHast = sanitize(hast)
   const html = toHtml(safeHast)
-  return <span dangerouslySetInnerHTML={{ __html: html }} />
+  return <span dangerouslySetInnerHTML={{ __html: html || '&nbsp;' }} />
 }
