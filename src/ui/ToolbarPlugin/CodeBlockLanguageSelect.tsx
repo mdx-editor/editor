@@ -10,7 +10,6 @@ import { CodeBlockNode } from '../../nodes/CodeBlock'
 export function CodeBlockLanguageSelect() {
   const [activeEditorType, activeEditor] = useEmitterValues('activeEditorType', 'activeEditor')
 
-  console.log(activeEditorType)
   const nodeLanguage = React.useMemo(() => {
     let language!: string
     activeEditor!.getEditorState().read(() => {

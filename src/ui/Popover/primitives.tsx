@@ -1,7 +1,5 @@
 import React from 'react'
 import * as Popover from '@radix-ui/react-popover'
-// import * as styles from './styles.css'
-// import { themeClassName } from '../theme.css'
 
 export function PopoverAnchor(props: React.ComponentProps<typeof Popover.Anchor>) {
   return <Popover.Anchor {...props} className="" />

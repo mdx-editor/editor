@@ -6,6 +6,7 @@ import { ReactComponent as ArrowRight } from './icons/arrow_right.svg'
 import { ReactComponent as ArrowDown } from './icons/arrow_drop_down.svg'
 import { ReactComponent as DeleteIcon } from './icons/delete.svg'
 import classNames from 'classnames'
+import styles from '../styles.module.css'
 
 type YamlConfig = Array<{ key: string; value: string }>
 
@@ -44,9 +45,9 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
   }, [watch, onChange])
 
   return (
-    <div className="border-2 border-solid rounded-md border-primary-50 p-3 not-prose data-[expanded=true]:mb-10" data-expanded={expanded}>
+    <div className={styles.frontmatterWrapper} data-expanded={expanded}>
       <button
-        className="border-0 bg-transparent  flex items-center text-sm"
+        className={styles.frontmatterToggleButton}
         onClick={(e) => {
           e.preventDefault()
           setExpanded((v) => !v)
@@ -58,16 +59,16 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
 
       {expanded && (
         <form>
-          <table className="table-fixed border-spacing-x-1 border-spacing-y-3 border-separate">
+          <table className={styles.frontmatterEditorTable}>
             <colgroup>
-              <col className="w-[30%]" />
-              <col className="w-[70%]" />
-              <col className="w-12" />
+              <col />
+              <col />
+              <col />
             </colgroup>
-            <thead className="text-xs">
+            <thead>
               <tr>
-                <th className="text-left">Key</th>
-                <th className="text-left">Value</th>
+                <th>Key</th>
+                <th>Value</th>
                 <th></th>
               </tr>
             </thead>
@@ -82,11 +83,7 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
                       <TableInput {...register(`yamlConfig.${index}.value`, { required: true })} />
                     </td>
                     <td>
-                      <button
-                        type="button"
-                        onClick={() => remove(index)}
-                        className="bg-transparent border-0 text-primary-400 hover:text-primary-600"
-                      >
+                      <button type="button" onClick={() => remove(index)} className={styles.iconButton}>
                         <DeleteIcon />
                       </button>
                     </td>
@@ -98,7 +95,7 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
               <tr>
                 <td>
                   <button
-                    className="rounded-md py-2 px-3 bg-primary-100 active:bg-primary-200 text-sm"
+                    className={styles.primaryButton}
                     type="button"
                     onClick={() => {
                       append({ key: '', value: '' })
@@ -121,5 +118,5 @@ const TableInput = React.forwardRef<
   React.HTMLAttributes<HTMLInputElement> & { autofocusIfEmpty?: boolean; autoFocus?: boolean; value?: string }
 >(({ className, autofocusIfEmpty, ...props }, ref) => {
   props.autoFocus = Boolean(!props.value && autofocusIfEmpty)
-  return <input className={classNames('w-full bg-primary-50 px-2 py-1 rounded-md font-mono', className)} {...props} ref={ref} />
+  return <input className={styles.frontmatterInput} {...props} ref={ref} />
 })

@@ -26,9 +26,9 @@ export function SelectTrigger({ placeholder }: { placeholder: string }) {
 
 export function SelectContent({ children }: { children: React.ReactNode }) {
   return (
-    <Select.Portal className={classNames('font-sans z-[60]', styles.editorRoot)}>
+    <Select.Portal className={classNames(styles.editorRoot)}>
       <Select.Content className={styles.toolbarNodeKindSelectContainer} onCloseAutoFocus={(e) => e.preventDefault()} position="popper">
-        <Select.Viewport className="">{children}</Select.Viewport>
+        <Select.Viewport>{children}</Select.Viewport>
       </Select.Content>
     </Select.Portal>
   )

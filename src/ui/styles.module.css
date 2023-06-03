@@ -4,6 +4,16 @@
 @import url('@radix-ui/colors/slate.css');
 @import url('@radix-ui/colors/slateDark.css');
 
+@define-extend clear-form-element {
+  border: 0;
+  background-color: transparent;
+  font-size: inherit;
+  appearance: none;
+  all: unset;
+  box-sizing: border-box;
+  cursor: default;
+}
+
 .editorRoot {
   --accentBase: var(--blue1);
   --accentBgSubtle: var(--blue2);
@@ -76,6 +86,13 @@
   --radius-full: 9999px;
 
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  --text-sm: 0.875rem;
+  --text-xs: 0.75rem;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.editorWrapper {
+  padding: var(--spacing-3);
 }
 
 .nestedListItem {
@@ -112,11 +129,13 @@
     padding-inline-end: var(--spacing-6);
     padding-inline-start: var(--spacing-6);
   }
+
+
 }
 
 .toolbarGroupOfGroups {
   display: flex;
-  gap: 1px;
+  margin-right: var(--spacing-2);
 }
 
 .toolbarToggleSingleGroup:first-of-type .toolbarToggleItem:only-child,
@@ -134,9 +153,9 @@
 }
 
 .toolbarToggleItem, .toolbarButton {
-  appearance: none;
-  border: 0;
-  background-color: transparent;
+  @extend clear-form-element;
+  padding-right: var(--spacing-1);
+  padding-left: var(--spacing-1);
   & svg {
     fill: var(--baseTextContrast);
   }
@@ -194,7 +213,6 @@
 .toolbarNodeKindSelectTrigger {
   border: 0;
   background-color: transparent;
-  font-size: inherit;
   display: flex;
   align-items: center;
   width: var(--spacing-36);
@@ -202,6 +220,8 @@
   padding-inline-start: var(--spacing-4) ;
   padding-inline-end: var(--spacing-2);
   border-radius: var(--radius-medium);
+  white-space: nowrap;
+  flex-wrap: nowrap;
 
   &:hover {
     background-color: var(--baseBgSubtle);
@@ -216,7 +236,234 @@
 
 .toolbarNodeKindSelectDropdownArrow {
   margin-left: auto;
+}
+
+.contentEditable {
+  width: 100%;
+  &:focus {
+    outline: none;
+  }
+}
+
+.sandpackWrapper {
+  margin-bottom:var(--spacing-5);
+}
+
+.frontmatterWrapper {
+  border: 1px solid var(--baseBorder);
+  border-radius: var(--radius-base);
+  padding: var(--spacing-3);
+  background-color: var(--baseBgSubtle);
+
+  &[data-expanded=true] {
+    margin-bottom: var(--spacing-10);
+  }
+}
+
+.frontmatterToggleButton {
+  @extend clear-form-element;
+  display: flex;
+  align-items: center;
+  gap:var(--spacing-1);
+}
+
+.frontmatterEditorTable {
+  table-layout: fixed;
+  margin-top: var(--spacing-3);
+  border-spacing: var(--spacing-2);
+  & th {
+    text-align: left;
+    font-size: var(--text-xs);
+  }
+
+  & col:nth-child(1) {
+    width: 30%;
+  }
+
+  & col:nth-child(2) {
+    width: 70%;
+  }
+
+  & td:last-child .iconButton {
+    margin-left: var(--spacing-4);
+    margin-right: var(--spacing-4);
+  }
+}
+
+.frontmatterInput {
+  @extend clear-form-element;
+  width: 100%;
+  padding: var(--spacing-2) var(--spacing-3);
+  border-radius: var(--radius-base);
+  border: 1px solid var(--baseBorder);
+  background-color: var(--baseBase);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+}
+
+.iconButton {
+  @extend clear-form-element;
+
   & svg {
-    display: block;
+    fill: var(--baseTextContrast);
+  }
+  &:hover svg {
+    fill: var(--accentText);
+  }
+}
+
+.primaryButton {
+  @extend clear-form-element;
+  padding: var(--spacing-2) var(--spacing-3);
+  border: 1px solid var(--accentBorder);
+  background-color: var(--accentSolidHover);
+  color:var(--baseBase);
+  font-size: var(--text-sm);
+  border-radius: var(--radius-medium);
+}
+
+.linkDialogEditForm {
+  display: flex;
+}
+
+.linkDialogInputContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.linkDialogInputWrapper {
+  display: flex;
+  border-radius: var(--radius-base);
+  align-items: center;
+  border:1px solid var(--baseBorder);
+  &[data-visible-dropdown=true] {
+    border-bottom-left-radius: var(--radius-none) ;
+    border-bottom-right-radius: var(--radius-none) ;
+  }
+  background-color: var(--baseBase);
+
+  & > button {
+    @extend clear-form-element;
+    padding-right: var(--spacing-2);
+  }
+}
+
+.linkDialogInput {
+  @extend clear-form-element;
+  width: 100%;
+  padding: var(--spacing-2) var(--spacing-3);
+  font-size: var(--text-sm);
+}
+
+.linkDialogAutocompleteContainer {
+  position: relative;
+
+  & ul {
+    all: unset;
+    box-sizing: border-box;
+    position: absolute;
+    font-size: var(--text-sm);
+    width: 100%;
+    display: none;
+    border-bottom-left-radius: var(--radius-medium) ;
+    border-bottom-right-radius: var(--radius-medium) ;
+    max-height: var(--spacing-48);
+    overflow-x: hidden;
+    overflow-y: auto;
+    border: 1px solid var(--baseBorder);
+    background-color: var(--baseBase);
+
+    &[data-visible=true] {
+      display: block;
+    }
+
+    & li {
+      padding: var(--spacing-1);
+      white-space: nowrap;
+      margin-bottom: var(--spacing-1);
+      overflow-x: hidden;
+      text-overflow: ellipsis;
+      &[data-selected=true] {
+        background-color: var(--baseBgSubtle);
+      }
+
+      &[data-highlighted=true] {
+        background-color: var(--baseBgHover);
+      }
+
+      &:last-of-type {
+        border-bottom-left-radius: var(--radius-medium) ;
+        border-bottom-right-radius: var(--radius-medium) ;
+      }
+    }
+  }
+}
+
+.linkDialogAnchor {
+  position: absolute;
+  background-color: highlight;
+  z-index: -1;
+
+  &[data-visible=true] {
+    visibility: visible;
+  }
+
+  &[data-visible=false] {
+    visibility: hidden;
+  }
+}
+
+.linkDialogPopoverContent {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-0_5);
+  border-radius:var(--radius-base);
+  border: 1px solid var(--baseBorder);
+  background-color: var(--baseBase);
+  padding:var(--spacing-2) var(--spacing-3);
+  font-size: var(--text-sm);
+}
+
+
+.linkDialogPreviewAnchor {
+  margin-right: var(--spacing-3);
+  display: flex;
+  align-items: center;
+  color: var(--accentSolid);
+  text-decoration: none;
+
+  & svg {
+    width: var(--spacing-5);
+    height: var(--spacing-5);
+    margin-left: var(--spacing-2);
+  }
+  border: 1px solid transparent;
+  & span {
+    max-width: 10rem;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.tooltipContent {
+  border-radius: var(--radius-medium);
+  padding: var(--spacing-1) var(--spacing-2);
+  font-size: var(--text-xs);
+  background-color: var(--baseText);
+  color: var(--baseBase);
+
+  & svg {
+    fill: var(--baseText);
+  }
+}
+
+.actionButton {
+  @extend clear-form-element;
+  padding: var(--spacing-2);
+  & svg { 
+    width: var(--spacing-5);
+    height: var(--spacing-5);
   }
 }

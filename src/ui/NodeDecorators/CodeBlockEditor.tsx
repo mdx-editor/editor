@@ -1,9 +1,9 @@
-import { CodeEditor as TheEditorFromSandpack, SandpackProvider } from '@codesandbox/sandpack-react'
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import { SandpackProvider, CodeEditor as TheEditorFromSandpack } from '@codesandbox/sandpack-react'
 import React from 'react'
-import { CodeBlockEditorProps } from '../../types/NodeDecoratorsProps'
-import { useCodeMirrorRef } from './useCodeMirrorRef'
 import { useEmitterValues, usePublisher } from '../../system'
+import { CodeBlockEditorProps } from '../../types/NodeDecoratorsProps'
+import styles from '../styles.module.css'
+import { useCodeMirrorRef } from './useCodeMirrorRef'
 
 export const CodeBlockEditor = ({ nodeKey, code, language, onChange, focusEmitter }: CodeBlockEditorProps) => {
   const [activeEditor] = useEmitterValues('activeEditor')
@@ -27,7 +27,7 @@ export const CodeBlockEditor = ({ nodeKey, code, language, onChange, focusEmitte
   )
 
   return (
-    <div className="mb-5">
+    <div className={styles.sandpackWrapper}>
       <SandpackProvider>
         <TheEditorFromSandpack
           showLineNumbers

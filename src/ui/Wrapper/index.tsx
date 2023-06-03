@@ -32,6 +32,7 @@ import { SandpackEditor } from '../NodeDecorators/SandpackEditor'
 import ListMaxIndentLevelPlugin from '../ListIndentPlugin'
 import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin'
 import styles from '../styles.module.css'
+import classNames from 'classnames'
 
 export function standardConfig(markdown: string) {
   return {
@@ -85,7 +86,7 @@ export const Wrapper: React.FC<WrappedEditorProps> = ({
   linkAutocompleteSuggestions,
 }) => {
   return (
-    <div className={styles.editorRoot}>
+    <div className={classNames(styles.editorRoot, styles.editorWrapper)}>
       <LexicalComposer initialConfig={standardConfig(markdown)}>
         <EditorSystemComponent
           headMarkdown={headMarkdown}
@@ -100,7 +101,7 @@ export const Wrapper: React.FC<WrappedEditorProps> = ({
           <ToolbarPlugin />
           <ViewModeToggler>
             <RichTextPlugin
-              contentEditable={<ContentEditable className="prose font-sans max-w-none w-full focus:outline-none" />}
+              contentEditable={<ContentEditable className={styles.contentEditable} />}
               placeholder={<div></div>}
               ErrorBoundary={LexicalErrorBoundary}
             />

@@ -17,6 +17,7 @@ import { ReactComponent as DropDownIcon } from './icons/arrow_drop_down.svg'
 import classNames from 'classnames'
 import { buttonClasses } from '../commonCssClasses'
 import { useCombobox } from 'downshift'
+import styles from '../styles.module.css'
 
 export const OPEN_LINK_DIALOG: LexicalCommand<undefined> = createCommand()
 
@@ -83,37 +84,21 @@ export function LinkEditForm({ initialUrl, onSubmit, onCancel, linkAutocompleteS
   const dropdownIsVisible = isOpen && items.length > 0
 
   return (
-    <form onSubmit={onSubmitEH} onReset={onCancel} className="flex ">
-      <div className="flex flex-col items-stretch">
-        <div
-          data-visible-dropdown={dropdownIsVisible}
-          className="rounded-md border-2 flex items-center border-primary-100 border-solid data-[visible-dropdown=true]:rounded-b-none data-[visible-dropdown=true]:border-b-0 bg-white"
-        >
-          <input
-            className="py-1 px-2 pr-1 text-sm font-sans focus:outline-none"
-            {...inputProps}
-            autoFocus
-            size={30}
-            data-editor-dialog={true}
-          />
-          <button aria-label="toggle menu" className="px-1" type="button" {...getToggleButtonProps()}>
+    <form onSubmit={onSubmitEH} onReset={onCancel} className={classNames(styles.linkDialogEditForm, styles.editorRoot)}>
+      <div className={styles.linkDialogInputContainer}>
+        <div data-visible-dropdown={dropdownIsVisible} className={styles.linkDialogInputWrapper}>
+          <input className={styles.linkDialogInput} {...inputProps} autoFocus size={30} data-editor-dialog={true} />
+          <button aria-label="toggle menu" type="button" {...getToggleButtonProps()}>
             <DropDownIcon />
           </button>
         </div>
 
-        <div className="relative">
-          <ul
-            {...getMenuProps()}
-            data-visible={dropdownIsVisible}
-            className={classNames(
-              'absolute text-sm w-full hidden data-[visible=true]:block rounded-b-md max-h-48 overflow-x-hidden overflow-y-auto border-2 border-primary-100 border-t-0 bg-white'
-            )}
-          >
+        <div className={styles.linkDialogAutocompleteContainer}>
+          <ul {...getMenuProps()} data-visible={dropdownIsVisible}>
             {items.map((item, index: number) => (
               <li
                 data-selected={selectedItem === item}
                 data-highlighted={highlightedIndex === index}
-                className="data-[selected=true]:bg-primary-200 data-[highlighted=true]:bg-primary-100 p-1 last:rounded-b-md whitespace-nowrap pl-1 mb-1 overflow-x-hidden text-ellipsis"
                 key={`${item}${index}`}
                 {...getItemProps({ item, index })}
               >
@@ -183,7 +168,7 @@ export function LinkDialogPlugin() {
     <Popover.Root open={linkDialogState.type !== 'inactive'}>
       <Popover.Anchor
         data-visible={linkDialogState.type === 'edit'}
-        className='data-[visible="true"]:visible data-[visible=false]:invisible absolute bg-[highlight] z-[-1]'
+        className={styles.linkDialogAnchor}
         style={{
           top: theRect?.top,
           left: theRect?.left,
@@ -194,7 +179,7 @@ export function LinkDialogPlugin() {
 
       <Popover.Portal>
         <Popover.Content
-          className="flex flex-row items-center gap-0.5 rounded-md border-2 border-solid border-surface-50 bg-popoverBg px-4 py-2 pr-3 font-sans text-sm shadow-sm shadow-surface-200"
+          className={classNames(styles.linkDialogPopoverContent, styles.editorRoot)}
           sideOffset={5}
           onOpenAutoFocus={(e) => e.preventDefault()}
           key={linkDialogState.linkNodeKey}
@@ -211,13 +196,13 @@ export function LinkDialogPlugin() {
           {linkDialogState.type === 'preview' && (
             <>
               <a
-                className="mr-3 pl-2 flex flex-row items-center text-primary-600 no-underline [&_svg]:w-5 [&_svg]:h-5 border-transparent border-solid border-1"
+                className={styles.linkDialogPreviewAnchor}
                 href={linkDialogState.url}
                 {...(urlIsExternal ? { target: '_blank', rel: 'noreferrer' } : {})}
                 title={linkDialogState.url}
               >
-                <span className="max-w-[10rem] overflow-hidden text-ellipsis whitespace-nowrap">{linkDialogState.url}</span>
-                {urlIsExternal && <OpenInNewIcon className="ml-2" />}
+                <span>{linkDialogState.url}</span>
+                {urlIsExternal && <OpenInNewIcon />}
               </a>
               <ActionButton onClick={() => switchFromPreviewToLinkEdit(true)} title="Edit link URL" aria-label="Edit link URL">
                 <EditIcon />
@@ -239,10 +224,7 @@ export function LinkDialogPlugin() {
                     </ActionButton>
                   </Tooltip.Trigger>
                   <Tooltip.Portal>
-                    <Tooltip.Content
-                      className="rounded-md bg-slate-700 p-1 px-2 font-sans text-xs text-slate-50 data-[state=delayed-open]:data-[side=bottom]:animate-slideUpAndFade data-[state=delayed-open]:data-[side=left]:animate-slideRightAndFade data-[state=delayed-open]:data-[side=right]:animate-slideLeftAndFade data-[state=delayed-open]:data-[side=top]:animate-slideDownAndFade"
-                      sideOffset={5}
-                    >
+                    <Tooltip.Content className={classNames(styles.tooltipContent, styles.editorRoot)} sideOffset={5}>
                       Copied!
                       <Tooltip.Arrow />
                     </Tooltip.Content>
@@ -262,5 +244,5 @@ export function LinkDialogPlugin() {
 }
 
 const ActionButton = React.forwardRef<HTMLButtonElement, React.ComponentPropsWithoutRef<'button'>>(({ className, ...props }, ref) => {
-  return <button className={classNames(buttonClasses, className, '[&_svg]:w-5 [&_svg]:h-5')} ref={ref} {...props} />
+  return <button className={classNames(styles.actionButton, className)} ref={ref} {...props} />
 })
