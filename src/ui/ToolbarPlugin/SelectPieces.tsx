@@ -1,19 +1,13 @@
 import React from 'react'
 import * as Select from '@radix-ui/react-select'
 import { ReactComponent as DropDownIcon } from './icons/arrow_drop_down.svg'
-import classnames from 'classnames'
+import classNames from 'classnames'
+import styles from '../styles.module.css'
 
 export const SelectItem = React.forwardRef<HTMLDivElement | null, { className?: string; children: React.ReactNode; value: string }>(
   ({ children, className, ...props }, forwardedRef) => {
     return (
-      <Select.Item
-        {...props}
-        ref={forwardedRef}
-        className={classnames(
-          className,
-          `cursor-default px-4 py-2 data-[highlighted]:bg-primary-200 data-[state=checked]:bg-primary-300 data-[highlighted]:outline-0 flex`
-        )}
-      >
+      <Select.Item {...props} ref={forwardedRef} className={classNames(className, styles.toolbarNodeKindSelectItem)}>
         <Select.ItemText>{children}</Select.ItemText>
       </Select.Item>
     )
@@ -21,12 +15,9 @@ export const SelectItem = React.forwardRef<HTMLDivElement | null, { className?: 
 )
 export function SelectTrigger({ placeholder }: { placeholder: string }) {
   return (
-    <Select.Trigger
-      aria-label={placeholder}
-      className="group flex w-36 flex-row items-center rounded-md border-0 bg-transparent p-2 pl-4 pr-2 font-sans text-base hover:bg-primary-100 data-[state=open]:rounded-b-none data-[state=open]:bg-primary-100"
-    >
+    <Select.Trigger aria-label={placeholder} className={styles.toolbarNodeKindSelectTrigger}>
       <Select.Value placeholder={placeholder} />
-      <Select.Icon className="ml-auto group-data-[state=open]:text-primary-900 [&_svg]:block">
+      <Select.Icon className={styles.toolbarNodeKindSelectDropdownArrow}>
         <DropDownIcon />
       </Select.Icon>
     </Select.Trigger>
@@ -35,8 +26,8 @@ export function SelectTrigger({ placeholder }: { placeholder: string }) {
 
 export function SelectContent({ children }: { children: React.ReactNode }) {
   return (
-    <Select.Portal className="font-sans z-[60]">
-      <Select.Content className="w-36 rounded-b-md bg-primary-100" onCloseAutoFocus={(e) => e.preventDefault()} position="popper">
+    <Select.Portal className={classNames('font-sans z-[60]', styles.editorRoot)}>
+      <Select.Content className={styles.toolbarNodeKindSelectContainer} onCloseAutoFocus={(e) => e.preventDefault()} position="popper">
         <Select.Viewport className="">{children}</Select.Viewport>
       </Select.Content>
     </Select.Portal>

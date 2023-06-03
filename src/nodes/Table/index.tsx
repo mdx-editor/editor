@@ -106,32 +106,32 @@ export function extractRowsFromHTML(tableElem: HTMLTableElement): Rows {
   return rows
 }
 
-function convertTableElement(domNode: HTMLElement): null | DOMConversionOutput {
-  const rowElems = domNode.querySelectorAll('tr')
-  if (!rowElems || rowElems.length === 0) {
-    return null
-  }
-  const rows: Rows = []
-  for (let y = 0; y < rowElems.length; y++) {
-    const rowElem = rowElems[y]
-    const cellElems = rowElem.querySelectorAll('td,th')
-    if (!cellElems || cellElems.length === 0) {
-      continue
-    }
-    const cells: Array<Cell> = []
-    for (let x = 0; x < cellElems.length; x++) {
-      const cellElem = cellElems[x] as HTMLElement
-      const isHeader = cellElem.nodeName === 'TH'
-      const cell = createCell(isHeader ? 'header' : 'normal')
-      cell.json = plainTextEditorJSON(JSON.stringify(cellElem.innerText.replace(/\n/g, ' ')))
-      cells.push(cell)
-    }
-    const row = createRow()
-    row.cells = cells
-    rows.push(row)
-  }
-  return { node: $createTableNode(rows) }
-}
+// function convertTableElement(domNode: HTMLElement): null | DOMConversionOutput {
+//   const rowElems = domNode.querySelectorAll('tr')
+//   if (!rowElems || rowElems.length === 0) {
+//     return null
+//   }
+//   const rows: Rows = []
+//   for (let y = 0; y < rowElems.length; y++) {
+//     const rowElem = rowElems[y]
+//     const cellElems = rowElem.querySelectorAll('td,th')
+//     if (!cellElems || cellElems.length === 0) {
+//       continue
+//     }
+//     const cells: Array<Cell> = []
+//     for (let x = 0; x < cellElems.length; x++) {
+//       const cellElem = cellElems[x] as HTMLElement
+//       const isHeader = cellElem.nodeName === 'TH'
+//       const cell = createCell(isHeader ? 'header' : 'normal')
+//       cell.json = plainTextEditorJSON(JSON.stringify(cellElem.innerText.replace(/\n/g, ' ')))
+//       cells.push(cell)
+//     }
+//     const row = createRow()
+//     row.cells = cells
+//     rows.push(row)
+//   }
+//   return { node: $createTableNode() }
+// }
 
 export function exportTableCellsToHTML(rows: Rows, rect?: { startX: number; endX: number; startY: number; endY: number }): HTMLElement {
   const table = document.createElement('table')
@@ -177,14 +177,14 @@ export class TableNode extends DecoratorNode<JSX.Element> {
     return new TableNode(Object.assign({}, node.__mdastNode), node.__key)
   }
 
-  static importDOM(): DOMConversionMap | null {
-    return {
-      table: (_node: Node) => ({
-        conversion: convertTableElement,
-        priority: 0,
-      }),
-    }
-  }
+  // static importDOM(): DOMConversionMap | null {
+  //   return {
+  //     table: (_node: Node) => ({
+  //       conversion: convertTableElement,
+  //       priority: 0,
+  //     }),
+  //   }
+  // }
 
   static importJSON(serializedNode: SerializedTableNode): TableNode {
     return $createTableNode(serializedNode.mdastNode)

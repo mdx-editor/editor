@@ -31,6 +31,7 @@ import { JsxEditor } from '../NodeDecorators/JsxEditor'
 import { SandpackEditor } from '../NodeDecorators/SandpackEditor'
 import ListMaxIndentLevelPlugin from '../ListIndentPlugin'
 import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin'
+import styles from '../styles.module.css'
 
 export function standardConfig(markdown: string) {
   return {
@@ -84,7 +85,7 @@ export const Wrapper: React.FC<WrappedEditorProps> = ({
   linkAutocompleteSuggestions,
 }) => {
   return (
-    <div className="p-3">
+    <div className={styles.editorRoot}>
       <LexicalComposer initialConfig={standardConfig(markdown)}>
         <EditorSystemComponent
           headMarkdown={headMarkdown}

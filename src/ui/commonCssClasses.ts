@@ -7,8 +7,3 @@ export const buttonClasses = classnames(
   childSvgClasses,
   'rounded-md border-0 bg-transparent p-2 transition-colors text-primary-900 hover:bg-primary-100 active:bg-primary-200 active:text-primary-800'
 )
-
-export const toggleItemClasses = classnames(
-  buttonClasses.replace('rounded-md', ''),
-  'data-toggle-on:bg-primary-200 data-toggle-on:text-primary-800'
-)

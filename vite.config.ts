@@ -54,4 +54,10 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['src/test/setup.ts'],
   },
+  css: {
+    modules: {
+      scopeBehaviour: 'local',
+      localsConvention: 'camelCaseOnly'
+    }
+  }
 })

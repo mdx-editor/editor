@@ -1,0 +1,222 @@
+@import url('@radix-ui/colors/blue.css');
+@import url('@radix-ui/colors/blueDark.css');
+
+@import url('@radix-ui/colors/slate.css');
+@import url('@radix-ui/colors/slateDark.css');
+
+.editorRoot {
+  --accentBase: var(--blue1);
+  --accentBgSubtle: var(--blue2);
+  --accentBg: var(--blue3);
+  --accentBgHover: var(--blue4);
+  --accentBgActive: var(--blue5);
+  --accentLine: var(--blue6);
+  --accentBorder: var(--blue7);
+  --accentBorderHover: var(--blue8);
+  --accentSolid: var(--blue9);
+  --accentSolidHover: var(--blue10);
+  --accentText: var(--blue11);
+  --accentTextContrast: var(--blue12);
+
+  --baseBase: var(--slate1);
+  --baseBgSubtle: var(--slate2);
+  --baseBg: var(--slate3);
+  --baseBgHover: var(--slate4);
+  --baseBgActive: var(--slate5);
+  --baseLine: var(--slate6);
+  --baseBorder: var(--slate7);
+  --baseBorderHover: var(--slate8);
+  --baseSolid: var(--slate9);
+  --baseSolidHover: var(--slate10);
+  --baseText: var(--slate11);
+  --baseTextContrast: var(--slate12);
+
+  --spacing-0:0px;
+  --spacing-px:1px;
+  --spacing-0_5:0.125rem;
+  --spacing-1:0.25rem;
+  --spacing-1_5:0.375rem;
+  --spacing-2:0.5rem;
+  --spacing-2_5:0.625rem;
+  --spacing-3:0.75rem;
+  --spacing-3_5:0.875rem;
+  --spacing-4:1rem;
+  --spacing-5:1.25rem;
+  --spacing-6:1.5rem;
+  --spacing-7:1.75rem;
+  --spacing-8:2rem;
+  --spacing-9:2.25rem;
+  --spacing-10:2.5rem;
+  --spacing-11:2.75rem;
+  --spacing-12:3rem;
+  --spacing-14:3.5rem;
+  --spacing-16:4rem;
+  --spacing-20:5rem;
+  --spacing-24:6rem;
+  --spacing-28:7rem;
+  --spacing-32:8rem;
+  --spacing-36:9rem;
+  --spacing-40:10rem;
+  --spacing-44:11rem;
+  --spacing-48:12rem;
+  --spacing-52:13rem;
+  --spacing-56:14rem;
+  --spacing-60:15rem;
+  --spacing-64:16rem;
+  --spacing-72:18rem;
+  --spacing-80:20rem;
+  --spacing-96:24rem;
+
+  --radius-none:0px;
+  --radius-small: var(--spacing-0_5);
+  --radius-base: var(--spacing-1);
+  --radius-medium: var(--spacing-1_5);
+  --radius-large: var(--spacing-2);
+  --radius-extra-large: var(--spacing-3);
+  --radius-full: 9999px;
+
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.nestedListItem {
+  list-style: none;
+}
+
+.toolbarRoot {
+  /* border: var(--spacing-px) solid var(--baseBorder); */
+  z-index: 50;
+  margin-bottom: var(--spacing-6);
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-2);
+  border-radius: var(--radius-medium);
+  padding: var(--spacing-2);
+  align-items: center;
+  overflow-x: auto;
+  position: sticky;
+  top: 0;
+  background-color: var(--baseBase);
+  width: inherit;
+}
+
+.toolbarModeSwitch {
+  margin-left: auto;
+  align-self: stretch;
+  align-items: stretch;
+  display: flex;
+  border:1px solid var(--baseBgHover);
+  border-radius: var(--radius-medium);
+
+  .toolbarToggleItem {
+    background-color: var(--baseBgSubtle);
+    padding-inline-end: var(--spacing-6);
+    padding-inline-start: var(--spacing-6);
+  }
+}
+
+.toolbarGroupOfGroups {
+  display: flex;
+  gap: 1px;
+}
+
+.toolbarToggleSingleGroup:first-of-type .toolbarToggleItem:only-child,
+.toolbarToggleSingleGroup:only-child .toolbarToggleItem:first-child, 
+.toolbarModeSwitch .toolbarToggleItem:first-child {
+  border-top-left-radius: var(--radius-base);
+  border-bottom-left-radius: var(--radius-base);
+}
+
+.toolbarToggleSingleGroup:last-of-type .toolbarToggleItem:only-child,
+.toolbarToggleSingleGroup:only-child .toolbarToggleItem:last-child,
+.toolbarModeSwitch .toolbarToggleItem:last-child {
+  border-top-right-radius: var(--radius-base);
+  border-bottom-right-radius: var(--radius-base);
+}
+
+.toolbarToggleItem, .toolbarButton {
+  appearance: none;
+  border: 0;
+  background-color: transparent;
+  & svg {
+    fill: var(--baseTextContrast);
+  }
+
+  &:hover {
+    color: var(--accentText);
+    & svg {
+      fill: var(--accentText);
+    }
+  }
+
+  &:active svg {
+    transform: translate(1px, 1px);
+  }
+
+  &[data-state=on], &:active {
+    background-color: var(--baseBgActive);
+  }
+}
+
+.toolbarButton {
+  border-radius: var(--radius-base);
+}
+
+.toolbarToggleSingleGroup {
+  white-space: nowrap;
+}
+
+.toolbarNodeKindSelectItem {
+  cursor: default;
+  display: flex;
+  padding: var(--spacing-2) var(--spacing-4);
+
+  &[data-highlighted] {
+    background-color: var(--baseBgHover);
+  }
+
+  &[data-state=checked] {
+    background-color: var(--baseBgActive);
+  }
+
+  &[data-highlighted] {
+    outline: none;
+  }
+}
+
+.toolbarNodeKindSelectContainer {
+  z-index: 60;
+  width: var(--spacing-36);
+  border-bottom-left-radius: var(--radius-base);
+  border-bottom-right-radius: var(--radius-base);
+  background-color: var(--baseBgSubtle);
+}
+
+.toolbarNodeKindSelectTrigger {
+  border: 0;
+  background-color: transparent;
+  font-size: inherit;
+  display: flex;
+  align-items: center;
+  width: var(--spacing-36);
+  padding: var(--spacing-2);
+  padding-inline-start: var(--spacing-4) ;
+  padding-inline-end: var(--spacing-2);
+  border-radius: var(--radius-medium);
+
+  &:hover {
+    background-color: var(--baseBgSubtle);
+  }
+
+  &[data-state=open] {
+    border-bottom-right-radius: var(--radius-none);
+    border-bottom-left-radius: var(--radius-none);
+    background-color: var(--baseBgSubtle);
+  }
+}
+
+.toolbarNodeKindSelectDropdownArrow {
+  margin-left: auto;
+  & svg {
+    display: block;
+  }
+}

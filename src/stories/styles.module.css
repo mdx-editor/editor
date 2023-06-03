@@ -1,0 +1,8 @@
+
+.myStyle {
+  color: red;
+
+  &:hover {
+    color: blue;
+  }
+}

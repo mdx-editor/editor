@@ -1,7 +1,6 @@
+import autoprefixer from 'autoprefixer'
+import nesting from 'postcss-nesting'
+
 export default {
-  plugins: {
-    'tailwindcss/nesting': 'postcss-nesting',
-    tailwindcss: {},
-    autoprefixer: {},
-  },
+  plugins: [ autoprefixer, nesting ]
 }

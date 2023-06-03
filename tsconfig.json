@@ -18,9 +18,15 @@
       "./src/@types"
     ],
     "types": [
+      "vite/client",
       "@testing-library/jest-dom",
       "lexical"
-    ]
+    ],
+    "plugins": [
+      {
+        "name": "typescript-plugin-css-modules"
+      }
+    ],
   },
   "include": [
     "src"
