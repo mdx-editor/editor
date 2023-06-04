@@ -105,15 +105,19 @@
   margin-bottom: var(--spacing-6);
   display: flex;
   flex-direction: row;
-  gap: var(--spacing-2);
+  gap: var(--spacing-1);
   border-radius: var(--radius-medium);
-  padding: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-2);
   align-items: center;
   overflow-x: auto;
   position: sticky;
   top: 0;
-  background-color: var(--baseBase);
+  background-color: var(--baseBgSubtle);
   width: inherit;
+
+  & div[role=separator] {
+    margin: var(--spacing-1);
+  }
 }
 
 .toolbarModeSwitch {
@@ -121,21 +125,24 @@
   align-self: stretch;
   align-items: stretch;
   display: flex;
-  border:1px solid var(--baseBgHover);
+  border: 1px solid var(--baseBg);
   border-radius: var(--radius-medium);
+  font-size: var(--text-xs);
 
   .toolbarToggleItem {
-    background-color: var(--baseBgSubtle);
-    padding-inline-end: var(--spacing-6);
-    padding-inline-start: var(--spacing-6);
+    background-color:var(--baseBgSubtle);
+    padding-inline-end: var(--spacing-4);
+    padding-inline-start: var(--spacing-4);
+    
+    &[data-state=on] {
+      color: var(--baseTextContrast);
+      background-color:var(--baseBorder);
+    }
   }
-
-
 }
 
 .toolbarGroupOfGroups {
   display: flex;
-  margin-right: var(--spacing-2);
 }
 
 .toolbarToggleSingleGroup:first-of-type .toolbarToggleItem:only-child,
@@ -154,17 +161,14 @@
 
 .toolbarToggleItem, .toolbarButton {
   @extend clear-form-element;
-  padding-right: var(--spacing-1);
-  padding-left: var(--spacing-1);
+  padding: var(--spacing-2);
+
   & svg {
-    fill: var(--baseTextContrast);
+    display: block;
   }
 
   &:hover {
-    color: var(--accentText);
-    & svg {
-      fill: var(--accentText);
-    }
+    color: var(--baseTextContrast);
   }
 
   &:active svg {
@@ -184,30 +188,13 @@
   white-space: nowrap;
 }
 
-.toolbarNodeKindSelectItem {
-  cursor: default;
-  display: flex;
-  padding: var(--spacing-2) var(--spacing-4);
-
-  &[data-highlighted] {
-    background-color: var(--baseBgHover);
-  }
-
-  &[data-state=checked] {
-    background-color: var(--baseBgActive);
-  }
-
-  &[data-highlighted] {
-    outline: none;
-  }
-}
-
 .toolbarNodeKindSelectContainer {
   z-index: 60;
   width: var(--spacing-36);
   border-bottom-left-radius: var(--radius-base);
   border-bottom-right-radius: var(--radius-base);
-  background-color: var(--baseBgSubtle);
+  background-color: var(--baseBgHover);
+  font-size: var(--text-sm);
 }
 
 .toolbarNodeKindSelectTrigger {
@@ -222,15 +209,39 @@
   border-radius: var(--radius-medium);
   white-space: nowrap;
   flex-wrap: nowrap;
+  font-size: var(--text-sm);
 
   &:hover {
-    background-color: var(--baseBgSubtle);
+    background-color: var(--baseBgHover);
   }
 
   &[data-state=open] {
     border-bottom-right-radius: var(--radius-none);
     border-bottom-left-radius: var(--radius-none);
+    background-color: var(--baseBgHover);
+  }
+}
+
+.toolbarNodeKindSelectItem {
+  cursor: default;
+  display: flex;
+  padding: var(--spacing-2) var(--spacing-4);
+
+  &[data-highlighted] {
     background-color: var(--baseBgSubtle);
+  }
+
+  &[data-state=checked] {
+    background-color: var(--baseBgActive);
+  }
+
+  &[data-highlighted] {
+    outline: none;
+  }
+
+  &:last-child {
+  border-bottom-left-radius: var(--radius-base);
+  border-bottom-right-radius: var(--radius-base);
   }
 }
 
@@ -303,13 +314,7 @@
 
 .iconButton {
   @extend clear-form-element;
-
-  & svg {
-    fill: var(--baseTextContrast);
-  }
-  &:hover svg {
-    fill: var(--accentText);
-  }
+  color:var(--baseTextContrast);
 }
 
 .primaryButton {
