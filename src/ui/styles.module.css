@@ -130,12 +130,10 @@
   font-size: var(--text-xs);
 
   .toolbarToggleItem {
-    background-color:var(--baseBgSubtle);
     padding-inline-end: var(--spacing-4);
     padding-inline-start: var(--spacing-4);
     
-    &[data-state=on] {
-      color: var(--baseTextContrast);
+    &:active, &[data-state=on] {
       background-color:var(--baseBorder);
     }
   }
@@ -168,7 +166,7 @@
   }
 
   &:hover {
-    color: var(--baseTextContrast);
+    background-color: var(--baseBgHover);
   }
 
   &:active svg {
@@ -176,7 +174,7 @@
   }
 
   &[data-state=on], &:active {
-    background-color: var(--baseBgActive);
+    background-color: var(--accentBgActive);
   }
 }
 
@@ -232,7 +230,7 @@
   }
 
   &[data-state=checked] {
-    background-color: var(--baseBgActive);
+    background-color: var(--accentBgActive);
   }
 
   &[data-highlighted] {
