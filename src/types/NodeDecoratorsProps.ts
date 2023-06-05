@@ -1,5 +1,7 @@
 import { EditorThemeClasses, LexicalEditor } from 'lexical'
 import { MdxJsxAttribute } from 'mdast-util-mdx-jsx'
+import { TableNode } from '../nodes/Table'
+import * as Mdast from 'mdast'
 
 export interface FrontmatterEditorProps {
   yaml: string
@@ -32,4 +34,10 @@ export interface SandpackEditorProps {
 
 export interface CodeBlockEditorProps extends SandpackEditorProps {
   language: string
+}
+
+export interface TableEditorProps {
+  parentEditor: LexicalEditor
+  lexicalTable: TableNode
+  mdastNode: Mdast.Table
 }

@@ -1,6 +1,12 @@
 import { system } from '../gurx'
 import React from 'react'
-import { CodeBlockEditorProps, FrontmatterEditorProps, JsxEditorProps, SandpackEditorProps } from '../types/NodeDecoratorsProps'
+import {
+  CodeBlockEditorProps,
+  FrontmatterEditorProps,
+  JsxEditorProps,
+  SandpackEditorProps,
+  TableEditorProps,
+} from '../types/NodeDecoratorsProps'
 
 function ComponentStub(componentName: string) {
   return () => {
@@ -14,6 +20,7 @@ export interface NodeDecorators {
   JsxEditor: React.FC<JsxEditorProps>
   SandpackEditor: React.FC<SandpackEditorProps>
   CodeBlockEditor: React.FC<CodeBlockEditorProps>
+  TableEditor: React.FC<TableEditorProps>
 }
 
 export const [NodeDecoratorsSystem, NodeDecoratorsSystemType] = system((r) => {
@@ -22,6 +29,7 @@ export const [NodeDecoratorsSystem, NodeDecoratorsSystemType] = system((r) => {
     JsxEditor: ComponentStub('JsxEditor'),
     SandpackEditor: ComponentStub('SandpackEditor'),
     CodeBlockEditor: ComponentStub('CodeBlockEditor'),
+    TableEditor: ComponentStub('TableEditor'),
   })
 
   return {

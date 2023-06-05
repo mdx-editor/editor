@@ -118,5 +118,5 @@ const TableInput = React.forwardRef<
   React.HTMLAttributes<HTMLInputElement> & { autofocusIfEmpty?: boolean; autoFocus?: boolean; value?: string }
 >(({ className, autofocusIfEmpty, ...props }, ref) => {
   props.autoFocus = Boolean(!props.value && autofocusIfEmpty)
-  return <input className={styles.frontmatterInput} {...props} ref={ref} />
+  return <input className={classNames(styles.frontmatterInput, className)} {...props} ref={ref} />
 })

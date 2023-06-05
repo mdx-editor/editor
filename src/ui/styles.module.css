@@ -499,3 +499,22 @@
   @mixin icon-button;
   border-radius: var(--radius-medium);
 }
+
+.tableEditor {
+  table-layout: fixed;
+  width: 100%;
+
+  & thead > tr > th {
+    text-align: right;
+  }
+}
+
+.tableColumnEditorTrigger {
+  @mixin icon-button;
+  border-radius: var(--radius-full);
+  opacity: 0.2;
+
+  &[data-active=true] {
+    opacity: 1;
+  }
+}

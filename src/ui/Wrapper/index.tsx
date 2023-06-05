@@ -9,6 +9,8 @@ import { LinkPlugin as LexicalLinkPlugin } from '@lexical/react/LexicalLinkPlugi
 import { ListPlugin } from '@lexical/react/LexicalListPlugin'
 import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
+import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin'
+import classNames from 'classnames'
 import { $getRoot } from 'lexical'
 import React from 'react'
 import {
@@ -25,14 +27,13 @@ import {
 import { EditorSystemComponent } from '../../system'
 import { NodeDecorators } from '../../system/NodeDecorators'
 import { SandpackConfigValue } from '../../system/Sandpack'
+import ListMaxIndentLevelPlugin from '../ListIndentPlugin'
 import { CodeBlockEditor } from '../NodeDecorators/CodeBlockEditor'
 import { FrontmatterEditor } from '../NodeDecorators/FrontmatterEditor'
 import { JsxEditor } from '../NodeDecorators/JsxEditor'
 import { SandpackEditor } from '../NodeDecorators/SandpackEditor'
-import ListMaxIndentLevelPlugin from '../ListIndentPlugin'
-import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin'
+import { TableEditor } from '../NodeDecorators/TableEditor'
 import styles from '../styles.module.css'
-import classNames from 'classnames'
 
 export function standardConfig(markdown: string) {
   return {
@@ -61,6 +62,7 @@ const nodeDecorators: NodeDecorators = {
   JsxEditor,
   SandpackEditor,
   CodeBlockEditor,
+  TableEditor,
 }
 
 // insert CM code block type rather than the default one
