@@ -448,7 +448,7 @@
   }
 }
 
-.linkDialogPopoverContent {
+.linkDialogPopoverContent, .tableColumnEditorPopoverContent {
   @extend drop-shadow-sm;
   display: flex;
   align-items: center;
@@ -459,6 +459,7 @@
   padding:var(--spacing-1) var(--spacing-2);
   font-size: var(--text-sm);
 }
+
 
 
 .linkDialogPreviewAnchor {
@@ -511,10 +512,52 @@
 
 .tableColumnEditorTrigger {
   @mixin icon-button;
+  padding: var(--spacing-1);
   border-radius: var(--radius-full);
   opacity: 0.2;
 
   &[data-active=true] {
     opacity: 1;
   }
+}
+
+.tableColumnEditorToolbar {
+  display: flex;
+  & > button {
+    @mixin icon-button;
+  }
+  & [role=separator] {
+    margin-left: var(--spacing-1);
+    margin-right: var(--spacing-1);
+  }
+}
+
+
+.toggleGroupRoot {
+  display: inline-flex;
+  & button {
+    @mixin icon-button;
+
+    &:first-child {
+      border-top-left-radius: var(--radius-medium);
+      border-bottom-left-radius: var(--radius-medium);
+    }
+
+    &:last-child {
+      border-top-right-radius: var(--radius-medium);
+      border-bottom-right-radius: var(--radius-medium);
+    }
+  }
+}
+
+.leftAlignedCell {
+  text-align: left;
+}
+
+.rightAlignedCell {
+  text-align: right;
+}
+
+.centeredCell {
+  text-align: center;
 }

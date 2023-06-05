@@ -13,12 +13,21 @@ import { TableEditorProps } from '../../types/NodeDecoratorsProps'
 import { MarkdownAstRenderer } from '../MarkdownAstRenderer'
 import * as RadixPopover from '@radix-ui/react-popover'
 import { ReactComponent as MoreHorizIcon } from './icons/more_horiz.svg'
+import { ReactComponent as AlignLeftIcon } from './icons/format_align_left.svg'
+import { ReactComponent as AlignCenterIcon } from './icons/format_align_center.svg'
+import { ReactComponent as AlignRightIcon } from './icons/format_align_right.svg'
+import { ReactComponent as InsertColLeftIcon } from './icons/insert_col_left.svg'
+import { ReactComponent as InsertColRightIcon } from './icons/insert_col_right.svg'
+import { ReactComponent as DeleteSmallIcon } from './icons/delete_small.svg'
+
 import styles from '../styles.module.css'
+import classNames from 'classnames'
+import * as RadixToolbar from '@radix-ui/react-toolbar'
 
 const AlignToTailwindClassMap = {
-  center: 'text-center',
-  left: 'text-left',
-  right: 'text-right',
+  center: styles.centeredCell,
+  left: styles.leftAlignedCell,
+  right: styles.rightAlignedCell,
 }
 
 export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEditor, lexicalTable }) => {
@@ -99,12 +108,15 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
   const onTableMouseOver = React.useCallback((e: React.MouseEvent<HTMLTableElement>) => {
     let tableCell = e.target as HTMLElement
 
-    while (!['TH', 'TD'].includes(tableCell.tagName)) {
+    while (tableCell && !['TH', 'TD'].includes(tableCell.tagName)) {
       if (tableCell === e.currentTarget) {
         return
       }
 
       tableCell = tableCell.parentElement!
+    }
+    if (tableCell === null) {
+      return
     }
     const tableRow = tableCell.parentElement!
     const tableContainer = tableRow.parentElement!
@@ -133,7 +145,16 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
           {Array.from({ length: mdastNode.children[0].children.length }, (_, colIndex) => {
             return (
               <th key={colIndex}>
-                <ColumnEditor {...{ setActiveCellWithBoundaries, parentEditor, colIndex, highlightedCoordinates, lexicalTable }} />
+                <ColumnEditor
+                  {...{
+                    setActiveCellWithBoundaries,
+                    parentEditor,
+                    colIndex,
+                    highlightedCoordinates,
+                    lexicalTable,
+                    align: (mdastNode.align || [])[colIndex],
+                  }}
+                />
               </th>
             )
           })}
@@ -310,11 +331,13 @@ interface ColumnEditorProps {
   colIndex: number
   highlightedCoordinates: [number, number]
   setActiveCellWithBoundaries: (cell: [number, number] | null) => void
+  align: Mdast.AlignType
 }
 
 export const ColumnEditor: React.FC<ColumnEditorProps> = ({
   parentEditor,
   highlightedCoordinates,
+  align,
   lexicalTable,
   colIndex,
   setActiveCellWithBoundaries,
@@ -352,29 +375,43 @@ export const ColumnEditor: React.FC<ColumnEditorProps> = ({
         <MoreHorizIcon />
       </RadixPopover.PopoverTrigger>
       <RadixPopover.Portal>
-        <RadixPopover.PopoverContent onOpenAutoFocus={(e) => e.preventDefault()} sideOffset={5} side="bottom">
-          <div>
-            <button className="bg-slate-100" onClick={setColumnAlign.bind(null, colIndex, 'left')}>
-              l
-            </button>
-            <button className="bg-slate-100" onClick={setColumnAlign.bind(null, colIndex, 'center')}>
-              c
-            </button>
-            <button className="bg-slate-100" onClick={setColumnAlign.bind(null, colIndex, 'right')}>
-              r
-            </button>
-
-            <button className="bg-slate-100" onClick={insertColumnAt.bind(null, colIndex)}>
-              +o
-            </button>
-            <button className="bg-slate-100" onClick={deleteColumnAt.bind(null, colIndex)}>
-              -
-            </button>
-
-            <button className="bg-slate-100" onClick={insertColumnAt.bind(null, colIndex + 1)}>
-              o+
-            </button>
-          </div>
+        <RadixPopover.PopoverContent
+          className={classNames(styles.editorRoot, styles.tableColumnEditorPopoverContent)}
+          onOpenAutoFocus={(e) => e.preventDefault()}
+          sideOffset={5}
+          side="top"
+        >
+          <RadixToolbar.Root className={styles.tableColumnEditorToolbar}>
+            <RadixToolbar.ToggleGroup
+              className={styles.toggleGroupRoot}
+              onValueChange={(value) => {
+                setColumnAlign(colIndex, value as Mdast.AlignType)
+              }}
+              value={align || 'left'}
+              type="single"
+              aria-label="Text alignment"
+            >
+              <RadixToolbar.ToggleItem value="left">
+                <AlignLeftIcon />
+              </RadixToolbar.ToggleItem>
+              <RadixToolbar.ToggleItem value="center">
+                <AlignCenterIcon />
+              </RadixToolbar.ToggleItem>
+              <RadixToolbar.ToggleItem value="right">
+                <AlignRightIcon />
+              </RadixToolbar.ToggleItem>
+            </RadixToolbar.ToggleGroup>
+            <RadixToolbar.Separator />
+            <RadixToolbar.Button onClick={insertColumnAt.bind(null, colIndex)}>
+              <InsertColLeftIcon />
+            </RadixToolbar.Button>
+            <RadixToolbar.Button onClick={insertColumnAt.bind(null, colIndex + 1)}>
+              <InsertColRightIcon />
+            </RadixToolbar.Button>
+            <RadixToolbar.Button onClick={deleteColumnAt.bind(null, colIndex)}>
+              <DeleteSmallIcon />
+            </RadixToolbar.Button>
+          </RadixToolbar.Root>
         </RadixPopover.PopoverContent>
       </RadixPopover.Portal>
     </RadixPopover.Root>
