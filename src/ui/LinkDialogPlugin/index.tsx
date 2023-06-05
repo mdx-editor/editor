@@ -199,7 +199,7 @@ export function LinkDialogPlugin() {
                 className={styles.linkDialogPreviewAnchor}
                 href={linkDialogState.url}
                 {...(urlIsExternal ? { target: '_blank', rel: 'noreferrer' } : {})}
-                title={linkDialogState.url}
+                title={urlIsExternal ? `Open ${linkDialogState.url} in new window` : linkDialogState.url}
               >
                 <span>{linkDialogState.url}</span>
                 {urlIsExternal && <OpenInNewIcon />}

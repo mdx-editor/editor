@@ -4,7 +4,7 @@
 @import url('@radix-ui/colors/slate.css');
 @import url('@radix-ui/colors/slateDark.css');
 
-@define-extend clear-form-element {
+@define-mixin clear-form-element {
   border: 0;
   background-color: transparent;
   font-size: inherit;
@@ -12,6 +12,32 @@
   all: unset;
   box-sizing: border-box;
   cursor: default;
+}
+
+@define-extend drop-shadow-sm {
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.05));
+}
+
+@define-mixin icon-button {
+  @mixin clear-form-element;
+
+  padding: var(--spacing-2);
+
+  & svg {
+    display: block;
+  }
+
+  &:hover {
+    background-color: var(--baseBgHover);
+  }
+
+  &:active svg {
+    transform: translate(1px, 1px);
+  }
+
+  &[data-state=on], &:active {
+    background-color: var(--accentBgActive);
+  }
 }
 
 .editorRoot {
@@ -158,7 +184,7 @@
 }
 
 .toolbarToggleItem, .toolbarButton {
-  @extend clear-form-element;
+  @mixin clear-form-element;
   padding: var(--spacing-2);
 
   & svg {
@@ -270,7 +296,7 @@
 }
 
 .frontmatterToggleButton {
-  @extend clear-form-element;
+  @mixin clear-form-element;
   display: flex;
   align-items: center;
   gap:var(--spacing-1);
@@ -300,7 +326,7 @@
 }
 
 .frontmatterInput {
-  @extend clear-form-element;
+  @mixin clear-form-element;
   width: 100%;
   padding: var(--spacing-2) var(--spacing-3);
   border-radius: var(--radius-base);
@@ -311,12 +337,12 @@
 }
 
 .iconButton {
-  @extend clear-form-element;
+  @mixin clear-form-element;
   color:var(--baseTextContrast);
 }
 
 .primaryButton {
-  @extend clear-form-element;
+  @mixin clear-form-element;
   padding: var(--spacing-2) var(--spacing-3);
   border: 1px solid var(--accentBorder);
   background-color: var(--accentSolidHover);
@@ -327,6 +353,7 @@
 
 .linkDialogEditForm {
   display: flex;
+  align-items: center;
 }
 
 .linkDialogInputContainer {
@@ -337,24 +364,27 @@
 
 .linkDialogInputWrapper {
   display: flex;
-  border-radius: var(--radius-base);
   align-items: center;
+  background-color: var(--baseBase);
+
+  border-radius: var(--radius-base);
   border:1px solid var(--baseBorder);
+
   &[data-visible-dropdown=true] {
     border-bottom-left-radius: var(--radius-none) ;
     border-bottom-right-radius: var(--radius-none) ;
+    border-bottom-width: 0;
   }
-  background-color: var(--baseBase);
 
   & > button {
-    @extend clear-form-element;
+    @mixin clear-form-element;
     padding-right: var(--spacing-2);
   }
 }
 
 .linkDialogInput {
-  @extend clear-form-element;
-  width: 100%;
+  @mixin clear-form-element;
+  width: 13rem;
   padding: var(--spacing-2) var(--spacing-3);
   font-size: var(--text-sm);
 }
@@ -375,6 +405,7 @@
     overflow-x: hidden;
     overflow-y: auto;
     border: 1px solid var(--baseBorder);
+    border-top-width: 0;
     background-color: var(--baseBase);
 
     &[data-visible=true] {
@@ -382,7 +413,7 @@
     }
 
     & li {
-      padding: var(--spacing-1);
+      padding: var(--spacing-2) var(--spacing-3);
       white-space: nowrap;
       margin-bottom: var(--spacing-1);
       overflow-x: hidden;
@@ -418,13 +449,14 @@
 }
 
 .linkDialogPopoverContent {
+  @extend drop-shadow-sm;
   display: flex;
   align-items: center;
   gap: var(--spacing-0_5);
   border-radius:var(--radius-base);
   border: 1px solid var(--baseBorder);
-  background-color: var(--baseBase);
-  padding:var(--spacing-2) var(--spacing-3);
+  background-color: var(--baseBg);
+  padding:var(--spacing-1) var(--spacing-2);
   font-size: var(--text-sm);
 }
 
@@ -432,8 +464,8 @@
 .linkDialogPreviewAnchor {
   margin-right: var(--spacing-3);
   display: flex;
-  align-items: center;
-  color: var(--accentSolid);
+  align-items: flex-start;
+  color: var(--accentText);
   text-decoration: none;
 
   & svg {
@@ -442,8 +474,9 @@
     margin-left: var(--spacing-2);
   }
   border: 1px solid transparent;
+
   & span {
-    max-width: 10rem;
+    max-width: 14rem;
     overflow-x: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -463,10 +496,6 @@
 }
 
 .actionButton {
-  @extend clear-form-element;
-  padding: var(--spacing-2);
-  & svg { 
-    width: var(--spacing-5);
-    height: var(--spacing-5);
-  }
+  @mixin icon-button;
+  border-radius: var(--radius-medium);
 }
