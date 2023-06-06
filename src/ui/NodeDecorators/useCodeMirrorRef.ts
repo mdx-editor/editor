@@ -1,5 +1,4 @@
 import { CodeMirrorRef } from '@codesandbox/sandpack-react/dist/components/CodeEditor/CodeMirror'
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { $createParagraphNode, $getNodeByKey } from 'lexical'
 import React from 'react'
 import { useEmitterValues, usePublisher } from '../../system'

@@ -2,6 +2,9 @@
 import React from 'react'
 import { useEmitterValues, usePublisher } from '../..'
 import { DiffViewer } from './DiffViewer'
+import { CodeMirrorRef } from '@codesandbox/sandpack-react/components/CodeEditor/CodeMirror'
+import { SandpackProvider, CodeEditor as TheEditorFromSandpack } from '@codesandbox/sandpack-react'
+import { markdown as markdownLanguageSupport } from '@codemirror/lang-markdown'
 
 export type ViewMode = 'editor' | 'markdown' | 'diff'
 
@@ -71,7 +74,29 @@ export const ViewModeToggler: React.FC<ViewModeProps> = ({ children }) => {
     <div>
       <div style={{ display: viewMode === 'editor' ? 'block' : 'none' }}>{children}</div>
       {viewMode === 'diff' ? <MarkdownDiffView /> : null}
-      {viewMode === 'markdown' ? <MarkdownPlainTextEditor /> : null}
+      {viewMode === 'markdown' ? <SourceEditor /> : null}
+    </div>
+  )
+}
+
+export const SourceEditor = () => {
+  const [markdown] = useEmitterValues('markdownSource')
+  const updateMarkdown = usePublisher('markdownSource')
+  const codeMirrorRef = React.useRef<CodeMirrorRef>(null)
+
+  return (
+    <div>
+      <SandpackProvider>
+        <TheEditorFromSandpack
+          showLineNumbers
+          additionalLanguages={[{ name: 'markdown', extensions: ['md'], language: markdownLanguageSupport() }]}
+          initMode="lazy"
+          filePath={`file.md`}
+          code={markdown}
+          onCodeUpdate={updateMarkdown}
+          ref={codeMirrorRef}
+        />
+      </SandpackProvider>
     </div>
   )
 }

@@ -19,6 +19,10 @@ import { ReactComponent as AlignRightIcon } from './icons/format_align_right.svg
 import { ReactComponent as InsertColLeftIcon } from './icons/insert_col_left.svg'
 import { ReactComponent as InsertColRightIcon } from './icons/insert_col_right.svg'
 import { ReactComponent as DeleteSmallIcon } from './icons/delete_small.svg'
+import { ReactComponent as InsertRowAboveIcon } from './icons/insert_row_above.svg'
+import { ReactComponent as InsertRowBelowIcon } from './icons/insert_row_below.svg'
+import { ReactComponent as AddRowIcon } from './icons/add_row.svg'
+import { ReactComponent as AddColumnIcon } from './icons/add_column.svg'
 
 import styles from '../styles.module.css'
 import classNames from 'classnames'
@@ -76,25 +80,6 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
     setActiveCellWithBoundaries([0, lexicalTable.getRowCount() - 1])
   }, [parentEditor, lexicalTable, setActiveCellWithBoundaries])
 
-  const insertRowAt = React.useCallback(
-    (rowIndex: number) => {
-      parentEditor.update(() => {
-        lexicalTable.insertRowAt(rowIndex)
-      })
-      setActiveCellWithBoundaries([0, rowIndex])
-    },
-    [parentEditor, lexicalTable, setActiveCellWithBoundaries]
-  )
-
-  const deleteRowAt = React.useCallback(
-    (rowIndex: number) => {
-      parentEditor.update(() => {
-        lexicalTable.deleteRowAt(rowIndex)
-      })
-    },
-    [parentEditor, lexicalTable]
-  )
-
   // adds column to the right and focuses the top cell of it
   const addColumnToRight = React.useCallback(() => {
     parentEditor.update(() => {
@@ -141,7 +126,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
 
       <thead>
         <tr>
-          <th className="w-28"></th>
+          <th className={styles.tableToolsColumn}></th>
           {Array.from({ length: mdastNode.children[0].children.length }, (_, colIndex) => {
             return (
               <th key={colIndex}>
@@ -158,7 +143,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
               </th>
             )
           })}
-          <th className="w-12"></th>
+          <th className={styles.tableToolsColumn}></th>
         </tr>
       </thead>
 
@@ -166,19 +151,8 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
         {mdastNode.children.map((row, rowIndex) => {
           return (
             <tr key={rowIndex}>
-              <td>
-                <div className="flex gap-3 invisible data-[active=true]:visible" data-active={highlightedCoordinates[1] === rowIndex}>
-                  <button className="bg-slate-100" onClick={insertRowAt.bind(null, rowIndex)}>
-                    +o
-                  </button>
-                  <button className="bg-slate-100" onClick={deleteRowAt.bind(null, rowIndex)}>
-                    -
-                  </button>
-
-                  <button className="bg-slate-100" onClick={insertRowAt.bind(null, rowIndex + 1)}>
-                    o+
-                  </button>
-                </div>
+              <td className={styles.toolCell}>
+                <RowEditor {...{ setActiveCellWithBoundaries, parentEditor, rowIndex, highlightedCoordinates, lexicalTable }} />
               </td>
               {row.children.map((mdastCell, colIndex) => {
                 return (
@@ -191,11 +165,11 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
                 )
               })}
               {rowIndex === 0 && (
-                <td rowSpan={lexicalTable.getRowCount()}>
-                  <button className="bg-slate-100 h-full overflow-auto block p-4" onClick={addColumnToRight}>
-                    +
+                <th rowSpan={lexicalTable.getRowCount()}>
+                  <button className={styles.addColumnButton} onClick={addColumnToRight}>
+                    <AddColumnIcon />
                   </button>
-                </td>
+                </th>
               )}
             </tr>
           )
@@ -205,8 +179,8 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
         <tr>
           <th></th>
           <th colSpan={lexicalTable.getColCount()}>
-            <button className="bg-slate-100 w-full block p-4" onClick={addRowToBottom}>
-              +
+            <button className={styles.addRowButton} onClick={addRowToBottom}>
+              <AddRowIcon />
             </button>
           </th>
           <th></th>
@@ -234,6 +208,7 @@ const Cell: React.FC<CellProps> = ({ align, ...props }) => {
   return (
     <td
       className={className}
+      data-active={isActive}
       onClick={() => {
         setActiveCell([props.colIndex, props.rowIndex])
       }}
@@ -316,11 +291,7 @@ const CellEditor: React.FC<CellProps> = ({ activeCellTuple, parentEditor, lexica
 
   return (
     <LexicalNestedComposer initialEditor={editor}>
-      <RichTextPlugin
-        contentEditable={<ContentEditable className="prose font-sans max-w-none w-full focus:outline-none text-sm" autoFocus />}
-        placeholder={<div className="text-sm"></div>}
-        ErrorBoundary={LexicalErrorBoundary}
-      />
+      <RichTextPlugin contentEditable={<ContentEditable autoFocus />} placeholder={<div></div>} ErrorBoundary={LexicalErrorBoundary} />
     </LexicalNestedComposer>
   )
 }
@@ -334,7 +305,7 @@ interface ColumnEditorProps {
   align: Mdast.AlignType
 }
 
-export const ColumnEditor: React.FC<ColumnEditorProps> = ({
+const ColumnEditor: React.FC<ColumnEditorProps> = ({
   parentEditor,
   highlightedCoordinates,
   align,
@@ -409,6 +380,68 @@ export const ColumnEditor: React.FC<ColumnEditorProps> = ({
               <InsertColRightIcon />
             </RadixToolbar.Button>
             <RadixToolbar.Button onClick={deleteColumnAt.bind(null, colIndex)}>
+              <DeleteSmallIcon />
+            </RadixToolbar.Button>
+          </RadixToolbar.Root>
+        </RadixPopover.PopoverContent>
+      </RadixPopover.Portal>
+    </RadixPopover.Root>
+  )
+}
+interface RowEditorProps {
+  parentEditor: LexicalEditor
+  lexicalTable: TableNode
+  rowIndex: number
+  highlightedCoordinates: [number, number]
+  setActiveCellWithBoundaries: (cell: [number, number] | null) => void
+}
+
+const RowEditor: React.FC<RowEditorProps> = ({
+  parentEditor,
+  highlightedCoordinates,
+  lexicalTable,
+  rowIndex,
+  setActiveCellWithBoundaries,
+}) => {
+  const insertRowAt = React.useCallback(
+    (rowIndex: number) => {
+      parentEditor.update(() => {
+        lexicalTable.insertRowAt(rowIndex)
+      })
+      setActiveCellWithBoundaries([0, rowIndex])
+    },
+    [parentEditor, lexicalTable, setActiveCellWithBoundaries]
+  )
+
+  const deleteRowAt = React.useCallback(
+    (rowIndex: number) => {
+      parentEditor.update(() => {
+        lexicalTable.deleteRowAt(rowIndex)
+      })
+    },
+    [parentEditor, lexicalTable]
+  )
+
+  return (
+    <RadixPopover.Root>
+      <RadixPopover.PopoverTrigger className={styles.tableColumnEditorTrigger} data-active={highlightedCoordinates[1] === rowIndex}>
+        <MoreHorizIcon />
+      </RadixPopover.PopoverTrigger>
+      <RadixPopover.Portal>
+        <RadixPopover.PopoverContent
+          className={classNames(styles.editorRoot, styles.tableColumnEditorPopoverContent)}
+          onOpenAutoFocus={(e) => e.preventDefault()}
+          sideOffset={5}
+          side="bottom"
+        >
+          <RadixToolbar.Root className={styles.tableColumnEditorToolbar}>
+            <RadixToolbar.Button onClick={insertRowAt.bind(null, rowIndex)}>
+              <InsertRowAboveIcon />
+            </RadixToolbar.Button>
+            <RadixToolbar.Button onClick={insertRowAt.bind(null, rowIndex + 1)}>
+              <InsertRowBelowIcon />
+            </RadixToolbar.Button>
+            <RadixToolbar.Button onClick={deleteRowAt.bind(null, rowIndex)}>
               <DeleteSmallIcon />
             </RadixToolbar.Button>
           </RadixToolbar.Root>
