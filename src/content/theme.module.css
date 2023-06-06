@@ -1,0 +1,56 @@
+.bold {
+  font-weight: bold;
+}
+
+.italic {
+  font-style: italic;
+}
+
+.underline {
+  text-decoration: underline;
+}
+
+.bold {
+    font-weight: 700
+}
+
+.italic {
+    font-style: italic
+}
+
+.underline {
+    text-decoration: underline
+}
+
+.strikethrough {
+    text-decoration: line-through
+}
+
+.underlineStrikethrough {
+    text-decoration: underline line-through
+}
+
+.subscript {
+    font-size: .8em;
+    vertical-align: sub!important
+}
+
+.superscript {
+    font-size: .8em;
+    vertical-align: super
+}
+
+.code {
+    background-color: var(--baseBg);
+    padding: 1px .25rem;
+    font-family: var(--font-mono);
+    font-size: 94%
+}
+
+.nestedListItem {
+  list-style:none;
+}
+
+.admonitionDanger, .admonitionInfo, .admonitionNote, .admonitionTip, .admonitionCaution {
+  border: 1px solid red;
+}

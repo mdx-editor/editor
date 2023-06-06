@@ -84,7 +84,7 @@ export function LinkEditForm({ initialUrl, onSubmit, onCancel, linkAutocompleteS
   const dropdownIsVisible = isOpen && items.length > 0
 
   return (
-    <form onSubmit={onSubmitEH} onReset={onCancel} className={classNames(styles.linkDialogEditForm, styles.editorRoot)}>
+    <form onSubmit={onSubmitEH} onReset={onCancel} className={classNames(styles.linkDialogEditForm)}>
       <div className={styles.linkDialogInputContainer}>
         <div data-visible-dropdown={dropdownIsVisible} className={styles.linkDialogInputWrapper}>
           <input className={styles.linkDialogInput} {...inputProps} autoFocus size={30} data-editor-dialog={true} />
@@ -121,6 +121,7 @@ export function LinkEditForm({ initialUrl, onSubmit, onCancel, linkAutocompleteS
 }
 
 export function LinkDialogPlugin() {
+  const [editorRootElementRef] = useEmitterValues('editorRootElementRef')
   const publishWindowChange = usePublisher('onWindowChange')
   const [linkDialogState, linkAutocompleteSuggestions, activeEditor] = useEmitterValues(
     'linkDialogState',
@@ -177,9 +178,9 @@ export function LinkDialogPlugin() {
         }}
       />
 
-      <Popover.Portal>
+      <Popover.Portal container={editorRootElementRef?.current}>
         <Popover.Content
-          className={classNames(styles.linkDialogPopoverContent, styles.editorRoot)}
+          className={classNames(styles.linkDialogPopoverContent)}
           sideOffset={5}
           onOpenAutoFocus={(e) => e.preventDefault()}
           key={linkDialogState.linkNodeKey}
@@ -223,8 +224,8 @@ export function LinkDialogPlugin() {
                       {copyUrlTooltipOpen ? <CheckIcon /> : <CopyIcon />}
                     </ActionButton>
                   </Tooltip.Trigger>
-                  <Tooltip.Portal>
-                    <Tooltip.Content className={classNames(styles.tooltipContent, styles.editorRoot)} sideOffset={5}>
+                  <Tooltip.Portal container={editorRootElementRef?.current}>
+                    <Tooltip.Content className={classNames(styles.tooltipContent)} sideOffset={5}>
                       Copied!
                       <Tooltip.Arrow />
                     </Tooltip.Content>

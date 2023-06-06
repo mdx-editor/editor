@@ -63,9 +63,10 @@ interface WrappedEditorProps {
   markdown: string
   onChange?: (markdown: string) => void
   viewMode?: ViewMode
+  className?: string
 }
 
-export const WrappedLexicalEditor: React.FC<WrappedEditorProps> = ({ viewMode, markdown, onChange }) => {
+export const WrappedLexicalEditor: React.FC<WrappedEditorProps> = ({ viewMode, markdown, onChange, className }) => {
   return (
     <Wrapper
       markdown={markdown}
@@ -73,6 +74,7 @@ export const WrappedLexicalEditor: React.FC<WrappedEditorProps> = ({ viewMode, m
       headMarkdown={markdown}
       sandpackConfig={virtuosoSampleSandpackConfig}
       jsxComponentDescriptors={jsxDescriptors}
+      className={className}
       onChange={onChange}
       linkAutocompleteSuggestions={['https://google.com/', 'https://news.ycombinator.com/', 'https://reddit.com/']}
     />

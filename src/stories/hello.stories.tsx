@@ -7,6 +7,7 @@ import './rawContents.d.ts'
 import codeBlocksMarkdown from './assets/code-blocks-markdown.md?raw'
 import initialMarkdown from './assets/kitchen-sink-markdown.md?raw'
 import jsxMarkdown from './assets/jsx.md?raw'
+import styles from './styles.module.css'
 
 import { WrappedLexicalEditor } from './boilerplate'
 
@@ -29,4 +30,12 @@ export function DiffMode() {
 export function Whitespace() {
   const markdown = '**so&#x20;**'
   return <WrappedLexicalEditor markdown={markdown} />
+}
+
+export function CustomColors() {
+  return <WrappedLexicalEditor markdown={initialMarkdown} className={styles.customEditorRoot} />
+}
+
+export function DarkMode() {
+  return <WrappedLexicalEditor markdown={initialMarkdown} className={'dark-theme'} />
 }

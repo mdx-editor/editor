@@ -1,28 +1,29 @@
 import { EditorThemeClasses } from 'lexical'
+import styles from './theme.module.css'
 
 export const theme: EditorThemeClasses = {
   text: {
-    bold: 'bold',
-    code: 'code',
-    italic: 'italic',
-    strikethrough: 'strikethrough',
-    subscript: 'subscript',
-    superscript: 'superscript',
-    underline: 'underline',
-    underlineStrikethrough: 'underlineStrikethrough',
+    bold: styles.bold,
+    italic: styles.italic,
+    underline: styles.underline,
+    code: styles.code,
+    strikethrough: styles.strikethrough,
+    subscript: styles.subscript,
+    superscript: styles.superscript,
+    underlineStrikethrough: styles.underlineStrikethrough,
   },
 
   list: {
     nested: {
-      listitem: 'nestedListItem',
+      listitem: styles.nestedListItem,
     },
   },
 
   admonition: {
-    danger: 'danger',
-    info: 'info',
-    note: 'note',
-    tip: 'tip',
-    caution: 'caution',
+    danger: styles.admonitionDanger,
+    info: styles.admonitionInfo,
+    note: styles.admonitionNote,
+    tip: styles.admonitionTip,
+    caution: styles.admonitionCaution,
   },
 }

@@ -27,6 +27,7 @@ import { ReactComponent as AddColumnIcon } from './icons/add_column.svg'
 import styles from '../styles.module.css'
 import classNames from 'classnames'
 import * as RadixToolbar from '@radix-ui/react-toolbar'
+import { useEmitterValues } from '../../system'
 
 const AlignToTailwindClassMap = {
   center: styles.centeredCell,
@@ -313,6 +314,8 @@ const ColumnEditor: React.FC<ColumnEditorProps> = ({
   colIndex,
   setActiveCellWithBoundaries,
 }) => {
+  const [editorRootElementRef] = useEmitterValues('editorRootElementRef')
+
   const insertColumnAt = React.useCallback(
     (colIndex: number) => {
       parentEditor.update(() => {
@@ -345,9 +348,9 @@ const ColumnEditor: React.FC<ColumnEditorProps> = ({
       <RadixPopover.PopoverTrigger className={styles.tableColumnEditorTrigger} data-active={highlightedCoordinates[0] === colIndex + 1}>
         <MoreHorizIcon />
       </RadixPopover.PopoverTrigger>
-      <RadixPopover.Portal>
+      <RadixPopover.Portal container={editorRootElementRef?.current}>
         <RadixPopover.PopoverContent
-          className={classNames(styles.editorRoot, styles.tableColumnEditorPopoverContent)}
+          className={classNames(styles.tableColumnEditorPopoverContent)}
           onOpenAutoFocus={(e) => e.preventDefault()}
           sideOffset={5}
           side="top"
@@ -403,6 +406,8 @@ const RowEditor: React.FC<RowEditorProps> = ({
   rowIndex,
   setActiveCellWithBoundaries,
 }) => {
+  const [editorRootElementRef] = useEmitterValues('editorRootElementRef')
+
   const insertRowAt = React.useCallback(
     (rowIndex: number) => {
       parentEditor.update(() => {
@@ -427,9 +432,9 @@ const RowEditor: React.FC<RowEditorProps> = ({
       <RadixPopover.PopoverTrigger className={styles.tableColumnEditorTrigger} data-active={highlightedCoordinates[1] === rowIndex}>
         <MoreHorizIcon />
       </RadixPopover.PopoverTrigger>
-      <RadixPopover.Portal>
+      <RadixPopover.Portal container={editorRootElementRef?.current}>
         <RadixPopover.PopoverContent
-          className={classNames(styles.editorRoot, styles.tableColumnEditorPopoverContent)}
+          className={classNames(styles.tableColumnEditorPopoverContent)}
           onOpenAutoFocus={(e) => e.preventDefault()}
           sideOffset={5}
           side="bottom"

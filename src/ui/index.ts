@@ -1,3 +1,5 @@
+import './styles.css'
+
 export * from './LinkDialogPlugin'
 export * from './SourcePlugin'
 export * from '../system'

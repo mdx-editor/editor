@@ -1,9 +1,4 @@
-@import url('@radix-ui/colors/blue.css');
-@import url('@radix-ui/colors/blueDark.css');
-
-@import url('@radix-ui/colors/slate.css');
-@import url('@radix-ui/colors/slateDark.css');
-
+@layer mdx-editor-styling {
 @define-mixin clear-form-element {
   border: 0;
   background-color: transparent;
@@ -12,6 +7,7 @@
   all: unset;
   box-sizing: border-box;
   cursor: default;
+  color: var(--baseText);
 }
 
 @define-extend drop-shadow-sm {
@@ -20,7 +16,6 @@
 
 @define-mixin icon-button {
   @mixin clear-form-element;
-
   padding: var(--spacing-2);
 
   & svg {
@@ -115,6 +110,7 @@
   --text-sm: 0.875rem;
   --text-xs: 0.75rem;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  color: var(--baseText);
 }
 
 .editorWrapper {
@@ -225,6 +221,7 @@
   border: 0;
   background-color: transparent;
   display: flex;
+  color: inherit;
   align-items: center;
   width: var(--spacing-36);
   padding: var(--spacing-2);
@@ -338,7 +335,7 @@
 
 .iconButton {
   @mixin clear-form-element;
-  color:var(--baseTextContrast);
+  color:var(--baseText);
 }
 
 .primaryButton {
@@ -628,4 +625,6 @@
 .addColumnButton {
   margin-left: var(--spacing-2);
   height: 100%;
+}
+
 }

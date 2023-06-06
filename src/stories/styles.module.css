@@ -1,8 +1,33 @@
+@import url('@radix-ui/colors/green.css');
+@import url('@radix-ui/colors/greenDark.css');
+@import url('@radix-ui/colors/sage.css');
+@import url('@radix-ui/colors/sageDark.css');
 
-.myStyle {
-  color: red;
 
-  &:hover {
-    color: blue;
-  }
+.customEditorRoot {
+  --accentBase: var(--green1);
+  --accentBgSubtle: var(--green2);
+  --accentBg: var(--green3);
+  --accentBgHover: var(--green4);
+  --accentBgActive: var(--green5);
+  --accentLine: var(--green6);
+  --accentBorder: var(--green7);
+  --accentBorderHover: var(--green8);
+  --accentSolid: var(--green9);
+  --accentSolidHover: var(--green10);
+  --accentText: var(--green11);
+  --accentTextContrast: var(--green12);
+
+  --baseBase: var(--sage1);
+  --baseBgSubtle: var(--sage2);
+  --baseBg: var(--sage3);
+  --baseBgHover: var(--sage4);
+  --baseBgActive: var(--sage5);
+  --baseLine: var(--sage6);
+  --baseBorder: var(--sage7);
+  --baseBorderHover: var(--sage8);
+  --baseSolid: var(--sage9);
+  --baseSolidHover: var(--sage10);
+  --baseText: var(--sage11);
+  --baseTextContrast: var(--sage12);
 }

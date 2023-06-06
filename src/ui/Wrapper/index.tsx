@@ -55,6 +55,7 @@ interface WrappedEditorProps {
   linkAutocompleteSuggestions?: string[]
   viewMode?: ViewMode
   onChange?: (markdown: string) => void
+  className?: string
 }
 
 const nodeDecorators: NodeDecorators = {
@@ -86,9 +87,11 @@ export const Wrapper: React.FC<WrappedEditorProps> = ({
   onChange,
   viewMode,
   linkAutocompleteSuggestions,
+  className,
 }) => {
+  const editorRootElementRef = React.useRef<HTMLDivElement>(null)
   return (
-    <div className={classNames(styles.editorRoot, styles.editorWrapper)}>
+    <div className={classNames(styles.editorRoot, styles.editorWrapper, className)} ref={editorRootElementRef}>
       <LexicalComposer initialConfig={standardConfig(markdown)}>
         <EditorSystemComponent
           headMarkdown={headMarkdown}
@@ -99,6 +102,7 @@ export const Wrapper: React.FC<WrappedEditorProps> = ({
           viewMode={viewMode}
           nodeDecorators={nodeDecorators}
           linkAutocompleteSuggestions={linkAutocompleteSuggestions}
+          editorRootElementRef={editorRootElementRef as any}
         >
           <ToolbarPlugin />
           <ViewModeToggler>

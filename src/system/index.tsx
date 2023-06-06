@@ -24,6 +24,7 @@ export const {
       nodeDecorators: 'nodeDecorators',
     },
     optional: {
+      editorRootElementRef: 'editorRootElementRef',
       viewMode: 'viewMode',
       linkAutocompleteSuggestions: 'linkAutocompleteSuggestions',
     },

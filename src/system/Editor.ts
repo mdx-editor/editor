@@ -63,6 +63,7 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
   const editorSubscriptions = r.node<EditorSubscription[]>([])
   const inFocus = r.node(false, true)
   const activeEditorType = r.node<ActiveEditorType>({ type: 'lexical' })
+  const editorRootElementRef = r.node<{ current: HTMLDivElement } | null>(null)
 
   r.link(
     r.pipe(
@@ -252,5 +253,6 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
     editorSubscriptions,
     activeEditorType,
     inFocus,
+    editorRootElementRef,
   }
 }, [])

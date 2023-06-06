@@ -3,6 +3,7 @@ import * as Select from '@radix-ui/react-select'
 import { ReactComponent as DropDownIcon } from './icons/arrow_drop_down.svg'
 import classNames from 'classnames'
 import styles from '../styles.module.css'
+import { useEmitterValues } from '../../system'
 
 export const SelectItem = React.forwardRef<HTMLDivElement | null, { className?: string; children: React.ReactNode; value: string }>(
   ({ children, className, ...props }, forwardedRef) => {
@@ -25,8 +26,10 @@ export function SelectTrigger({ placeholder }: { placeholder: string }) {
 }
 
 export function SelectContent({ children }: { children: React.ReactNode }) {
+  const [editorRootElementRef] = useEmitterValues('editorRootElementRef')
+
   return (
-    <Select.Portal className={classNames(styles.editorRoot)}>
+    <Select.Portal container={editorRootElementRef?.current}>
       <Select.Content className={styles.toolbarNodeKindSelectContainer} onCloseAutoFocus={(e) => e.preventDefault()} position="popper">
         <Select.Viewport>{children}</Select.Viewport>
       </Select.Content>
