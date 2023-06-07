@@ -24,7 +24,7 @@ import {
   ViewMode,
   ViewModeToggler,
 } from '../../'
-import { EditorSystemComponent } from '../../system'
+import { EditorSystemComponent, useEmitterValues } from '../../system'
 import { NodeDecorators } from '../../system/NodeDecorators'
 import { SandpackConfigValue } from '../../system/Sandpack'
 import ListMaxIndentLevelPlugin from '../ListIndentPlugin'
@@ -118,10 +118,15 @@ export const Wrapper: React.FC<WrappedEditorProps> = ({
           <ListMaxIndentLevelPlugin maxDepth={7} />
           <TabIndentationPlugin />
           <LinkDialogPlugin />
-          <HistoryPlugin />
+          <SharedHistoryPlugin />
           <MarkdownShortcutPlugin transformers={patchMarkdownTransformers(TRANSFORMERS)} />
         </EditorSystemComponent>
       </LexicalComposer>
     </div>
   )
+}
+
+export const SharedHistoryPlugin = () => {
+  const [historyState] = useEmitterValues('historyState')
+  return <HistoryPlugin externalHistoryState={historyState} />
 }

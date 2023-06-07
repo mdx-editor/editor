@@ -7,7 +7,7 @@ import {
   REMOVE_LIST_COMMAND,
 } from '@lexical/list'
 import { $isHeadingNode } from '@lexical/rich-text'
-import { $findMatchingParent, $getNearestNodeOfType } from '@lexical/utils'
+import { $findMatchingParent, $getNearestNodeOfType, $insertNodeToNearestRoot } from '@lexical/utils'
 import {
   $getRoot,
   $getSelection,
@@ -35,6 +35,9 @@ import {
 } from '../ui/ToolbarPlugin/BlockTypeSelect/blockFormatters'
 import { INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontalRuleNode'
 import { ActiveEditorType } from '../types/ActiveEditorType'
+import { $createTableNode } from '../nodes/Table'
+import * as Mdast from 'mdast'
+import { createEmptyHistoryState } from '@lexical/react/LexicalHistoryPlugin'
 
 type Teardowns = Array<() => void>
 
@@ -46,8 +49,20 @@ const ListTypeCommandMap = new Map<ListType | '', LexicalCommand<void>>([
 
 type EditorSubscription = (activeEditor: LexicalEditor, rootEditor: LexicalEditor) => () => void
 
+function seedTable(): Mdast.Table {
+  return {
+    type: 'table',
+    children: [
+      {
+        type: 'tableRow',
+        children: [{ type: 'tableCell', children: [] }],
+      },
+    ],
+  }
+}
 export const [EditorSystem, EditorSystemType] = system((r) => {
   const editor = r.node<LexicalEditor | null>(null, true)
+  const historyState = r.node(createEmptyHistoryState())
   const activeEditor = r.derive(editor, null)
 
   const currentFormat = r.node(0, true)
@@ -58,6 +73,7 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
   const applyListType = r.node<ListType | ''>()
   const applyBlockType = r.node<BlockType | AdmonitionKind>()
   const insertHorizontalRule = r.node<true>()
+  const insertTable = r.node<true>()
   const insertFrontmatter = r.node<true>()
   const createEditorSubscription = r.node<EditorSubscription>()
   const editorSubscriptions = r.node<EditorSubscription[]>([])
@@ -97,6 +113,26 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
           firstItem.insertBefore(fmNode)
         } else {
           $getRoot().append(fmNode)
+        }
+      }
+    })
+  })
+
+  r.sub(r.pipe(insertTable, r.o.withLatestFrom(activeEditor)), ([, theEditor]) => {
+    theEditor?.getEditorState().read(() => {
+      const selection = $getSelection()
+
+      if ($isRangeSelection(selection)) {
+        const focusNode = selection.focus.getNode()
+
+        if (focusNode !== null) {
+          theEditor.update(() => {
+            const tableNode = $createTableNode(seedTable())
+            $insertNodeToNearestRoot(tableNode)
+            setTimeout(() => {
+              tableNode.select([0, 0])
+            }, 50)
+          })
         }
       }
     })
@@ -249,10 +285,12 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
     applyBlockType,
     insertHorizontalRule,
     insertFrontmatter,
+    insertTable,
     createEditorSubscription,
     editorSubscriptions,
     activeEditorType,
     inFocus,
+    historyState,
     editorRootElementRef,
   }
 }, [])

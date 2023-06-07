@@ -7,7 +7,6 @@
   all: unset;
   box-sizing: border-box;
   cursor: default;
-  color: var(--baseText);
 }
 
 @define-extend drop-shadow-sm {
@@ -272,6 +271,7 @@
 
 .contentEditable {
   width: 100%;
+  color: var(--baseTextContrast);
   &:focus {
     outline: none;
   }
@@ -526,12 +526,12 @@
     }
   }
 
-  .tableColumnEditorTrigger, .tableRowEditorTrigger, .addRowButton, .addColumnButton {
+  .tableColumnEditorTrigger, .tableRowEditorTrigger, .addRowButton, .addColumnButton, .iconButton {
     opacity: 0;
   }
 
   &:hover {
-    .tableColumnEditorTrigger, .tableRowEditorTrigger, .addRowButton, .addColumnButton {
+    .tableColumnEditorTrigger, .tableRowEditorTrigger, .addRowButton, .addColumnButton, .iconButton {
       opacity: .3;
 
       &:hover {
@@ -544,7 +544,8 @@
 .toolCell {
   text-align: right;
   & button {
-    margin-left: auto;
+    margin: auto;
+    display: block;
   }
 }
 
@@ -590,6 +591,10 @@
 
 .tableToolsColumn {
   width: 3rem;
+  & button {
+    margin: auto;
+    display: block;
+  }
 }
 
 .leftAlignedCell {

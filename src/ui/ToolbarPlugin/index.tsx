@@ -14,6 +14,7 @@ import { ReactComponent as HorizontalRuleIcon } from './icons/horizontal_rule.sv
 import { ReactComponent as LinkIcon } from './icons/link.svg'
 import { ReactComponent as DeleteIcon } from './icons/delete.svg'
 import { ReactComponent as FrontmatterIcon } from './icons/frontmatter.svg'
+import { ReactComponent as TableIcon } from './icons/table.svg'
 import { CodeBlockLanguageSelect } from './CodeBlockLanguageSelect'
 
 import classNames from 'classnames'
@@ -160,6 +161,7 @@ function RichTextButtonSet() {
   const insertFrontmatter = usePublisher('insertFrontmatter')
   const openLinkEditDialog = usePublisher('openLinkEditDialog')
   const insertHorizontalRule = usePublisher('insertHorizontalRule')
+  const insertTable = usePublisher('insertTable')
 
   return (
     <>
@@ -220,9 +222,13 @@ function RichTextButtonSet() {
       <ToolbarButton onClick={openLinkEditDialog.bind(null, true)}>
         <LinkIcon />
       </ToolbarButton>
+      <ToolbarButton onClick={insertTable.bind(null, true)}>
+        <TableIcon />
+      </ToolbarButton>
       <ToolbarButton onClick={insertHorizontalRule.bind(null, true)}>
         <HorizontalRuleIcon />
       </ToolbarButton>
+
       <ToolbarSeparator />
 
       <ToolbarButton onClick={insertCodeBlock.bind(null, true)}>

@@ -4,7 +4,7 @@ import { LexicalNestedComposer } from '@lexical/react/LexicalNestedComposer'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import { $getRoot, BLUR_COMMAND, COMMAND_PRIORITY_CRITICAL, KEY_ENTER_COMMAND, KEY_TAB_COMMAND, LexicalEditor, createEditor } from 'lexical'
 import * as Mdast from 'mdast'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { theme } from '../../content/theme'
 import { LexicalVisitors, exportLexicalTreeToMdast } from '../../export'
 import { UsedLexicalNodes, importMdastTreeToLexical } from '../../import'
@@ -28,6 +28,7 @@ import styles from '../styles.module.css'
 import classNames from 'classnames'
 import * as RadixToolbar from '@radix-ui/react-toolbar'
 import { useEmitterValues } from '../../system'
+import { SharedHistoryPlugin } from '../Wrapper'
 
 const AlignToTailwindClassMap = {
   center: styles.centeredCell,
@@ -60,19 +61,28 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
       }
 
       if (rowIndex > lexicalTable.getRowCount() - 1) {
-        //TODO: focus on the next editor
+        setActiveCell(null)
+        parentEditor.update(() => {
+          lexicalTable.getLatest().selectNext()
+        })
         return
       }
 
       if (rowIndex < 0) {
-        //TODO: focus on the previous editor
+        setActiveCell(null)
+        parentEditor.update(() => {
+          lexicalTable.getLatest().selectPrevious()
+        })
         return
       }
 
       setActiveCell([colIndex, rowIndex])
     },
-    [lexicalTable]
+    [lexicalTable, parentEditor]
   )
+  useEffect(() => {
+    lexicalTable.focusEmitter.subscribe(setActiveCellWithBoundaries)
+  }, [lexicalTable, setActiveCellWithBoundaries])
 
   const addRowToBottom = React.useCallback(() => {
     parentEditor.update(() => {
@@ -127,7 +137,20 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
 
       <thead>
         <tr>
-          <th className={styles.tableToolsColumn}></th>
+          <th className={styles.tableToolsColumn}>
+            <button
+              className={styles.iconButton}
+              title="Delete table"
+              onClick={() => {
+                parentEditor.update(() => {
+                  lexicalTable.selectNext()
+                  lexicalTable.remove()
+                })
+              }}
+            >
+              <DeleteSmallIcon />
+            </button>
+          </th>
           {Array.from({ length: mdastNode.children[0].children.length }, (_, colIndex) => {
             return (
               <th key={colIndex}>
@@ -214,7 +237,7 @@ const Cell: React.FC<CellProps> = ({ align, ...props }) => {
         setActiveCell([props.colIndex, props.rowIndex])
       }}
     >
-      {isActive ? <CellEditor {...props} /> : <MarkdownAstRenderer mdastChildren={props.contents} />}
+      {true ? <CellEditor {...props} /> : <MarkdownAstRenderer mdastChildren={props.contents} />}
     </td>
   )
 }
@@ -293,6 +316,7 @@ const CellEditor: React.FC<CellProps> = ({ activeCellTuple, parentEditor, lexica
   return (
     <LexicalNestedComposer initialEditor={editor}>
       <RichTextPlugin contentEditable={<ContentEditable autoFocus />} placeholder={<div></div>} ErrorBoundary={LexicalErrorBoundary} />
+      <SharedHistoryPlugin />
     </LexicalNestedComposer>
   )
 }
@@ -345,7 +369,11 @@ const ColumnEditor: React.FC<ColumnEditorProps> = ({
   )
   return (
     <RadixPopover.Root>
-      <RadixPopover.PopoverTrigger className={styles.tableColumnEditorTrigger} data-active={highlightedCoordinates[0] === colIndex + 1}>
+      <RadixPopover.PopoverTrigger
+        className={styles.tableColumnEditorTrigger}
+        data-active={highlightedCoordinates[0] === colIndex + 1}
+        title="Column menu"
+      >
         <MoreHorizIcon />
       </RadixPopover.PopoverTrigger>
       <RadixPopover.Portal container={editorRootElementRef?.current}>
@@ -365,24 +393,24 @@ const ColumnEditor: React.FC<ColumnEditorProps> = ({
               type="single"
               aria-label="Text alignment"
             >
-              <RadixToolbar.ToggleItem value="left">
+              <RadixToolbar.ToggleItem value="left" title="Align left">
                 <AlignLeftIcon />
               </RadixToolbar.ToggleItem>
-              <RadixToolbar.ToggleItem value="center">
+              <RadixToolbar.ToggleItem value="center" title="Align center">
                 <AlignCenterIcon />
               </RadixToolbar.ToggleItem>
-              <RadixToolbar.ToggleItem value="right">
+              <RadixToolbar.ToggleItem value="right" title="Align right">
                 <AlignRightIcon />
               </RadixToolbar.ToggleItem>
             </RadixToolbar.ToggleGroup>
             <RadixToolbar.Separator />
-            <RadixToolbar.Button onClick={insertColumnAt.bind(null, colIndex)}>
+            <RadixToolbar.Button onClick={insertColumnAt.bind(null, colIndex)} title="Insert a column to the left of this one">
               <InsertColLeftIcon />
             </RadixToolbar.Button>
-            <RadixToolbar.Button onClick={insertColumnAt.bind(null, colIndex + 1)}>
+            <RadixToolbar.Button onClick={insertColumnAt.bind(null, colIndex + 1)} title="Insert a column to the right of this one">
               <InsertColRightIcon />
             </RadixToolbar.Button>
-            <RadixToolbar.Button onClick={deleteColumnAt.bind(null, colIndex)}>
+            <RadixToolbar.Button onClick={deleteColumnAt.bind(null, colIndex)} title="Delete this column">
               <DeleteSmallIcon />
             </RadixToolbar.Button>
           </RadixToolbar.Root>
@@ -440,13 +468,13 @@ const RowEditor: React.FC<RowEditorProps> = ({
           side="bottom"
         >
           <RadixToolbar.Root className={styles.tableColumnEditorToolbar}>
-            <RadixToolbar.Button onClick={insertRowAt.bind(null, rowIndex)}>
+            <RadixToolbar.Button onClick={insertRowAt.bind(null, rowIndex)} title="Insert a row above this one">
               <InsertRowAboveIcon />
             </RadixToolbar.Button>
-            <RadixToolbar.Button onClick={insertRowAt.bind(null, rowIndex + 1)}>
+            <RadixToolbar.Button onClick={insertRowAt.bind(null, rowIndex + 1)} title="Insert a row below this one">
               <InsertRowBelowIcon />
             </RadixToolbar.Button>
-            <RadixToolbar.Button onClick={deleteRowAt.bind(null, rowIndex)}>
+            <RadixToolbar.Button onClick={deleteRowAt.bind(null, rowIndex)} title="Delete this row">
               <DeleteSmallIcon />
             </RadixToolbar.Button>
           </RadixToolbar.Root>

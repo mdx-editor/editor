@@ -3,6 +3,7 @@ import * as Mdast from 'mdast'
 import React from 'react'
 import { TableEditorProps } from '../../types/NodeDecoratorsProps'
 import { useEmitterValues } from '../../system'
+import { noop } from '../../utils/fp'
 
 export type SerializedTableNode = Spread<
   {
@@ -17,8 +18,24 @@ const InternalTableEditor: React.FC<TableEditorProps> = (props) => {
   const [{ TableEditor }] = useEmitterValues('nodeDecorators')
   return <TableEditor {...props} />
 }
+
+type CoordinatesSubscription = (coords: [colIndex: number, rowIndex: number]) => void
+
+function coordinatesEmitter() {
+  let subscription: CoordinatesSubscription = noop
+  return {
+    publish: (coords: [colIndex: number, rowIndex: number]) => {
+      subscription(coords)
+    },
+    subscribe: (cb: CoordinatesSubscription) => {
+      subscription = cb
+    },
+  }
+}
+
 export class TableNode extends DecoratorNode<JSX.Element> {
   __mdastNode: Mdast.Table
+  focusEmitter = coordinatesEmitter()
 
   static getType(): string {
     return 'table'
@@ -53,6 +70,7 @@ export class TableNode extends DecoratorNode<JSX.Element> {
   }
 
   constructor(mdastNode?: Mdast.Table, key?: NodeKey) {
+    console.log('constructed')
     super(key)
     this.__mdastNode = mdastNode || { type: 'table', children: [] }
   }
@@ -137,6 +155,10 @@ export class TableNode extends DecoratorNode<JSX.Element> {
 
   decorate(parentEditor: LexicalEditor, _config: EditorConfig): JSX.Element {
     return <InternalTableEditor lexicalTable={this} mdastNode={this.__mdastNode} parentEditor={parentEditor} />
+  }
+
+  select(coords: [colIndex: number, rowIndex: number]): void {
+    this.focusEmitter.publish(coords)
   }
 
   isInline(): false {
