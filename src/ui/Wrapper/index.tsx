@@ -34,6 +34,19 @@ import { JsxEditor } from '../NodeDecorators/JsxEditor'
 import { SandpackEditor } from '../NodeDecorators/SandpackEditor'
 import { TableEditor } from '../NodeDecorators/TableEditor'
 import styles from '../styles.module.css'
+import {
+  BoldItalicUnderlineButtons,
+  CodeBlockButton,
+  CodeFormattingButton,
+  FrontmatterButton,
+  HorizontalRuleButton,
+  LinkButton,
+  ListButtons,
+  SandpackButton,
+  TableButton,
+  ToolbarSeparator,
+} from '../ToolbarPlugin/toolbarComponents'
+import { BlockTypeSelect } from '../ToolbarPlugin/BlockTypeSelect'
 
 export function standardConfig(markdown: string) {
   return {
@@ -53,6 +66,7 @@ interface WrappedEditorProps {
   sandpackConfig: SandpackConfigValue
   jsxComponentDescriptors: JsxComponentDescriptors
   linkAutocompleteSuggestions?: string[]
+  toolbarComponents?: React.ComponentType[]
   viewMode?: ViewMode
   onChange?: (markdown: string) => void
   className?: string
@@ -65,6 +79,28 @@ const nodeDecorators: NodeDecorators = {
   CodeBlockEditor,
   TableEditor,
 }
+
+const defaultToolbarComponents = [
+  BoldItalicUnderlineButtons,
+  ToolbarSeparator,
+
+  CodeFormattingButton,
+  ToolbarSeparator,
+
+  ListButtons,
+  ToolbarSeparator,
+  BlockTypeSelect,
+  ToolbarSeparator,
+  LinkButton,
+  TableButton,
+  HorizontalRuleButton,
+  FrontmatterButton,
+
+  ToolbarSeparator,
+
+  CodeBlockButton,
+  SandpackButton,
+]
 
 // insert CM code block type rather than the default one
 function patchMarkdownTransformers(transformers: Transformer[]) {
@@ -88,6 +124,7 @@ export const Wrapper: React.FC<WrappedEditorProps> = ({
   viewMode,
   linkAutocompleteSuggestions,
   className,
+  toolbarComponents = defaultToolbarComponents,
 }) => {
   const editorRootElementRef = React.useRef<HTMLDivElement>(null)
   return (
@@ -103,6 +140,7 @@ export const Wrapper: React.FC<WrappedEditorProps> = ({
           nodeDecorators={nodeDecorators}
           linkAutocompleteSuggestions={linkAutocompleteSuggestions}
           editorRootElementRef={editorRootElementRef as any}
+          toolbarComponents={toolbarComponents}
         >
           <ToolbarPlugin />
           <ViewModeToggler>

@@ -8,13 +8,23 @@ import { LinkDialogSystem } from './LinkDialog'
 import { JsxSystem } from './Jsx'
 import { OnChangeSystem } from './OnChange'
 import { NodeDecoratorsSystem } from './NodeDecorators'
+import { ToolbarSystem } from './Toolbar'
 
 export const {
   Component: EditorSystemComponent,
   usePublisher,
   useEmitterValues,
 } = realmFactoryToComponent(
-  getRealmFactory(EditorSystem, ViewModeSystem, SandpackSystem, LinkDialogSystem, JsxSystem, OnChangeSystem, NodeDecoratorsSystem),
+  getRealmFactory(
+    EditorSystem,
+    ViewModeSystem,
+    SandpackSystem,
+    LinkDialogSystem,
+    JsxSystem,
+    OnChangeSystem,
+    NodeDecoratorsSystem,
+    ToolbarSystem
+  ),
   {
     required: {
       markdownSource: 'markdownSource',
@@ -22,6 +32,7 @@ export const {
       jsxComponentDescriptors: 'jsxComponentDescriptors',
       sandpackConfig: 'sandpackConfig',
       nodeDecorators: 'nodeDecorators',
+      toolbarComponents: 'toolbarComponents',
     },
     optional: {
       editorRootElementRef: 'editorRootElementRef',

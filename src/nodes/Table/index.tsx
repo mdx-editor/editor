@@ -70,7 +70,6 @@ export class TableNode extends DecoratorNode<JSX.Element> {
   }
 
   constructor(mdastNode?: Mdast.Table, key?: NodeKey) {
-    console.log('constructed')
     super(key)
     this.__mdastNode = mdastNode || { type: 'table', children: [] }
   }
