@@ -2,62 +2,33 @@
 import * as RadixToolbar from '@radix-ui/react-toolbar'
 import React from 'react'
 import { CodeBlockLanguageSelect } from './CodeBlockLanguageSelect'
-import { ReactComponent as DeleteIcon } from './icons/delete.svg'
+import DeleteIcon from './icons/delete.svg'
 
 import { $getNodeByKey } from 'lexical'
 import { SandpackNode } from '../../nodes'
 import { CodeBlockNode } from '../../nodes/CodeBlock'
-import { useEmitterValues, usePublisher } from '../../system'
+import { useEmitterValues } from '../../system'
 import { CodeBlockEditorType, SandpackEditorType } from '../../types/ActiveEditorType'
-import { ViewMode } from '../SourcePlugin'
 import styles from '../styles.module.css'
-import { ToggleItem, ToggleSingleGroup, ToolbarButton, ToolbarSeparator } from './toolbarComponents'
+import { ToolbarButton, ToolbarSeparator, ViewModeSwitch } from './toolbarComponents'
 
 export const ToolbarPlugin = () => {
-  const [activeEditorType] = useEmitterValues('activeEditorType')
+  const [activeEditorType, viewMode] = useEmitterValues('activeEditorType', 'viewMode')
 
   return (
     <RadixToolbar.Root className={styles.toolbarRoot} aria-label="Formatting options">
-      {activeEditorType.type === 'lexical' ? (
-        <RichTextButtonSet />
-      ) : activeEditorType.type === 'codeblock' ? (
-        <CodeBlockButtonSet />
-      ) : (
-        <SandpackButtonSet />
-      )}
+      {viewMode === 'editor' &&
+        (activeEditorType.type === 'lexical' ? (
+          <RichTextButtonSet />
+        ) : activeEditorType.type === 'codeblock' ? (
+          <CodeBlockButtonSet />
+        ) : (
+          <SandpackButtonSet />
+        ))}
 
       <ToolbarSeparator />
       <ViewModeSwitch />
     </RadixToolbar.Root>
-  )
-}
-
-const ViewModeSwitch: React.FC = () => {
-  const [viewMode] = useEmitterValues('viewMode', 'activeEditorType')
-  const setViewMode = usePublisher('viewMode')
-  return (
-    <ToggleSingleGroup
-      aria-label="View Mode"
-      onValueChange={(v) => {
-        if (v !== '') {
-          setViewMode(v as ViewMode)
-        }
-      }}
-      value={viewMode}
-      className={styles.toolbarModeSwitch}
-    >
-      <ToggleItem value="editor" aria-label="Rich text">
-        Rich Text
-      </ToggleItem>
-
-      <ToggleItem value="diff" aria-label="View diff">
-        Diff View
-      </ToggleItem>
-
-      <ToggleItem value="markdown" aria-label="View Markdown">
-        Markdown
-      </ToggleItem>
-    </ToggleSingleGroup>
   )
 }
 
@@ -67,16 +38,16 @@ const CodeBlockButtonSet: React.FC = () => {
     <>
       <CodeBlockLanguageSelect />
 
-      <ToolbarButton>
-        <DeleteIcon
-          onClick={() => {
-            activeEditor!.update(() => {
-              const node = $getNodeByKey((activeEditorType as CodeBlockEditorType).nodeKey) as CodeBlockNode
-              node.selectNext()
-              node.remove()
-            })
-          }}
-        />
+      <ToolbarButton
+        onClick={() => {
+          activeEditor!.update(() => {
+            const node = $getNodeByKey((activeEditorType as CodeBlockEditorType).nodeKey) as CodeBlockNode
+            node.selectNext()
+            node.remove()
+          })
+        }}
+      >
+        <DeleteIcon />
       </ToolbarButton>
     </>
   )
@@ -86,16 +57,16 @@ const SandpackButtonSet: React.FC = () => {
   const [activeEditor, activeEditorType] = useEmitterValues('activeEditor', 'activeEditorType')
   return (
     <>
-      <ToolbarButton>
-        <DeleteIcon
-          onClick={() => {
-            activeEditor!.update(() => {
-              const node = $getNodeByKey((activeEditorType as SandpackEditorType).nodeKey) as SandpackNode
-              node.selectNext()
-              node.remove()
-            })
-          }}
-        />
+      <ToolbarButton
+        onClick={() => {
+          activeEditor!.update(() => {
+            const node = $getNodeByKey((activeEditorType as SandpackEditorType).nodeKey) as SandpackNode
+            node.selectNext()
+            node.remove()
+          })
+        }}
+      >
+        <DeleteIcon />
       </ToolbarButton>
     </>
   )

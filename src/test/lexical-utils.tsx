@@ -21,19 +21,19 @@ import type {
   Spread,
 } from 'lexical'
 
-import { beforeEach, afterEach } from 'vitest'
+import { afterEach, beforeEach } from 'vitest'
 
 import { CodeHighlightNode, CodeNode } from '@lexical/code'
 import { AutoLinkNode, LinkNode } from '@lexical/link'
 import { ListItemNode, ListNode } from '@lexical/list'
-import { HeadingNode, QuoteNode } from '@lexical/rich-text'
 import { HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode'
-import { $isRangeSelection, createEditor, DecoratorNode, ElementNode, TextNode } from 'lexical'
+import { HeadingNode, QuoteNode } from '@lexical/rich-text'
+import { $isRangeSelection, DecoratorNode, ElementNode, TextNode, createEditor } from 'lexical'
 import * as React from 'react'
 import { createRef } from 'react'
 import { createRoot } from 'react-dom/client'
 import * as ReactTestUtils from 'react-dom/test-utils'
-import { UsedLexicalNodes } from '../index'
+import { UsedLexicalNodes } from '../import'
 
 let _keyCounter = 1
 

@@ -3,7 +3,6 @@ import { CODE, ElementTransformer, Transformer, TRANSFORMERS } from '@lexical/ma
 import { LexicalComposer } from '@lexical/react/LexicalComposer'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary'
-import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
 import { HorizontalRulePlugin } from '@lexical/react/LexicalHorizontalRulePlugin'
 import { LinkPlugin as LexicalLinkPlugin } from '@lexical/react/LexicalLinkPlugin'
 import { ListPlugin } from '@lexical/react/LexicalListPlugin'
@@ -13,27 +12,17 @@ import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin
 import classNames from 'classnames'
 import { $getRoot } from 'lexical'
 import React from 'react'
-import {
-  $createCodeBlockNode,
-  contentTheme,
-  importMarkdownToLexical,
-  JsxComponentDescriptors,
-  LinkDialogPlugin,
-  ToolbarPlugin,
-  UsedLexicalNodes,
-  ViewMode,
-  ViewModeToggler,
-} from '../../'
-import { EditorSystemComponent, useEmitterValues } from '../../system'
-import { NodeDecorators } from '../../system/NodeDecorators'
-import { SandpackConfigValue } from '../../system/Sandpack'
-import ListMaxIndentLevelPlugin from '../ListIndentPlugin'
-import { CodeBlockEditor } from '../NodeDecorators/CodeBlockEditor'
-import { FrontmatterEditor } from '../NodeDecorators/FrontmatterEditor'
-import { JsxEditor } from '../NodeDecorators/JsxEditor'
-import { SandpackEditor } from '../NodeDecorators/SandpackEditor'
-import { TableEditor } from '../NodeDecorators/TableEditor'
-import styles from '../styles.module.css'
+import { EditorSystemComponent } from '../system'
+import { NodeDecorators } from '../system/NodeDecorators'
+import { SandpackConfigValue } from '../system/Sandpack'
+import ListMaxIndentLevelPlugin from './ListIndentPlugin'
+import { CodeBlockEditor } from './NodeDecorators/CodeBlockEditor'
+import { FrontmatterEditor } from './NodeDecorators/FrontmatterEditor'
+import { JsxEditor } from './NodeDecorators/JsxEditor'
+import { SandpackEditor } from './NodeDecorators/SandpackEditor'
+import { TableEditor } from './NodeDecorators/TableEditor'
+import styles from './styles.module.css'
+import { BlockTypeSelect } from './ToolbarPlugin/BlockTypeSelect'
 import {
   BoldItalicUnderlineButtons,
   CodeBlockButton,
@@ -45,22 +34,30 @@ import {
   SandpackButton,
   TableButton,
   ToolbarSeparator,
-} from '../ToolbarPlugin/toolbarComponents'
-import { BlockTypeSelect } from '../ToolbarPlugin/BlockTypeSelect'
+} from './ToolbarPlugin/toolbarComponents'
+import { SharedHistoryPlugin } from './SharedHistoryPlugin'
+import { importMarkdownToLexical, UsedLexicalNodes } from '../import'
+import { theme as contentTheme } from '../content/theme'
+import { JsxComponentDescriptors } from '../types/JsxComponentDescriptors'
+import { ViewMode } from '../types/ViewMode'
+import { $createCodeBlockNode } from '../nodes'
+import { ToolbarPlugin } from './ToolbarPlugin'
+import { ViewModeToggler } from './SourcePlugin'
+import { LinkDialogPlugin } from './LinkDialogPlugin'
 
 export function standardConfig(markdown: string) {
   return {
     editorState: () => {
       importMarkdownToLexical($getRoot(), markdown)
     },
-    namespace: 'MyEditor',
+    namespace: 'MDXEditor',
     theme: contentTheme,
     nodes: UsedLexicalNodes,
     onError: (error: Error) => console.error(error),
   }
 }
 
-interface WrappedEditorProps {
+interface MDXEditorProps {
   markdown: string
   headMarkdown: string
   sandpackConfig: SandpackConfigValue
@@ -72,7 +69,7 @@ interface WrappedEditorProps {
   className?: string
 }
 
-const nodeDecorators: NodeDecorators = {
+const defaultNodeDecorators: NodeDecorators = {
   FrontmatterEditor,
   JsxEditor,
   SandpackEditor,
@@ -115,7 +112,7 @@ function patchMarkdownTransformers(transformers: Transformer[]) {
   return transformers
 }
 
-export const Wrapper: React.FC<WrappedEditorProps> = ({
+export const MDXEditor: React.FC<MDXEditorProps> = ({
   markdown,
   headMarkdown,
   jsxComponentDescriptors,
@@ -137,7 +134,7 @@ export const Wrapper: React.FC<WrappedEditorProps> = ({
           sandpackConfig={sandpackConfig}
           onChange={onChange}
           viewMode={viewMode}
-          nodeDecorators={nodeDecorators}
+          nodeDecorators={defaultNodeDecorators}
           linkAutocompleteSuggestions={linkAutocompleteSuggestions}
           editorRootElementRef={editorRootElementRef as any}
           toolbarComponents={toolbarComponents}
@@ -162,9 +159,4 @@ export const Wrapper: React.FC<WrappedEditorProps> = ({
       </LexicalComposer>
     </div>
   )
-}
-
-export const SharedHistoryPlugin = () => {
-  const [historyState] = useEmitterValues('historyState')
-  return <HistoryPlugin externalHistoryState={historyState} />
 }

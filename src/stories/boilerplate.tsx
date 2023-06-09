@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import React from 'react'
-import { JsxComponentDescriptors, SandpackConfig, ViewMode, Wrapper } from '..'
+import { JsxComponentDescriptors, SandpackConfig, ViewMode, MDXEditor } from '../index'
 import dataCode from './assets/dataCode.ts?raw'
 
 const defaultSnippetContent = `
@@ -68,7 +68,7 @@ interface WrappedEditorProps {
 
 export const WrappedLexicalEditor: React.FC<WrappedEditorProps> = ({ viewMode, markdown, onChange, className }) => {
   return (
-    <Wrapper
+    <MDXEditor
       markdown={markdown}
       viewMode={viewMode}
       headMarkdown={markdown}

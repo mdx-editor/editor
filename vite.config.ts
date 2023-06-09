@@ -36,10 +36,17 @@ export default defineConfig({
         skipLibCheck: true,
       },
     }),
-    svgr(),
+    svgr({
+      exportAsDefault: true,
+      svgrOptions: {
+        svgo: true,
+        replaceAttrValues: { 'black': 'currentColor' }
+      }
+    }),
   ],
   build: {
     minify: 'terser',
+    cssMinify: false,
     lib: {
       entry: ['src/index.ts'],
       formats: ['es', 'cjs'],

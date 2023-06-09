@@ -1,7 +1,7 @@
 import React from 'react'
 import { FrontmatterEditorProps } from '../types/NodeDecoratorsProps'
 import { FrontmatterEditor } from '../ui/NodeDecorators/FrontmatterEditor'
-import { LinkEditForm } from '../ui'
+import { LinkEditForm } from '../ui/LinkDialogPlugin/'
 import { randGitCommitSha, randUrl } from '@ngneat/falso'
 
 export const Frontmatter = () => {
@@ -29,8 +29,8 @@ export const LinkEditFormExample = () => {
         onSubmit={(e) => {
           console.log(e)
         }}
-        onCancel={(e) => {
-          console.log(e)
+        onCancel={() => {
+          console.log('canceled')
         }}
       />
       <div className="w-10 h-10 bg-red-300">some contnet</div>

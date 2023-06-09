@@ -59,21 +59,21 @@ export interface LexicalExportVisitor<LN extends LexicalNode, UN extends MdastNo
   join?<T extends Mdast.Content>(prevNode: T, currentNode: T): T
 }
 
-export const LexicalRootVisitor: LexicalExportVisitor<LexicalRootNode, Mdast.Content> = {
+const LexicalRootVisitor: LexicalExportVisitor<LexicalRootNode, Mdast.Content> = {
   testLexicalNode: $isRootNode,
   visitLexicalNode: ({ actions }) => {
     actions.addAndStepInto('root')
   },
 }
 
-export const LexicalParagraphVisitor: LexicalExportVisitor<ParagraphNode, Mdast.Paragraph> = {
+const LexicalParagraphVisitor: LexicalExportVisitor<ParagraphNode, Mdast.Paragraph> = {
   testLexicalNode: $isParagraphNode,
   visitLexicalNode: ({ actions }) => {
     actions.addAndStepInto('paragraph')
   },
 }
 
-export const LexicalFrontmatterVisitor: LexicalExportVisitor<FrontmatterNode, Mdast.YAML> = {
+const LexicalFrontmatterVisitor: LexicalExportVisitor<FrontmatterNode, Mdast.YAML> = {
   testLexicalNode: $isFrontmatterNode,
   visitLexicalNode: ({ actions, lexicalNode }) => {
     actions.addAndStepInto('yaml', { value: lexicalNode.getYaml() })
@@ -87,7 +87,7 @@ const LexicalLinkVisitor: LexicalExportVisitor<LinkNode, Mdast.Link> = {
   },
 }
 
-export const LexicalHeadingVisitor: LexicalExportVisitor<HeadingNode, Mdast.Heading> = {
+const LexicalHeadingVisitor: LexicalExportVisitor<HeadingNode, Mdast.Heading> = {
   testLexicalNode: $isHeadingNode,
   visitLexicalNode: ({ lexicalNode, actions }) => {
     const depth = parseInt(lexicalNode.getTag()[1], 10) as Mdast.Heading['depth']
@@ -95,7 +95,7 @@ export const LexicalHeadingVisitor: LexicalExportVisitor<HeadingNode, Mdast.Head
   },
 }
 
-export const LexicalListVisitor: LexicalExportVisitor<ListNode, Mdast.List> = {
+const LexicalListVisitor: LexicalExportVisitor<ListNode, Mdast.List> = {
   testLexicalNode: $isListNode,
   visitLexicalNode: ({ lexicalNode, actions }) => {
     actions.addAndStepInto('list', {
@@ -106,7 +106,7 @@ export const LexicalListVisitor: LexicalExportVisitor<ListNode, Mdast.List> = {
   },
 }
 
-export const LexicalListItemVisitor: LexicalExportVisitor<ListItemNode, Mdast.ListItem> = {
+const LexicalListItemVisitor: LexicalExportVisitor<ListItemNode, Mdast.ListItem> = {
   testLexicalNode: $isListItemNode,
   visitLexicalNode: ({ lexicalNode, mdastParent, actions }) => {
     const children = lexicalNode.getChildren()
@@ -128,7 +128,7 @@ export const LexicalListItemVisitor: LexicalExportVisitor<ListItemNode, Mdast.Li
   },
 }
 
-export const LexicalQuoteVisitor: LexicalExportVisitor<QuoteNode, Mdast.Blockquote> = {
+const LexicalQuoteVisitor: LexicalExportVisitor<QuoteNode, Mdast.Blockquote> = {
   testLexicalNode: $isQuoteNode,
   visitLexicalNode: ({ lexicalNode, mdastParent, actions }) => {
     const blockquote = actions.appendToParent(mdastParent, {
@@ -139,7 +139,7 @@ export const LexicalQuoteVisitor: LexicalExportVisitor<QuoteNode, Mdast.Blockquo
   },
 }
 
-export const AdmonitionVisitor: LexicalExportVisitor<AdmonitionNode, ContainerDirective> = {
+const AdmonitionVisitor: LexicalExportVisitor<AdmonitionNode, ContainerDirective> = {
   testLexicalNode: $isAdmonitionNode,
   visitLexicalNode: ({ lexicalNode, actions }) => {
     actions.addAndStepInto('containerDirective', {
@@ -148,7 +148,7 @@ export const AdmonitionVisitor: LexicalExportVisitor<AdmonitionNode, ContainerDi
   },
 }
 
-export const SandpackNodeVisitor: LexicalExportVisitor<SandpackNode, Mdast.Code> = {
+const SandpackNodeVisitor: LexicalExportVisitor<SandpackNode, Mdast.Code> = {
   testLexicalNode: $isSandpackNode,
   visitLexicalNode: ({ lexicalNode, actions }) => {
     actions.addAndStepInto('code', {
@@ -159,7 +159,7 @@ export const SandpackNodeVisitor: LexicalExportVisitor<SandpackNode, Mdast.Code>
   },
 }
 
-export const CodeBlockVisitor: LexicalExportVisitor<CodeBlockNode, Mdast.Code> = {
+const CodeBlockVisitor: LexicalExportVisitor<CodeBlockNode, Mdast.Code> = {
   testLexicalNode: $isCodeBlockNode,
   visitLexicalNode: ({ lexicalNode, actions }) => {
     actions.addAndStepInto('code', {
@@ -174,14 +174,14 @@ function isMdastText(mdastNode: Mdast.Content): mdastNode is Mdast.Text {
   return mdastNode.type === 'text'
 }
 
-export const LexicalLinebreakVisitor: LexicalExportVisitor<LineBreakNode, Mdast.Text> = {
+const LexicalLinebreakVisitor: LexicalExportVisitor<LineBreakNode, Mdast.Text> = {
   testLexicalNode: $isLineBreakNode,
   visitLexicalNode: ({ mdastParent, actions }) => {
     actions.appendToParent(mdastParent, { type: 'text', value: '\n' })
   },
 }
 
-export const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text> = {
+const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text> = {
   shouldJoin: (prevNode, currentNode) => {
     return ['text', 'emphasis', 'strong', 'mdxJsxTextElement'].includes(prevNode.type) && prevNode.type === currentNode.type
   },
@@ -268,14 +268,14 @@ export const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text> = {
   },
 }
 
-export const LexicalThematicBreakVisitor: LexicalExportVisitor<HorizontalRuleNode, Mdast.ThematicBreak> = {
+const LexicalThematicBreakVisitor: LexicalExportVisitor<HorizontalRuleNode, Mdast.ThematicBreak> = {
   testLexicalNode: $isHorizontalRuleNode,
   visitLexicalNode({ actions }) {
     actions.addAndStepInto('thematicBreak')
   },
 }
 
-export const LexicalImageVisitor: LexicalExportVisitor<ImageNode, Mdast.Image> = {
+const LexicalImageVisitor: LexicalExportVisitor<ImageNode, Mdast.Image> = {
   testLexicalNode: $isImageNode,
   visitLexicalNode({ lexicalNode, actions }) {
     actions.addAndStepInto('image', {
@@ -286,14 +286,14 @@ export const LexicalImageVisitor: LexicalExportVisitor<ImageNode, Mdast.Image> =
   },
 }
 
-export const LexicalTableVisitor: LexicalExportVisitor<TableNode, Mdast.Table> = {
+const LexicalTableVisitor: LexicalExportVisitor<TableNode, Mdast.Table> = {
   testLexicalNode: $isTableNode,
   visitLexicalNode({ actions, mdastParent, lexicalNode }) {
     actions.appendToParent(mdastParent, lexicalNode.getMdastNode())
   },
 }
 
-export const JsxVisitor: LexicalExportVisitor<JsxNode, MdxJsxFlowElement | MdxJsxTextElement> = {
+const JsxVisitor: LexicalExportVisitor<JsxNode, MdxJsxFlowElement | MdxJsxTextElement> = {
   testLexicalNode: $isJsxNode,
   visitLexicalNode({ mdastParent, lexicalNode, actions }) {
     const nodeType = lexicalNode.getKind() === 'text' ? 'mdxJsxTextElement' : 'mdxJsxFlowElement'

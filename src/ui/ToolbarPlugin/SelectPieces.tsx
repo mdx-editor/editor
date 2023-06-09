@@ -1,6 +1,6 @@
 import React from 'react'
 import * as Select from '@radix-ui/react-select'
-import { ReactComponent as DropDownIcon } from './icons/arrow_drop_down.svg'
+import DropDownIcon from './icons/arrow_drop_down.svg'
 import classNames from 'classnames'
 import styles from '../styles.module.css'
 import { useEmitterValues } from '../../system'

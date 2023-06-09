@@ -1,21 +1,26 @@
 import * as RadixToolbar from '@radix-ui/react-toolbar'
 import classNames from 'classnames'
 import React from 'react'
-import { useEmitterValues, usePublisher } from '..'
+import { useEmitterValues, usePublisher } from '../../system'
 import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from '../../FormatConstants'
 import styles from '../styles.module.css'
-import { ReactComponent as CodeIcon } from './icons/code.svg'
-import { ReactComponent as LiveCodeIcon } from './icons/deployed_code.svg'
-import { ReactComponent as BoldIcon } from './icons/format_bold.svg'
-import { ReactComponent as ItalicIcon } from './icons/format_italic.svg'
-import { ReactComponent as BulletedListIcon } from './icons/format_list_bulleted.svg'
-import { ReactComponent as NumberedListIcon } from './icons/format_list_numbered.svg'
-import { ReactComponent as UnderlinedIcon } from './icons/format_underlined.svg'
-import { ReactComponent as FrameSourceIcon } from './icons/frame_source.svg'
-import { ReactComponent as FrontmatterIcon } from './icons/frontmatter.svg'
-import { ReactComponent as HorizontalRuleIcon } from './icons/horizontal_rule.svg'
-import { ReactComponent as LinkIcon } from './icons/link.svg'
-import { ReactComponent as TableIcon } from './icons/table.svg'
+import CodeIcon from './icons/code.svg'
+import LiveCodeIcon from './icons/deployed_code.svg'
+import BoldIcon from './icons/format_bold.svg'
+import ItalicIcon from './icons/format_italic.svg'
+import BulletedListIcon from './icons/format_list_bulleted.svg'
+import NumberedListIcon from './icons/format_list_numbered.svg'
+import UnderlinedIcon from './icons/format_underlined.svg'
+import FrameSourceIcon from './icons/frame_source.svg'
+import FrontmatterIcon from './icons/frontmatter.svg'
+import HorizontalRuleIcon from './icons/horizontal_rule.svg'
+import LinkIcon from './icons/link.svg'
+import TableIcon from './icons/table.svg'
+import RichTextIcon from './icons/rich_text.svg'
+import MarkdownIcon from './icons/markdown.svg'
+import DifferenceIcon from './icons/difference.svg'
+
+import type { ViewMode } from '../../types/ViewMode'
 
 export const ToggleItem = React.forwardRef<HTMLButtonElement, RadixToolbar.ToolbarToggleItemProps>(
   ({ className: passedClassName, ...props }, forwardedRef) => {
@@ -57,9 +62,7 @@ export const GroupGroup: React.FC<{ children: React.ReactNode }> = ({ children }
   return <div className={styles.toolbarGroupOfGroups}>{children}</div>
 }
 
-export const ToolbarSeparator = React.forwardRef<HTMLDivElement, RadixToolbar.SeparatorProps>(() => {
-  return <RadixToolbar.Separator />
-})
+export const ToolbarSeparator = RadixToolbar.ToolbarSeparator
 
 export const BoldItalicUnderlineButtons: React.FC = () => {
   const [currentFormat] = useEmitterValues('currentFormat', 'currentListType')
@@ -178,5 +181,34 @@ export const FrontmatterButton: React.FC = () => {
     <ToolbarButton onClick={insertFrontmatter.bind(null, true)}>
       <FrontmatterIcon />
     </ToolbarButton>
+  )
+}
+
+export const ViewModeSwitch: React.FC = () => {
+  const [viewMode] = useEmitterValues('viewMode', 'activeEditorType')
+  const setViewMode = usePublisher('viewMode')
+  return (
+    <ToggleSingleGroup
+      aria-label="View Mode"
+      onValueChange={(v) => {
+        if (v !== '') {
+          setViewMode(v as ViewMode)
+        }
+      }}
+      value={viewMode}
+      className={styles.toolbarModeSwitch}
+    >
+      <ToggleItem value="editor" aria-label="Rich text" title="Rich text">
+        <RichTextIcon />
+      </ToggleItem>
+
+      <ToggleItem value="diff" aria-label="View diff" title="Diff">
+        <DifferenceIcon />
+      </ToggleItem>
+
+      <ToggleItem value="markdown" aria-label="View Markdown" title="Markdown">
+        <MarkdownIcon />
+      </ToggleItem>
+    </ToggleSingleGroup>
   )
 }

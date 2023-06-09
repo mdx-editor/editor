@@ -1,6 +1,8 @@
 import { $createParagraphNode, $createTextNode, $getRoot, LexicalEditor } from 'lexical'
 import { describe, expect, it } from 'vitest'
-import { JsxComponentDescriptors, ToMarkdownOptions, exportMarkdownFromLexical, importMarkdownToLexical } from '../'
+import { exportMarkdownFromLexical, ToMarkdownOptions } from '../export'
+import { importMarkdownToLexical } from '../import'
+import { JsxComponentDescriptors } from '../'
 import { initializeUnitTest } from './lexical-utils'
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access

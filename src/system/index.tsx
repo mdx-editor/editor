@@ -1,5 +1,5 @@
 import { getRealmFactory, realmFactoryToComponent } from '../gurx'
-import React, { PropsWithChildren } from 'react'
+import React from 'react'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { EditorSystem } from './Editor'
 import { ViewModeSystem } from './ViewMode'
@@ -43,7 +43,7 @@ export const {
       onChange: 'onChange',
     },
   },
-  ({ children }: PropsWithChildren) => {
+  ({ children }: React.PropsWithChildren) => {
     return (
       <div>
         <CaptureLexicalEditor />
@@ -53,15 +53,9 @@ export const {
   }
 )
 
-const CaptureLexicalEditor = () => {
+const CaptureLexicalEditor: React.FC = () => {
   const setEditor = usePublisher('editor')
   const [lexicalEditor] = useLexicalComposerContext()
   React.useEffect(() => setEditor(lexicalEditor), [lexicalEditor, setEditor])
   return null
 }
-
-export * from './Editor'
-export * from './Jsx'
-export * from './LinkDialog'
-export * from './Sandpack'
-export * from './ViewMode'

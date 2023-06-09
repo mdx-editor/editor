@@ -20,13 +20,14 @@
     "types": [
       "vite/client",
       "@testing-library/jest-dom",
-      "lexical"
+      "lexical",
+      "svgr",
     ],
     "plugins": [
       {
         "name": "typescript-plugin-css-modules"
       }
-    ],
+    ]
   },
   "include": [
     "src"

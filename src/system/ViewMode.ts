@@ -1,7 +1,7 @@
 import { $getRoot } from 'lexical'
 import { system } from '../gurx'
 import { importMarkdownToLexical } from '../import'
-import { ViewMode } from '../ui'
+import { ViewMode } from '../types/ViewMode'
 import { getStateAsMarkdown } from '../utils/lexicalHelpers'
 import { EditorSystemType } from './Editor'
 import { JsxSystemType } from './Jsx'
