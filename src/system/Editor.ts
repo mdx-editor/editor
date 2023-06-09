@@ -26,13 +26,7 @@ import {
 import { system } from '../gurx'
 import { $createFrontmatterNode, $isAdmonitionNode, $isFrontmatterNode, AdmonitionKind } from '../nodes'
 import { BlockType, HeadingType } from '../ui/ToolbarPlugin/BlockTypeSelect'
-import {
-  formatAdmonition,
-  formatCode,
-  formatHeading,
-  formatParagraph,
-  formatQuote,
-} from '../ui/ToolbarPlugin/BlockTypeSelect/blockFormatters'
+import { formatAdmonition, formatHeading, formatParagraph, formatQuote } from '../ui/ToolbarPlugin/BlockTypeSelect/blockFormatters'
 import { INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontalRuleNode'
 import { ActiveEditorType } from '../types/ActiveEditorType'
 import { $createTableNode } from '../nodes/Table'
@@ -147,10 +141,6 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
         }
         case 'quote': {
           formatQuote(theEditor)
-          break
-        }
-        case 'code': {
-          formatCode(theEditor)
           break
         }
         case 'note':

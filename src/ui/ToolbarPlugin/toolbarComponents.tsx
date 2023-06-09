@@ -19,8 +19,9 @@ import TableIcon from './icons/table.svg'
 import RichTextIcon from './icons/rich_text.svg'
 import MarkdownIcon from './icons/markdown.svg'
 import DifferenceIcon from './icons/difference.svg'
-
+import { BlockTypeSelect } from './BlockTypeSelect'
 import type { ViewMode } from '../../types/ViewMode'
+export { BlockTypeSelect } from './BlockTypeSelect'
 
 export const ToggleItem = React.forwardRef<HTMLButtonElement, RadixToolbar.ToolbarToggleItemProps>(
   ({ className: passedClassName, ...props }, forwardedRef) => {
@@ -211,4 +212,26 @@ export const ViewModeSwitch: React.FC = () => {
       </ToggleItem>
     </ToggleSingleGroup>
   )
+}
+
+export const ToolbarFlexWhitespace: React.FC = () => {
+  return <div style={{ flex: 1 }} />
+}
+
+export const ToolbarComponents = {
+  BlockTypeSelect,
+  BoldItalicUnderlineButtons,
+  CodeBlockButton,
+  FrontmatterButton,
+  GroupGroup,
+  HorizontalRuleIcon,
+  LinkButton,
+  ListButtons,
+  SandpackButton,
+  TableButton,
+  ToggleItem,
+  ToggleSingleGroup,
+  ToggleSingleGroupWithItem,
+  ToolbarButton,
+  ToolbarSeparator,
 }

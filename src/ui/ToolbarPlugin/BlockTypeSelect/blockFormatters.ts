@@ -1,7 +1,6 @@
 import { $setBlocksType } from '@lexical/selection'
 import { $createParagraphNode, $getSelection, $isRangeSelection, DEPRECATED_$isGridSelection, LexicalEditor } from 'lexical'
 import { $createHeadingNode, $createQuoteNode, HeadingTagType } from '@lexical/rich-text'
-import { $createCodeNode } from '@lexical/code'
 import { $createAdmonitionNode, AdmonitionKind } from '../../../nodes'
 
 export const formatParagraph = (editor: LexicalEditor) => {
@@ -36,26 +35,6 @@ export const formatAdmonition = (editor: LexicalEditor, kind: AdmonitionKind) =>
       $setBlocksType(selection, () => {
         return $createAdmonitionNode(kind)
       })
-    }
-  })
-}
-
-export const formatCode = (editor: LexicalEditor) => {
-  editor.update(() => {
-    let selection = $getSelection()
-
-    if ($isRangeSelection(selection) || DEPRECATED_$isGridSelection(selection)) {
-      if (selection.isCollapsed()) {
-        $setBlocksType(selection, () => $createCodeNode())
-      } else {
-        const textContent = selection.getTextContent()
-        const codeNode = $createCodeNode()
-        selection.insertNodes([codeNode])
-        selection = $getSelection()
-        if ($isRangeSelection(selection)) {
-          selection.insertRawText(textContent)
-        }
-      }
     }
   })
 }

@@ -22,7 +22,6 @@ import { JsxEditor } from './NodeDecorators/JsxEditor'
 import { SandpackEditor } from './NodeDecorators/SandpackEditor'
 import { TableEditor } from './NodeDecorators/TableEditor'
 import styles from './styles.module.css'
-import { BlockTypeSelect } from './ToolbarPlugin/BlockTypeSelect'
 import {
   BoldItalicUnderlineButtons,
   CodeBlockButton,
@@ -34,6 +33,7 @@ import {
   SandpackButton,
   TableButton,
   ToolbarSeparator,
+  BlockTypeSelect,
 } from './ToolbarPlugin/toolbarComponents'
 import { SharedHistoryPlugin } from './SharedHistoryPlugin'
 import { importMarkdownToLexical, UsedLexicalNodes } from '../import'
@@ -45,7 +45,7 @@ import { ToolbarPlugin } from './ToolbarPlugin'
 import { ViewModeToggler } from './SourcePlugin'
 import { LinkDialogPlugin } from './LinkDialogPlugin'
 
-export function standardConfig(markdown: string) {
+export function lexicalComposerConfig(markdown: string) {
   return {
     editorState: () => {
       importMarkdownToLexical($getRoot(), markdown)
@@ -59,9 +59,9 @@ export function standardConfig(markdown: string) {
 
 interface MDXEditorProps {
   markdown: string
-  headMarkdown: string
-  sandpackConfig: SandpackConfigValue
-  jsxComponentDescriptors: JsxComponentDescriptors
+  sandpackConfig?: SandpackConfigValue
+  headMarkdown?: string
+  jsxComponentDescriptors?: JsxComponentDescriptors
   linkAutocompleteSuggestions?: string[]
   toolbarComponents?: React.ComponentType[]
   viewMode?: ViewMode
@@ -99,6 +99,29 @@ const defaultToolbarComponents = [
   SandpackButton,
 ]
 
+const defaultSandpackConfig: SandpackConfigValue = {
+  defaultPreset: 'react',
+  presets: [
+    {
+      name: 'react',
+      sandpackTemplate: 'react',
+      sandpackTheme: 'light',
+      snippetFileName: '/App.js',
+      defaultSnippetLanguage: 'jsx',
+      defaultSnippetContent: `
+export default function App() {
+  return (
+    <div className="App">
+      <h1>Hello CodeSandbox</h1>
+      <h2>Start editing to see some magic happen!</h2>
+    </div>
+  );
+}
+`.trim(),
+    },
+  ],
+}
+
 // insert CM code block type rather than the default one
 function patchMarkdownTransformers(transformers: Transformer[]) {
   const codeTransformer = transformers.find((t) => t === CODE) as ElementTransformer
@@ -115,8 +138,8 @@ function patchMarkdownTransformers(transformers: Transformer[]) {
 export const MDXEditor: React.FC<MDXEditorProps> = ({
   markdown,
   headMarkdown,
-  jsxComponentDescriptors,
-  sandpackConfig,
+  jsxComponentDescriptors = [],
+  sandpackConfig = defaultSandpackConfig,
   onChange,
   viewMode,
   linkAutocompleteSuggestions,
@@ -126,10 +149,10 @@ export const MDXEditor: React.FC<MDXEditorProps> = ({
   const editorRootElementRef = React.useRef<HTMLDivElement>(null)
   return (
     <div className={classNames(styles.editorRoot, styles.editorWrapper, className)} ref={editorRootElementRef}>
-      <LexicalComposer initialConfig={standardConfig(markdown)}>
+      <LexicalComposer initialConfig={lexicalComposerConfig(markdown)}>
         <EditorSystemComponent
-          headMarkdown={headMarkdown}
           markdownSource={markdown}
+          headMarkdown={headMarkdown || markdown}
           jsxComponentDescriptors={jsxComponentDescriptors}
           sandpackConfig={sandpackConfig}
           onChange={onChange}

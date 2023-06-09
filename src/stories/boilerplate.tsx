@@ -14,7 +14,7 @@ export default function App() {
 }
 `
 
-const virtuosoSampleSandpackConfig: SandpackConfig = {
+export const virtuosoSampleSandpackConfig: SandpackConfig = {
   defaultPreset: 'react',
   presets: [
     {
@@ -41,7 +41,7 @@ const virtuosoSampleSandpackConfig: SandpackConfig = {
   ],
 }
 
-const jsxDescriptors: JsxComponentDescriptors = [
+export const jsxDescriptors: JsxComponentDescriptors = [
   {
     name: 'MyLeaf',
     kind: 'text',

@@ -19,7 +19,6 @@ export const BlockTypeSelect = () => {
       <SelectTrigger placeholder="Block type" />
       <SelectContent>
         <SelectItem value="paragraph">Paragraph</SelectItem>
-        <SelectItem value="code">Code Block</SelectItem>
         <SelectItem value="quote">Quote</SelectItem>
         <Select.Separator />
         <SelectItem value="h1">Heading 1</SelectItem>

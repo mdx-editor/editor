@@ -11,15 +11,15 @@ import styles from './styles.module.css'
 
 import { WrappedLexicalEditor } from './boilerplate'
 
-export function MarkdownKitchenSink() {
+export function A1MarkdownKitchenSink() {
   return <WrappedLexicalEditor markdown={initialMarkdown} />
 }
 
-export function CodeBlocks() {
+export function A3CodeBlocks() {
   return <WrappedLexicalEditor markdown={codeBlocksMarkdown} />
 }
 
-export function JSX() {
+export function A4JSX() {
   return <WrappedLexicalEditor onChange={(markdown) => console.log(markdown)} markdown={jsxMarkdown} />
 }
 
