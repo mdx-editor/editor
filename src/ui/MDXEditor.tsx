@@ -67,6 +67,7 @@ interface MDXEditorProps {
   viewMode?: ViewMode
   onChange?: (markdown: string) => void
   className?: string
+  contentEditableClassName?: string
 }
 
 const defaultNodeDecorators: NodeDecorators = {
@@ -144,6 +145,7 @@ export const MDXEditor: React.FC<MDXEditorProps> = ({
   viewMode,
   linkAutocompleteSuggestions,
   className,
+  contentEditableClassName,
   toolbarComponents = defaultToolbarComponents,
 }) => {
   const editorRootElementRef = React.useRef<HTMLDivElement>(null)
@@ -165,7 +167,7 @@ export const MDXEditor: React.FC<MDXEditorProps> = ({
           <ToolbarPlugin />
           <ViewModeToggler>
             <RichTextPlugin
-              contentEditable={<ContentEditable className={styles.contentEditable} />}
+              contentEditable={<ContentEditable className={classNames(styles.contentEditable, contentEditableClassName)} />}
               placeholder={<div></div>}
               ErrorBoundary={LexicalErrorBoundary}
             />

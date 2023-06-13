@@ -237,7 +237,7 @@ const Cell: React.FC<CellProps> = ({ align, ...props }) => {
         setActiveCell([props.colIndex, props.rowIndex])
       }}
     >
-      {true ? <CellEditor {...props} /> : <MarkdownAstRenderer mdastChildren={props.contents} />}
+      {isActive ? <CellEditor {...props} /> : <MarkdownAstRenderer mdastChildren={props.contents} />}
     </td>
   )
 }

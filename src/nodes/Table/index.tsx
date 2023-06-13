@@ -42,7 +42,7 @@ export class TableNode extends DecoratorNode<JSX.Element> {
   }
 
   static clone(node: TableNode): TableNode {
-    return new TableNode(Object.assign({}, node.__mdastNode), node.__key)
+    return new TableNode(structuredClone(node.__mdastNode), node.__key)
   }
 
   static importJSON(serializedNode: SerializedTableNode): TableNode {
@@ -51,7 +51,7 @@ export class TableNode extends DecoratorNode<JSX.Element> {
 
   exportJSON(): SerializedTableNode {
     return {
-      mdastNode: this.__mdastNode,
+      mdastNode: structuredClone(this.__mdastNode),
       type: 'table',
       version: 1,
     }
@@ -103,7 +103,7 @@ export class TableNode extends DecoratorNode<JSX.Element> {
       const cells = row.children
       const cellsClone = Array.from(cells)
       const rowClone = { ...row, children: cellsClone }
-      cellsClone.splice(colIndex, 0, EMPTY_CELL)
+      cellsClone.splice(colIndex, 0, structuredClone(EMPTY_CELL))
       table.children[rowIndex] = rowClone
     }
   }
@@ -115,7 +115,7 @@ export class TableNode extends DecoratorNode<JSX.Element> {
       const row = table.children[rowIndex]
       const cells = row.children
       const cellsClone = Array.from(cells)
-      const rowClone = { ...row, children: cellsClone }
+      const rowClone = { ...row, hildren: cellsClone }
       cellsClone.splice(colIndex, 1)
       table.children[rowIndex] = rowClone
     }
@@ -126,7 +126,7 @@ export class TableNode extends DecoratorNode<JSX.Element> {
     const table = self.__mdastNode
     const newRow: Mdast.TableRow = {
       type: 'tableRow',
-      children: Array.from({ length: this.getColCount() }, () => EMPTY_CELL),
+      children: Array.from({ length: this.getColCount() }, () => structuredClone(EMPTY_CELL)),
     }
     table.children.splice(y, 0, newRow)
   }
