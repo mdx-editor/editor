@@ -40,7 +40,6 @@ import {
 import { $createCodeBlockNode, CodeBlockNode } from '../nodes/CodeBlock'
 import { $createJsxNode, JsxNode } from '../nodes/Jsx'
 import { $createTableNode, TableNode } from '../nodes/Table'
-import { theme } from '../content/theme'
 
 type MdastNode = Mdast.Content
 

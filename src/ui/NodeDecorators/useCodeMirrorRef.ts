@@ -8,6 +8,11 @@ export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'san
   const setActiveEditorType = usePublisher('activeEditorType')
   const codeMirrorRef = React.useRef<CodeMirrorRef>(null)
 
+  // these flags escape the editor with arrows.
+  // they are set to true when the cursor is at the top or bottom of the editor, and then the user presses the arrow.
+  const atBottom = React.useRef(false)
+  const atTop = React.useRef(false)
+
   const onFocusHandler = React.useCallback(() => {
     setActiveEditorType({ type: editorType, nodeKey })
   }, [nodeKey, setActiveEditorType, editorType])
@@ -21,16 +26,23 @@ export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'san
           const selectionEnd = state.selection.ranges[0].to
 
           if (docLength === selectionEnd) {
-            activeEditor?.update(() => {
-              const node = $getNodeByKey(nodeKey)!
-              const nextSibling = node.getNextSibling()
-              if (nextSibling) {
-                codeMirrorRef?.current?.getCodemirror()?.contentDOM.blur()
-                node.selectNext()
-              } else {
-                node.insertAfter($createParagraphNode())
-              }
-            })
+            // escaping once
+            if (!atBottom.current) {
+              atBottom.current = true
+            } else {
+              // escaping twice
+              activeEditor?.update(() => {
+                const node = $getNodeByKey(nodeKey)!
+                const nextSibling = node.getNextSibling()
+                if (nextSibling) {
+                  codeMirrorRef?.current?.getCodemirror()?.contentDOM.blur()
+                  node.selectNext()
+                } else {
+                  node.insertAfter($createParagraphNode())
+                }
+              })
+              atBottom.current = false
+            }
           }
         }
       } else if (e.key === 'ArrowUp') {
@@ -39,16 +51,23 @@ export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'san
           const selectionStart = state.selection.ranges[0].from
 
           if (selectionStart === 0) {
-            activeEditor?.update(() => {
-              const node = $getNodeByKey(nodeKey)!
-              const previousSibling = node.getPreviousSibling()
-              if (previousSibling) {
-                codeMirrorRef?.current?.getCodemirror()?.contentDOM.blur()
-                node.selectPrevious()
-              } else {
-                // TODO: insert a paragraph before the sandpack node
-              }
-            })
+            // escaping once
+            if (!atTop.current) {
+              atTop.current = true
+            } else {
+              // escaping twice
+              activeEditor?.update(() => {
+                const node = $getNodeByKey(nodeKey)!
+                const previousSibling = node.getPreviousSibling()
+                if (previousSibling) {
+                  codeMirrorRef?.current?.getCodemirror()?.contentDOM.blur()
+                  node.selectPrevious()
+                } else {
+                  // TODO: insert a paragraph before the sandpack node
+                }
+              })
+              atTop.current = false
+            }
           }
         }
       } else if (e.key === 'Enter') {

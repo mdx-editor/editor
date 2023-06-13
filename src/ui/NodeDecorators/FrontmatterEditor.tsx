@@ -45,7 +45,7 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
   }, [watch, onChange])
 
   return (
-    <div className={styles.frontmatterWrapper} data-expanded={expanded}>
+    <div className={styles.frontmatterWrapper} data-expanded={expanded} data-editor-type="frontmatter">
       <button
         className={styles.frontmatterToggleButton}
         onClick={(e) => {

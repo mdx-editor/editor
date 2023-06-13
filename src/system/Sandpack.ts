@@ -65,6 +65,7 @@ const defaultSandpackConfig: SandpackConfig = {
     },
   ],
 }
+
 export const [SandpackSystem] = system(
   (r, [{ activeEditor, activeEditorType, createEditorSubscription }]) => {
     const sandpackConfig = r.node<SandpackConfigValue>(defaultSandpackConfig)

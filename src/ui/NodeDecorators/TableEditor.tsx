@@ -2,7 +2,16 @@ import { ContentEditable } from '@lexical/react/LexicalContentEditable'
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary'
 import { LexicalNestedComposer } from '@lexical/react/LexicalNestedComposer'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
-import { $getRoot, BLUR_COMMAND, COMMAND_PRIORITY_CRITICAL, KEY_ENTER_COMMAND, KEY_TAB_COMMAND, LexicalEditor, createEditor } from 'lexical'
+import {
+  $createParagraphNode,
+  $getRoot,
+  BLUR_COMMAND,
+  COMMAND_PRIORITY_CRITICAL,
+  KEY_ENTER_COMMAND,
+  KEY_TAB_COMMAND,
+  LexicalEditor,
+  createEditor,
+} from 'lexical'
 import * as Mdast from 'mdast'
 import React, { useEffect } from 'react'
 import { theme } from '../../content/theme'
@@ -63,7 +72,14 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
       if (rowIndex > lexicalTable.getRowCount() - 1) {
         setActiveCell(null)
         parentEditor.update(() => {
-          lexicalTable.getLatest().selectNext()
+          const nextSibling = lexicalTable.getLatest().getNextSibling()
+          if (nextSibling) {
+            lexicalTable.getLatest().selectNext()
+          } else {
+            const newParagraph = $createParagraphNode()
+            lexicalTable.insertAfter(newParagraph)
+            newParagraph.select()
+          }
         })
         return
       }

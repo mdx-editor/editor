@@ -106,6 +106,10 @@ export class TableNode extends DecoratorNode<JSX.Element> {
       cellsClone.splice(colIndex, 0, structuredClone(EMPTY_CELL))
       table.children[rowIndex] = rowClone
     }
+
+    if (table.align && table.align.length > 0) {
+      table.align.splice(colIndex, 0, 'left')
+    }
   }
 
   deleteColumnAt(colIndex: number): void {
