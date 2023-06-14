@@ -5,7 +5,6 @@ import React from 'react'
 import { SandpackProvider } from '@codesandbox/sandpack-react'
 import { $createSandpackNode } from '../nodes/Sandpack'
 import { $insertNodeToNearestRoot } from '@lexical/utils'
-import { CodeBlockMeta } from '../types/CodeBlockMeta'
 import { $createCodeBlockNode } from '../nodes'
 
 export type Dependencies = Record<string, string>
@@ -23,6 +22,8 @@ export type FileSet = {
 
 export interface SandpackPreset {
   name: string
+  label: string
+  meta: string
   sandpackTemplate: SandpackProviderProps['template']
   sandpackTheme: SandpackProviderProps['theme']
   snippetFileName: string
@@ -38,8 +39,6 @@ export interface SandpackConfig {
   defaultPreset: string
   presets: Array<SandpackPreset>
 }
-
-export type SandpackConfigValue = SandpackConfig | ((meta: CodeBlockMeta) => SandpackPreset)
 
 const defaultSnippetContent = `
 export default function App() {
@@ -57,6 +56,8 @@ const defaultSandpackConfig: SandpackConfig = {
   presets: [
     {
       name: 'react',
+      meta: 'live react',
+      label: 'React',
       sandpackTemplate: 'react',
       sandpackTheme: 'light',
       snippetFileName: '/App.js',
@@ -68,8 +69,8 @@ const defaultSandpackConfig: SandpackConfig = {
 
 export const [SandpackSystem] = system(
   (r, [{ activeEditor, activeEditorType, createEditorSubscription }]) => {
-    const sandpackConfig = r.node<SandpackConfigValue>(defaultSandpackConfig)
-    const insertSandpack = r.node<true>()
+    const sandpackConfig = r.node<SandpackConfig>(defaultSandpackConfig)
+    const insertSandpack = r.node<string>()
     const insertCodeBlock = r.node<true>()
 
     // clear the node when the regular editor is focused.
@@ -84,27 +85,26 @@ export const [SandpackSystem] = system(
       )
     })
 
-    r.sub(r.pipe(insertSandpack, r.o.withLatestFrom(activeEditor, sandpackConfig)), ([, theEditor, sandpackConfig]) => {
+    r.sub(r.pipe(insertSandpack, r.o.withLatestFrom(activeEditor, sandpackConfig)), ([meta, theEditor, sandpackConfig]) => {
       theEditor?.getEditorState().read(() => {
         const selection = $getSelection()
 
         if ($isRangeSelection(selection)) {
           const focusNode = selection.focus.getNode()
 
-          const defaultPreset =
-            typeof sandpackConfig === 'function'
-              ? sandpackConfig({})
-              : sandpackConfig.presets.find((preset) => preset.name === sandpackConfig.defaultPreset)
-          if (!defaultPreset) {
-            throw new Error('No default sandpack preset found')
+          const preset = meta
+            ? sandpackConfig.presets.find((preset) => preset.meta === meta)
+            : sandpackConfig.presets.find((preset) => preset.name == sandpackConfig.defaultPreset)
+          if (!preset) {
+            throw new Error(`No sandpack preset found with ${meta}`)
           }
 
           if (focusNode !== null) {
             theEditor.update(() => {
               const sandpackNode = $createSandpackNode({
-                code: defaultPreset.defaultSnippetContent || '',
-                language: defaultPreset.defaultSnippetLanguage || 'jsx',
-                meta: 'live',
+                code: preset.defaultSnippetContent || '',
+                language: preset.defaultSnippetLanguage || 'jsx',
+                meta: preset.meta,
               })
 
               $insertNodeToNearestRoot(sandpackNode)

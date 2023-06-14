@@ -17,7 +17,7 @@ body {
 
 ## React sandpack:
 
-```tsx live 
+```tsx live react
 export default function App() {
   return <h1>Hello world from a markdown</h1>
 }
@@ -25,7 +25,7 @@ export default function App() {
 
 ## Virtuoso Sandpack:
 
-```tsx live preset=virtuoso
+```tsx live virtuoso
 import { Virtuoso } from 'react-virtuoso'
 import { generateUsers } from './data'
 

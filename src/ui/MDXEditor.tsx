@@ -14,7 +14,7 @@ import { $getRoot } from 'lexical'
 import React from 'react'
 import { EditorSystemComponent } from '../system'
 import { NodeDecorators } from '../system/NodeDecorators'
-import { SandpackConfigValue } from '../system/Sandpack'
+import { SandpackConfig } from '../system/Sandpack'
 import ListMaxIndentLevelPlugin from './ListIndentPlugin'
 import { CodeBlockEditor } from './NodeDecorators/CodeBlockEditor'
 import { FrontmatterEditor } from './NodeDecorators/FrontmatterEditor'
@@ -59,7 +59,7 @@ export function lexicalComposerConfig(markdown: string) {
 
 interface MDXEditorProps {
   markdown: string
-  sandpackConfig?: SandpackConfigValue
+  sandpackConfig?: SandpackConfig
   headMarkdown?: string
   jsxComponentDescriptors?: JsxComponentDescriptors
   linkAutocompleteSuggestions?: string[]
@@ -100,11 +100,13 @@ const defaultToolbarComponents = [
   SandpackButton,
 ]
 
-const defaultSandpackConfig: SandpackConfigValue = {
+const defaultSandpackConfig: SandpackConfig = {
   defaultPreset: 'react',
   presets: [
     {
       name: 'react',
+      meta: 'live react',
+      label: 'React',
       sandpackTemplate: 'react',
       sandpackTheme: 'light',
       snippetFileName: '/App.js',

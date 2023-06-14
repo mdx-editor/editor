@@ -14,7 +14,8 @@ export const SelectItem = React.forwardRef<HTMLDivElement | null, { className?: 
     )
   }
 )
-export function SelectTrigger({ placeholder }: { placeholder: string }) {
+
+export const SelectTrigger: React.FC<{ placeholder: string }> = ({ placeholder }) => {
   return (
     <Select.Trigger aria-label={placeholder} className={styles.toolbarNodeKindSelectTrigger}>
       <Select.Value placeholder={placeholder} />
@@ -25,14 +26,28 @@ export function SelectTrigger({ placeholder }: { placeholder: string }) {
   )
 }
 
-export function SelectContent({ children }: { children: React.ReactNode }) {
+export const SelectContent: React.FC<{ children: React.ReactNode; className?: string }> = ({
+  children,
+  className = styles.toolbarNodeKindSelectContainer,
+}) => {
   const [editorRootElementRef] = useEmitterValues('editorRootElementRef')
 
   return (
     <Select.Portal container={editorRootElementRef?.current}>
-      <Select.Content className={styles.toolbarNodeKindSelectContainer} onCloseAutoFocus={(e) => e.preventDefault()} position="popper">
+      <Select.Content className={className} onCloseAutoFocus={(e) => e.preventDefault()} position="popper">
         <Select.Viewport>{children}</Select.Viewport>
       </Select.Content>
     </Select.Portal>
+  )
+}
+
+export const SelectButtonTrigger: React.FC<{ children: React.ReactNode; title: string }> = ({ children, title }) => {
+  return (
+    <Select.Trigger className={styles.toolbarButtonSelectTrigger} title={title}>
+      {children}
+      <Select.Icon className={styles.toolbarNodeKindSelectDropdownArrow}>
+        <DropDownIcon />
+      </Select.Icon>
+    </Select.Trigger>
   )
 }

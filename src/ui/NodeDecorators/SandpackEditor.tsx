@@ -2,7 +2,7 @@ import { SandpackCodeEditor, SandpackLayout, SandpackPreview, SandpackProvider, 
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import React from 'react'
 import { useEmitterValues, usePublisher } from '../../system'
-import { SandpackConfigValue, SandpackPreset } from '../../system/Sandpack'
+import { SandpackConfig, SandpackConfigValue, SandpackPreset } from '../../system/Sandpack'
 import { SandpackEditorProps } from '../../types/NodeDecoratorsProps'
 import { parseCodeBlockMeta } from './parseCodeBlockMeta'
 import { useCodeMirrorRef } from './useCodeMirrorRef'
@@ -18,19 +18,8 @@ const CodeUpdateEmitter = ({ onChange, snippetFileName }: CodeUpdateEmitterProps
   return null
 }
 
-function getPreset(meta: string, config: SandpackConfigValue) {
-  let preset!: SandpackPreset | undefined
-  const metaObj = parseCodeBlockMeta(meta)
-  if (typeof config === 'function') {
-    preset = config(metaObj)
-  } else {
-    const presetName = metaObj.preset || config?.defaultPreset
-    preset = config?.presets.find((p) => p.name === presetName)
-    if (!preset) {
-      throw new Error(`No preset found for name ${presetName}`)
-    }
-  }
-  return preset
+function getPresetOrDefault(meta: string, config: SandpackConfig) {
+  return config.presets.find((preset) => preset.meta === meta) || config.presets.find((preset) => preset.name === config.defaultPreset)
 }
 
 export const SandpackEditor = ({ nodeKey, code, meta, onChange, focusEmitter }: SandpackEditorProps) => {
@@ -55,7 +44,10 @@ export const SandpackEditor = ({ nodeKey, code, meta, onChange, focusEmitter }: 
     [onChange, editor]
   )
 
-  const preset = getPreset(meta, config)
+  const preset = getPresetOrDefault(meta, config)
+  if (!preset) {
+    throw new Error(`No sandpack preset found for meta: ${meta}`)
+  }
 
   return (
     <SandpackProvider

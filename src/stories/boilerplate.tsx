@@ -12,13 +12,15 @@ export default function App() {
     </div>
   );
 }
-`
+`.trim()
 
 export const virtuosoSampleSandpackConfig: SandpackConfig = {
   defaultPreset: 'react',
   presets: [
     {
+      label: 'React',
       name: 'react',
+      meta: 'live react',
       sandpackTemplate: 'react',
       sandpackTheme: 'light',
       snippetFileName: '/App.js',
@@ -26,10 +28,13 @@ export const virtuosoSampleSandpackConfig: SandpackConfig = {
       defaultSnippetContent,
     },
     {
+      label: 'Virtuoso',
       name: 'virtuoso',
+      meta: 'live virtuoso',
       sandpackTemplate: 'react-ts',
       sandpackTheme: 'light',
       snippetFileName: '/App.tsx',
+      defaultSnippetContent,
       dependencies: {
         'react-virtuoso': 'latest',
         '@ngneat/falso': 'latest',

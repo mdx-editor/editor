@@ -213,7 +213,8 @@
   white-space: nowrap;
 }
 
-.toolbarNodeKindSelectContainer {
+.toolbarNodeKindSelectContainer, 
+.toolbarButtonDropdownContainer {
   z-index: 60;
   width: var(--spacing-36);
   border-bottom-left-radius: var(--radius-base);
@@ -222,7 +223,12 @@
   font-size: var(--text-sm);
 }
 
-.toolbarNodeKindSelectTrigger {
+.toolbarButtonDropdownContainer {
+  border-top-right-radius: var(--radius-base);
+}
+
+.toolbarNodeKindSelectTrigger, 
+.toolbarButtonSelectTrigger {
   border: 0;
   background-color: transparent;
   display: flex;
@@ -246,6 +252,10 @@
     border-bottom-left-radius: var(--radius-none);
     background-color: var(--baseBgHover);
   }
+}
+
+.toolbarButtonSelectTrigger {
+  width: var(--spacing-20);
 }
 
 .toolbarNodeKindSelectItem {

@@ -21,6 +21,8 @@ import MarkdownIcon from './icons/markdown.svg'
 import DifferenceIcon from './icons/difference.svg'
 import { BlockTypeSelect } from './BlockTypeSelect'
 import type { ViewMode } from '../../types/ViewMode'
+import * as Select from '@radix-ui/react-select'
+import { SelectButtonTrigger, SelectContent, SelectItem } from './SelectPieces'
 export { BlockTypeSelect } from './BlockTypeSelect'
 
 export const ToggleItem = React.forwardRef<HTMLButtonElement, RadixToolbar.ToolbarToggleItemProps>(
@@ -169,10 +171,29 @@ export const HorizontalRuleButton: React.FC = () => {
 
 export const SandpackButton: React.FC = () => {
   const insertSandpack = usePublisher('insertSandpack')
+  const [sandpackConfig] = useEmitterValues('sandpackConfig')
   return (
-    <ToolbarButton onClick={insertSandpack.bind(null, true)}>
-      <LiveCodeIcon />
-    </ToolbarButton>
+    <>
+      {sandpackConfig.presets.length === 1 ? (
+        <ToolbarButton onClick={insertSandpack.bind(null, '')}>
+          <LiveCodeIcon />
+        </ToolbarButton>
+      ) : (
+        <Select.Root value="" onValueChange={insertSandpack}>
+          <SelectButtonTrigger title="Insert live code snippet">
+            <LiveCodeIcon />
+          </SelectButtonTrigger>
+
+          <SelectContent className={styles.toolbarButtonDropdownContainer}>
+            {sandpackConfig.presets.map((preset) => (
+              <SelectItem key={preset.name} value={preset.meta}>
+                {preset.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select.Root>
+      )}
+    </>
   )
 }
 
