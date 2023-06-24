@@ -24,8 +24,8 @@ export const virtuosoSampleSandpackConfig: SandpackConfig = {
       sandpackTemplate: 'react',
       sandpackTheme: 'light',
       snippetFileName: '/App.js',
-      defaultSnippetLanguage: 'jsx',
-      defaultSnippetContent,
+      snippetLanguage: 'jsx',
+      initialSnippetContent: defaultSnippetContent,
     },
     {
       label: 'Virtuoso',
@@ -34,7 +34,7 @@ export const virtuosoSampleSandpackConfig: SandpackConfig = {
       sandpackTemplate: 'react-ts',
       sandpackTheme: 'light',
       snippetFileName: '/App.tsx',
-      defaultSnippetContent,
+      initialSnippetContent: defaultSnippetContent,
       dependencies: {
         'react-virtuoso': 'latest',
         '@ngneat/falso': 'latest',

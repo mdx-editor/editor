@@ -110,8 +110,8 @@ const defaultSandpackConfig: SandpackConfig = {
       sandpackTemplate: 'react',
       sandpackTheme: 'light',
       snippetFileName: '/App.js',
-      defaultSnippetLanguage: 'jsx',
-      defaultSnippetContent: `
+      snippetLanguage: 'jsx',
+      initialSnippetContent: `
 export default function App() {
   return (
     <div className="App">
