@@ -16,7 +16,7 @@ import * as Mdast from 'mdast'
 import React, { useEffect } from 'react'
 import { theme } from '../../content/theme'
 import { LexicalVisitors, exportLexicalTreeToMdast } from '../../export'
-import { UsedLexicalNodes, importMdastTreeToLexical } from '../../import'
+import { defaultLexicalNodes, importMdastTreeToLexical } from '../../import'
 import { TableNode } from '../../nodes/Table'
 import { TableEditorProps } from '../../types/NodeDecoratorsProps'
 import { MarkdownAstRenderer } from '../MarkdownAstRenderer'
@@ -260,10 +260,16 @@ const Cell: React.FC<CellProps> = ({ align, ...props }) => {
 }
 
 const CellEditor: React.FC<CellProps> = ({ activeCellTuple, parentEditor, lexicalTable, contents, colIndex, rowIndex }) => {
+  const [markdownParseOptions, lexicalConvertOptions, jsxComponentDescriptors, lexicalNodes] = useEmitterValues(
+    'markdownParseOptions',
+    'lexicalConvertOptions',
+    'jsxComponentDescriptors',
+    'lexicalNodes'
+  )
   const [editor] = React.useState(() => {
     let disposed = false
     const editor = createEditor({
-      nodes: UsedLexicalNodes,
+      nodes: lexicalNodes,
       theme: theme,
     })
 
@@ -273,7 +279,11 @@ const CellEditor: React.FC<CellProps> = ({ activeCellTuple, parentEditor, lexica
       }
       disposed = true
       editor.getEditorState().read(() => {
-        const mdast = exportLexicalTreeToMdast($getRoot(), LexicalVisitors, [])
+        const mdast = exportLexicalTreeToMdast({
+          root: $getRoot(),
+          jsxComponentDescriptors,
+          ...lexicalConvertOptions!,
+        })
         parentEditor.update(() => {
           lexicalTable.updateCellContents(colIndex, rowIndex, (mdast.children[0] as Mdast.Paragraph).children)
         })
@@ -324,7 +334,11 @@ const CellEditor: React.FC<CellProps> = ({ activeCellTuple, parentEditor, lexica
     })
 
     editor.update(() => {
-      importMdastTreeToLexical($getRoot(), { type: 'root', children: [{ type: 'paragraph', children: contents }] })
+      importMdastTreeToLexical({
+        root: $getRoot(),
+        mdastRoot: { type: 'root', children: [{ type: 'paragraph', children: contents }] },
+        visitors: markdownParseOptions!.visitors,
+      })
     })
 
     return editor

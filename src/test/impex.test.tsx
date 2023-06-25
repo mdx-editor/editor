@@ -1,12 +1,38 @@
 import { $createParagraphNode, $createTextNode, $getRoot, LexicalEditor } from 'lexical'
 import { describe, expect, it } from 'vitest'
-import { exportMarkdownFromLexical, ToMarkdownOptions } from '../export'
-import { importMarkdownToLexical } from '../import'
+import {
+  defaultExtensions,
+  defaultLexicalVisitors,
+  defaultToMarkdownOptions,
+  exportMarkdownFromLexical,
+  ToMarkdownOptions,
+} from '../export'
+import { defaultMdastExtensions, defaultMdastVisitors, defaultSyntaxExtensions, importMarkdownToLexical } from '../import'
 import { JsxComponentDescriptors } from '../'
 import { initializeUnitTest } from './lexical-utils'
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 ;(globalThis as any).IS_REACT_ACT_ENVIRONMENT = true
+
+function importMarkdownUtil(root: ReturnType<typeof $getRoot>, markdown: string) {
+  return importMarkdownToLexical({
+    root,
+    markdown,
+    syntaxExtensions: Object.values(defaultSyntaxExtensions),
+    mdastExtensions: Object.values(defaultMdastExtensions),
+    visitors: Object.values(defaultMdastVisitors),
+  })
+}
+
+function exportMarkdownUtil(root: ReturnType<typeof $getRoot>) {
+  return exportMarkdownFromLexical({
+    root,
+    toMarkdownOptions: defaultToMarkdownOptions,
+    jsxComponentDescriptors: [],
+    toMarkdownExtensions: Object.values(defaultExtensions),
+    visitors: Object.values(defaultLexicalVisitors),
+  })
+}
 
 describe('importing markdown into lexical', () => {
   initializeUnitTest((testEnv) => {
@@ -14,7 +40,7 @@ describe('importing markdown into lexical', () => {
       const { editor } = testEnv
       editor!.update(() => {
         const root = $getRoot()
-        importMarkdownToLexical(root, '')
+        importMarkdownUtil(root, '')
       })
 
       expect(editor?.getEditorState().toJSON().root).toMatchObject({
@@ -41,7 +67,7 @@ describe('importing markdown into lexical', () => {
 
       editor!.update(() => {
         const root = $getRoot()
-        importMarkdownToLexical(root, 'Hello World')
+        importMarkdownUtil(root, 'Hello World')
       })
     })
   })
@@ -52,7 +78,7 @@ describe('converting', () => {
     it('generates root node from a Lexical RootNode', () => {
       const { editor } = testEnv
       editor!.update(() => {
-        expect(exportMarkdownFromLexical({ root: $getRoot() })).toEqual('')
+        expect(exportMarkdownUtil($getRoot())).toEqual('')
       })
     })
 
@@ -62,7 +88,7 @@ describe('converting', () => {
         const paragraph = $createParagraphNode()
         paragraph.append($createTextNode('Hello World'))
         $getRoot().append(paragraph)
-        expect(exportMarkdownFromLexical({ root: $getRoot() })).toEqual('Hello World\n')
+        expect(exportMarkdownUtil($getRoot())).toEqual('Hello World\n')
       })
     })
 
@@ -74,7 +100,7 @@ describe('converting', () => {
         node.setFormat('bold')
         paragraph.append(node)
         $getRoot().append(paragraph)
-        expect(exportMarkdownFromLexical({ root: $getRoot() })).toEqual('**Hello World**&#x20;\n')
+        expect(exportMarkdownUtil($getRoot())).toEqual('**Hello World**&#x20;\n')
       })
     })
 
@@ -86,7 +112,7 @@ describe('converting', () => {
         node.setFormat(0b11)
         paragraph.append(node)
         $getRoot().append(paragraph)
-        expect(exportMarkdownFromLexical({ root: $getRoot() })).toEqual('***Hello World***&#x20;\n')
+        expect(exportMarkdownUtil($getRoot())).toEqual('***Hello World***&#x20;\n')
       })
     })
 
@@ -98,7 +124,7 @@ describe('converting', () => {
         node.setFormat('bold')
         paragraph.append(node)
         $getRoot().append(paragraph)
-        expect(exportMarkdownFromLexical({ root: $getRoot() })).toEqual('&#x20;**Hello World**\n')
+        expect(exportMarkdownUtil($getRoot())).toEqual('&#x20;**Hello World**\n')
       })
     })
 
@@ -110,7 +136,7 @@ describe('converting', () => {
         node.setFormat(0b11)
         paragraph.append(node)
         $getRoot().append(paragraph)
-        expect(exportMarkdownFromLexical({ root: $getRoot() })).toEqual('&#x20;***Hello World***\n')
+        expect(exportMarkdownUtil($getRoot())).toEqual('&#x20;***Hello World***\n')
       })
     })
 
@@ -121,7 +147,7 @@ describe('converting', () => {
 function testIdenticalMarkdownAfterImportExport(
   editor: LexicalEditor,
   markdown: string,
-  exportOptions?: ToMarkdownOptions,
+  exportOptions: ToMarkdownOptions = defaultToMarkdownOptions,
   jsxComponentDescriptors: JsxComponentDescriptors = []
 ) {
   editor.registerUpdateListener(({ editorState }) => {
@@ -129,8 +155,9 @@ function testIdenticalMarkdownAfterImportExport(
       expect(
         exportMarkdownFromLexical({
           root: $getRoot(),
-          options: exportOptions,
-          visitors: undefined,
+          toMarkdownOptions: exportOptions,
+          toMarkdownExtensions: Object.values(defaultExtensions),
+          visitors: Object.values(defaultLexicalVisitors),
           jsxComponentDescriptors,
         })
           .trim()
@@ -141,7 +168,7 @@ function testIdenticalMarkdownAfterImportExport(
 
   editor.update(() => {
     const root = $getRoot()
-    importMarkdownToLexical(root, markdown)
+    importMarkdownUtil(root, markdown)
   })
 }
 

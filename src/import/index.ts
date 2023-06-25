@@ -3,17 +3,7 @@ import { $createLinkNode, LinkNode } from '@lexical/link'
 import { $createListItemNode, $createListNode, $isListItemNode, ListItemNode, ListNode } from '@lexical/list'
 import { $createHorizontalRuleNode, HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode'
 import { $createHeadingNode, $createQuoteNode, $isQuoteNode, HeadingNode, QuoteNode } from '@lexical/rich-text'
-import {
-  $createParagraphNode,
-  $createTextNode,
-  $getRoot,
-  ElementNode,
-  LexicalNode,
-  RootNode as LexicalRootNode,
-  ParagraphNode,
-  RootNode,
-  createEditor,
-} from 'lexical'
+import { $createParagraphNode, $createTextNode, ElementNode, Klass, LexicalNode, RootNode as LexicalRootNode, ParagraphNode } from 'lexical'
 import * as Mdast from 'mdast'
 import { ContainerDirective, directiveFromMarkdown } from 'mdast-util-directive'
 import { fromMarkdown } from 'mdast-util-from-markdown'
@@ -255,7 +245,7 @@ export const MdastMdxJsxElementVisitor: MdastImportVisitor<MdxJsxTextElement> = 
   },
 }
 
-export const MdastVisitors = [
+export const defaultMdastVisitors: Record<string, MdastImportVisitor<Mdast.Content>> = {
   MdastRootVisitor,
   MdastParagraphVisitor,
   MdastTextVisitor,
@@ -274,34 +264,56 @@ export const MdastVisitors = [
   MdastMdxJsEsmVisitor,
   MdastMdxJsxElementVisitor,
   MdastTableVisitor,
-]
+}
+
+export type ImportVisitors = Array<MdastImportVisitor<Mdast.Content>>
 
 function isParent(node: unknown): node is Mdast.Parent {
   return (node as { children?: Array<any> }).children instanceof Array
 }
 
-export function importMarkdownToLexical(
-  root: LexicalRootNode,
-  markdown: string,
-  visitors: Array<MdastImportVisitor<Mdast.Content>> = MdastVisitors
-): void {
+type FromMarkdownArgs = NonNullable<Parameters<typeof fromMarkdown>[1]>
+
+export interface MdastTreeImportOptions {
+  root: LexicalRootNode
+  visitors: Array<MdastImportVisitor<Mdast.Content>>
+  mdastRoot: Mdast.Root
+}
+
+export interface MarkdownParseOptions extends Omit<MdastTreeImportOptions, 'mdastRoot'> {
+  markdown: string
+  syntaxExtensions: NonNullable<FromMarkdownArgs['extensions']>
+  mdastExtensions: NonNullable<FromMarkdownArgs['mdastExtensions']>
+}
+
+export const defaultMdastExtensions: Record<string, MarkdownParseOptions['mdastExtensions'][number]> = {
+  mdxFromMarkdown: mdxFromMarkdown(),
+  frontmatterFromMarkdown: frontmatterFromMarkdown('yaml'),
+  directiveFromMarkdown: directiveFromMarkdown,
+  gfmTableFromMarkdown: gfmTableFromMarkdown,
+}
+
+export const defaultSyntaxExtensions: Record<string, MarkdownParseOptions['syntaxExtensions'][number]> = {
+  mdxjs: mdxjs(),
+  frontmatter: frontmatter(),
+  directive: directive(),
+  gfmTable: gfmTable,
+}
+
+export function importMarkdownToLexical({ root, markdown, visitors, syntaxExtensions, mdastExtensions }: MarkdownParseOptions): void {
   const mdastRoot = fromMarkdown(markdown, {
-    extensions: [mdxjs(), frontmatter(), directive(), gfmTable],
-    mdastExtensions: [mdxFromMarkdown(), frontmatterFromMarkdown('yaml'), directiveFromMarkdown, gfmTableFromMarkdown],
+    extensions: syntaxExtensions,
+    mdastExtensions,
   })
 
   if (mdastRoot.children.length === 0) {
     mdastRoot.children.push({ type: 'paragraph', children: [] })
   }
 
-  importMdastTreeToLexical(root, mdastRoot, visitors)
+  importMdastTreeToLexical({ root, mdastRoot, visitors })
 }
 
-export function importMdastTreeToLexical(
-  root: LexicalRootNode,
-  mdastRoot: Mdast.Root,
-  visitors: Array<MdastImportVisitor<Mdast.Content>> = MdastVisitors
-) {
+export function importMdastTreeToLexical({ root, mdastRoot, visitors }: MdastTreeImportOptions): void {
   const formattingMap = new WeakMap<object, number>()
 
   function visitChildren(mdastNode: Mdast.Parent, lexicalParent: LexicalNode) {
@@ -349,7 +361,7 @@ export function importMdastTreeToLexical(
   visit(mdastRoot, root, null)
 }
 
-export const UsedLexicalNodes = [
+export const defaultLexicalNodes: Record<string, Klass<LexicalNode>> = {
   ParagraphNode,
   LinkNode,
   HeadingNode,
@@ -365,4 +377,4 @@ export const UsedLexicalNodes = [
   JsxNode,
   CodeNode, // this one should not be used, but markdown shortcuts complain about it
   TableNode,
-]
+}

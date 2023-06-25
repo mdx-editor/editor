@@ -315,7 +315,7 @@ const JsxVisitor: LexicalExportVisitor<JsxNode, MdxJsxFlowElement | MdxJsxTextEl
   },
 }
 
-export const LexicalVisitors = [
+export const defaultLexicalVisitors = {
   LexicalRootVisitor,
   LexicalParagraphVisitor,
   LexicalFrontmatterVisitor,
@@ -333,4 +333,4 @@ export const LexicalVisitors = [
   LexicalImageVisitor,
   JsxVisitor,
   LexicalTableVisitor,
-]
+}

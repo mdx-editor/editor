@@ -1,8 +1,7 @@
 import { $getRoot, $getSelection, ElementNode, LexicalEditor, RangeSelection, TextNode } from 'lexical'
 import { $isAtNodeEnd } from '@lexical/selection'
-import { JsxComponentDescriptors } from '../types/JsxComponentDescriptors'
 import { tap } from './fp'
-import { exportMarkdownFromLexical } from '../export'
+import { ExportMarkdownFromLexicalOptions, exportMarkdownFromLexical } from '../export'
 
 export function fromWithinEditorRead<T>(editor: LexicalEditor, fn: () => T): T {
   let result: T | null = null
@@ -65,10 +64,10 @@ export function getSelectionRectangle(editor: LexicalEditor) {
   return null
 }
 
-export function getStateAsMarkdown(editor: LexicalEditor, jsxComponentDescriptors?: JsxComponentDescriptors) {
+export function getStateAsMarkdown(editor: LexicalEditor, exportParams: Omit<ExportMarkdownFromLexicalOptions, 'root'>) {
   return tap({ markdown: '' }, (result) => {
     editor.getEditorState().read(() => {
-      result.markdown = exportMarkdownFromLexical({ root: $getRoot(), jsxComponentDescriptors })
+      result.markdown = exportMarkdownFromLexical({ root: $getRoot(), ...exportParams })
     })
   }).markdown
 }

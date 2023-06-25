@@ -5,7 +5,7 @@ import { frontmatterToMarkdown } from 'mdast-util-frontmatter'
 import { gfmTableToMarkdown } from 'mdast-util-gfm-table'
 import { MdxjsEsm, mdxToMarkdown } from 'mdast-util-mdx'
 import { Options as ToMarkdownOptions, toMarkdown } from 'mdast-util-to-markdown'
-import { LexicalExportVisitor, LexicalVisitors } from './visitors'
+import { LexicalExportVisitor } from './visitors'
 import { JsxComponentDescriptors } from '../types/JsxComponentDescriptors'
 export type { Options as ToMarkdownOptions } from 'mdast-util-to-markdown'
 
@@ -13,11 +13,13 @@ function isParent(node: unknown): node is Mdast.Parent {
   return (node as { children?: Array<any> }).children instanceof Array
 }
 
-export function exportLexicalTreeToMdast(
-  root: LexicalRootNode,
-  visitors: Array<LexicalExportVisitor<LexicalNode, Mdast.Content>>,
+export interface ExportLexicalTreeOptions {
+  root: LexicalRootNode
+  visitors: LexicalVisitors
   jsxComponentDescriptors: JsxComponentDescriptors
-): Mdast.Root {
+}
+
+export function exportLexicalTreeToMdast({ root, visitors, jsxComponentDescriptors }: ExportLexicalTreeOptions): Mdast.Root {
   let unistRoot: Mdast.Root | null = null
   const referredComponents = new Set<string>()
   visit(root, null)
@@ -187,28 +189,33 @@ function fixWrappingWhitespace(node: Mdast.Parent | Mdast.Content, parentChain: 
   }
 }
 
-interface ExportMarkdownFromLexicalParams {
-  root: LexicalRootNode
-  options?: ToMarkdownOptions
-  visitors?: Array<LexicalExportVisitor<LexicalNode, Mdast.Content>>
-  jsxComponentDescriptors?: JsxComponentDescriptors
+export type LexicalVisitors = LexicalExportVisitor<LexicalNode, Mdast.Content>[]
+
+export interface ExportMarkdownFromLexicalOptions extends ExportLexicalTreeOptions {
+  toMarkdownExtensions: ToMarkdownOptions['extensions']
+  toMarkdownOptions: ToMarkdownOptions
+}
+
+export const defaultExtensions = {
+  mdxToMarkdown: mdxToMarkdown(),
+  frontmatterToMarkdown: frontmatterToMarkdown('yaml'),
+  directiveToMarkdown,
+  gfmTableToMarkdown: gfmTableToMarkdown({ tableCellPadding: true, tablePipeAlign: true }),
+}
+
+export const defaultToMarkdownOptions: ToMarkdownOptions = {
+  listItemIndent: 'one',
 }
 
 export function exportMarkdownFromLexical({
   root,
-  options,
-  visitors = LexicalVisitors,
-  jsxComponentDescriptors = [],
-}: ExportMarkdownFromLexicalParams): string {
-  const md = toMarkdown(exportLexicalTreeToMdast(root, visitors, jsxComponentDescriptors), {
-    extensions: [
-      mdxToMarkdown(),
-      frontmatterToMarkdown('yaml'),
-      directiveToMarkdown,
-      gfmTableToMarkdown({ tableCellPadding: true, tablePipeAlign: true }),
-    ],
-    listItemIndent: 'one',
-    ...options,
+  toMarkdownOptions,
+  toMarkdownExtensions,
+  visitors,
+  jsxComponentDescriptors,
+}: ExportMarkdownFromLexicalOptions): string {
+  return toMarkdown(exportLexicalTreeToMdast({ root, visitors, jsxComponentDescriptors }), {
+    extensions: toMarkdownExtensions,
+    ...toMarkdownOptions,
   })
-  return md
 }

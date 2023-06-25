@@ -4,7 +4,7 @@ import { EditorSystemType } from './Editor'
 import { JsxSystemType } from './Jsx'
 
 export const [OnChangeSystem, OnChangeSystemType] = system(
-  (r, [{ createEditorSubscription }, { jsxComponentDescriptors }]) => {
+  (r, [{ createEditorSubscription, lexicalConvertOptions }, { jsxComponentDescriptors }]) => {
     const onChange = r.node<string>()
 
     r.pub(createEditorSubscription, (activeEditor, rootEditor) => {
@@ -14,7 +14,8 @@ export const [OnChangeSystem, OnChangeSystemType] = system(
         }
 
         const descriptors = r.getValue(jsxComponentDescriptors)
-        r.pub(onChange, getStateAsMarkdown(rootEditor, descriptors))
+        const options = r.getValue(lexicalConvertOptions)
+        r.pub(onChange, getStateAsMarkdown(rootEditor, { jsxComponentDescriptors: descriptors, ...options! }))
       })
     })
 

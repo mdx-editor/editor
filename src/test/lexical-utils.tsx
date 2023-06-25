@@ -33,7 +33,7 @@ import * as React from 'react'
 import { createRef } from 'react'
 import { createRoot } from 'react-dom/client'
 import * as ReactTestUtils from 'react-dom/test-utils'
-import { UsedLexicalNodes } from '../import'
+import { defaultLexicalNodes } from '../import'
 
 let _keyCounter = 1
 
@@ -405,7 +405,7 @@ const DEFAULT_NODES = Array.from(
     TestInlineElementNode,
     TestTextNode,
     HorizontalRuleNode,
-    ...UsedLexicalNodes,
+    ...Object.values(defaultLexicalNodes),
   ])
 )
 

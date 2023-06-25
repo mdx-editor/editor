@@ -10,7 +10,7 @@ import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPl
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin'
 import classNames from 'classnames'
-import { $getRoot } from 'lexical'
+import { $getRoot, Klass, LexicalNode } from 'lexical'
 import React from 'react'
 import { EditorSystemComponent } from '../system/EditorSystemComponent'
 import { NodeDecorators } from '../system/NodeDecorators'
@@ -36,7 +36,14 @@ import {
   BlockTypeSelect,
 } from './ToolbarPlugin/toolbarComponents'
 import { SharedHistoryPlugin } from './SharedHistoryPlugin'
-import { importMarkdownToLexical, UsedLexicalNodes } from '../import'
+import {
+  defaultMdastExtensions,
+  defaultMdastVisitors,
+  defaultSyntaxExtensions,
+  MarkdownParseOptions,
+  importMarkdownToLexical,
+  defaultLexicalNodes,
+} from '../import'
 import { theme as contentTheme } from '../content/theme'
 import { JsxComponentDescriptors } from '../types/JsxComponentDescriptors'
 import { ViewMode } from '../types/ViewMode'
@@ -44,18 +51,8 @@ import { $createCodeBlockNode } from '../nodes'
 import { ToolbarPlugin } from './ToolbarPlugin'
 import { ViewModeToggler } from './SourcePlugin'
 import { LinkDialogPlugin } from './LinkDialogPlugin'
-
-function lexicalComposerConfig(markdown: string) {
-  return {
-    editorState: () => {
-      importMarkdownToLexical($getRoot(), markdown)
-    },
-    namespace: 'MDXEditor',
-    theme: contentTheme,
-    nodes: UsedLexicalNodes,
-    onError: (error: Error) => console.error(error),
-  }
-}
+import { defaultExtensions, defaultToMarkdownOptions, ExportMarkdownFromLexicalOptions } from '../export/export'
+import { defaultLexicalVisitors } from '../export'
 
 export interface MDXEditorProps {
   markdown: string
@@ -68,6 +65,17 @@ export interface MDXEditorProps {
   onChange?: (markdown: string) => void
   className?: string
   contentEditableClassName?: string
+  markdownParseOptions?: {
+    syntaxExtensions?: MarkdownParseOptions['syntaxExtensions']
+    mdastExtensions?: MarkdownParseOptions['mdastExtensions']
+    visitors?: MarkdownParseOptions['visitors']
+  }
+  lexicalNodes?: Klass<LexicalNode>[]
+  lexicalConvertOptions?: {
+    extensions?: ExportMarkdownFromLexicalOptions['toMarkdownExtensions']
+    markdownOptions?: ExportMarkdownFromLexicalOptions['toMarkdownOptions']
+    visitors?: ExportMarkdownFromLexicalOptions['visitors']
+  }
 }
 
 const defaultNodeDecorators: NodeDecorators = {
@@ -149,11 +157,38 @@ export const MDXEditor: React.FC<MDXEditorProps> = ({
   className,
   contentEditableClassName,
   toolbarComponents = defaultToolbarComponents,
+  markdownParseOptions: {
+    syntaxExtensions = Object.values(defaultSyntaxExtensions),
+    mdastExtensions = Object.values(defaultMdastExtensions),
+    visitors: importVisitors = Object.values(defaultMdastVisitors),
+  } = {},
+  lexicalConvertOptions: {
+    extensions: toMarkdownExtensions = Object.values(defaultExtensions),
+    markdownOptions: toMarkdownOptions = defaultToMarkdownOptions,
+    visitors: exportVisitors = Object.values(defaultLexicalVisitors),
+  } = {},
+  lexicalNodes = Object.values(defaultLexicalNodes),
 }) => {
   const editorRootElementRef = React.useRef<HTMLDivElement>(null)
   return (
     <div className={classNames(styles.editorRoot, styles.editorWrapper, className)} ref={editorRootElementRef}>
-      <LexicalComposer initialConfig={lexicalComposerConfig(markdown)}>
+      <LexicalComposer
+        initialConfig={{
+          editorState: () => {
+            importMarkdownToLexical({
+              root: $getRoot(),
+              visitors: importVisitors,
+              mdastExtensions,
+              markdown,
+              syntaxExtensions,
+            })
+          },
+          namespace: 'MDXEditor',
+          theme: contentTheme,
+          nodes: lexicalNodes,
+          onError: (error: Error) => console.error(error),
+        }}
+      >
         <EditorSystemComponent
           markdownSource={markdown}
           headMarkdown={headMarkdown || markdown}
@@ -165,6 +200,17 @@ export const MDXEditor: React.FC<MDXEditorProps> = ({
           linkAutocompleteSuggestions={linkAutocompleteSuggestions}
           editorRootElementRef={editorRootElementRef as any}
           toolbarComponents={toolbarComponents}
+          markdownParseOptions={{
+            visitors: importVisitors,
+            mdastExtensions,
+            syntaxExtensions,
+          }}
+          lexicalConvertOptions={{
+            visitors: exportVisitors,
+            toMarkdownOptions: toMarkdownOptions,
+            toMarkdownExtensions: toMarkdownExtensions,
+          }}
+          lexicalNodes={lexicalNodes}
         >
           <ToolbarPlugin />
           <ViewModeToggler>

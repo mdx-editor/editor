@@ -17,8 +17,10 @@ import {
   COMMAND_PRIORITY_CRITICAL,
   COMMAND_PRIORITY_LOW,
   FORMAT_TEXT_COMMAND,
+  Klass,
   LexicalCommand,
   LexicalEditor,
+  LexicalNode,
   RangeSelection,
   SELECTION_CHANGE_COMMAND,
   TextFormatType,
@@ -32,6 +34,8 @@ import { ActiveEditorType } from '../types/ActiveEditorType'
 import { $createTableNode } from '../nodes/Table'
 import * as Mdast from 'mdast'
 import { createEmptyHistoryState } from '@lexical/react/LexicalHistoryPlugin'
+import { MarkdownParseOptions } from '../import'
+import { ExportMarkdownFromLexicalOptions } from '../export/export'
 
 type Teardowns = Array<() => void>
 
@@ -74,6 +78,12 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
   const inFocus = r.node(false, true)
   const activeEditorType = r.node<ActiveEditorType>({ type: 'lexical' })
   const editorRootElementRef = r.node<{ current: HTMLDivElement } | null>(null)
+  const markdownParseOptions = r.node<Pick<MarkdownParseOptions, 'syntaxExtensions' | 'mdastExtensions' | 'visitors'> | null>(null)
+  const lexicalConvertOptions = r.node<Pick<
+    ExportMarkdownFromLexicalOptions,
+    'visitors' | 'toMarkdownOptions' | 'toMarkdownExtensions'
+  > | null>(null)
+  const lexicalNodes = r.node<Klass<LexicalNode>[]>([])
 
   r.link(
     r.pipe(
@@ -282,5 +292,8 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
     inFocus,
     historyState,
     editorRootElementRef,
+    markdownParseOptions,
+    lexicalConvertOptions,
+    lexicalNodes,
   }
 }, [])

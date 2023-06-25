@@ -33,6 +33,9 @@ export const {
       sandpackConfig: 'sandpackConfig',
       nodeDecorators: 'nodeDecorators',
       toolbarComponents: 'toolbarComponents',
+      markdownParseOptions: 'markdownParseOptions',
+      lexicalConvertOptions: 'lexicalConvertOptions',
+      lexicalNodes: 'lexicalNodes',
     },
     optional: {
       editorRootElementRef: 'editorRootElementRef',
