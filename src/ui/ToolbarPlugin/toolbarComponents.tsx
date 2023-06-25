@@ -1,7 +1,7 @@
 import * as RadixToolbar from '@radix-ui/react-toolbar'
 import classNames from 'classnames'
 import React from 'react'
-import { useEmitterValues, usePublisher } from '../../system'
+import { useEmitterValues, usePublisher } from '../../system/EditorSystemComponent'
 import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from '../../FormatConstants'
 import styles from '../styles.module.css'
 import CodeIcon from './icons/code.svg'

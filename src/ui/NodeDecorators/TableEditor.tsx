@@ -36,7 +36,7 @@ import AddColumnIcon from './icons/add_column.svg'
 import styles from '../styles.module.css'
 import classNames from 'classnames'
 import * as RadixToolbar from '@radix-ui/react-toolbar'
-import { useEmitterValues } from '../../system'
+import { useEmitterValues } from '../../system/EditorSystemComponent'
 import { SharedHistoryPlugin } from '../SharedHistoryPlugin'
 
 const AlignToTailwindClassMap = {

@@ -10,7 +10,7 @@ import { LexicalNestedComposer } from '@lexical/react/LexicalNestedComposer'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import * as RadixPopover from '@radix-ui/react-popover'
 import { useForm } from 'react-hook-form'
-import { useEmitterValues } from '../../system'
+import { useEmitterValues } from '../../system/EditorSystemComponent'
 import { JsxEditorProps } from '../../types/NodeDecoratorsProps'
 import { PopoverContent, PopoverTrigger } from '../../ui/Popover/primitives'
 

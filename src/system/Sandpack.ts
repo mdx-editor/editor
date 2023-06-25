@@ -7,19 +7,11 @@ import { $createSandpackNode } from '../nodes/Sandpack'
 import { $insertNodeToNearestRoot } from '@lexical/utils'
 import { $createCodeBlockNode } from '../nodes'
 
-export type Dependencies = Record<string, string>
 type SandpackProviderProps = React.ComponentProps<typeof SandpackProvider>
 
-export type DependencySet = {
-  name: string
-  dependencies: Dependencies
-}
-
-export type FileSet = {
-  name: string
-  files: Record<string, string>
-}
-
+/**
+ * Defines a single preset that can be used to create a sandbox.
+ */
 export interface SandpackPreset {
   /**
    * The name of the preset - use this to reference the preset from the defaultPreset field
@@ -48,7 +40,7 @@ export interface SandpackPreset {
   /**
    * The dependencies that will be added to the sandbox, just like in package.json
    */
-  dependencies?: Dependencies
+  dependencies?: Record<string, string>
   /**
    * The files that will be added to the sandbox (read-only).
    * The key is the name of the file, and the value is the contents of the file.
@@ -64,6 +56,9 @@ export interface SandpackPreset {
   initialSnippetContent?: string
 }
 
+/**
+ * The configuration for the available sandpack presets
+ */
 export interface SandpackConfig {
   /**
    * The name of the default preset that will be used if no meta (other than live) is set

@@ -1,6 +1,6 @@
 import { SandpackProvider, CodeEditor as TheEditorFromSandpack } from '@codesandbox/sandpack-react'
 import React from 'react'
-import { useEmitterValues, usePublisher } from '../../system'
+import { useEmitterValues, usePublisher } from '../../system/EditorSystemComponent'
 import { CodeBlockEditorProps } from '../../types/NodeDecoratorsProps'
 import styles from '../styles.module.css'
 import { useCodeMirrorRef } from './useCodeMirrorRef'

@@ -12,7 +12,7 @@ import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin
 import classNames from 'classnames'
 import { $getRoot } from 'lexical'
 import React from 'react'
-import { EditorSystemComponent } from '../system'
+import { EditorSystemComponent } from '../system/EditorSystemComponent'
 import { NodeDecorators } from '../system/NodeDecorators'
 import { SandpackConfig } from '../system/Sandpack'
 import ListMaxIndentLevelPlugin from './ListIndentPlugin'
@@ -45,7 +45,7 @@ import { ToolbarPlugin } from './ToolbarPlugin'
 import { ViewModeToggler } from './SourcePlugin'
 import { LinkDialogPlugin } from './LinkDialogPlugin'
 
-export function lexicalComposerConfig(markdown: string) {
+function lexicalComposerConfig(markdown: string) {
   return {
     editorState: () => {
       importMarkdownToLexical($getRoot(), markdown)
@@ -57,7 +57,7 @@ export function lexicalComposerConfig(markdown: string) {
   }
 }
 
-interface MDXEditorProps {
+export interface MDXEditorProps {
   markdown: string
   sandpackConfig?: SandpackConfig
   headMarkdown?: string

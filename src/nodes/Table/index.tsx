@@ -2,7 +2,7 @@ import { DecoratorNode, EditorConfig, LexicalEditor, LexicalNode, NodeKey, Seria
 import * as Mdast from 'mdast'
 import React from 'react'
 import { TableEditorProps } from '../../types/NodeDecoratorsProps'
-import { useEmitterValues } from '../../system'
+import { useEmitterValues } from '../../system/EditorSystemComponent'
 import { noop } from '../../utils/fp'
 
 export type SerializedTableNode = Spread<

@@ -3,7 +3,7 @@ import * as Select from '@radix-ui/react-select'
 import DropDownIcon from './icons/arrow_drop_down.svg'
 import classNames from 'classnames'
 import styles from '../styles.module.css'
-import { useEmitterValues } from '../../system'
+import { useEmitterValues } from '../../system/EditorSystemComponent'
 
 export const SelectItem = React.forwardRef<HTMLDivElement | null, { className?: string; children: React.ReactNode; value: string }>(
   ({ children, className, ...props }, forwardedRef) => {

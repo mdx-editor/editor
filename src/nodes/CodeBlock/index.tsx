@@ -1,6 +1,6 @@
 import { DecoratorNode, EditorConfig, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
 import React from 'react'
-import { useEmitterValues } from '../../system'
+import { useEmitterValues } from '../../system/EditorSystemComponent'
 import { noop } from '../../utils/fp'
 import { CodeBlockEditorProps } from '../../types/NodeDecoratorsProps'
 

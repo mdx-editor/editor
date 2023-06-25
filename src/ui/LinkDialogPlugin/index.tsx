@@ -6,7 +6,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import React from 'react'
 
 import { createCommand, LexicalCommand } from 'lexical'
-import { useEmitterValues, usePublisher } from '../../system'
+import { useEmitterValues, usePublisher } from '../../system/EditorSystemComponent'
 import CheckIcon from './icons/check.svg'
 import CloseIcon from './icons/close.svg'
 import CopyIcon from './icons/content_copy.svg'

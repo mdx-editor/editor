@@ -1,7 +1,7 @@
 import React from 'react'
 import * as Select from '@radix-ui/react-select'
 import { SelectItem, SelectTrigger, SelectContent } from './SelectPieces'
-import { useEmitterValues } from '../../system'
+import { useEmitterValues } from '../../system/EditorSystemComponent'
 import { $getNodeByKey } from 'lexical'
 import { CodeBlockEditorType } from '../../types/ActiveEditorType'
 import { CodeBlockNode } from '../../nodes/CodeBlock'

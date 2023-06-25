@@ -16,7 +16,7 @@ import {
 import { MdxJsxAttribute } from 'mdast-util-mdx-jsx'
 import React from 'react'
 import { theme as contentTheme } from '../../content/theme'
-import { useEmitterValues } from '../../system'
+import { useEmitterValues } from '../../system/EditorSystemComponent'
 import { JsxEditorProps, JsxKind } from '../../types/NodeDecoratorsProps'
 
 type updateFn = (node: LexicalNode) => void

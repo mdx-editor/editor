@@ -53,6 +53,7 @@ export class AdmonitionNode extends ElementNode {
 
   createDOM(config: EditorConfig): HTMLElement {
     const element = document.createElement('div')
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
     addClassNamesToElement(element, config.theme.admonition[this.__kind])
 
     return element

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import React from 'react'
-import { useEmitterValues, usePublisher } from '../../system'
+import { useEmitterValues, usePublisher } from '../../system/EditorSystemComponent'
 import { DiffViewer } from './DiffViewer'
 import { CodeMirrorRef } from '@codesandbox/sandpack-react/components/CodeEditor/CodeMirror'
 import { SandpackProvider, CodeEditor as TheEditorFromSandpack } from '@codesandbox/sandpack-react'

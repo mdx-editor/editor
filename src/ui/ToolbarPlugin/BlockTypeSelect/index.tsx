@@ -1,7 +1,7 @@
 import React from 'react'
 import * as Select from '@radix-ui/react-select'
 import { AdmonitionKind } from '../../../nodes'
-import { useEmitterValues, usePublisher } from '../../../system'
+import { useEmitterValues, usePublisher } from '../../../system/EditorSystemComponent'
 import { SelectItem, SelectTrigger, SelectContent } from '../SelectPieces'
 
 export type HeadingType = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'

@@ -1,7 +1,7 @@
 import { CodeMirrorRef } from '@codesandbox/sandpack-react/dist/components/CodeEditor/CodeMirror'
 import { $createParagraphNode, $getNodeByKey } from 'lexical'
 import React from 'react'
-import { useEmitterValues, usePublisher } from '../../system'
+import { useEmitterValues, usePublisher } from '../../system/EditorSystemComponent'
 
 export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'sandpack', language: string) {
   const [activeEditor] = useEmitterValues('activeEditor')

@@ -1,10 +1,9 @@
 import { SandpackCodeEditor, SandpackLayout, SandpackPreview, SandpackProvider, useSandpack } from '@codesandbox/sandpack-react'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import React from 'react'
-import { useEmitterValues, usePublisher } from '../../system'
-import { SandpackConfig, SandpackConfigValue, SandpackPreset } from '../../system/Sandpack'
+import { useEmitterValues, usePublisher } from '../../system/EditorSystemComponent'
+import { SandpackConfig } from '../../system/Sandpack'
 import { SandpackEditorProps } from '../../types/NodeDecoratorsProps'
-import { parseCodeBlockMeta } from './parseCodeBlockMeta'
 import { useCodeMirrorRef } from './useCodeMirrorRef'
 
 interface CodeUpdateEmitterProps {
