@@ -2,7 +2,7 @@
 import { CODE, ElementTransformer, Transformer, TRANSFORMERS } from '@lexical/markdown'
 import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin'
 import React from 'react'
-import { $createCodeBlockNode } from '../../nodes'
+import { $createCodeBlockNode } from '../nodes'
 
 // insert CM code block type rather than the default one
 // TODO: this modifies the original array

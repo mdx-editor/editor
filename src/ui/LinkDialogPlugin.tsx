@@ -6,7 +6,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import React from 'react'
 
 import { createCommand, LexicalCommand } from 'lexical'
-import { useEmitterValues, usePublisher } from '../../system/EditorSystemComponent'
+import { useEmitterValues, usePublisher } from '../system/EditorSystemComponent'
 import CheckIcon from './icons/check.svg'
 import CloseIcon from './icons/close.svg'
 import CopyIcon from './icons/content_copy.svg'
@@ -16,7 +16,7 @@ import OpenInNewIcon from './icons/open_in_new.svg'
 import DropDownIcon from './icons/arrow_drop_down.svg'
 import classNames from 'classnames'
 import { useCombobox } from 'downshift'
-import styles from '../styles.module.css'
+import styles from './styles.module.css'
 
 export const OPEN_LINK_DIALOG: LexicalCommand<undefined> = createCommand()
 

@@ -7,7 +7,7 @@ import { useEmitterValues } from '../../system/EditorSystemComponent'
 import { CodeBlockEditorType, SandpackEditorType } from '../../types/ActiveEditorType'
 import styles from '../styles.module.css'
 import { CodeBlockLanguageSelect } from './CodeBlockLanguageSelect'
-import DeleteIcon from './icons/delete.svg'
+import DeleteIcon from '../icons/delete.svg'
 import { ToolbarButton, ToolbarSeparator, ViewModeSwitch } from './toolbarComponents'
 
 export const ToolbarPlugin = () => {

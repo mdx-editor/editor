@@ -3,6 +3,6 @@
     <path d="M0 0h24v24H0z"/>
   </mask>
   <g mask="url(#a)">
-    <path d="m12 15-5-5h10l-5 5Z"/>
+    <path d="M10 17V7l5 5-5 5Z"/>
   </g>
 </svg>
