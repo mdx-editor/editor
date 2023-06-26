@@ -9,14 +9,16 @@ import { LexicalExportVisitor } from './visitors'
 import { JsxComponentDescriptors } from '../types/JsxComponentDescriptors'
 export type { Options as ToMarkdownOptions } from 'mdast-util-to-markdown'
 
-function isParent(node: unknown): node is Mdast.Parent {
-  return (node as { children?: Array<any> }).children instanceof Array
-}
+export type LexicalVisitor = LexicalExportVisitor<LexicalNode, Mdast.Content>
 
 export interface ExportLexicalTreeOptions {
   root: LexicalRootNode
-  visitors: LexicalVisitors
+  visitors: LexicalVisitor[]
   jsxComponentDescriptors: JsxComponentDescriptors
+}
+
+function isParent(node: unknown): node is Mdast.Parent {
+  return (node as { children?: Array<any> }).children instanceof Array
 }
 
 export function exportLexicalTreeToMdast({ root, visitors, jsxComponentDescriptors }: ExportLexicalTreeOptions): Mdast.Root {
@@ -188,8 +190,6 @@ function fixWrappingWhitespace(node: Mdast.Parent | Mdast.Content, parentChain: 
     nodeAsParent.children.forEach((child) => fixWrappingWhitespace(child, [...parentChain, nodeAsParent]))
   }
 }
-
-export type LexicalVisitors = LexicalExportVisitor<LexicalNode, Mdast.Content>[]
 
 export interface ExportMarkdownFromLexicalOptions extends ExportLexicalTreeOptions {
   toMarkdownExtensions: ToMarkdownOptions['extensions']

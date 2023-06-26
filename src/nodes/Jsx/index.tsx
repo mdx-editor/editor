@@ -19,7 +19,7 @@ import { theme as contentTheme } from '../../content/theme'
 import { useEmitterValues } from '../../system/EditorSystemComponent'
 import { JsxEditorProps, JsxKind } from '../../types/NodeDecoratorsProps'
 
-type updateFn = (node: LexicalNode) => void
+export type updateFn = (node: LexicalNode) => void
 
 export interface JsxPayload {
   name: string
@@ -37,7 +37,7 @@ export type SerializedJsxNode = Spread<
   SerializedLexicalNode
 >
 
-interface JsxNodeConstructorParams extends JsxPayload {
+export interface JsxNodeConstructorParams extends JsxPayload {
   key?: NodeKey
 }
 

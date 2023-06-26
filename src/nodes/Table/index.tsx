@@ -19,7 +19,7 @@ const InternalTableEditor: React.FC<TableEditorProps> = (props) => {
   return <TableEditor {...props} />
 }
 
-type CoordinatesSubscription = (coords: [colIndex: number, rowIndex: number]) => void
+export type CoordinatesSubscription = (coords: [colIndex: number, rowIndex: number]) => void
 
 function coordinatesEmitter() {
   let subscription: CoordinatesSubscription = noop

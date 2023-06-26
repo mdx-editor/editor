@@ -1,28 +1,44 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { CODE, ElementTransformer, Transformer, TRANSFORMERS } from '@lexical/markdown'
 import { LexicalComposer } from '@lexical/react/LexicalComposer'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary'
 import { HorizontalRulePlugin } from '@lexical/react/LexicalHorizontalRulePlugin'
 import { LinkPlugin as LexicalLinkPlugin } from '@lexical/react/LexicalLinkPlugin'
 import { ListPlugin } from '@lexical/react/LexicalListPlugin'
-import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin'
 import classNames from 'classnames'
 import { $getRoot, Klass, LexicalNode } from 'lexical'
 import React from 'react'
+import { theme as contentTheme } from '../content/theme'
+import { defaultLexicalVisitors } from '../export'
+import { ExportMarkdownFromLexicalOptions, defaultExtensions, defaultToMarkdownOptions } from '../export/export'
+import {
+  MarkdownParseOptions,
+  defaultLexicalNodes,
+  defaultMdastExtensions,
+  defaultMdastVisitors,
+  defaultSyntaxExtensions,
+  importMarkdownToLexical,
+} from '../import'
 import { EditorSystemComponent } from '../system/EditorSystemComponent'
 import { NodeDecorators } from '../system/NodeDecorators'
 import { SandpackConfig } from '../system/Sandpack'
+import { JsxComponentDescriptors } from '../types/JsxComponentDescriptors'
+import { ViewMode } from '../types/ViewMode'
+import { LinkDialogPlugin } from './LinkDialogPlugin'
 import ListMaxIndentLevelPlugin from './ListIndentPlugin'
+import { PatchedMarkdownShortcutPlugin } from './MarkdownShortcutPlugin'
 import { CodeBlockEditor } from './NodeDecorators/CodeBlockEditor'
 import { FrontmatterEditor } from './NodeDecorators/FrontmatterEditor'
 import { JsxEditor } from './NodeDecorators/JsxEditor'
 import { SandpackEditor } from './NodeDecorators/SandpackEditor'
 import { TableEditor } from './NodeDecorators/TableEditor'
-import styles from './styles.module.css'
+import { SharedHistoryPlugin } from './SharedHistoryPlugin'
+import { ViewModeToggler } from './SourcePlugin'
+import { ToolbarPlugin } from './ToolbarPlugin'
 import {
+  BlockTypeSelect,
   BoldItalicUnderlineButtons,
   CodeBlockButton,
   CodeFormattingButton,
@@ -33,34 +49,42 @@ import {
   SandpackButton,
   TableButton,
   ToolbarSeparator,
-  BlockTypeSelect,
 } from './ToolbarPlugin/toolbarComponents'
-import { SharedHistoryPlugin } from './SharedHistoryPlugin'
-import {
-  defaultMdastExtensions,
-  defaultMdastVisitors,
-  defaultSyntaxExtensions,
-  MarkdownParseOptions,
-  importMarkdownToLexical,
-  defaultLexicalNodes,
-} from '../import'
-import { theme as contentTheme } from '../content/theme'
-import { JsxComponentDescriptors } from '../types/JsxComponentDescriptors'
-import { ViewMode } from '../types/ViewMode'
-import { $createCodeBlockNode } from '../nodes'
-import { ToolbarPlugin } from './ToolbarPlugin'
-import { ViewModeToggler } from './SourcePlugin'
-import { LinkDialogPlugin } from './LinkDialogPlugin'
-import { defaultExtensions, defaultToMarkdownOptions, ExportMarkdownFromLexicalOptions } from '../export/export'
-import { defaultLexicalVisitors } from '../export'
+import styles from './styles.module.css'
 
+/**
+ * MDXEditor is a rich text editor React Component for editing markdown.
+ */
 export interface MDXEditorProps {
+  /**
+   * The markdown content to be edited.
+   */
   markdown: string
+  /**
+   * The configuration for the sandpack editor that's used for the fenced code blocks.
+   * @see the {@link SandpackConfig} interface for more details.
+   */
   sandpackConfig?: SandpackConfig
+  /**
+   * The markdown content to use for the diff view mode. If not provided, the contents of the `markdown` prop will be used.
+   */
   headMarkdown?: string
+  /**
+   * The configuration for the JSX components used in the markdown content.
+   * @see the {@link JsxComponentDescriptors} interface for more details.
+   */
   jsxComponentDescriptors?: JsxComponentDescriptors
+  /**
+   * The list of suggestions to be shown in the link autocomplete dialog dropdown.
+   */
   linkAutocompleteSuggestions?: string[]
+  /**
+   * The set of components to be rendered in the toolbar.
+   */
   toolbarComponents?: React.ComponentType[]
+  /**
+   * The initial view mode for the editor. Defaults to `ViewMode.editor`.
+   */
   viewMode?: ViewMode
   onChange?: (markdown: string) => void
   className?: string
@@ -134,16 +158,33 @@ export default function App() {
 }
 
 // insert CM code block type rather than the default one
-function patchMarkdownTransformers(transformers: Transformer[]) {
-  const codeTransformer = transformers.find((t) => t === CODE) as ElementTransformer
 
-  codeTransformer.replace = (parentNode, _children, match) => {
-    const codeBlockNode = $createCodeBlockNode({ code: '', language: match ? match[1] : '', meta: '' })
-    parentNode.replace(codeBlockNode)
-    setTimeout(() => codeBlockNode.select(), 80)
+export interface DefaultMdxOptionValues {
+  markdownParse: {
+    defaultVisitors: typeof defaultMdastVisitors
+    defaultSyntaxExtensions: typeof defaultSyntaxExtensions
+    defaultMdastExtensions: typeof defaultMdastExtensions
   }
+  lexicalConvert: {
+    defaultVisitors: typeof defaultLexicalVisitors
+    defaultExtensions: typeof defaultExtensions
+    defaultMarkdownOptions: typeof defaultToMarkdownOptions
+  }
+  defaultLexicalNodes: typeof defaultLexicalNodes
+}
 
-  return transformers
+export const defaultMdxOptionValues: DefaultMdxOptionValues = {
+  markdownParse: {
+    defaultVisitors: defaultMdastVisitors,
+    defaultSyntaxExtensions,
+    defaultMdastExtensions,
+  },
+  lexicalConvert: {
+    defaultVisitors: defaultLexicalVisitors,
+    defaultExtensions,
+    defaultMarkdownOptions: defaultToMarkdownOptions,
+  },
+  defaultLexicalNodes,
 }
 
 export const MDXEditor: React.FC<MDXEditorProps> = ({
@@ -227,7 +268,7 @@ export const MDXEditor: React.FC<MDXEditorProps> = ({
           <TabIndentationPlugin />
           <LinkDialogPlugin />
           <SharedHistoryPlugin />
-          <MarkdownShortcutPlugin transformers={patchMarkdownTransformers(TRANSFORMERS)} />
+          <PatchedMarkdownShortcutPlugin />
         </EditorSystemComponent>
       </LexicalComposer>
     </div>

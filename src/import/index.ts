@@ -43,14 +43,14 @@ export interface MdastVisitActions {
   getParentFormatting(): number
 }
 
-export interface MdastVisitParams<T extends MdastNode> {
+export interface MdastVisitParams<T extends Mdast.Content> {
   mdastNode: T
   lexicalParent: LexicalNode
   actions: MdastVisitActions
 }
 
-export interface MdastImportVisitor<UN extends MdastNode> {
-  testNode: ((mdastNode: MdastNode | Mdast.Root) => boolean) | string
+export interface MdastImportVisitor<UN extends Mdast.Content> {
+  testNode: ((mdastNode: Mdast.Content | Mdast.Root) => boolean) | string
 
   visitNode(params: MdastVisitParams<UN>): void
 }

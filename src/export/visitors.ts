@@ -36,8 +36,6 @@ import { $isTableNode, TableNode } from '../nodes/Table'
 
 export type { Options as ToMarkdownOptions } from 'mdast-util-to-markdown'
 
-type MdastNode = Mdast.Content
-
 export interface LexicalVisitActions<T extends LexicalNode> {
   visitChildren(node: T, mdastParent: Mdast.Parent): void
   addAndStepInto(type: string, props?: Record<string, unknown>, hasChildren?: boolean): void
@@ -51,7 +49,7 @@ export interface LexicalNodeVisitParams<T extends LexicalNode> {
   actions: LexicalVisitActions<T>
 }
 
-export interface LexicalExportVisitor<LN extends LexicalNode, UN extends MdastNode> {
+export interface LexicalExportVisitor<LN extends LexicalNode, UN extends Mdast.Content> {
   testLexicalNode?(lexicalNode: LexicalNode): lexicalNode is LN
   visitLexicalNode?(params: LexicalNodeVisitParams<LN>): void
 
