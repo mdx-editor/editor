@@ -22,7 +22,6 @@ import {
   importMarkdownToLexical,
 } from '../import'
 import { EditorSystemComponent } from '../system/EditorSystemComponent'
-import { NodeDecorators } from '../system/NodeDecorators'
 import { SandpackConfig } from '../system/Sandpack'
 import { JsxComponentDescriptors } from '../types/JsxComponentDescriptors'
 import { ViewMode } from '../types/ViewMode'
@@ -51,6 +50,7 @@ import {
   ToolbarSeparator,
 } from './ToolbarPlugin/toolbarComponents'
 import styles from './styles.module.css'
+import { NodeDecoratorComponents } from '../types/ExtendedEditorConfig'
 
 /**
  * MDXEditor is a rich text editor React Component for editing markdown.
@@ -102,7 +102,7 @@ export interface MDXEditorProps {
   }
 }
 
-const defaultNodeDecorators: NodeDecorators = {
+const defaultNodeDecorators: NodeDecoratorComponents = {
   FrontmatterEditor,
   JsxEditor,
   SandpackEditor,
@@ -225,7 +225,10 @@ export const MDXEditor: React.FC<MDXEditorProps> = ({
             })
           },
           namespace: 'MDXEditor',
-          theme: contentTheme,
+          theme: {
+            ...contentTheme,
+            nodeDecoratorComponents: defaultNodeDecorators,
+          },
           nodes: lexicalNodes,
           onError: (error: Error) => console.error(error),
         }}
@@ -237,7 +240,6 @@ export const MDXEditor: React.FC<MDXEditorProps> = ({
           sandpackConfig={sandpackConfig}
           onChange={onChange}
           viewMode={viewMode}
-          nodeDecorators={defaultNodeDecorators}
           linkAutocompleteSuggestions={linkAutocompleteSuggestions}
           editorRootElementRef={editorRootElementRef as any}
           toolbarComponents={toolbarComponents}

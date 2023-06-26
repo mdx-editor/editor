@@ -7,7 +7,6 @@ import { SandpackSystem } from './Sandpack'
 import { LinkDialogSystem } from './LinkDialog'
 import { JsxSystem } from './Jsx'
 import { OnChangeSystem } from './OnChange'
-import { NodeDecoratorsSystem } from './NodeDecorators'
 import { ToolbarSystem } from './Toolbar'
 
 export const {
@@ -15,23 +14,13 @@ export const {
   usePublisher,
   useEmitterValues,
 } = realmFactoryToComponent(
-  getRealmFactory(
-    EditorSystem,
-    ViewModeSystem,
-    SandpackSystem,
-    LinkDialogSystem,
-    JsxSystem,
-    OnChangeSystem,
-    NodeDecoratorsSystem,
-    ToolbarSystem
-  ),
+  getRealmFactory(EditorSystem, ViewModeSystem, SandpackSystem, LinkDialogSystem, JsxSystem, OnChangeSystem, ToolbarSystem),
   {
     required: {
       markdownSource: 'markdownSource',
       headMarkdown: 'headMarkdown',
       jsxComponentDescriptors: 'jsxComponentDescriptors',
       sandpackConfig: 'sandpackConfig',
-      nodeDecorators: 'nodeDecorators',
       toolbarComponents: 'toolbarComponents',
       markdownParseOptions: 'markdownParseOptions',
       lexicalConvertOptions: 'lexicalConvertOptions',

@@ -1,8 +1,7 @@
-import { DecoratorNode, EditorConfig, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
+import { DecoratorNode, EditorConfig, LexicalEditor, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
 import React from 'react'
-import { useEmitterValues } from '../system/EditorSystemComponent'
 import { noop } from '../utils/fp'
-import { CodeBlockEditorProps } from '../types/NodeDecoratorsProps'
+import { ExtendedEditorConfig } from '../types/ExtendedEditorConfig'
 
 export interface CodeBlockPayload {
   code: string
@@ -22,11 +21,6 @@ function voidEmitter() {
       subscription = cb
     },
   }
-}
-
-function InternalCodeBlockEditor(props: CodeBlockEditorProps) {
-  const [{ CodeBlockEditor }] = useEmitterValues('nodeDecorators')
-  return <CodeBlockEditor {...props} />
 }
 
 /**
@@ -115,9 +109,16 @@ export class CodeBlockNode extends DecoratorNode<JSX.Element> {
     this.__focusEmitter.publish()
   }
 
-  decorate(): JSX.Element {
+  decorate(
+    _editor: LexicalEditor,
+    {
+      theme: {
+        nodeDecoratorComponents: { CodeBlockEditor },
+      },
+    }: ExtendedEditorConfig
+  ): JSX.Element {
     return (
-      <InternalCodeBlockEditor
+      <CodeBlockEditor
         nodeKey={this.getKey()}
         code={this.getCode()}
         meta={this.getMeta()}

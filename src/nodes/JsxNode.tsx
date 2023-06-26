@@ -16,8 +16,8 @@ import {
 import { MdxJsxAttribute } from 'mdast-util-mdx-jsx'
 import React from 'react'
 import { theme as contentTheme } from '../content/theme'
-import { useEmitterValues } from '../system/EditorSystemComponent'
-import { JsxEditorProps, JsxKind } from '../types/NodeDecoratorsProps'
+import { JsxKind } from '../types/NodeDecoratorsProps'
+import { ExtendedEditorConfig } from '../types/ExtendedEditorConfig'
 
 export type updateFn = (node: LexicalNode) => void
 
@@ -67,11 +67,6 @@ const EmptySerializedFlowEditorState = {
   version: 1,
   children: [],
 } as SerializedRootNode
-
-function InternalJsxEditor(props: JsxEditorProps) {
-  const [{ JsxEditor }] = useEmitterValues('nodeDecorators')
-  return <JsxEditor {...props} />
-}
 
 /**
  * @noInheritDoc
@@ -194,9 +189,16 @@ export class JsxNode extends DecoratorNode<JSX.Element> {
     })
   }
 
-  decorate(): JSX.Element {
+  decorate(
+    _parentEditor: LexicalEditor,
+    {
+      theme: {
+        nodeDecoratorComponents: { JsxEditor },
+      },
+    }: ExtendedEditorConfig
+  ): JSX.Element {
     return (
-      <InternalJsxEditor
+      <JsxEditor
         attributes={this.getAttributes()}
         componentName={this.getName()}
         kind={this.getKind()}

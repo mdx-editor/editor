@@ -1,7 +1,6 @@
-import { DecoratorNode, EditorConfig, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
+import { DecoratorNode, EditorConfig, LexicalEditor, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
 import React from 'react'
-import { useEmitterValues } from '../system/EditorSystemComponent'
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import { ExtendedEditorConfig } from '../types/ExtendedEditorConfig'
 
 export interface FrontmatterPayload {
   yaml: string
@@ -14,28 +13,6 @@ export type SerializedFrontmatterNode = Spread<
   },
   SerializedLexicalNode
 >
-
-interface FrontmatterEditorProps {
-  yaml: string
-  onChange: (yaml: string) => void
-}
-
-const InternalFrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) => {
-  const [{ FrontmatterEditor }] = useEmitterValues('nodeDecorators')
-
-  const [editor] = useLexicalComposerContext()
-
-  const writeToEditor = React.useCallback(
-    (yaml: string) => {
-      editor?.update(() => {
-        onChange(yaml)
-      })
-    },
-    [editor, onChange]
-  )
-
-  return <FrontmatterEditor yaml={yaml} onChange={writeToEditor} />
-}
 
 /**
  * @noInheritDoc
@@ -91,8 +68,24 @@ export class FrontmatterNode extends DecoratorNode<JSX.Element> {
     }
   }
 
-  decorate(): JSX.Element {
-    return <InternalFrontmatterEditor yaml={this.getYaml()} onChange={(yaml) => this.setYaml(yaml)} />
+  decorate(
+    editor: LexicalEditor,
+    {
+      theme: {
+        nodeDecoratorComponents: { FrontmatterEditor },
+      },
+    }: ExtendedEditorConfig
+  ): JSX.Element {
+    return (
+      <FrontmatterEditor
+        yaml={this.getYaml()}
+        onChange={(yaml) =>
+          editor?.update(() => {
+            this.setYaml(yaml)
+          })
+        }
+      />
+    )
   }
 }
 

@@ -1,9 +1,8 @@
-import { DecoratorNode, EditorConfig, LexicalEditor, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
+import { DecoratorNode, LexicalEditor, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
 import * as Mdast from 'mdast'
 import React from 'react'
-import { TableEditorProps } from '../types/NodeDecoratorsProps'
-import { useEmitterValues } from '../system/EditorSystemComponent'
 import { noop } from '../utils/fp'
+import { ExtendedEditorConfig } from '../types/ExtendedEditorConfig'
 
 export type SerializedTableNode = Spread<
   {
@@ -13,11 +12,6 @@ export type SerializedTableNode = Spread<
 >
 
 const EMPTY_CELL: Mdast.TableCell = { type: 'tableCell', children: [] as Mdast.PhrasingContent[] }
-
-const InternalTableEditor: React.FC<TableEditorProps> = (props) => {
-  const [{ TableEditor }] = useEmitterValues('nodeDecorators')
-  return <TableEditor {...props} />
-}
 
 export type CoordinatesSubscription = (coords: [colIndex: number, rowIndex: number]) => void
 
@@ -159,8 +153,15 @@ export class TableNode extends DecoratorNode<JSX.Element> {
     table.align[colIndex] = align
   }
 
-  decorate(parentEditor: LexicalEditor, _config: EditorConfig): JSX.Element {
-    return <InternalTableEditor lexicalTable={this} mdastNode={this.__mdastNode} parentEditor={parentEditor} />
+  decorate(
+    parentEditor: LexicalEditor,
+    {
+      theme: {
+        nodeDecoratorComponents: { TableEditor },
+      },
+    }: ExtendedEditorConfig
+  ): JSX.Element {
+    return <TableEditor lexicalTable={this} mdastNode={this.__mdastNode} parentEditor={parentEditor} />
   }
 
   select(coords: [colIndex: number, rowIndex: number]): void {

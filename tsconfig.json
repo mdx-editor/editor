@@ -20,8 +20,7 @@
     "types": [
       "vite/client",
       "@testing-library/jest-dom",
-      "lexical",
-      "svgr",
+      "svgr"
     ],
     "plugins": [
       {

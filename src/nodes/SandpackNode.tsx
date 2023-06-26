@@ -1,8 +1,7 @@
-import { DecoratorNode, EditorConfig, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
+import { DecoratorNode, EditorConfig, LexicalEditor, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
 import React from 'react'
-import { useEmitterValues } from '../system/EditorSystemComponent'
 import { noop } from '../utils/fp'
-import { SandpackEditorProps } from '../types/NodeDecoratorsProps'
+import { ExtendedEditorConfig } from '../types/ExtendedEditorConfig'
 
 export interface SandpackPayload {
   code: string
@@ -22,11 +21,6 @@ function voidEmitter() {
       subscription = cb
     },
   }
-}
-
-function InternalSandpackEditor(props: SandpackEditorProps) {
-  const [{ SandpackEditor }] = useEmitterValues('nodeDecorators')
-  return <SandpackEditor {...props} />
 }
 
 /**
@@ -115,9 +109,16 @@ export class SandpackNode extends DecoratorNode<JSX.Element> {
     this.__focusEmitter.publish()
   }
 
-  decorate(): JSX.Element {
+  decorate(
+    _parentEditor: LexicalEditor,
+    {
+      theme: {
+        nodeDecoratorComponents: { SandpackEditor },
+      },
+    }: ExtendedEditorConfig
+  ): JSX.Element {
     return (
-      <InternalSandpackEditor
+      <SandpackEditor
         nodeKey={this.getKey()}
         code={this.getCode()}
         meta={this.getMeta()}
