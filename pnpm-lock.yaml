@@ -258,6 +258,9 @@ devDependencies:
   typedoc-plugin-markdown:
     specifier: ^3.15.3
     version: 3.15.3(typedoc@0.24.8)
+  typedoc-plugin-no-inherit:
+    specifier: ^1.4.0
+    version: 1.4.0(typedoc@0.24.8)
   typescript:
     specifier: 5.0.4
     version: 5.0.4
@@ -8084,6 +8087,14 @@ packages:
       typedoc: '>=0.24.0'
     dependencies:
       handlebars: 4.7.7
+      typedoc: 0.24.8(typescript@5.0.4)
+    dev: true
+
+  /typedoc-plugin-no-inherit@1.4.0(typedoc@0.24.8):
+    resolution: {integrity: sha512-cAvqQ8X9xh1xztVoDKtF4nYRSBx9XwttN3OBbNNpA0YaJSRM8XvpVVhugq8FoO1HdWjF3aizS0JzdUOMDt0y9g==}
+    peerDependencies:
+      typedoc: '>=0.23.0'
+    dependencies:
       typedoc: 0.24.8(typescript@5.0.4)
     dev: true
 

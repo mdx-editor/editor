@@ -15,9 +15,9 @@ import {
 } from 'lexical'
 import { MdxJsxAttribute } from 'mdast-util-mdx-jsx'
 import React from 'react'
-import { theme as contentTheme } from '../../content/theme'
-import { useEmitterValues } from '../../system/EditorSystemComponent'
-import { JsxEditorProps, JsxKind } from '../../types/NodeDecoratorsProps'
+import { theme as contentTheme } from '../content/theme'
+import { useEmitterValues } from '../system/EditorSystemComponent'
+import { JsxEditorProps, JsxKind } from '../types/NodeDecoratorsProps'
 
 export type updateFn = (node: LexicalNode) => void
 
@@ -73,6 +73,9 @@ function InternalJsxEditor(props: JsxEditorProps) {
   return <JsxEditor {...props} />
 }
 
+/**
+ * @noInheritDoc
+ */
 export class JsxNode extends DecoratorNode<JSX.Element> {
   __kind: JsxKind
   __name: string

@@ -17,21 +17,22 @@ import { mdxjs } from 'micromark-extension-mdxjs'
 import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from '../FormatConstants'
 import {
   $createAdmonitionNode,
+  $createCodeBlockNode,
   $createFrontmatterNode,
   $createImageNode,
+  $createJsxNode,
   $createSandpackNode,
+  $createTableNode,
   $isAdmonitionNode,
   AdmonitionKind,
   AdmonitionNode,
+  CodeBlockNode,
   FrontmatterNode,
   ImageNode,
+  JsxNode,
   SandpackNode,
+  TableNode,
 } from '../nodes'
-import { $createCodeBlockNode, CodeBlockNode } from '../nodes/CodeBlock'
-import { $createJsxNode, JsxNode } from '../nodes/Jsx'
-import { $createTableNode, TableNode } from '../nodes/Table'
-
-type MdastNode = Mdast.Content
 
 export interface MdastVisitActions {
   visitChildren(node: Mdast.Parent, lexicalParent: LexicalNode): void

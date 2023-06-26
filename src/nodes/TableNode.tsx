@@ -1,9 +1,9 @@
 import { DecoratorNode, EditorConfig, LexicalEditor, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
 import * as Mdast from 'mdast'
 import React from 'react'
-import { TableEditorProps } from '../../types/NodeDecoratorsProps'
-import { useEmitterValues } from '../../system/EditorSystemComponent'
-import { noop } from '../../utils/fp'
+import { TableEditorProps } from '../types/NodeDecoratorsProps'
+import { useEmitterValues } from '../system/EditorSystemComponent'
+import { noop } from '../utils/fp'
 
 export type SerializedTableNode = Spread<
   {
@@ -33,6 +33,9 @@ function coordinatesEmitter() {
   }
 }
 
+/**
+ * @noInheritDoc
+ */
 export class TableNode extends DecoratorNode<JSX.Element> {
   __mdastNode: Mdast.Table
   focusEmitter = coordinatesEmitter()

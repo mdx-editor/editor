@@ -1,6 +1,6 @@
 import { DecoratorNode, EditorConfig, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
 import React from 'react'
-import { useEmitterValues } from '../../system/EditorSystemComponent'
+import { useEmitterValues } from '../system/EditorSystemComponent'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 
 export interface FrontmatterPayload {
@@ -37,6 +37,9 @@ const InternalFrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =
   return <FrontmatterEditor yaml={yaml} onChange={writeToEditor} />
 }
 
+/**
+ * @noInheritDoc
+ */
 export class FrontmatterNode extends DecoratorNode<JSX.Element> {
   __yaml: string
 

@@ -39,6 +39,9 @@ export type SerializedImageNode = Spread<
   SerializedLexicalNode
 >
 
+/**
+ * @noInheritDoc
+ */
 export class ImageNode extends DecoratorNode<JSX.Element> {
   __src: string
   __altText: string

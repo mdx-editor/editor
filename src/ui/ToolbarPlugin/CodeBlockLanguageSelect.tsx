@@ -4,7 +4,7 @@ import { SelectItem, SelectTrigger, SelectContent } from './SelectPieces'
 import { useEmitterValues } from '../../system/EditorSystemComponent'
 import { $getNodeByKey } from 'lexical'
 import { CodeBlockEditorType } from '../../types/ActiveEditorType'
-import { CodeBlockNode } from '../../nodes/CodeBlock'
+import { CodeBlockNode } from '../../nodes'
 
 export function CodeBlockLanguageSelect() {
   const [activeEditorType, activeEditor] = useEmitterValues('activeEditorType', 'activeEditor')

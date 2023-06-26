@@ -1,6 +1,6 @@
 import { EditorThemeClasses, LexicalEditor } from 'lexical'
 import { MdxJsxAttribute } from 'mdast-util-mdx-jsx'
-import { TableNode } from '../nodes/Table'
+import { TableNode } from '../nodes'
 import * as Mdast from 'mdast'
 
 export interface FrontmatterEditorProps {

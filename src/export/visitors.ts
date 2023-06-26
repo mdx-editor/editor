@@ -8,9 +8,9 @@ import {
   $isRootNode,
   $isTextNode,
   LexicalNode,
+  RootNode as LexicalRootNode,
   LineBreakNode,
   ParagraphNode,
-  RootNode as LexicalRootNode,
   TextNode,
 } from 'lexical'
 import * as Mdast from 'mdast'
@@ -18,21 +18,22 @@ import { ContainerDirective } from 'mdast-util-directive'
 import type { MdxJsxFlowElement, MdxJsxTextElement } from 'mdast-util-mdx-jsx'
 import {
   $isAdmonitionNode,
-  $isSandpackNode,
-  AdmonitionNode,
-  SandpackNode,
-  JsxNode,
-  $isJsxNode,
-  $isImageNode,
-  ImageNode,
-  $isFrontmatterNode,
-  FrontmatterNode,
   $isCodeBlockNode,
+  $isFrontmatterNode,
+  $isImageNode,
+  $isJsxNode,
+  $isSandpackNode,
+  $isTableNode,
+  AdmonitionNode,
   CodeBlockNode,
+  FrontmatterNode,
+  ImageNode,
+  JsxNode,
+  SandpackNode,
+  TableNode,
 } from '../nodes'
 
 import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from '../FormatConstants'
-import { $isTableNode, TableNode } from '../nodes/Table'
 
 export type { Options as ToMarkdownOptions } from 'mdast-util-to-markdown'
 

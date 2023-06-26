@@ -1,11 +1,10 @@
-import { system } from '../gurx'
-import { $getSelection, $isRangeSelection, COMMAND_PRIORITY_LOW, FOCUS_COMMAND } from 'lexical'
-import { EditorSystemType } from './Editor'
-import React from 'react'
 import { SandpackProvider } from '@codesandbox/sandpack-react'
-import { $createSandpackNode } from '../nodes/Sandpack'
 import { $insertNodeToNearestRoot } from '@lexical/utils'
-import { $createCodeBlockNode } from '../nodes'
+import { $getSelection, $isRangeSelection, COMMAND_PRIORITY_LOW, FOCUS_COMMAND } from 'lexical'
+import React from 'react'
+import { system } from '../gurx'
+import { $createCodeBlockNode, $createSandpackNode } from '../nodes'
+import { EditorSystemType } from './Editor'
 
 type SandpackProviderProps = React.ComponentProps<typeof SandpackProvider>
 

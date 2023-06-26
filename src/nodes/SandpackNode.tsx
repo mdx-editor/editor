@@ -1,16 +1,16 @@
 import { DecoratorNode, EditorConfig, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
 import React from 'react'
-import { useEmitterValues } from '../../system/EditorSystemComponent'
-import { noop } from '../../utils/fp'
-import { CodeBlockEditorProps } from '../../types/NodeDecoratorsProps'
+import { useEmitterValues } from '../system/EditorSystemComponent'
+import { noop } from '../utils/fp'
+import { SandpackEditorProps } from '../types/NodeDecoratorsProps'
 
-export interface CodeBlockPayload {
+export interface SandpackPayload {
   code: string
   meta: string
   language: string
 }
 
-export type SerializedCodeBlockNode = Spread<CodeBlockPayload & { type: 'codeblock'; version: 1 }, SerializedLexicalNode>
+export type SerializedSandpackNode = Spread<SandpackPayload & { type: 'sandpack'; version: 1 }, SerializedLexicalNode>
 
 function voidEmitter() {
   let subscription = noop
@@ -24,28 +24,31 @@ function voidEmitter() {
   }
 }
 
-function InternalCodeBlockEditor(props: CodeBlockEditorProps) {
-  const [{ CodeBlockEditor }] = useEmitterValues('nodeDecorators')
-  return <CodeBlockEditor {...props} />
+function InternalSandpackEditor(props: SandpackEditorProps) {
+  const [{ SandpackEditor }] = useEmitterValues('nodeDecorators')
+  return <SandpackEditor {...props} />
 }
 
-export class CodeBlockNode extends DecoratorNode<JSX.Element> {
+/**
+ * @noInheritDoc
+ */
+export class SandpackNode extends DecoratorNode<JSX.Element> {
   __code: string
   __meta: string
   __language: string
   __focusEmitter = voidEmitter()
 
   static getType(): string {
-    return 'codeblock'
+    return 'sandpack'
   }
 
-  static clone(node: CodeBlockNode): CodeBlockNode {
-    return new CodeBlockNode(node.__code, node.__language, node.__meta, node.__key)
+  static clone(node: SandpackNode): SandpackNode {
+    return new SandpackNode(node.__code, node.__language, node.__meta, node.__key)
   }
 
-  static importJSON(serializedNode: SerializedCodeBlockNode): CodeBlockNode {
+  static importJSON(serializedNode: SerializedSandpackNode): SandpackNode {
     const { code, meta, language } = serializedNode
-    return $createCodeBlockNode({
+    return $createSandpackNode({
       code,
       language,
       meta,
@@ -59,12 +62,12 @@ export class CodeBlockNode extends DecoratorNode<JSX.Element> {
     this.__language = language
   }
 
-  exportJSON(): SerializedCodeBlockNode {
+  exportJSON(): SerializedSandpackNode {
     return {
       code: this.getCode(),
       language: this.getLanguage(),
       meta: this.getMeta(),
-      type: 'codeblock',
+      type: 'sandpack',
       version: 1,
     }
   }
@@ -114,11 +117,10 @@ export class CodeBlockNode extends DecoratorNode<JSX.Element> {
 
   decorate(): JSX.Element {
     return (
-      <InternalCodeBlockEditor
+      <InternalSandpackEditor
         nodeKey={this.getKey()}
         code={this.getCode()}
         meta={this.getMeta()}
-        language={this.getLanguage()}
         onChange={(code) => this.setCode(code)}
         focusEmitter={this.__focusEmitter}
       />
@@ -126,10 +128,10 @@ export class CodeBlockNode extends DecoratorNode<JSX.Element> {
   }
 }
 
-export function $createCodeBlockNode({ code, language, meta }: CodeBlockPayload): CodeBlockNode {
-  return new CodeBlockNode(code, language, meta)
+export function $createSandpackNode({ code, language, meta }: SandpackPayload): SandpackNode {
+  return new SandpackNode(code, language, meta)
 }
 
-export function $isCodeBlockNode(node: LexicalNode | null | undefined): node is CodeBlockNode {
-  return node instanceof CodeBlockNode
+export function $isSandpackNode(node: LexicalNode | null | undefined): node is SandpackNode {
+  return node instanceof SandpackNode
 }

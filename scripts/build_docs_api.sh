@@ -3,6 +3,7 @@
 set -e
 
 typedoc --plugin typedoc-plugin-markdown \
+	--plugin typedoc-plugin-no-inherit \
 	--tsconfig tsconfig.docs.json \
 	--out docs/api \
 	--readme none \
@@ -10,4 +11,4 @@ typedoc --plugin typedoc-plugin-markdown \
 	--categorizeByGroup false \
 	--hideBreadcrumbs true \
 	--hideMembersSymbol true \
-	dist/index.d.ts
+	src/index.ts
