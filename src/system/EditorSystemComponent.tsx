@@ -30,6 +30,7 @@ export const {
       editorRootElementRef: 'editorRootElementRef',
       viewMode: 'viewMode',
       linkAutocompleteSuggestions: 'linkAutocompleteSuggestions',
+      imageAutocompleteSuggestions: 'imageAutocompleteSuggestions',
     },
     events: {
       onChange: 'onChange',

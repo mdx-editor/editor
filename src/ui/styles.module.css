@@ -367,6 +367,7 @@
 .linkDialogEditForm {
   display: flex;
   align-items: center;
+  gap: var(--spacing-2);
 }
 
 .linkDialogInputContainer {
@@ -461,7 +462,7 @@
   }
 }
 
-.linkDialogPopoverContent, .tableColumnEditorPopoverContent {
+.linkDialogPopoverContent, .tableColumnEditorPopoverContent, .dialogContent {
   @mixin drop-shadow-sm;
   display: flex;
   align-items: center;
@@ -511,7 +512,17 @@
 
 .actionButton {
   @mixin icon-button;
+  padding: var(--spacing-1) var(--spacing-1);
   border-radius: var(--radius-medium);
+}
+
+.primaryActionButton {
+  background-color: var(--accentSolid);
+  color:var(--baseBase);
+  &:hover {
+    background-color: var(--accentSolidHover);
+    color:var(--baseBase);
+  }
 }
 
 .tableEditor {
@@ -646,4 +657,58 @@
 .addColumnButton {
   margin-left: var(--spacing-2);
   height: 100%;
+}
+
+/** Dialog */
+.dialogOverlay {
+  position: fixed;
+  inset: 0;
+  animation: overlayShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  background-color: var(--baseBase);
+  z-index: 51;
+  opacity: 0.5;
+}
+
+.dialogContent {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90vw;
+  max-width: 450px;
+  max-height: 85vh;
+  animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 52;
+}
+.dialogContent:focus {
+  outline: none;
+}
+
+.dialogTitle {
+  margin: 0;
+}
+
+.dialogDescription {
+
+}
+
+
+@keyframes overlayShow {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: .5;
+  }
+}
+
+@keyframes contentShow {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
 }

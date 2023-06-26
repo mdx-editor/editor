@@ -26,7 +26,7 @@ import {
   TextFormatType,
 } from 'lexical'
 import { system } from '../gurx'
-import { $createFrontmatterNode, $isAdmonitionNode, $isFrontmatterNode, AdmonitionKind } from '../nodes'
+import { $createFrontmatterNode, $createImageNode, $isAdmonitionNode, $isFrontmatterNode, AdmonitionKind } from '../nodes'
 import { BlockType, HeadingType } from '../ui/ToolbarPlugin/BlockTypeSelect'
 import { formatAdmonition, formatHeading, formatParagraph, formatQuote } from '../ui/ToolbarPlugin/BlockTypeSelect/blockFormatters'
 import { INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontalRuleNode'
@@ -73,6 +73,7 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
   const insertHorizontalRule = r.node<true>()
   const insertTable = r.node<true>()
   const insertFrontmatter = r.node<true>()
+  const insertImage = r.node<string>()
   const createEditorSubscription = r.node<EditorSubscription>()
   const editorSubscriptions = r.node<EditorSubscription[]>([])
   const inFocus = r.node(false, true)
@@ -84,6 +85,8 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
     'visitors' | 'toMarkdownOptions' | 'toMarkdownExtensions'
   > | null>(null)
   const lexicalNodes = r.node<Klass<LexicalNode>[]>([])
+
+  const imageAutocompleteSuggestions = r.node<string[]>([])
 
   r.link(
     r.pipe(
@@ -106,6 +109,23 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
 
   r.sub(r.pipe(insertHorizontalRule, r.o.withLatestFrom(activeEditor)), ([, theEditor]) => {
     theEditor?.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, undefined)
+  })
+
+  r.sub(r.pipe(insertImage, r.o.withLatestFrom(activeEditor)), ([src, theEditor]) => {
+    theEditor?.getEditorState().read(() => {
+      const selection = $getSelection()
+
+      if ($isRangeSelection(selection)) {
+        const focusNode = selection.focus.getNode()
+
+        if (focusNode !== null) {
+          theEditor.update(() => {
+            const imageNode = $createImageNode({ altText: '', src, title: '' })
+            $insertNodeToNearestRoot(imageNode)
+          })
+        }
+      }
+    })
   })
 
   r.sub(r.pipe(insertFrontmatter, r.o.withLatestFrom(activeEditor)), ([, theEditor]) => {
@@ -285,6 +305,7 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
     applyBlockType,
     insertHorizontalRule,
     insertFrontmatter,
+    insertImage,
     insertTable,
     createEditorSubscription,
     editorSubscriptions,
@@ -295,5 +316,6 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
     markdownParseOptions,
     lexicalConvertOptions,
     lexicalNodes,
+    imageAutocompleteSuggestions,
   }
 }, [])
