@@ -21,7 +21,7 @@
   "main": "dist/index.cjs",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
-  "version": "0.0.1",
+  "version": "0.0.0-development",
   "description": "React component for rich text markdown editing",
   "scripts": {
     "build": "vite build",
@@ -30,7 +30,8 @@
     "dev": "LADLE=true ladle dev",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext .ts,.tsx",
-    "test": "vitest"
+    "test": "vitest",
+    "semantic-release": "semantic-release"
   },
   "files": [
     "dist"
@@ -142,7 +143,8 @@
     "vite": "^4.3.9",
     "vite-plugin-dts": "^2.3.0",
     "vite-plugin-svgr": "^3.2.0",
-    "vitest": "^0.31.1"
+    "vitest": "^0.31.1",
+    "semantic-release": "^21.0.5"
   },
   "publishConfig": {
     "access": "public"
@@ -150,5 +152,9 @@
   "engines": {
     "node": ">=16"
   },
-  "packageManager": "pnpm@8.3.0"
+  "packageManager": "pnpm@8.3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mdx-editor/editor.git"
+  }
 }
