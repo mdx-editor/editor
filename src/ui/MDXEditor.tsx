@@ -80,6 +80,10 @@ export interface MDXEditorProps {
    */
   linkAutocompleteSuggestions?: string[]
   /**
+   * The list of suggestions to be shown in the image autocomplete dialog dropdown.
+   */
+  imageAutoCompleteSuggestions?: string[]
+  /**
    * The set of components to be rendered in the toolbar.
    */
   toolbarComponents?: React.ComponentType[]
@@ -197,6 +201,7 @@ export const MDXEditor: React.FC<MDXEditorProps> = ({
   onChange,
   viewMode,
   linkAutocompleteSuggestions,
+  imageAutoCompleteSuggestions,
   className,
   contentEditableClassName,
   toolbarComponents = defaultToolbarComponents,
@@ -243,6 +248,7 @@ export const MDXEditor: React.FC<MDXEditorProps> = ({
           onChange={onChange}
           viewMode={viewMode}
           linkAutocompleteSuggestions={linkAutocompleteSuggestions}
+          imageAutocompleteSuggestions={imageAutoCompleteSuggestions}
           editorRootElementRef={editorRootElementRef as any}
           toolbarComponents={toolbarComponents}
           markdownParseOptions={{

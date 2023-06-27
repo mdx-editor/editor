@@ -82,6 +82,7 @@ export const WrappedLexicalEditor: React.FC<WrappedEditorProps> = ({ viewMode, m
       className={className}
       onChange={onChange}
       linkAutocompleteSuggestions={['https://google.com/', 'https://news.ycombinator.com/', 'https://reddit.com/']}
+      imageAutoCompleteSuggestions={['https://picsum.photos/200', 'https://picsum.photos/201']}
     />
   )
 }

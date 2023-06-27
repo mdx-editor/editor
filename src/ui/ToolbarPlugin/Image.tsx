@@ -18,6 +18,7 @@ export const ImageButton = React.forwardRef<HTMLButtonElement, RadixToolbar.Tool
   const [editorRootElementRef, imageAutocompleteSuggestions] = useEmitterValues('editorRootElementRef', 'imageAutocompleteSuggestions')
   const [open, setOpen] = React.useState(false)
   const insertImage = usePublisher('insertImage')
+  console.log(imageAutocompleteSuggestions)
 
   const onSubmit = React.useCallback(
     (url: string) => {
@@ -114,7 +115,14 @@ const ImageForm: React.FC<ImageFormProps> = ({ initialUrl, onSubmit, imageAutoco
     <form onSubmit={onSubmitEH} className={classNames(styles.linkDialogEditForm)}>
       <div className={styles.linkDialogInputContainer}>
         <div data-visible-dropdown={dropdownIsVisible} className={styles.linkDialogInputWrapper}>
-          <input className={styles.linkDialogInput} {...inputProps} autoFocus size={30} data-editor-dialog={true} />
+          <input
+            placeholder="Paste or select an image url"
+            className={styles.linkDialogInput}
+            {...inputProps}
+            autoFocus
+            size={30}
+            data-editor-dialog={true}
+          />
           <button aria-label="toggle menu" type="button" {...getToggleButtonProps()}>
             <DropDownIcon />
           </button>

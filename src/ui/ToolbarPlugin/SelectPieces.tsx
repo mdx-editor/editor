@@ -41,9 +41,13 @@ export const SelectContent: React.FC<{ children: React.ReactNode; className?: st
   )
 }
 
-export const SelectButtonTrigger: React.FC<{ children: React.ReactNode; title: string }> = ({ children, title }) => {
+export const SelectButtonTrigger: React.FC<{ children: React.ReactNode; title: string; className: string }> = ({
+  children,
+  title,
+  className,
+}) => {
   return (
-    <Select.Trigger className={styles.toolbarButtonSelectTrigger} title={title}>
+    <Select.Trigger className={classNames(styles.toolbarButtonSelectTrigger, className)} title={title}>
       {children}
       <Select.Icon className={styles.toolbarNodeKindSelectDropdownArrow}>
         <DropDownIcon />

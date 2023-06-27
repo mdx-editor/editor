@@ -186,7 +186,7 @@
 
 .toolbarToggleItem, .toolbarButton {
   @mixin clear-form-element;
-  padding: var(--spacing-2);
+  padding: var(--spacing-1);
 
   & svg {
     display: block;
@@ -235,7 +235,7 @@
   color: inherit;
   align-items: center;
   width: var(--spacing-36);
-  padding: var(--spacing-2);
+  padding: var(--spacing-1);
   padding-inline-start: var(--spacing-4) ;
   padding-inline-end: var(--spacing-2);
   border-radius: var(--radius-medium);
@@ -254,8 +254,11 @@
   }
 }
 
+/** used in the sandpack */
 .toolbarButtonSelectTrigger {
-  width: var(--spacing-20);
+  width: auto;
+  padding-inline-start: var(--spacing-2) ;
+  padding-inline-end: var(--spacing-1);
 }
 
 .toolbarNodeKindSelectItem {
@@ -401,6 +404,9 @@
   width: 13rem;
   padding: var(--spacing-2) var(--spacing-3);
   font-size: var(--text-sm);
+  &::placeholder {
+    color: var(--baseBorder);
+  }
 }
 
 .linkDialogAutocompleteContainer {
@@ -674,22 +680,11 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 90vw;
-  max-width: 450px;
-  max-height: 85vh;
   animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
   z-index: 52;
 }
 .dialogContent:focus {
   outline: none;
-}
-
-.dialogTitle {
-  margin: 0;
-}
-
-.dialogDescription {
-
 }
 
 
