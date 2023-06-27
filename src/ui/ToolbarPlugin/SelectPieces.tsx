@@ -41,7 +41,7 @@ export const SelectContent: React.FC<{ children: React.ReactNode; className?: st
   )
 }
 
-export const SelectButtonTrigger: React.FC<{ children: React.ReactNode; title: string; className: string }> = ({
+export const SelectButtonTrigger: React.FC<{ children: React.ReactNode; title: string; className?: string }> = ({
   children,
   title,
   className,
