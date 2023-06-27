@@ -30,7 +30,7 @@ dependencies:
     version: 0.11.1(@lexical/clipboard@0.11.1)(@lexical/selection@0.11.1)(@lexical/utils@0.11.1)(lexical@0.11.1)
   '@lexical/react':
     specifier: ^0.11.1
-    version: 0.11.1(lexical@0.11.1)(react-dom@18.2.0)(react@18.2.0)(yjs@13.6.2)
+    version: 0.11.1(lexical@0.11.1)(react-dom@18.2.0)(react@18.2.0)(yjs@13.6.6)
   '@lexical/rich-text':
     specifier: ^0.11.1
     version: 0.11.1(@lexical/clipboard@0.11.1)(@lexical/selection@0.11.1)(@lexical/utils@0.11.1)(lexical@0.11.1)
@@ -1431,7 +1431,7 @@ packages:
       lexical: 0.11.1
     dev: false
 
-  /@lexical/react@0.11.1(lexical@0.11.1)(react-dom@18.2.0)(react@18.2.0)(yjs@13.6.2):
+  /@lexical/react@0.11.1(lexical@0.11.1)(react-dom@18.2.0)(react@18.2.0)(yjs@13.6.6):
     resolution: {integrity: sha512-iXZusD0Z+eqttuh8s58ZP3H+tn0V1JYOay/Xo3y6/N+UXJ3NpBfVXRQB97cY/861jezMgbmvcjXuhH/rlKCvSg==}
     peerDependencies:
       lexical: 0.11.1
@@ -1454,7 +1454,7 @@ packages:
       '@lexical/table': 0.11.1(lexical@0.11.1)
       '@lexical/text': 0.11.1(lexical@0.11.1)
       '@lexical/utils': 0.11.1(lexical@0.11.1)
-      '@lexical/yjs': 0.11.1(lexical@0.11.1)(yjs@13.6.2)
+      '@lexical/yjs': 0.11.1(lexical@0.11.1)(yjs@13.6.6)
       lexical: 0.11.1
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
@@ -1513,7 +1513,7 @@ packages:
       lexical: 0.11.1
     dev: false
 
-  /@lexical/yjs@0.11.1(lexical@0.11.1)(yjs@13.6.2):
+  /@lexical/yjs@0.11.1(lexical@0.11.1)(yjs@13.6.6):
     resolution: {integrity: sha512-69Q462s4roXN6S8mk/ogMRZNyqLY024w38RzMVvJkY/W7sz30vPNX1RyEDHvTjgBhPXQqhRgmDUPT2V3lE7dRg==}
     peerDependencies:
       lexical: 0.11.1
@@ -1521,7 +1521,7 @@ packages:
     dependencies:
       '@lexical/offset': 0.11.1(lexical@0.11.1)
       lexical: 0.11.1
-      yjs: 13.6.2
+      yjs: 13.6.6
     dev: false
 
   /@lezer/common@1.0.3:
@@ -2680,8 +2680,8 @@ packages:
       '@swc/core-win32-x64-msvc': 1.3.62
     dev: true
 
-  /@testing-library/dom@9.3.0:
-    resolution: {integrity: sha512-Dffe68pGwI6WlLRYR2I0piIkyole9cSBH5jGQKCGMRpHW5RHCqAUaqc2Kv0tUyd4dU4DLPKhJIjyKOnjv4tuUw==}
+  /@testing-library/dom@9.3.1:
+    resolution: {integrity: sha512-0DGPd9AR3+iDTjGoMpxIkAsUihHZ3Ai6CneU6bRRrffXMgzCdlNk43jTrD2/5LT6CBb3MWTP8v510JzYtahD2w==}
     engines: {node: '>=14'}
     dependencies:
       '@babel/code-frame': 7.22.5
@@ -2701,7 +2701,7 @@ packages:
       '@adobe/css-tools': 4.2.0
       '@babel/runtime': 7.22.5
       '@types/testing-library__jest-dom': 5.14.6
-      aria-query: 5.1.3
+      aria-query: 5.3.0
       chalk: 3.0.0
       css.escape: 1.5.1
       dom-accessibility-api: 0.5.16
@@ -2717,7 +2717,7 @@ packages:
       react-dom: ^18.0.0
     dependencies:
       '@babel/runtime': 7.22.5
-      '@testing-library/dom': 9.3.0
+      '@testing-library/dom': 9.3.1
       '@types/react-dom': 18.2.4
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
@@ -3242,6 +3242,12 @@ packages:
     resolution: {integrity: sha512-R5iJ5lkuHybztUfuOAznmboyjWq8O6sqNqtK7CLOqdydi54VNbORp49mb14KbWgG1QD3JFO9hJdZ+y4KutfdOQ==}
     dependencies:
       deep-equal: 2.2.1
+    dev: true
+
+  /aria-query@5.3.0:
+    resolution: {integrity: sha512-b0P0sZPKtyu8HkeRAfCq0IfURZK+SuwMjY1UXGBU27wpAiTwQAIlq56IbIO+ytk/JjS1fMR14ee5WBBfKi5J6A==}
+    dependencies:
+      dequal: 2.0.3
     dev: true
 
   /array-buffer-byte-length@1.0.0:
@@ -8790,8 +8796,8 @@ packages:
     engines: {node: '>= 6'}
     dev: true
 
-  /yjs@13.6.2:
-    resolution: {integrity: sha512-shFc4JI8Hr3NqKYlS09xX6lyQwU3LvQlOXEkHK2aBa1T/luNLf0qHtoujgb9pRPxhIK0uevobHhDw0+AET1Vkw==}
+  /yjs@13.6.6:
+    resolution: {integrity: sha512-VTvezMeMuOra9jKG1Ym5XuQ2H4xXOubIIIupv/B5oygasa9IqDE7Ufv93QTSe9uz69J5VZGMQb2WTEmJv4kJFQ==}
     engines: {node: '>=16.0.0', npm: '>=8.0.0'}
     dependencies:
       lib0: 0.2.78

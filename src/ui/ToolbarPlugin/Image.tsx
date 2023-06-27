@@ -18,7 +18,6 @@ export const ImageButton = React.forwardRef<HTMLButtonElement, RadixToolbar.Tool
   const [editorRootElementRef, imageAutocompleteSuggestions] = useEmitterValues('editorRootElementRef', 'imageAutocompleteSuggestions')
   const [open, setOpen] = React.useState(false)
   const insertImage = usePublisher('insertImage')
-  console.log(imageAutocompleteSuggestions)
 
   const onSubmit = React.useCallback(
     (url: string) => {

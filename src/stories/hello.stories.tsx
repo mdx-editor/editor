@@ -10,6 +10,7 @@ import jsxMarkdown from './assets/jsx.md?raw'
 import styles from './styles.module.css'
 
 import { WrappedLexicalEditor } from './boilerplate'
+import { MDXEditor, MDXEditorMethods } from '../'
 
 export function A1MarkdownKitchenSink() {
   return <WrappedLexicalEditor markdown={initialMarkdown} />
@@ -38,4 +39,15 @@ export function CustomColors() {
 
 export function DarkMode() {
   return <WrappedLexicalEditor markdown={initialMarkdown} className={'dark-theme'} />
+}
+
+export function GetValueWithButton() {
+  const ref = React.useRef<MDXEditorMethods>(null)
+
+  return (
+    <div>
+      <button onClick={() => console.log(ref.current?.getMarkdown())}>Get Markdown</button>
+      <MDXEditor markdown={initialMarkdown} ref={ref} />
+    </div>
+  )
 }

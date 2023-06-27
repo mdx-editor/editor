@@ -34,6 +34,7 @@ import { createRef } from 'react'
 import { createRoot } from 'react-dom/client'
 import * as ReactTestUtils from 'react-dom/test-utils'
 import { defaultLexicalNodes } from '../import'
+import { MDXEditor } from '../'
 
 let _keyCounter = 1
 

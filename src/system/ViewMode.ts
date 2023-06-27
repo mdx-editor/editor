@@ -7,9 +7,8 @@ import { EditorSystemType } from './Editor'
 import { JsxSystemType } from './Jsx'
 
 export const [ViewModeSystem] = system(
-  (r, [{ editor, markdownParseOptions, lexicalConvertOptions }, { jsxComponentDescriptors }]) => {
+  (r, [{ editor, markdownParseOptions, markdownSource }, {}]) => {
     const viewMode = r.node<ViewMode>('editor')
-    const markdownSource = r.node('')
     const headMarkdown = r.node('')
 
     r.sub(
@@ -24,21 +23,16 @@ export const [ViewModeSystem] = system(
           },
           { current: 'editor' as ViewMode, next: 'editor' as ViewMode }
         ),
-        r.o.withLatestFrom(editor, markdownSource, jsxComponentDescriptors, markdownParseOptions, lexicalConvertOptions)
+        r.o.withLatestFrom(editor, markdownSource, markdownParseOptions)
       ),
-      ([{ current }, editor, markdownValue, jsxComponentDescriptors, markdownParseOptions, lexicalConvertOptions]) => {
-        // we're switching away from the editor, update the source.
-        if (current === 'editor') {
-          if (editor) {
-            r.pub(markdownSource, getStateAsMarkdown(editor, { jsxComponentDescriptors, ...lexicalConvertOptions! }))
-          }
-        } else if (current === 'markdown') {
+      ([{ current }, editor, markdownSource, markdownParseOptions]) => {
+        if (current === 'markdown') {
           // we're switching away from the markdown editor, convert the source back to lexical nodes.
           editor?.update(() => {
             $getRoot().clear()
             importMarkdownToLexical({
               root: $getRoot(),
-              markdown: markdownValue,
+              markdown: markdownSource,
               ...markdownParseOptions!,
             })
           })
@@ -49,7 +43,6 @@ export const [ViewModeSystem] = system(
     return {
       viewMode,
       headMarkdown,
-      markdownSource,
     }
   },
   [EditorSystemType, JsxSystemType]

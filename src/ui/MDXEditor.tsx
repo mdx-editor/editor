@@ -21,7 +21,7 @@ import {
   defaultSyntaxExtensions,
   importMarkdownToLexical,
 } from '../import'
-import { EditorSystemComponent } from '../system/EditorSystemComponent'
+import { EditorSystemComponent, useEmitterValues } from '../system/EditorSystemComponent'
 import { SandpackConfig } from '../system/Sandpack'
 import { JsxComponentDescriptors } from '../types/JsxComponentDescriptors'
 import { ViewMode } from '../types/ViewMode'
@@ -193,94 +193,121 @@ export const defaultMdxOptionValues: DefaultMdxOptionValues = {
   defaultLexicalNodes,
 }
 
-export const MDXEditor: React.FC<MDXEditorProps> = ({
-  markdown,
-  headMarkdown,
-  jsxComponentDescriptors = [],
-  sandpackConfig = defaultSandpackConfig,
-  onChange,
-  viewMode,
-  linkAutocompleteSuggestions,
-  imageAutoCompleteSuggestions,
-  className,
-  contentEditableClassName,
-  toolbarComponents = defaultToolbarComponents,
-  markdownParseOptions: {
-    syntaxExtensions = Object.values(defaultSyntaxExtensions),
-    mdastExtensions = Object.values(defaultMdastExtensions),
-    visitors: importVisitors = Object.values(defaultMdastVisitors),
-  } = {},
-  lexicalConvertOptions: {
-    extensions: toMarkdownExtensions = Object.values(defaultExtensions),
-    markdownOptions: toMarkdownOptions = defaultToMarkdownOptions,
-    visitors: exportVisitors = Object.values(defaultLexicalVisitors),
-  } = {},
-  lexicalNodes = Object.values(defaultLexicalNodes),
-}) => {
-  const editorRootElementRef = React.useRef<HTMLDivElement>(null)
-  return (
-    <div className={classNames(styles.editorRoot, styles.editorWrapper, className)} ref={editorRootElementRef}>
-      <LexicalComposer
-        initialConfig={{
-          editorState: () => {
-            importMarkdownToLexical({
-              root: $getRoot(),
+export interface MDXEditorMethods {
+  getMarkdown: () => string
+}
+
+export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>(
+  (
+    {
+      markdown,
+      headMarkdown,
+      jsxComponentDescriptors = [],
+      sandpackConfig = defaultSandpackConfig,
+      onChange,
+      viewMode,
+      linkAutocompleteSuggestions,
+      imageAutoCompleteSuggestions,
+      className,
+      contentEditableClassName,
+      toolbarComponents = defaultToolbarComponents,
+      markdownParseOptions: {
+        syntaxExtensions = Object.values(defaultSyntaxExtensions),
+        mdastExtensions = Object.values(defaultMdastExtensions),
+        visitors: importVisitors = Object.values(defaultMdastVisitors),
+      } = {},
+      lexicalConvertOptions: {
+        extensions: toMarkdownExtensions = Object.values(defaultExtensions),
+        markdownOptions: toMarkdownOptions = defaultToMarkdownOptions,
+        visitors: exportVisitors = Object.values(defaultLexicalVisitors),
+      } = {},
+      lexicalNodes = Object.values(defaultLexicalNodes),
+    },
+    ref
+  ) => {
+    const editorRootElementRef = React.useRef<HTMLDivElement>(null)
+    return (
+      <div className={classNames(styles.editorRoot, styles.editorWrapper, className)} ref={editorRootElementRef}>
+        <LexicalComposer
+          initialConfig={{
+            editorState: () => {
+              importMarkdownToLexical({
+                root: $getRoot(),
+                visitors: importVisitors,
+                mdastExtensions,
+                markdown,
+                syntaxExtensions,
+              })
+            },
+            namespace: 'MDXEditor',
+            theme: {
+              ...contentTheme,
+              nodeDecoratorComponents: defaultNodeDecorators,
+            },
+            nodes: lexicalNodes,
+            onError: (error: Error) => console.error(error),
+          }}
+        >
+          <EditorSystemComponent
+            markdownSource={markdown}
+            headMarkdown={headMarkdown || markdown}
+            jsxComponentDescriptors={jsxComponentDescriptors}
+            sandpackConfig={sandpackConfig}
+            onChange={onChange}
+            viewMode={viewMode}
+            linkAutocompleteSuggestions={linkAutocompleteSuggestions}
+            imageAutocompleteSuggestions={imageAutoCompleteSuggestions}
+            editorRootElementRef={editorRootElementRef as any}
+            toolbarComponents={toolbarComponents}
+            markdownParseOptions={{
               visitors: importVisitors,
               mdastExtensions,
-              markdown,
               syntaxExtensions,
-            })
-          },
-          namespace: 'MDXEditor',
-          theme: {
-            ...contentTheme,
-            nodeDecoratorComponents: defaultNodeDecorators,
-          },
-          nodes: lexicalNodes,
-          onError: (error: Error) => console.error(error),
-        }}
-      >
-        <EditorSystemComponent
-          markdownSource={markdown}
-          headMarkdown={headMarkdown || markdown}
-          jsxComponentDescriptors={jsxComponentDescriptors}
-          sandpackConfig={sandpackConfig}
-          onChange={onChange}
-          viewMode={viewMode}
-          linkAutocompleteSuggestions={linkAutocompleteSuggestions}
-          imageAutocompleteSuggestions={imageAutoCompleteSuggestions}
-          editorRootElementRef={editorRootElementRef as any}
-          toolbarComponents={toolbarComponents}
-          markdownParseOptions={{
-            visitors: importVisitors,
-            mdastExtensions,
-            syntaxExtensions,
-          }}
-          lexicalConvertOptions={{
-            visitors: exportVisitors,
-            toMarkdownOptions: toMarkdownOptions,
-            toMarkdownExtensions: toMarkdownExtensions,
-          }}
-          lexicalNodes={lexicalNodes}
-        >
-          <ToolbarPlugin />
-          <ViewModeToggler>
-            <RichTextPlugin
-              contentEditable={<ContentEditable className={classNames(styles.contentEditable, contentEditableClassName)} />}
-              placeholder={<div></div>}
-              ErrorBoundary={LexicalErrorBoundary}
-            />
-          </ViewModeToggler>
-          <LexicalLinkPlugin />
-          <HorizontalRulePlugin />
-          <ListPlugin />
-          <ListMaxIndentLevelPlugin maxDepth={7} />
-          <TabIndentationPlugin />
-          <LinkDialogPlugin />
-          <SharedHistoryPlugin />
-          <PatchedMarkdownShortcutPlugin />
-        </EditorSystemComponent>
-      </LexicalComposer>
-    </div>
+            }}
+            lexicalConvertOptions={{
+              visitors: exportVisitors,
+              toMarkdownOptions: toMarkdownOptions,
+              toMarkdownExtensions: toMarkdownExtensions,
+            }}
+            lexicalNodes={lexicalNodes}
+          >
+            <ToolbarPlugin />
+            <ViewModeToggler>
+              <RichTextPlugin
+                contentEditable={<ContentEditable className={classNames(styles.contentEditable, contentEditableClassName)} />}
+                placeholder={<div></div>}
+                ErrorBoundary={LexicalErrorBoundary}
+              />
+            </ViewModeToggler>
+            <LexicalLinkPlugin />
+            <HorizontalRulePlugin />
+            <ListPlugin />
+            <ListMaxIndentLevelPlugin maxDepth={7} />
+            <TabIndentationPlugin />
+            <LinkDialogPlugin />
+            <SharedHistoryPlugin />
+            <PatchedMarkdownShortcutPlugin />
+            <MDXMethods mdxRef={ref} />
+          </EditorSystemComponent>
+        </LexicalComposer>
+      </div>
+    )
+  }
+)
+
+const MDXMethods: React.FC<{ mdxRef: React.ForwardedRef<MDXEditorMethods> }> = ({ mdxRef }) => {
+  const [markdownSource] = useEmitterValues('markdownSource')
+
+  React.useImperativeHandle(
+    mdxRef,
+    () => {
+      return {
+        getMarkdown: () => {
+          return markdownSource
+        },
+      }
+    },
+    [markdownSource]
   )
+  return null
 }

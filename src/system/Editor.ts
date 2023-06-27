@@ -60,6 +60,7 @@ function seedTable(): Mdast.Table {
 }
 export const [EditorSystem, EditorSystemType] = system((r) => {
   const editor = r.node<LexicalEditor | null>(null, true)
+  const markdownSource = r.node('')
   const historyState = r.node(createEmptyHistoryState())
   const activeEditor = r.derive(editor, null)
 
@@ -317,5 +318,6 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
     lexicalConvertOptions,
     lexicalNodes,
     imageAutocompleteSuggestions,
+    markdownSource,
   }
 }, [])
