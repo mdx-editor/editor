@@ -9,7 +9,7 @@ import {
   SerializedElementNode,
   Spread,
   AdmonitionKind,
-  EditorConfig,
+  EditorConfig
 } from 'lexical'
 
 export { AdmonitionKind }
@@ -81,7 +81,7 @@ export class AdmonitionNode extends ElementNode {
   exportJSON(): SerializedElementNode {
     return {
       ...super.exportJSON(),
-      type: 'admonition',
+      type: 'admonition'
     }
   }
 

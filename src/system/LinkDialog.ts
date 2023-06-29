@@ -5,7 +5,7 @@ import {
   COMMAND_PRIORITY_LOW,
   KEY_ESCAPE_COMMAND,
   KEY_MODIFIER_COMMAND,
-  RangeSelection,
+  RangeSelection
 } from 'lexical'
 import { system } from '../gurx'
 import { getSelectedNode, getSelectionRectangle } from '../utils/lexicalHelpers'
@@ -77,7 +77,7 @@ export const [LinkDialogSystem, LinkDialogSystemType] = system(
               initialUrl: node.getURL(),
               url: node.getURL(),
               linkNodeKey: node.getKey(),
-              rectangle,
+              rectangle
             })
           } else {
             r.pub(linkDialogState, {
@@ -85,7 +85,7 @@ export const [LinkDialogSystem, LinkDialogSystemType] = system(
               initialUrl: '',
               url: '',
               linkNodeKey: '',
-              rectangle,
+              rectangle
             })
           }
         })
@@ -137,7 +137,7 @@ export const [LinkDialogSystem, LinkDialogSystemType] = system(
               initialUrl: state.url,
               url: state.url,
               linkNodeKey: state.linkNodeKey,
-              rectangle: state.rectangle,
+              rectangle: state.rectangle
             }
           } else {
             throw new Error('Cannot switch to edit mode when not in preview mode')
@@ -156,14 +156,14 @@ export const [LinkDialogSystem, LinkDialogSystemType] = system(
             type: 'preview',
             linkNodeKey: state.linkNodeKey,
             rectangle: state.rectangle,
-            url,
+            url
           })
         } else {
           if (state.initialUrl !== '') {
             editor?.dispatchCommand(TOGGLE_LINK_COMMAND, null)
           }
           r.pub(linkDialogState, {
-            type: 'inactive',
+            type: 'inactive'
           })
         }
       } else {
@@ -179,7 +179,7 @@ export const [LinkDialogSystem, LinkDialogSystemType] = system(
           if (state.type === 'edit') {
             return {
               ...state,
-              url,
+              url
             }
           } else {
             throw new Error('Cannot update link url when not in edit mode')
@@ -198,14 +198,14 @@ export const [LinkDialogSystem, LinkDialogSystemType] = system(
             editor?.focus()
             if (state.initialUrl === '') {
               return {
-                type: 'inactive' as const,
+                type: 'inactive' as const
               }
             } else {
               return {
                 type: 'preview' as const,
                 url: state.initialUrl,
                 linkNodeKey: state.linkNodeKey,
-                rectangle: state.rectangle,
+                rectangle: state.rectangle
               }
             }
           } else {
@@ -229,16 +229,16 @@ export const [LinkDialogSystem, LinkDialogSystemType] = system(
                 type: 'preview' as const,
                 url: node.getURL(),
                 linkNodeKey: node.getKey(),
-                rectangle: getSelectionRectangle(activeEditor),
+                rectangle: getSelectionRectangle(activeEditor)
               }
             } else {
               return {
-                type: 'inactive' as const,
+                type: 'inactive' as const
               }
             }
           } else {
             return {
-              type: 'inactive' as const,
+              type: 'inactive' as const
             }
           }
         })
@@ -256,7 +256,7 @@ export const [LinkDialogSystem, LinkDialogSystemType] = system(
       removeLink,
       openLinkEditDialog,
       applyLinkChanges,
-      linkAutocompleteSuggestions,
+      linkAutocompleteSuggestions
     }
   },
   [EditorSystemType]

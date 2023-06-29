@@ -66,7 +66,7 @@ export function exportLexicalTreeToMdast({ root, visitors, jsxComponentDescripto
     const visitor = visitors.find((visitor) => visitor.testLexicalNode?.(lexicalNode))
     if (!visitor) {
       throw new Error(`no lexical visitor found for ${lexicalNode.getType()}`, {
-        cause: lexicalNode,
+        cause: lexicalNode
       })
     }
 
@@ -78,7 +78,7 @@ export function exportLexicalTreeToMdast({ root, visitors, jsxComponentDescripto
           const newNode = {
             type,
             ...props,
-            ...(hasChildren ? { children: [] } : {}),
+            ...(hasChildren ? { children: [] } : {})
           }
           appendToParent(mdastParent!, newNode as unknown as Mdast.Content)
           if ($isElementNode(lexicalNode) && hasChildren) {
@@ -87,8 +87,8 @@ export function exportLexicalTreeToMdast({ root, visitors, jsxComponentDescripto
         },
         appendToParent,
         visitChildren,
-        registerReferredComponent,
-      },
+        registerReferredComponent
+      }
     })
   }
 
@@ -121,7 +121,7 @@ export function exportLexicalTreeToMdast({ root, visitors, jsxComponentDescripto
   const imports = Array.from(importsMap).map(([source, componentNames]) => {
     return {
       type: 'mdxjsEsm',
-      value: `import { ${componentNames.join(', ')} } from '${source}'`,
+      value: `import { ${componentNames.join(', ')} } from '${source}'`
     } as MdxjsEsm
   })
 
@@ -129,7 +129,7 @@ export function exportLexicalTreeToMdast({ root, visitors, jsxComponentDescripto
     ...Array.from(defaultImportsMap).map(([componentName, source]) => {
       return {
         type: 'mdxjsEsm',
-        value: `import ${componentName} from '${source}'`,
+        value: `import ${componentName} from '${source}'`
       } as MdxjsEsm
     })
   )
@@ -162,7 +162,7 @@ function fixWrappingWhitespace(node: Mdast.Parent | Mdast.Content, parentChain: 
         if (parent) {
           parent.children.splice(parent.children.indexOf(node as unknown as Mdast.Content) + 1, 0, {
             type: 'text',
-            value: trailingWhitespace[0],
+            value: trailingWhitespace[0]
           })
           fixWrappingWhitespace(parent, parentChain.slice(0, -1))
         }
@@ -178,7 +178,7 @@ function fixWrappingWhitespace(node: Mdast.Parent | Mdast.Content, parentChain: 
         if (parent) {
           parent.children.splice(parent.children.indexOf(node as unknown as Mdast.Content), 0, {
             type: 'text',
-            value: leadingWhitespace[0],
+            value: leadingWhitespace[0]
           })
           fixWrappingWhitespace(parent, parentChain.slice(0, -1))
         }
@@ -200,11 +200,11 @@ export const defaultExtensions = {
   mdxToMarkdown: mdxToMarkdown(),
   frontmatterToMarkdown: frontmatterToMarkdown('yaml'),
   directiveToMarkdown,
-  gfmTableToMarkdown: gfmTableToMarkdown({ tableCellPadding: true, tablePipeAlign: true }),
+  gfmTableToMarkdown: gfmTableToMarkdown({ tableCellPadding: true, tablePipeAlign: true })
 }
 
 export const defaultToMarkdownOptions: ToMarkdownOptions = {
-  listItemIndent: 'one',
+  listItemIndent: 'one'
 }
 
 export function exportMarkdownFromLexical({
@@ -212,10 +212,10 @@ export function exportMarkdownFromLexical({
   toMarkdownOptions,
   toMarkdownExtensions,
   visitors,
-  jsxComponentDescriptors,
+  jsxComponentDescriptors
 }: ExportMarkdownFromLexicalOptions): string {
   return toMarkdown(exportLexicalTreeToMdast({ root, visitors, jsxComponentDescriptors }), {
     extensions: toMarkdownExtensions,
-    ...toMarkdownOptions,
+    ...toMarkdownOptions
   })
 }

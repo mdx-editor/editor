@@ -41,7 +41,7 @@ import {
   useImperativeHandle,
   useState,
   useCallback,
-  useMemo,
+  useMemo
 } from 'react'
 import { always, tap } from '../utils/fp'
 import { RealmNode } from './realm'
@@ -314,6 +314,6 @@ export function realmFactoryToComponent<
     useEmitter,
     useEmitterValues,
     usePubKeys,
-    usePublisher,
+    usePublisher
   }
 }

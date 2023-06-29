@@ -159,7 +159,7 @@ export function realm() {
           done(args)
         },
       sink,
-      sources,
+      sources
     })
     return subSingle(sink, cb)
   }
@@ -295,7 +295,7 @@ export function realm() {
       map,
       pulls: nodesToKeySet(pulls),
       sink,
-      sources: nodesToKeySet(sources),
+      sources: nodesToKeySet(sources)
     }
 
     ;[...sources, ...pulls].forEach(({ key: sourceKey }) => {
@@ -359,7 +359,7 @@ export function realm() {
             done((sourceValue as T)[index])
           },
           sink,
-          sources: [source],
+          sources: [source]
         })
       })
     }) as unknown as NodesFromValues<T>
@@ -383,7 +383,7 @@ export function realm() {
           done(mapFunction(value as I))
         },
         sink,
-        sources: [source],
+        sources: [source]
       })
       return sink
     }) as Operator<I, O>
@@ -418,7 +418,7 @@ export function realm() {
           }
         },
         sink,
-        sources: [source],
+        sources: [source]
       })
       return sink
     }) as Operator<I, I>
@@ -498,7 +498,7 @@ export function realm() {
           }
         },
         sink,
-        sources: [bufNode],
+        sources: [bufNode]
       })
       return sink
     }) as Operator<I, [I, O]>
@@ -516,7 +516,7 @@ export function realm() {
           }
         },
         sink,
-        sources: [source],
+        sources: [source]
       })
       return sink
     }
@@ -540,7 +540,7 @@ export function realm() {
             done(args),
         pulls: nodes,
         sink,
-        sources: [source],
+        sources: [source]
       })
       return sink
     }
@@ -569,7 +569,7 @@ export function realm() {
         (...args) =>
           done(args),
       sink,
-      sources: nodes,
+      sources: nodes
     })
     return sink
   }
@@ -631,7 +631,7 @@ export function realm() {
       throttleTime,
       withLatestFrom,
       once,
-      passOnlyAfterNodeHasEmittedBefore,
+      passOnlyAfterNodeHasEmittedBefore
     },
     pipe,
     pub,
@@ -644,7 +644,7 @@ export function realm() {
     spread,
     sub,
     subKey,
-    subKeys,
+    subKeys
   }
 }
 

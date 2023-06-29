@@ -62,9 +62,9 @@ export function system<Dependencies extends LongTuple<AnySystemType>, Constructo
     {
       constructor,
       dependencies,
-      id,
+      id
     },
-    { id },
+    { id }
   ]
 }
 

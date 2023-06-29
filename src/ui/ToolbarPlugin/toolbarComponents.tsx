@@ -257,5 +257,5 @@ export const ToolbarComponents = {
   ToggleSingleGroupWithItem,
   ToolbarButton,
   ToolbarSeparator,
-  ImageButton,
+  ImageButton
 }

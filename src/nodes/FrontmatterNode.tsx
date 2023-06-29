@@ -31,7 +31,7 @@ export class FrontmatterNode extends DecoratorNode<JSX.Element> {
   static importJSON(serializedNode: SerializedFrontmatterNode): FrontmatterNode {
     const { yaml } = serializedNode
     const node = $createFrontmatterNode({
-      yaml,
+      yaml
     })
     return node
   }
@@ -45,7 +45,7 @@ export class FrontmatterNode extends DecoratorNode<JSX.Element> {
     return {
       yaml: this.getYaml(),
       type: 'frontmatter',
-      version: 1,
+      version: 1
     }
   }
 
@@ -72,8 +72,8 @@ export class FrontmatterNode extends DecoratorNode<JSX.Element> {
     editor: LexicalEditor,
     {
       theme: {
-        nodeDecoratorComponents: { FrontmatterEditor },
-      },
+        nodeDecoratorComponents: { FrontmatterEditor }
+      }
     }: ExtendedEditorConfig
   ): JSX.Element {
     return (

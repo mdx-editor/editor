@@ -10,13 +10,13 @@ export const theme: EditorThemeClasses = {
     strikethrough: styles.strikethrough,
     subscript: styles.subscript,
     superscript: styles.superscript,
-    underlineStrikethrough: styles.underlineStrikethrough,
+    underlineStrikethrough: styles.underlineStrikethrough
   },
 
   list: {
     nested: {
-      listitem: styles.nestedListItem,
-    },
+      listitem: styles.nestedListItem
+    }
   },
 
   admonition: {
@@ -24,6 +24,6 @@ export const theme: EditorThemeClasses = {
     info: styles.admonitionInfo,
     note: styles.admonitionNote,
     tip: styles.admonitionTip,
-    caution: styles.admonitionCaution,
-  },
+    caution: styles.admonitionCaution
+  }
 }

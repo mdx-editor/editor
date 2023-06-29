@@ -31,7 +31,7 @@ import {
   ImageNode,
   JsxNode,
   SandpackNode,
-  TableNode,
+  TableNode
 } from '../nodes'
 
 export interface MdastVisitActions {
@@ -61,7 +61,7 @@ export const MdastRootVisitor: MdastImportVisitor<Mdast.Content> = {
   testNode: 'root',
   visitNode({ actions, mdastNode, lexicalParent }) {
     actions.visitChildren(mdastNode as unknown as Mdast.Root, lexicalParent)
-  },
+  }
 }
 
 export const MdastParagraphVisitor: MdastImportVisitor<Mdast.Paragraph> = {
@@ -73,7 +73,7 @@ export const MdastParagraphVisitor: MdastImportVisitor<Mdast.Paragraph> = {
     } else {
       actions.addAndStepInto($createParagraphNode())
     }
-  },
+  }
 }
 
 export const MdastLinkVisitor: MdastImportVisitor<Mdast.Link> = {
@@ -81,24 +81,24 @@ export const MdastLinkVisitor: MdastImportVisitor<Mdast.Link> = {
   visitNode({ mdastNode, actions }) {
     actions.addAndStepInto(
       $createLinkNode(mdastNode.url, {
-        title: mdastNode.title,
+        title: mdastNode.title
       })
     )
-  },
+  }
 }
 
 export const MdastAdmonitionVisitor: MdastImportVisitor<ContainerDirective> = {
   testNode: 'containerDirective',
   visitNode({ mdastNode, actions }) {
     actions.addAndStepInto($createAdmonitionNode(mdastNode.name as AdmonitionKind))
-  },
+  }
 }
 
 export const MdastHeadingVisitor: MdastImportVisitor<Mdast.Heading> = {
   testNode: 'heading',
   visitNode: function ({ mdastNode, actions }): void {
     actions.addAndStepInto($createHeadingNode(`h${mdastNode.depth}`))
-  },
+  }
 }
 
 export const MdastListVisitor: MdastImportVisitor<Mdast.List> = {
@@ -115,28 +115,28 @@ export const MdastListVisitor: MdastImportVisitor<Mdast.List> = {
     }
 
     actions.visitChildren(mdastNode, lexicalNode)
-  },
+  }
 }
 
 export const MdastListItemVisitor: MdastImportVisitor<Mdast.ListItem> = {
   testNode: 'listItem',
   visitNode({ actions }) {
     actions.addAndStepInto($createListItemNode())
-  },
+  }
 }
 
 export const MdastBlockQuoteVisitor: MdastImportVisitor<Mdast.Blockquote> = {
   testNode: 'blockquote',
   visitNode({ actions }) {
     actions.addAndStepInto($createQuoteNode())
-  },
+  }
 }
 
 export const MdastTableVisitor: MdastImportVisitor<Mdast.Table> = {
   testNode: 'table',
   visitNode({ mdastNode, lexicalParent }) {
     ;(lexicalParent as ElementNode).append($createTableNode(mdastNode))
-  },
+  }
 }
 
 export const MdastFormattingVisitor: MdastImportVisitor<Mdast.Emphasis | Mdast.Strong | MdxJsxTextElement> = {
@@ -155,14 +155,14 @@ export const MdastFormattingVisitor: MdastImportVisitor<Mdast.Emphasis | Mdast.S
       actions.addFormatting(IS_UNDERLINE)
     }
     actions.visitChildren(mdastNode, lexicalParent)
-  },
+  }
 }
 
 export const MdastInlineCodeVisitor: MdastImportVisitor<Mdast.InlineCode> = {
   testNode: 'inlineCode',
   visitNode({ mdastNode, actions }) {
     actions.addAndStepInto($createTextNode(mdastNode.value).setFormat(IS_CODE))
-  },
+  }
 }
 
 export const MdastCodeVisitor: MdastImportVisitor<Mdast.Code> = {
@@ -174,24 +174,24 @@ export const MdastCodeVisitor: MdastImportVisitor<Mdast.Code> = {
       constructor({
         code: mdastNode.value,
         language: mdastNode.lang!,
-        meta: mdastNode.meta!,
+        meta: mdastNode.meta!
       })
     )
-  },
+  }
 }
 
 export const MdastTextVisitor: MdastImportVisitor<Mdast.Text> = {
   testNode: 'text',
   visitNode({ mdastNode, actions }) {
     actions.addAndStepInto($createTextNode(mdastNode.value).setFormat(actions.getParentFormatting()))
-  },
+  }
 }
 
 export const MdastThematicBreakVisitor: MdastImportVisitor<Mdast.ThematicBreak> = {
   testNode: 'thematicBreak',
   visitNode({ actions }) {
     actions.addAndStepInto($createHorizontalRuleNode())
-  },
+  }
 }
 
 export const MdastImageVisitor: MdastImportVisitor<Mdast.Image> = {
@@ -201,10 +201,10 @@ export const MdastImageVisitor: MdastImportVisitor<Mdast.Image> = {
       $createImageNode({
         src: mdastNode.url,
         altText: mdastNode.alt || '',
-        title: mdastNode.title || '',
+        title: mdastNode.title || ''
       })
     )
-  },
+  }
 }
 
 export const MdastFrontmatterVisitor: MdastImportVisitor<Mdast.YAML> = {
@@ -212,10 +212,10 @@ export const MdastFrontmatterVisitor: MdastImportVisitor<Mdast.YAML> = {
   visitNode({ mdastNode, actions }) {
     actions.addAndStepInto(
       $createFrontmatterNode({
-        yaml: mdastNode.value,
+        yaml: mdastNode.value
       })
     )
-  },
+  }
 }
 
 export const MdastMdxJsEsmVisitor: MdastImportVisitor<MdxjsEsm> = {
@@ -223,7 +223,7 @@ export const MdastMdxJsEsmVisitor: MdastImportVisitor<MdxjsEsm> = {
   visitNode() {
     // nothing - we will reconstruct the necessary import statements in the export based on the used elements.
     void 0
-  },
+  }
 }
 
 export const MdastMdxJsxElementVisitor: MdastImportVisitor<MdxJsxTextElement> = {
@@ -240,10 +240,10 @@ export const MdastMdxJsxElementVisitor: MdastImportVisitor<MdxJsxTextElement> = 
         attributes: mdastNode.attributes as any,
         updateFn: (lexicalParent) => {
           actions.visitChildren(mdastNode, lexicalParent)
-        },
+        }
       })
     )
-  },
+  }
 }
 
 export const defaultMdastVisitors: Record<string, MdastImportVisitor<Mdast.Content>> = {
@@ -264,7 +264,7 @@ export const defaultMdastVisitors: Record<string, MdastImportVisitor<Mdast.Conte
   MdastAdmonitionVisitor,
   MdastMdxJsEsmVisitor,
   MdastMdxJsxElementVisitor,
-  MdastTableVisitor,
+  MdastTableVisitor
 }
 
 export type ImportVisitors = Array<MdastImportVisitor<Mdast.Content>>
@@ -291,20 +291,20 @@ export const defaultMdastExtensions: Record<string, MarkdownParseOptions['mdastE
   mdxFromMarkdown: mdxFromMarkdown(),
   frontmatterFromMarkdown: frontmatterFromMarkdown('yaml'),
   directiveFromMarkdown: directiveFromMarkdown,
-  gfmTableFromMarkdown: gfmTableFromMarkdown,
+  gfmTableFromMarkdown: gfmTableFromMarkdown
 }
 
 export const defaultSyntaxExtensions: Record<string, MarkdownParseOptions['syntaxExtensions'][number]> = {
   mdxjs: mdxjs(),
   frontmatter: frontmatter(),
   directive: directive(),
-  gfmTable: gfmTable,
+  gfmTable: gfmTable
 }
 
 export function importMarkdownToLexical({ root, markdown, visitors, syntaxExtensions, mdastExtensions }: MarkdownParseOptions): void {
   const mdastRoot = fromMarkdown(markdown, {
     extensions: syntaxExtensions,
-    mdastExtensions,
+    mdastExtensions
   })
 
   if (mdastRoot.children.length === 0) {
@@ -333,7 +333,7 @@ export function importMdastTreeToLexical({ root, mdastRoot, visitors }: MdastTre
     })
     if (!visitor) {
       throw new Error(`no unist visitor found for ${mdastNode.type}`, {
-        cause: mdastNode,
+        cause: mdastNode
       })
     }
 
@@ -354,8 +354,8 @@ export function importMdastTreeToLexical({ root, mdastRoot, visitors }: MdastTre
         },
         getParentFormatting() {
           return formattingMap.get(mdastParent!) ?? 0
-        },
-      },
+        }
+      }
     })
   }
 
@@ -377,5 +377,5 @@ export const defaultLexicalNodes: Record<string, Klass<LexicalNode>> = {
   AdmonitionNode,
   JsxNode,
   CodeNode, // this one should not be used, but markdown shortcuts complain about it
-  TableNode,
+  TableNode
 }

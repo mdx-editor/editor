@@ -27,7 +27,7 @@ export const [OnChangeSystem, OnChangeSystemType] = system(
     })
 
     return {
-      onChange,
+      onChange
     }
   },
   [EditorSystemType, JsxSystemType]

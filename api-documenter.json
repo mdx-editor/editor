@@ -1,0 +1,11 @@
+{
+  "outputTarget": "markdown",
+  "plugins": [
+    {
+      "packageName": "doc-plugin-rush-stack",
+      "enabledFeatureNames": [
+        "rush-stack-markdown-documenter"
+      ]
+    }
+  ]
+}

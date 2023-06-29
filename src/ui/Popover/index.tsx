@@ -17,7 +17,7 @@ export const Popover = ({ children, open, selection, popoverContentProps }: Popo
           top: selection?.top,
           left: selection?.left,
           width: selection?.width,
-          height: selection?.height,
+          height: selection?.height
         }}
       />
     )}

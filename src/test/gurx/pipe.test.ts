@@ -117,7 +117,7 @@ describe('pipe', () => {
     // simultaneous publishing should not trigger
     r.pubIn({
       [a.key]: 3,
-      [b.key]: 3,
+      [b.key]: 3
     })
     expect(spy).toHaveBeenCalledTimes(2)
 

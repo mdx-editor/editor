@@ -19,7 +19,7 @@ import {
   defaultMdastExtensions,
   defaultMdastVisitors,
   defaultSyntaxExtensions,
-  importMarkdownToLexical,
+  importMarkdownToLexical
 } from '../import'
 import { EditorSystemComponent, useEmitterValues } from '../system/EditorSystemComponent'
 import { SandpackConfig } from '../system/Sandpack'
@@ -48,7 +48,7 @@ import {
   ListButtons,
   SandpackButton,
   TableButton,
-  ToolbarSeparator,
+  ToolbarSeparator
 } from './ToolbarPlugin/toolbarComponents'
 import styles from './styles.module.css'
 import { NodeDecoratorComponents } from '../types/ExtendedEditorConfig'
@@ -112,7 +112,7 @@ const defaultNodeDecorators: NodeDecoratorComponents = {
   JsxEditor,
   SandpackEditor,
   CodeBlockEditor,
-  TableEditor,
+  TableEditor
 }
 
 const defaultToolbarComponents = [
@@ -135,7 +135,7 @@ const defaultToolbarComponents = [
   ToolbarSeparator,
 
   CodeBlockButton,
-  SandpackButton,
+  SandpackButton
 ]
 
 const defaultSandpackConfig: SandpackConfig = {
@@ -158,9 +158,9 @@ export default function App() {
     </div>
   );
 }
-`.trim(),
-    },
-  ],
+`.trim()
+    }
+  ]
 }
 
 // insert CM code block type rather than the default one
@@ -183,14 +183,14 @@ export const defaultMdxOptionValues: DefaultMdxOptionValues = {
   markdownParse: {
     defaultVisitors: defaultMdastVisitors,
     defaultSyntaxExtensions,
-    defaultMdastExtensions,
+    defaultMdastExtensions
   },
   lexicalConvert: {
     defaultVisitors: defaultLexicalVisitors,
     defaultExtensions,
-    defaultMarkdownOptions: defaultToMarkdownOptions,
+    defaultMarkdownOptions: defaultToMarkdownOptions
   },
-  defaultLexicalNodes,
+  defaultLexicalNodes
 }
 
 export interface MDXEditorMethods {
@@ -214,14 +214,14 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>(
       markdownParseOptions: {
         syntaxExtensions = Object.values(defaultSyntaxExtensions),
         mdastExtensions = Object.values(defaultMdastExtensions),
-        visitors: importVisitors = Object.values(defaultMdastVisitors),
+        visitors: importVisitors = Object.values(defaultMdastVisitors)
       } = {},
       lexicalConvertOptions: {
         extensions: toMarkdownExtensions = Object.values(defaultExtensions),
         markdownOptions: toMarkdownOptions = defaultToMarkdownOptions,
-        visitors: exportVisitors = Object.values(defaultLexicalVisitors),
+        visitors: exportVisitors = Object.values(defaultLexicalVisitors)
       } = {},
-      lexicalNodes = Object.values(defaultLexicalNodes),
+      lexicalNodes = Object.values(defaultLexicalNodes)
     },
     ref
   ) => {
@@ -236,16 +236,16 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>(
                 visitors: importVisitors,
                 mdastExtensions,
                 markdown,
-                syntaxExtensions,
+                syntaxExtensions
               })
             },
             namespace: 'MDXEditor',
             theme: {
               ...contentTheme,
-              nodeDecoratorComponents: defaultNodeDecorators,
+              nodeDecoratorComponents: defaultNodeDecorators
             },
             nodes: lexicalNodes,
-            onError: (error: Error) => console.error(error),
+            onError: (error: Error) => console.error(error)
           }}
         >
           <EditorSystemComponent
@@ -262,12 +262,12 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>(
             markdownParseOptions={{
               visitors: importVisitors,
               mdastExtensions,
-              syntaxExtensions,
+              syntaxExtensions
             }}
             lexicalConvertOptions={{
               visitors: exportVisitors,
               toMarkdownOptions: toMarkdownOptions,
-              toMarkdownExtensions: toMarkdownExtensions,
+              toMarkdownExtensions: toMarkdownExtensions
             }}
             lexicalNodes={lexicalNodes}
           >
@@ -304,7 +304,7 @@ const MDXMethods: React.FC<{ mdxRef: React.ForwardedRef<MDXEditorMethods> }> = (
       return {
         getMarkdown: () => {
           return markdownSource
-        },
+        }
       }
     },
     [markdownSource]

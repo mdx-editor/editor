@@ -22,7 +22,7 @@ export function HomepageMiniEditor() {
           ToolbarComponents.BoldItalicUnderlineButtons,
           ToolbarComponents.ToolbarSeparator,
           ToolbarComponents.LinkButton,
-          ToolbarComponents.BlockTypeSelect,
+          ToolbarComponents.BlockTypeSelect
         ]}
       />
     </div>

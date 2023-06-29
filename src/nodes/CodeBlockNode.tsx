@@ -19,7 +19,7 @@ function voidEmitter() {
     },
     subscribe: (cb: () => void) => {
       subscription = cb
-    },
+    }
   }
 }
 
@@ -45,7 +45,7 @@ export class CodeBlockNode extends DecoratorNode<JSX.Element> {
     return $createCodeBlockNode({
       code,
       language,
-      meta,
+      meta
     })
   }
 
@@ -62,7 +62,7 @@ export class CodeBlockNode extends DecoratorNode<JSX.Element> {
       language: this.getLanguage(),
       meta: this.getMeta(),
       type: 'codeblock',
-      version: 1,
+      version: 1
     }
   }
 
@@ -113,8 +113,8 @@ export class CodeBlockNode extends DecoratorNode<JSX.Element> {
     _editor: LexicalEditor,
     {
       theme: {
-        nodeDecoratorComponents: { CodeBlockEditor },
-      },
+        nodeDecoratorComponents: { CodeBlockEditor }
+      }
     }: ExtendedEditorConfig
   ): JSX.Element {
     return (

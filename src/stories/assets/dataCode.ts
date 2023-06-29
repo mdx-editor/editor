@@ -15,7 +15,7 @@ export function user(index = 0) {
     initials: `${firstName.substring(0, 1)}${lastName.substring(0, 1)}`,
     jobTitle: randJobTitle(),
     description: randSentence({ length: 1 }).join(' '),
-    longText: randParagraph({ length: 2 }).join('\n'),
+    longText: randParagraph({ length: 2 }).join('\n')
   }
 }
 

@@ -20,7 +20,7 @@ describe('realm factory', () => {
             done((a as number) + (b as number))
           },
           sink: c,
-          sources: [a, b],
+          sources: [a, b]
         })
         return { c }
       },
@@ -63,7 +63,7 @@ describe('realm factory', () => {
         r.connect({
           map: (done) => (value) => done(value),
           sink: b,
-          sources: [a],
+          sources: [a]
         })
 
         return { b }

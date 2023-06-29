@@ -10,7 +10,7 @@ import {
   KEY_ENTER_COMMAND,
   KEY_TAB_COMMAND,
   LexicalEditor,
-  createEditor,
+  createEditor
 } from 'lexical'
 import * as Mdast from 'mdast'
 import React, { useEffect } from 'react'
@@ -42,7 +42,7 @@ import { SharedHistoryPlugin } from '../SharedHistoryPlugin'
 const AlignToTailwindClassMap = {
   center: styles.centeredCell,
   left: styles.leftAlignedCell,
-  right: styles.rightAlignedCell,
+  right: styles.rightAlignedCell
 }
 
 export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEditor, lexicalTable }) => {
@@ -178,7 +178,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
                     colIndex,
                     highlightedCoordinates,
                     lexicalTable,
-                    align: (mdastNode.align || [])[colIndex],
+                    align: (mdastNode.align || [])[colIndex]
                   }}
                 />
               </th>
@@ -270,7 +270,7 @@ const CellEditor: React.FC<CellProps> = ({ activeCellTuple, parentEditor, lexica
     let disposed = false
     const editor = createEditor({
       nodes: lexicalNodes,
-      theme: theme,
+      theme: theme
     })
 
     function saveAndDispose(nextCell: [number, number] | null) {
@@ -282,7 +282,7 @@ const CellEditor: React.FC<CellProps> = ({ activeCellTuple, parentEditor, lexica
         const mdast = exportLexicalTreeToMdast({
           root: $getRoot(),
           jsxComponentDescriptors,
-          ...lexicalConvertOptions!,
+          ...lexicalConvertOptions!
         })
         parentEditor.update(() => {
           lexicalTable.updateCellContents(colIndex, rowIndex, (mdast.children[0] as Mdast.Paragraph).children)
@@ -337,7 +337,7 @@ const CellEditor: React.FC<CellProps> = ({ activeCellTuple, parentEditor, lexica
       importMdastTreeToLexical({
         root: $getRoot(),
         mdastRoot: { type: 'root', children: [{ type: 'paragraph', children: contents }] },
-        visitors: markdownParseOptions!.visitors,
+        visitors: markdownParseOptions!.visitors
       })
     })
 
@@ -367,7 +367,7 @@ const ColumnEditor: React.FC<ColumnEditorProps> = ({
   align,
   lexicalTable,
   colIndex,
-  setActiveCellWithBoundaries,
+  setActiveCellWithBoundaries
 }) => {
   const [editorRootElementRef] = useEmitterValues('editorRootElementRef')
 
@@ -463,7 +463,7 @@ const RowEditor: React.FC<RowEditorProps> = ({
   highlightedCoordinates,
   lexicalTable,
   rowIndex,
-  setActiveCellWithBoundaries,
+  setActiveCellWithBoundaries
 }) => {
   const [editorRootElementRef] = useEmitterValues('editorRootElementRef')
 

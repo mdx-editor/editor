@@ -57,10 +57,10 @@ export const SandpackEditor = ({ nodeKey, code, meta, onChange, focusEmitter }: 
         ...Object.entries(preset.files || {}).reduce(
           (acc, [filePath, fileContents]) => ({ ...acc, ...{ [filePath]: { code: fileContents, readOnly: true } } }),
           {}
-        ),
+        )
       }}
       customSetup={{
-        dependencies: preset.dependencies,
+        dependencies: preset.dependencies
       }}
     >
       <SandpackLayout>

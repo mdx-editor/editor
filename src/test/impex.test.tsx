@@ -201,14 +201,14 @@ describe.skip('mdx jsx components', () => {
       name: 'A1',
       kind: 'text',
       source: './some/place.js',
-      props: [],
+      props: []
     },
     {
       name: 'A2',
       kind: 'text',
       source: './some/place.js',
-      props: [],
-    },
+      props: []
+    }
   ]
 
   initializeUnitTest((testEnv) => {
@@ -255,8 +255,8 @@ describe('markdown export options', () => {
           lexicalConvertOptions={{
             markdownOptions: {
               bullet: '-',
-              listItemIndent: 'one',
-            },
+              listItemIndent: 'one'
+            }
           }}
         />
       )

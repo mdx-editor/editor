@@ -24,7 +24,7 @@ describe('generated component', () => {
   it('loads and displays greeting', () => {
     const factory = simpleRealm()
     const { Component: Comp, useEmitterValues } = realmFactoryToComponent(factory, {
-      optional: { prop: 'prop' },
+      optional: { prop: 'prop' }
     })
 
     const Child = () => {
@@ -50,7 +50,7 @@ describe('generated component', () => {
     }, [])
 
     const { Component: Comp, useEmitterValues } = realmFactoryToComponent(getRealmFactory(sys), {
-      optional: { prop1: 'prop1', prop2: 'prop2' },
+      optional: { prop1: 'prop1', prop2: 'prop2' }
     })
 
     const Child = () => {
@@ -87,7 +87,7 @@ describe('generated component', () => {
     const factory = simpleRealm()
     const spy = vi.fn()
     const { Component: Comp, usePublisher } = realmFactoryToComponent(factory, {
-      events: { propChanged: 'prop' },
+      events: { propChanged: 'prop' }
     })
 
     const Child = () => {
@@ -123,9 +123,9 @@ describe('generated component', () => {
     const {
       Component: Comp,
       useEmitter,
-      usePublisher,
+      usePublisher
     } = realmFactoryToComponent(factory, {
-      events: {},
+      events: {}
     })
 
     const Child = () => {

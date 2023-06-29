@@ -75,7 +75,7 @@ const ImageForm: React.FC<ImageFormProps> = ({ initialUrl, onSubmit, imageAutoco
     items,
     itemToString(item) {
       return item ?? ''
-    },
+    }
   })
 
   const onSubmitEH = (e: React.FormEvent) => {
@@ -105,7 +105,7 @@ const ImageForm: React.FC<ImageFormProps> = ({ initialUrl, onSubmit, imageAutoco
       onKeyDownEH(e)
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       downshiftInputProps.onKeyDown(e)
-    },
+    }
   }
 
   const dropdownIsVisible = isOpen && items.length > 0

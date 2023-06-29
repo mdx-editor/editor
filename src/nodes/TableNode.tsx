@@ -23,7 +23,7 @@ function coordinatesEmitter() {
     },
     subscribe: (cb: CoordinatesSubscription) => {
       subscription = cb
-    },
+    }
   }
 }
 
@@ -50,7 +50,7 @@ export class TableNode extends DecoratorNode<JSX.Element> {
     return {
       mdastNode: structuredClone(this.__mdastNode),
       type: 'table',
-      version: 1,
+      version: 1
     }
   }
 
@@ -127,7 +127,7 @@ export class TableNode extends DecoratorNode<JSX.Element> {
     const table = self.__mdastNode
     const newRow: Mdast.TableRow = {
       type: 'tableRow',
-      children: Array.from({ length: this.getColCount() }, () => structuredClone(EMPTY_CELL)),
+      children: Array.from({ length: this.getColCount() }, () => structuredClone(EMPTY_CELL))
     }
     table.children.splice(y, 0, newRow)
   }
@@ -157,8 +157,8 @@ export class TableNode extends DecoratorNode<JSX.Element> {
     parentEditor: LexicalEditor,
     {
       theme: {
-        nodeDecoratorComponents: { TableEditor },
-      },
+        nodeDecoratorComponents: { TableEditor }
+      }
     }: ExtendedEditorConfig
   ): JSX.Element {
     return <TableEditor lexicalTable={this} mdastNode={this.__mdastNode} parentEditor={parentEditor} />

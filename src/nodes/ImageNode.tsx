@@ -7,7 +7,7 @@ import type {
   LexicalNode,
   NodeKey,
   SerializedLexicalNode,
-  Spread,
+  Spread
 } from 'lexical'
 
 import { DecoratorNode } from 'lexical'
@@ -60,7 +60,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     const node = $createImageNode({
       altText,
       title,
-      src,
+      src
     })
     return node
   }
@@ -79,8 +79,8 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     return {
       img: () => ({
         conversion: convertImageElement,
-        priority: 0,
-      }),
+        priority: 0
+      })
     }
   }
 
@@ -97,7 +97,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
       title: this.getTitle(),
       src: this.getSrc(),
       type: 'image',
-      version: 1,
+      version: 1
     }
   }
 

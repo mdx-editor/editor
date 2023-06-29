@@ -42,7 +42,7 @@ describe('gurx realm', () => {
     r.connect<[number]>({
       map: (done) => (value) => done(value * 2),
       sink: b,
-      sources: [a],
+      sources: [a]
     })
 
     const spy = vi.fn()
@@ -62,19 +62,19 @@ describe('gurx realm', () => {
     r.connect<[number]>({
       map: (done) => (value) => done(value * 2),
       sink: b,
-      sources: [a],
+      sources: [a]
     })
 
     r.connect<[number]>({
       map: (done) => (value) => done(value * 3),
       sink: c,
-      sources: [a],
+      sources: [a]
     })
 
     r.connect<[number, number]>({
       map: (done) => (b, c) => done(b + c),
       sink: d,
-      sources: [b, c],
+      sources: [b, c]
     })
 
     const spy = vi.fn()
@@ -99,7 +99,7 @@ describe('gurx realm', () => {
         }
       },
       sink: c,
-      sources: [a],
+      sources: [a]
     })
 
     r.connect<[number]>({
@@ -109,7 +109,7 @@ describe('gurx realm', () => {
         }
       },
       sink: c,
-      sources: [b],
+      sources: [b]
     })
 
     r.connect<[number]>({
@@ -117,7 +117,7 @@ describe('gurx realm', () => {
         done(value * 2)
       },
       sink: d,
-      sources: [c],
+      sources: [c]
     })
 
     const spy = vi.fn()
@@ -127,7 +127,7 @@ describe('gurx realm', () => {
 
     r.pubIn({
       [a.key]: 2,
-      [b.key]: 3,
+      [b.key]: 3
     })
     expect(spy).toHaveBeenCalledWith(2)
     expect(spy).toHaveBeenCalledTimes(1)
@@ -136,7 +136,7 @@ describe('gurx realm', () => {
 
     r.pubIn({
       [a.key]: 3,
-      [b.key]: 4,
+      [b.key]: 4
     })
     expect(spy).toHaveBeenCalledWith(4)
     expect(spy).toHaveBeenCalledTimes(2)
@@ -157,44 +157,44 @@ describe('gurx realm', () => {
     r.connect<[number]>({
       map: (done) => (value) => done(value + 1),
       sink: b,
-      sources: [a],
+      sources: [a]
     })
 
     r.connect<[number]>({
       map: (done) => (value) => done(value + 1),
       sink: c,
-      sources: [b],
+      sources: [b]
     })
 
     r.connect<[number]>({
       map: (done) => (value) => done(value + 1),
       sink: d,
-      sources: [c],
+      sources: [c]
     })
 
     r.connect<[number]>({
       map: (done) => (value) => done(value + 1),
       sink: e,
-      sources: [d],
+      sources: [d]
     })
 
     r.connect<[number, number]>({
       map: (done) => (a, e) => done(a + e + 1),
       pulls: [e],
       sink: f,
-      sources: [a],
+      sources: [a]
     })
 
     r.connect<[number]>({
       map: (done) => (value) => done(value + 1),
       sink: g,
-      sources: [f],
+      sources: [f]
     })
 
     r.connect<[number]>({
       map: (done) => (value) => done(value + 1),
       sink: h,
-      sources: [g],
+      sources: [g]
     })
 
     const spy = vi.fn()
@@ -211,7 +211,7 @@ describe('gurx realm', () => {
     r.connect<[number]>({
       map: (done) => (value) => value % 2 === 0 && done(value),
       sink: b,
-      sources: [a],
+      sources: [a]
     })
 
     const spy = vi.fn()
@@ -237,19 +237,19 @@ describe('gurx realm', () => {
     r.connect<[number]>({
       map: (done) => (value) => value % 2 === 0 && done(value),
       sink: b,
-      sources: [a],
+      sources: [a]
     })
 
     r.connect({
       map: (done) => (value) => done(value),
       sink: c,
-      sources: [b],
+      sources: [b]
     })
 
     r.connect({
       map: (done) => (value) => done(value),
       sink: d,
-      sources: [c],
+      sources: [c]
     })
 
     const spy = vi.fn()
@@ -274,7 +274,7 @@ describe('gurx realm', () => {
     r.connect<[number, number]>({
       map: (done) => (a, b) => done(a + b),
       sink: c,
-      sources: [a, b],
+      sources: [a, b]
     })
 
     const spy = vi.fn()
@@ -294,7 +294,7 @@ describe('gurx realm', () => {
       map: (done) => (b, a) => done(a + b),
       pulls: [a],
       sink: c,
-      sources: [b],
+      sources: [b]
     })
 
     const spy = vi.fn()
@@ -319,7 +319,7 @@ describe('gurx realm', () => {
     r.connect({
       map: (value) => value,
       sink: b,
-      sources: [a],
+      sources: [a]
     })
     r.sub(b, spy)
     r.pub(a, 'foo')
@@ -344,14 +344,14 @@ describe('gurx realm', () => {
     r.connect({
       map: (value) => value,
       sink: b,
-      sources: [a],
+      sources: [a]
     })
 
     r.sub(a, b, spy)
 
     r.pubIn({
       [a.key]: 'qux',
-      [b.key]: 'mu',
+      [b.key]: 'mu'
     })
 
     expect(spy).toHaveBeenCalledWith(['qux', 'mu'])
@@ -364,7 +364,7 @@ describe('gurx realm', () => {
     const spy = vi.fn()
     r.label({
       a,
-      b,
+      b
     })
     r.subKeys(['a', 'b'], spy)
     r.pub(a, '2')

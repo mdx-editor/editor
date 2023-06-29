@@ -18,7 +18,7 @@ import type {
   SerializedElementNode,
   SerializedLexicalNode,
   SerializedTextNode,
-  Spread,
+  Spread
 } from 'lexical'
 
 import { afterEach, beforeEach } from 'vitest'
@@ -55,7 +55,7 @@ export function initializeUnitTest(runTests: (testEnv: TestEnv) => void, editorC
 
     get outerHTML() {
       return this.container!.innerHTML
-    },
+    }
   }
 
   // eslint-disable-next-line @typescript-eslint/require-await
@@ -100,10 +100,10 @@ export function initializeUnitTest(runTests: (testEnv: TestEnv) => void, editorC
 
 export function initializeClipboard() {
   Object.defineProperty(window, 'DragEvent', {
-    value: class DragEvent {},
+    value: class DragEvent {}
   })
   Object.defineProperty(window, 'ClipboardEvent', {
-    value: class ClipboardEvent {},
+    value: class ClipboardEvent {}
   })
 }
 
@@ -136,7 +136,7 @@ export class TestElementNode extends ElementNode {
     return {
       ...super.exportJSON(),
       type: 'test_block',
-      version: 1,
+      version: 1
     }
   }
 
@@ -173,7 +173,7 @@ export class TestTextNode extends TextNode {
     return {
       ...super.exportJSON(),
       type: 'test_text',
-      version: 1,
+      version: 1
     }
   }
 }
@@ -207,7 +207,7 @@ export class TestInlineElementNode extends ElementNode {
     return {
       ...super.exportJSON(),
       type: 'test_inline_block',
-      version: 1,
+      version: 1
     }
   }
 
@@ -258,7 +258,7 @@ export class TestSegmentedNode extends TextNode {
     return {
       ...super.exportJSON(),
       type: 'test_segmented',
-      version: 1,
+      version: 1
     }
   }
 }
@@ -296,7 +296,7 @@ export class TestExcludeFromCopyElementNode extends ElementNode {
     return {
       ...super.exportJSON(),
       type: 'test_exclude_from_copy_block',
-      version: 1,
+      version: 1
     }
   }
 
@@ -342,7 +342,7 @@ export class TestDecoratorNode extends DecoratorNode<JSX.Element> {
     return {
       ...super.exportJSON(),
       type: 'test_decorator',
-      version: 1,
+      version: 1
     }
   }
 
@@ -351,15 +351,15 @@ export class TestDecoratorNode extends DecoratorNode<JSX.Element> {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       'test-decorator': (_domNode: HTMLElement) => {
         return {
-          conversion: () => ({ node: $createTestDecoratorNode() }),
+          conversion: () => ({ node: $createTestDecoratorNode() })
         }
-      },
+      }
     }
   }
 
   exportDOM() {
     return {
-      element: document.createElement('test-decorator'),
+      element: document.createElement('test-decorator')
     }
   }
 
@@ -406,7 +406,7 @@ const DEFAULT_NODES = Array.from(
     TestInlineElementNode,
     TestTextNode,
     HorizontalRuleNode,
-    ...Object.values(defaultLexicalNodes),
+    ...Object.values(defaultLexicalNodes)
   ])
 )
 
@@ -437,7 +437,7 @@ export function createTestEditor(
     },
     ...config,
     // @ts-ignore
-    nodes: DEFAULT_NODES.concat(customNodes),
+    nodes: DEFAULT_NODES.concat(customNodes)
   })
   return editor
 }

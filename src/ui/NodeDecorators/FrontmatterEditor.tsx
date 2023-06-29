@@ -21,13 +21,13 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
 
   const { register, control, watch } = useForm({
     defaultValues: {
-      yamlConfig,
-    },
+      yamlConfig
+    }
   })
 
   const { fields, append, remove } = useFieldArray({
     control,
-    name: 'yamlConfig',
+    name: 'yamlConfig'
   })
 
   React.useEffect(() => {

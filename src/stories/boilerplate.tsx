@@ -25,7 +25,7 @@ export const virtuosoSampleSandpackConfig: SandpackConfig = {
       sandpackTheme: 'light',
       snippetFileName: '/App.js',
       snippetLanguage: 'jsx',
-      initialSnippetContent: defaultSnippetContent,
+      initialSnippetContent: defaultSnippetContent
     },
     {
       label: 'Virtuoso',
@@ -37,13 +37,13 @@ export const virtuosoSampleSandpackConfig: SandpackConfig = {
       initialSnippetContent: defaultSnippetContent,
       dependencies: {
         'react-virtuoso': 'latest',
-        '@ngneat/falso': 'latest',
+        '@ngneat/falso': 'latest'
       },
       files: {
-        '/data.ts': dataCode,
-      },
-    },
-  ],
+        '/data.ts': dataCode
+      }
+    }
+  ]
 }
 
 export const jsxDescriptors: JsxComponentDescriptors = [
@@ -53,15 +53,15 @@ export const jsxDescriptors: JsxComponentDescriptors = [
     source: './external',
     props: [
       { name: 'foo', type: 'string' },
-      { name: 'bar', type: 'string' },
-    ],
+      { name: 'bar', type: 'string' }
+    ]
   },
   {
     name: 'BlockNode',
     kind: 'flow',
     source: './external',
-    props: [],
-  },
+    props: []
+  }
 ]
 
 interface WrappedEditorProps {

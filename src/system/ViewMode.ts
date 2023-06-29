@@ -18,7 +18,7 @@ export const [ViewModeSystem] = system(
           (prev, next) => {
             return {
               current: prev.next,
-              next,
+              next
             }
           },
           { current: 'editor' as ViewMode, next: 'editor' as ViewMode }
@@ -33,7 +33,7 @@ export const [ViewModeSystem] = system(
             importMarkdownToLexical({
               root: $getRoot(),
               markdown: markdownSource,
-              ...markdownParseOptions!,
+              ...markdownParseOptions!
             })
           })
         }
@@ -42,7 +42,7 @@ export const [ViewModeSystem] = system(
 
     return {
       viewMode,
-      headMarkdown,
+      headMarkdown
     }
   },
   [EditorSystemType, JsxSystemType]

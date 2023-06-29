@@ -50,7 +50,7 @@ export function LinkEditForm({ initialUrl, onSubmit, onCancel, linkAutocompleteS
     items,
     itemToString(item) {
       return item ?? ''
-    },
+    }
   })
 
   const onSubmitEH = (e: React.FormEvent) => {
@@ -77,7 +77,7 @@ export function LinkEditForm({ initialUrl, onSubmit, onCancel, linkAutocompleteS
     onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => {
       onKeyDownEH(e)
       downshiftInputProps.onKeyDown(e)
-    },
+    }
   }
 
   const dropdownIsVisible = isOpen && items.length > 0
@@ -173,7 +173,7 @@ export function LinkDialogPlugin() {
           top: theRect?.top,
           left: theRect?.left,
           width: theRect?.width,
-          height: theRect?.height,
+          height: theRect?.height
         }}
       />
 

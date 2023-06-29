@@ -56,7 +56,7 @@ export function getSelectionRectangle(editor: LexicalEditor) {
       top: rect.top + window.scrollY,
       left: rect.left + window.scrollX,
       width: rect.width,
-      height: rect.height,
+      height: rect.height
     }
   } else if (!activeElement || activeElement.className !== 'link-input') {
     return null

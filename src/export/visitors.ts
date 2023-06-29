@@ -11,7 +11,7 @@ import {
   RootNode as LexicalRootNode,
   LineBreakNode,
   ParagraphNode,
-  TextNode,
+  TextNode
 } from 'lexical'
 import * as Mdast from 'mdast'
 import { ContainerDirective } from 'mdast-util-directive'
@@ -30,7 +30,7 @@ import {
   ImageNode,
   JsxNode,
   SandpackNode,
-  TableNode,
+  TableNode
 } from '../nodes'
 
 import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from '../FormatConstants'
@@ -62,28 +62,28 @@ const LexicalRootVisitor: LexicalExportVisitor<LexicalRootNode, Mdast.Content> =
   testLexicalNode: $isRootNode,
   visitLexicalNode: ({ actions }) => {
     actions.addAndStepInto('root')
-  },
+  }
 }
 
 const LexicalParagraphVisitor: LexicalExportVisitor<ParagraphNode, Mdast.Paragraph> = {
   testLexicalNode: $isParagraphNode,
   visitLexicalNode: ({ actions }) => {
     actions.addAndStepInto('paragraph')
-  },
+  }
 }
 
 const LexicalFrontmatterVisitor: LexicalExportVisitor<FrontmatterNode, Mdast.YAML> = {
   testLexicalNode: $isFrontmatterNode,
   visitLexicalNode: ({ actions, lexicalNode }) => {
     actions.addAndStepInto('yaml', { value: lexicalNode.getYaml() })
-  },
+  }
 }
 
 const LexicalLinkVisitor: LexicalExportVisitor<LinkNode, Mdast.Link> = {
   testLexicalNode: $isLinkNode,
   visitLexicalNode: ({ lexicalNode, actions }) => {
     actions.addAndStepInto('link', { url: lexicalNode.getURL(), title: lexicalNode.getTitle() })
-  },
+  }
 }
 
 const LexicalHeadingVisitor: LexicalExportVisitor<HeadingNode, Mdast.Heading> = {
@@ -91,7 +91,7 @@ const LexicalHeadingVisitor: LexicalExportVisitor<HeadingNode, Mdast.Heading> = 
   visitLexicalNode: ({ lexicalNode, actions }) => {
     const depth = parseInt(lexicalNode.getTag()[1], 10) as Mdast.Heading['depth']
     actions.addAndStepInto('heading', { depth })
-  },
+  }
 }
 
 const LexicalListVisitor: LexicalExportVisitor<ListNode, Mdast.List> = {
@@ -100,9 +100,9 @@ const LexicalListVisitor: LexicalExportVisitor<ListNode, Mdast.List> = {
     actions.addAndStepInto('list', {
       ordered: lexicalNode.getListType() === 'number',
       //TODO: figure out when spread can be true
-      spread: false,
+      spread: false
     })
-  },
+  }
 }
 
 const LexicalListItemVisitor: LexicalExportVisitor<ListItemNode, Mdast.ListItem> = {
@@ -120,11 +120,11 @@ const LexicalListItemVisitor: LexicalExportVisitor<ListItemNode, Mdast.ListItem>
       const listItem = actions.appendToParent(mdastParent, {
         type: 'listItem' as const,
         spread: false,
-        children: [{ type: 'paragraph' as const, children: [] }],
+        children: [{ type: 'paragraph' as const, children: [] }]
       }) as Mdast.ListItem
       actions.visitChildren(lexicalNode, listItem.children[0] as Mdast.Paragraph)
     }
-  },
+  }
 }
 
 const LexicalQuoteVisitor: LexicalExportVisitor<QuoteNode, Mdast.Blockquote> = {
@@ -132,19 +132,19 @@ const LexicalQuoteVisitor: LexicalExportVisitor<QuoteNode, Mdast.Blockquote> = {
   visitLexicalNode: ({ lexicalNode, mdastParent, actions }) => {
     const blockquote = actions.appendToParent(mdastParent, {
       type: 'blockquote' as const,
-      children: [{ type: 'paragraph' as const, children: [] }],
+      children: [{ type: 'paragraph' as const, children: [] }]
     }) as Mdast.Blockquote
     actions.visitChildren(lexicalNode, blockquote.children[0] as Mdast.Paragraph)
-  },
+  }
 }
 
 const AdmonitionVisitor: LexicalExportVisitor<AdmonitionNode, ContainerDirective> = {
   testLexicalNode: $isAdmonitionNode,
   visitLexicalNode: ({ lexicalNode, actions }) => {
     actions.addAndStepInto('containerDirective', {
-      name: lexicalNode.getKind(),
+      name: lexicalNode.getKind()
     })
-  },
+  }
 }
 
 const SandpackNodeVisitor: LexicalExportVisitor<SandpackNode, Mdast.Code> = {
@@ -153,9 +153,9 @@ const SandpackNodeVisitor: LexicalExportVisitor<SandpackNode, Mdast.Code> = {
     actions.addAndStepInto('code', {
       value: lexicalNode.getCode(),
       lang: lexicalNode.getLanguage(),
-      meta: lexicalNode.getMeta(),
+      meta: lexicalNode.getMeta()
     })
-  },
+  }
 }
 
 const CodeBlockVisitor: LexicalExportVisitor<CodeBlockNode, Mdast.Code> = {
@@ -164,9 +164,9 @@ const CodeBlockVisitor: LexicalExportVisitor<CodeBlockNode, Mdast.Code> = {
     actions.addAndStepInto('code', {
       value: lexicalNode.getCode(),
       lang: lexicalNode.getLanguage(),
-      meta: lexicalNode.getMeta(),
+      meta: lexicalNode.getMeta()
     })
-  },
+  }
 }
 
 function isMdastText(mdastNode: Mdast.Content): mdastNode is Mdast.Text {
@@ -177,7 +177,7 @@ const LexicalLinebreakVisitor: LexicalExportVisitor<LineBreakNode, Mdast.Text> =
   testLexicalNode: $isLineBreakNode,
   visitLexicalNode: ({ mdastParent, actions }) => {
     actions.appendToParent(mdastParent, { type: 'text', value: '\n' })
-  },
+  }
 }
 
 const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text> = {
@@ -189,12 +189,12 @@ const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text> = {
     if (isMdastText(prevNode) && isMdastText(currentNode)) {
       return {
         type: 'text',
-        value: prevNode.value + currentNode.value,
+        value: prevNode.value + currentNode.value
       } as unknown as T
     } else {
       return {
         ...prevNode,
-        children: [...(prevNode as unknown as Mdast.Parent).children, ...(currentNode as unknown as Mdast.Parent).children],
+        children: [...(prevNode as unknown as Mdast.Parent).children, ...(currentNode as unknown as Mdast.Parent).children]
       }
     }
   },
@@ -209,7 +209,7 @@ const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text> = {
 
     if (format & IS_CODE) {
       actions.addAndStepInto('inlineCode', {
-        value: textContent,
+        value: textContent
       })
       return
     }
@@ -219,13 +219,13 @@ const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text> = {
     if (prevFormat & format & IS_ITALIC) {
       localParentNode = actions.appendToParent(localParentNode, {
         type: 'emphasis',
-        children: [],
+        children: []
       }) as Mdast.Parent
     }
     if (prevFormat & format & IS_BOLD) {
       localParentNode = actions.appendToParent(localParentNode, {
         type: 'strong',
-        children: [],
+        children: []
       }) as Mdast.Parent
     }
     if (prevFormat & format & IS_UNDERLINE) {
@@ -233,21 +233,21 @@ const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text> = {
         type: 'mdxJsxTextElement',
         name: 'u',
         children: [],
-        attributes: [],
+        attributes: []
       }) as Mdast.Parent
     }
 
     if (format & IS_ITALIC && !(prevFormat & IS_ITALIC)) {
       localParentNode = actions.appendToParent(localParentNode, {
         type: 'emphasis',
-        children: [],
+        children: []
       }) as Mdast.Parent
     }
 
     if (format & IS_BOLD && !(prevFormat & IS_BOLD)) {
       localParentNode = actions.appendToParent(localParentNode, {
         type: 'strong',
-        children: [],
+        children: []
       }) as Mdast.Parent
     }
 
@@ -256,22 +256,22 @@ const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text> = {
         type: 'mdxJsxTextElement',
         name: 'u',
         children: [],
-        attributes: [],
+        attributes: []
       }) as Mdast.Parent
     }
 
     actions.appendToParent(localParentNode, {
       type: 'text',
-      value: textContent,
+      value: textContent
     })
-  },
+  }
 }
 
 const LexicalThematicBreakVisitor: LexicalExportVisitor<HorizontalRuleNode, Mdast.ThematicBreak> = {
   testLexicalNode: $isHorizontalRuleNode,
   visitLexicalNode({ actions }) {
     actions.addAndStepInto('thematicBreak')
-  },
+  }
 }
 
 const LexicalImageVisitor: LexicalExportVisitor<ImageNode, Mdast.Image> = {
@@ -280,16 +280,16 @@ const LexicalImageVisitor: LexicalExportVisitor<ImageNode, Mdast.Image> = {
     actions.addAndStepInto('image', {
       url: lexicalNode.getSrc(),
       alt: lexicalNode.getAltText(),
-      title: lexicalNode.getTitle(),
+      title: lexicalNode.getTitle()
     })
-  },
+  }
 }
 
 const LexicalTableVisitor: LexicalExportVisitor<TableNode, Mdast.Table> = {
   testLexicalNode: $isTableNode,
   visitLexicalNode({ actions, mdastParent, lexicalNode }) {
     actions.appendToParent(mdastParent, lexicalNode.getMdastNode())
-  },
+  }
 }
 
 const JsxVisitor: LexicalExportVisitor<JsxNode, MdxJsxFlowElement | MdxJsxTextElement> = {
@@ -303,7 +303,7 @@ const JsxVisitor: LexicalExportVisitor<JsxNode, MdxJsxFlowElement | MdxJsxTextEl
       type: nodeType,
       name: lexicalNode.getName(),
       attributes: lexicalNode.getAttributes(),
-      children: [],
+      children: []
     } as MdxJsxFlowElement | MdxJsxTextElement
 
     actions.appendToParent(mdastParent, node)
@@ -311,7 +311,7 @@ const JsxVisitor: LexicalExportVisitor<JsxNode, MdxJsxFlowElement | MdxJsxTextEl
     lexicalNode.inNestedEditor(() => {
       actions.visitChildren(lexicalNode, node)
     })
-  },
+  }
 }
 
 export const defaultLexicalVisitors = {
@@ -331,5 +331,5 @@ export const defaultLexicalVisitors = {
   AdmonitionVisitor,
   LexicalImageVisitor,
   JsxVisitor,
-  LexicalTableVisitor,
+  LexicalTableVisitor
 }

@@ -28,7 +28,7 @@ export const SelectTrigger: React.FC<{ placeholder: string }> = ({ placeholder }
 
 export const SelectContent: React.FC<{ children: React.ReactNode; className?: string }> = ({
   children,
-  className = styles.toolbarNodeKindSelectContainer,
+  className = styles.toolbarNodeKindSelectContainer
 }) => {
   const [editorRootElementRef] = useEmitterValues('editorRootElementRef')
 

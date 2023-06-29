@@ -4,7 +4,7 @@ import {
   INSERT_UNORDERED_LIST_COMMAND,
   ListNode,
   ListType,
-  REMOVE_LIST_COMMAND,
+  REMOVE_LIST_COMMAND
 } from '@lexical/list'
 import { $isHeadingNode } from '@lexical/rich-text'
 import { $findMatchingParent, $getNearestNodeOfType, $insertNodeToNearestRoot } from '@lexical/utils'
@@ -23,7 +23,7 @@ import {
   LexicalNode,
   RangeSelection,
   SELECTION_CHANGE_COMMAND,
-  TextFormatType,
+  TextFormatType
 } from 'lexical'
 import { system } from '../gurx'
 import { $createFrontmatterNode, $createImageNode, $isAdmonitionNode, $isFrontmatterNode, AdmonitionKind } from '../nodes'
@@ -42,7 +42,7 @@ type Teardowns = Array<() => void>
 const ListTypeCommandMap = new Map<ListType | '', LexicalCommand<void>>([
   ['number', INSERT_ORDERED_LIST_COMMAND],
   ['bullet', INSERT_UNORDERED_LIST_COMMAND],
-  ['', REMOVE_LIST_COMMAND],
+  ['', REMOVE_LIST_COMMAND]
 ])
 
 type EditorSubscription = (activeEditor: LexicalEditor, rootEditor: LexicalEditor) => () => void
@@ -53,9 +53,9 @@ function seedTable(): Mdast.Table {
     children: [
       {
         type: 'tableRow',
-        children: [{ type: 'tableCell', children: [] }],
-      },
-    ],
+        children: [{ type: 'tableCell', children: [] }]
+      }
+    ]
   }
 }
 export const [EditorSystem, EditorSystemType] = system((r) => {
@@ -216,7 +216,7 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
         const type = parentList ? parentList.getListType() : element.getListType()
         r.pubIn({
           [currentListType.key]: type,
-          [currentBlockType.key]: '',
+          [currentBlockType.key]: ''
         })
       } else {
         r.pub(currentListType, null)
@@ -229,7 +229,7 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
 
         r.pubIn({
           [currentListType.key]: null,
-          [currentBlockType.key]: blockType,
+          [currentBlockType.key]: blockType
         })
       }
     }
@@ -240,7 +240,7 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
     if ($isRangeSelection(selection)) {
       r.pubKeys({
         currentSelection: selection,
-        currentFormat: selection.format,
+        currentFormat: selection.format
       })
     }
   }
@@ -252,7 +252,7 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
         (_, editor) => {
           r.pubIn({
             [activeEditor.key]: editor,
-            [inFocus.key]: true,
+            [inFocus.key]: true
           })
           handleSelectionChange()
 
@@ -318,6 +318,6 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
     lexicalConvertOptions,
     lexicalNodes,
     imageAutocompleteSuggestions,
-    markdownSource,
+    markdownSource
   }
 }, [])

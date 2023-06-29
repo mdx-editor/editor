@@ -91,9 +91,9 @@ const defaultSandpackConfig: SandpackConfig = {
       sandpackTheme: 'light',
       snippetFileName: '/App.js',
       snippetLanguage: 'jsx',
-      initialSnippetContent: defaultSnippetContent,
-    },
-  ],
+      initialSnippetContent: defaultSnippetContent
+    }
+  ]
 }
 
 export const [SandpackSystem] = system(
@@ -133,7 +133,7 @@ export const [SandpackSystem] = system(
               const sandpackNode = $createSandpackNode({
                 code: preset.initialSnippetContent || '',
                 language: preset.snippetLanguage || 'jsx',
-                meta: preset.meta,
+                meta: preset.meta
               })
 
               $insertNodeToNearestRoot(sandpackNode)
@@ -157,7 +157,7 @@ export const [SandpackSystem] = system(
               const codeBlockNode = $createCodeBlockNode({
                 code: '',
                 language: 'jsx',
-                meta: '',
+                meta: ''
               })
 
               $insertNodeToNearestRoot(codeBlockNode)
@@ -172,7 +172,7 @@ export const [SandpackSystem] = system(
     return {
       insertSandpack,
       insertCodeBlock,
-      sandpackConfig,
+      sandpackConfig
     }
   },
   [EditorSystemType]

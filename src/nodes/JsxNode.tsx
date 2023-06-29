@@ -11,7 +11,7 @@ import {
   SerializedLexicalNode,
   SerializedParagraphNode,
   SerializedRootNode,
-  Spread,
+  Spread
 } from 'lexical'
 import { MdxJsxAttribute } from 'mdast-util-mdx-jsx'
 import React from 'react'
@@ -54,9 +54,9 @@ const EmptySerializedTextEditorState = {
       direction: 'ltr',
       format: 'left',
       indent: 0,
-      children: [],
-    } as SerializedParagraphNode,
-  ],
+      children: []
+    } as SerializedParagraphNode
+  ]
 } as SerializedRootNode
 
 const EmptySerializedFlowEditorState = {
@@ -65,7 +65,7 @@ const EmptySerializedFlowEditorState = {
   indent: 0,
   direction: 'ltr',
   version: 1,
-  children: [],
+  children: []
 } as SerializedRootNode
 
 /**
@@ -86,7 +86,7 @@ export class JsxNode extends DecoratorNode<JSX.Element> {
       name: node.__name,
       kind: node.__kind,
       attributes: node.__attributes,
-      state: node.__editor.getEditorState().toJSON(),
+      state: node.__editor.getEditorState().toJSON()
     })
   }
 
@@ -96,7 +96,7 @@ export class JsxNode extends DecoratorNode<JSX.Element> {
       kind,
       name,
       attributes,
-      state,
+      state
     })
   }
 
@@ -139,7 +139,7 @@ export class JsxNode extends DecoratorNode<JSX.Element> {
       attributes: this.getAttributes(),
       state: this.__editor.getEditorState().toJSON(),
       type: 'jsx',
-      version: 1,
+      version: 1
     }
   }
 
@@ -193,8 +193,8 @@ export class JsxNode extends DecoratorNode<JSX.Element> {
     _parentEditor: LexicalEditor,
     {
       theme: {
-        nodeDecoratorComponents: { JsxEditor },
-      },
+        nodeDecoratorComponents: { JsxEditor }
+      }
     }: ExtendedEditorConfig
   ): JSX.Element {
     return (

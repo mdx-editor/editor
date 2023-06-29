@@ -3,3 +3,5 @@ node_modules/
 **/dist
 **.tgz
 docs
+temp
+etc

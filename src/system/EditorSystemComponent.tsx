@@ -12,7 +12,7 @@ import { ToolbarSystem } from './Toolbar'
 export const {
   Component: EditorSystemComponent,
   usePublisher,
-  useEmitterValues,
+  useEmitterValues
 } = realmFactoryToComponent(
   getRealmFactory(EditorSystem, ViewModeSystem, SandpackSystem, LinkDialogSystem, JsxSystem, OnChangeSystem, ToolbarSystem),
   {
@@ -24,17 +24,17 @@ export const {
       toolbarComponents: 'toolbarComponents',
       markdownParseOptions: 'markdownParseOptions',
       lexicalConvertOptions: 'lexicalConvertOptions',
-      lexicalNodes: 'lexicalNodes',
+      lexicalNodes: 'lexicalNodes'
     },
     optional: {
       editorRootElementRef: 'editorRootElementRef',
       viewMode: 'viewMode',
       linkAutocompleteSuggestions: 'linkAutocompleteSuggestions',
-      imageAutocompleteSuggestions: 'imageAutocompleteSuggestions',
+      imageAutocompleteSuggestions: 'imageAutocompleteSuggestions'
     },
     events: {
-      onChange: 'onChange',
-    },
+      onChange: 'onChange'
+    }
   },
   ({ children }: React.PropsWithChildren) => {
     return (

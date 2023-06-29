@@ -5,6 +5,6 @@ export const [JsxSystem, JsxSystemType] = system((r) => {
   const jsxComponentDescriptors = r.node<JsxComponentDescriptors>([])
 
   return {
-    jsxComponentDescriptors,
+    jsxComponentDescriptors
   }
 }, [])

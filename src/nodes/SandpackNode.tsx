@@ -19,7 +19,7 @@ function voidEmitter() {
     },
     subscribe: (cb: () => void) => {
       subscription = cb
-    },
+    }
   }
 }
 
@@ -45,7 +45,7 @@ export class SandpackNode extends DecoratorNode<JSX.Element> {
     return $createSandpackNode({
       code,
       language,
-      meta,
+      meta
     })
   }
 
@@ -62,7 +62,7 @@ export class SandpackNode extends DecoratorNode<JSX.Element> {
       language: this.getLanguage(),
       meta: this.getMeta(),
       type: 'sandpack',
-      version: 1,
+      version: 1
     }
   }
 
@@ -113,8 +113,8 @@ export class SandpackNode extends DecoratorNode<JSX.Element> {
     _parentEditor: LexicalEditor,
     {
       theme: {
-        nodeDecoratorComponents: { SandpackEditor },
-      },
+        nodeDecoratorComponents: { SandpackEditor }
+      }
     }: ExtendedEditorConfig
   ): JSX.Element {
     return (

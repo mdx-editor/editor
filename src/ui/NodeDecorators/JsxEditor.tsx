@@ -91,7 +91,7 @@ const JsxPropertyPanel: React.FC<JsxPropertyPanelProps> = ({ attributes, compone
       // TODO: handle mdxjs expressions
       acc[attribute.name] = attribute.value as string
       return acc
-    }, {} as Record<string, string>),
+    }, {} as Record<string, string>)
   })
 
   // iterate over the attributes and render a two column table with the name and value
