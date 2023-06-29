@@ -52,9 +52,10 @@ import {
 } from './ToolbarPlugin/toolbarComponents'
 import styles from './styles.module.css'
 import { NodeDecoratorComponents } from '../types/ExtendedEditorConfig'
+import type { ComponentType } from 'react'
 
 /**
- * MDXEditor is a rich text editor React Component for editing markdown.
+ * The properties of the {@link MDXEditor} react component
  */
 export interface MDXEditorProps {
   /**
@@ -86,7 +87,7 @@ export interface MDXEditorProps {
   /**
    * The set of components to be rendered in the toolbar.
    */
-  toolbarComponents?: React.ComponentType[]
+  toolbarComponents?: ComponentType[]
   /**
    * The initial view mode for the editor. Defaults to `ViewMode.editor`.
    */
@@ -94,17 +95,9 @@ export interface MDXEditorProps {
   onChange?: (markdown: string) => void
   className?: string
   contentEditableClassName?: string
-  markdownParseOptions?: {
-    syntaxExtensions?: MarkdownParseOptions['syntaxExtensions']
-    mdastExtensions?: MarkdownParseOptions['mdastExtensions']
-    visitors?: MarkdownParseOptions['visitors']
-  }
+  markdownParseOptions?: Partial<MarkdownParseOptions>
   lexicalNodes?: Klass<LexicalNode>[]
-  lexicalConvertOptions?: {
-    extensions?: ExportMarkdownFromLexicalOptions['toMarkdownExtensions']
-    markdownOptions?: ExportMarkdownFromLexicalOptions['toMarkdownOptions']
-    visitors?: ExportMarkdownFromLexicalOptions['visitors']
-  }
+  lexicalConvertOptions?: Partial<ExportMarkdownFromLexicalOptions>
 }
 
 const defaultNodeDecorators: NodeDecoratorComponents = {
@@ -193,10 +186,22 @@ export const defaultMdxOptionValues: DefaultMdxOptionValues = {
   defaultLexicalNodes
 }
 
+/**
+ * The interface for the {@link MDXEditor} object reference.
+ *
+ * @example
+ * ```tsx
+ *  const mdxEditorRef = React.useRef<MDXEditorMethods>(null)
+ *  <MDXEditor ref={mdxEditorRef} />
+ * ```
+ */
 export interface MDXEditorMethods {
   getMarkdown: () => string
 }
 
+/**
+ * The MDXEditor React component
+ */
 export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>(
   (
     {
@@ -217,8 +222,8 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>(
         visitors: importVisitors = Object.values(defaultMdastVisitors)
       } = {},
       lexicalConvertOptions: {
-        extensions: toMarkdownExtensions = Object.values(defaultExtensions),
-        markdownOptions: toMarkdownOptions = defaultToMarkdownOptions,
+        toMarkdownExtensions = Object.values(defaultExtensions),
+        toMarkdownOptions = defaultToMarkdownOptions,
         visitors: exportVisitors = Object.values(defaultLexicalVisitors)
       } = {},
       lexicalNodes = Object.values(defaultLexicalNodes)

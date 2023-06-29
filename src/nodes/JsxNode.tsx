@@ -68,9 +68,6 @@ const EmptySerializedFlowEditorState = {
   children: []
 } as SerializedRootNode
 
-/**
- * @noInheritDoc
- */
 export class JsxNode extends DecoratorNode<JSX.Element> {
   __kind: JsxKind
   __name: string

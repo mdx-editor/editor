@@ -23,7 +23,6 @@ export type SerializedAdmonitionNode = Spread<
   SerializedElementNode
 >
 
-/** @noInheritDoc */
 export class AdmonitionNode extends ElementNode {
   __kind: AdmonitionKind
   static getType(): string {

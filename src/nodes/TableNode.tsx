@@ -27,9 +27,6 @@ function coordinatesEmitter() {
   }
 }
 
-/**
- * @noInheritDoc
- */
 export class TableNode extends DecoratorNode<JSX.Element> {
   __mdastNode: Mdast.Table
   focusEmitter = coordinatesEmitter()

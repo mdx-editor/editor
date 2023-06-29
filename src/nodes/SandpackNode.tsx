@@ -23,9 +23,6 @@ function voidEmitter() {
   }
 }
 
-/**
- * @noInheritDoc
- */
 export class SandpackNode extends DecoratorNode<JSX.Element> {
   __code: string
   __meta: string

@@ -1,3 +1,9 @@
+/**
+ * The `@mdxeditor/editor` package exports the MDXEditor React component, along with some utilities and default option values that id the customization of the widget.
+ * In addition to that, the package exports the LexicalNodes used to represent the MDX AST, as well as the NodeDecorators used to render the nodes in the editor.
+ *
+ * @packageDocumentation
+ */
 export * from './nodes'
 export * from './ui/MDXEditor'
 export type { SandpackConfig, SandpackPreset } from './system/Sandpack'

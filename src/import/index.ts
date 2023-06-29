@@ -33,6 +33,7 @@ import {
   SandpackNode,
   TableNode
 } from '../nodes'
+import { FromMarkdownOptions, ParseOptions } from 'mdast-util-from-markdown/lib'
 
 export interface MdastVisitActions {
   visitChildren(node: Mdast.Parent, lexicalParent: LexicalNode): void
@@ -273,8 +274,6 @@ function isParent(node: unknown): node is Mdast.Parent {
   return (node as { children?: Array<any> }).children instanceof Array
 }
 
-type FromMarkdownArgs = NonNullable<Parameters<typeof fromMarkdown>[1]>
-
 export interface MdastTreeImportOptions {
   root: LexicalRootNode
   visitors: Array<MdastImportVisitor<Mdast.Content>>
@@ -283,8 +282,8 @@ export interface MdastTreeImportOptions {
 
 export interface MarkdownParseOptions extends Omit<MdastTreeImportOptions, 'mdastRoot'> {
   markdown: string
-  syntaxExtensions: NonNullable<FromMarkdownArgs['extensions']>
-  mdastExtensions: NonNullable<FromMarkdownArgs['mdastExtensions']>
+  syntaxExtensions: NonNullable<ParseOptions['extensions']>
+  mdastExtensions: NonNullable<FromMarkdownOptions['mdastExtensions']>
 }
 
 export const defaultMdastExtensions: Record<string, MarkdownParseOptions['mdastExtensions'][number]> = {

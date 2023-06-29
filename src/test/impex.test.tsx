@@ -253,7 +253,7 @@ describe('markdown export options', () => {
           ref={ref}
           markdown={md}
           lexicalConvertOptions={{
-            markdownOptions: {
+            toMarkdownOptions: {
               bullet: '-',
               listItemIndent: 'one'
             }

@@ -23,9 +23,6 @@ function voidEmitter() {
   }
 }
 
-/**
- * @noInheritDoc
- */
 export class CodeBlockNode extends DecoratorNode<JSX.Element> {
   __code: string
   __meta: string

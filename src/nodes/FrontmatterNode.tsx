@@ -14,9 +14,6 @@ export type SerializedFrontmatterNode = Spread<
   SerializedLexicalNode
 >
 
-/**
- * @noInheritDoc
- */
 export class FrontmatterNode extends DecoratorNode<JSX.Element> {
   __yaml: string
 
