@@ -4,11 +4,23 @@ import { noop } from '../utils/fp'
 import { ExtendedEditorConfig } from '../types/ExtendedEditorConfig'
 
 export interface CodeBlockPayload {
+  /**
+   * The code contents of the block.
+   */
   code: string
+  /**
+   * The additional meta data of the block.
+   */
   meta: string
+  /**
+   * The language of the code block (i.e. `js`, `jsx`, etc.). This is used for syntax highlighting.
+   */
   language: string
 }
 
+/**
+ * A serialized representation of an {@link CodeBlockNode}.
+ */
 export type SerializedCodeBlockNode = Spread<CodeBlockPayload & { type: 'codeblock'; version: 1 }, SerializedLexicalNode>
 
 function voidEmitter() {
@@ -23,6 +35,9 @@ function voidEmitter() {
   }
 }
 
+/**
+ * A lexical node that represents a fenced code block. Use {@link "$createCodeBlockNode"} to construct one.
+ */
 export class CodeBlockNode extends DecoratorNode<JSX.Element> {
   __code: string
   __meta: string
@@ -127,10 +142,18 @@ export class CodeBlockNode extends DecoratorNode<JSX.Element> {
   }
 }
 
-export function $createCodeBlockNode({ code, language, meta }: CodeBlockPayload): CodeBlockNode {
+/**
+ * Creates a {@link CodeBlockNode}.
+ * @param payload - The code contents, the language  (i.e. js, jsx, etc.), and the additional meta data of the block.
+ */
+export function $createCodeBlockNode(payload: CodeBlockPayload): CodeBlockNode {
+  const { code, language, meta } = payload
   return new CodeBlockNode(code, language, meta)
 }
 
+/**
+ * Returns true if the given node is a {@link CodeBlockNode}.
+ */
 export function $isCodeBlockNode(node: LexicalNode | null | undefined): node is CodeBlockNode {
   return node instanceof CodeBlockNode
 }

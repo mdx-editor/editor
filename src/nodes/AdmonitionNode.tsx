@@ -14,6 +14,9 @@ import {
 
 export { AdmonitionKind }
 
+/**
+ * A serialized representation of an {@link AdmonitionNode}.
+ */
 export type SerializedAdmonitionNode = Spread<
   {
     type: 'admonition'
@@ -23,6 +26,19 @@ export type SerializedAdmonitionNode = Spread<
   SerializedElementNode
 >
 
+/**
+ * A lexical node that represents the markdown directives (better known as admonitions, thanks to Docusaurus). Use {@link "$createAdmonitionNode"} to construct one.
+ *
+ * @remarks
+ *
+ * An admonition in markdown looks like this:
+ *
+ * ```md
+ * :::tip
+ * Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+ * :::
+ * ```
+ */
 export class AdmonitionNode extends ElementNode {
   __kind: AdmonitionKind
   static getType(): string {
@@ -100,11 +116,18 @@ export class AdmonitionNode extends ElementNode {
   }
 }
 
+/**
+ * Creates an {@link AdmonitionNode}.
+ * @param kind - The kind of admonition to create. Accepts `'note' | 'tip' | 'danger' | 'info' | 'caution'`
+ */
 export function $createAdmonitionNode(kind?: AdmonitionKind): AdmonitionNode {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return $applyNodeReplacement(new AdmonitionNode(kind))
 }
 
+/**
+ * Returns `true` if the given node is an {@link AdmonitionNode}.
+ */
 export function $isAdmonitionNode(node: LexicalNode | null | undefined): node is AdmonitionNode {
   return node instanceof AdmonitionNode
 }

@@ -133,7 +133,7 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
     theEditor?.update(() => {
       const firstItem = $getRoot().getFirstChild()
       if (!$isFrontmatterNode(firstItem)) {
-        const fmNode = $createFrontmatterNode({ yaml: '"": ""' })
+        const fmNode = $createFrontmatterNode('"": ""')
         if (firstItem) {
           firstItem.insertBefore(fmNode)
         } else {

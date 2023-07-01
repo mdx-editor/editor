@@ -211,11 +211,7 @@ export const MdastImageVisitor: MdastImportVisitor<Mdast.Image> = {
 export const MdastFrontmatterVisitor: MdastImportVisitor<Mdast.YAML> = {
   testNode: 'yaml',
   visitNode({ mdastNode, actions }) {
-    actions.addAndStepInto(
-      $createFrontmatterNode({
-        yaml: mdastNode.value
-      })
-    )
+    actions.addAndStepInto($createFrontmatterNode(mdastNode.value))
   }
 }
 
@@ -267,8 +263,6 @@ export const defaultMdastVisitors: Record<string, MdastImportVisitor<Mdast.Conte
   MdastMdxJsxElementVisitor,
   MdastTableVisitor
 }
-
-export type ImportVisitors = Array<MdastImportVisitor<Mdast.Content>>
 
 function isParent(node: unknown): node is Mdast.Parent {
   return (node as { children?: Array<any> }).children instanceof Array

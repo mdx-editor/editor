@@ -2,10 +2,9 @@ import { DecoratorNode, EditorConfig, LexicalEditor, LexicalNode, NodeKey, Seria
 import React from 'react'
 import { ExtendedEditorConfig } from '../types/ExtendedEditorConfig'
 
-export interface FrontmatterPayload {
-  yaml: string
-}
-
+/**
+ * A serialized representation of an {@link FrontmatterNode}.
+ */
 export type SerializedFrontmatterNode = Spread<
   {
     yaml: string
@@ -14,6 +13,10 @@ export type SerializedFrontmatterNode = Spread<
   SerializedLexicalNode
 >
 
+/**
+ * Represents {@link https://daily-dev-tips.com/posts/what-exactly-is-frontmatter/ | the frontmatter} of the markdown document.
+ * Use {@link "$createFrontmatterNode"} to construct one.
+ */
 export class FrontmatterNode extends DecoratorNode<JSX.Element> {
   __yaml: string
 
@@ -27,9 +30,7 @@ export class FrontmatterNode extends DecoratorNode<JSX.Element> {
 
   static importJSON(serializedNode: SerializedFrontmatterNode): FrontmatterNode {
     const { yaml } = serializedNode
-    const node = $createFrontmatterNode({
-      yaml
-    })
+    const node = $createFrontmatterNode(yaml)
     return node
   }
 
@@ -86,10 +87,17 @@ export class FrontmatterNode extends DecoratorNode<JSX.Element> {
   }
 }
 
-export function $createFrontmatterNode({ yaml }: FrontmatterPayload): FrontmatterNode {
+/**
+ * Creates a {@link FrontmatterNode}.
+ * @param yaml - The YAML string of the frontmatter.
+ */
+export function $createFrontmatterNode(yaml: string): FrontmatterNode {
   return new FrontmatterNode(yaml)
 }
 
+/**
+ * Returns `true` if the given node is a {@link FrontmatterNode}.
+ */
 export function $isFrontmatterNode(node: LexicalNode | null | undefined): node is FrontmatterNode {
   return node instanceof FrontmatterNode
 }

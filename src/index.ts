@@ -4,14 +4,11 @@
  *
  * @packageDocumentation
  */
-export * from './nodes'
-export * from './ui/MDXEditor'
 export type { SandpackConfig, SandpackPreset } from './system/Sandpack'
 export type * from './types/JsxComponentDescriptors'
-export type * from './types/NodeDecoratorsProps'
-export type * from './types/ViewMode'
-export type * from './types/ActiveEditorType'
-export type * from './import'
-export type * from './export'
-export type { LexicalNodeVisitParams, LexicalVisitActions } from './export/visitors'
+export type { MdastTreeImportOptions, MarkdownParseOptions, MdastVisitActions, MdastVisitParams, MdastImportVisitor } from './import'
+export type { ToMarkdownOptions, LexicalVisitActions, LexicalNodeVisitParams, LexicalExportVisitor } from './export'
+
+export * from './nodes'
+export * from './ui/MDXEditor'
 export { ToolbarComponents } from './ui/ToolbarPlugin/toolbarComponents'
