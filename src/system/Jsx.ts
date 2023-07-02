@@ -1,8 +1,8 @@
 import { system } from '../gurx'
-import { JsxComponentDescriptors } from '../types/JsxComponentDescriptors'
+import { JsxComponentDescriptor } from '../types/JsxComponentDescriptors'
 
 export const [JsxSystem, JsxSystemType] = system((r) => {
-  const jsxComponentDescriptors = r.node<JsxComponentDescriptors>([])
+  const jsxComponentDescriptors = r.node<JsxComponentDescriptor[]>([])
 
   return {
     jsxComponentDescriptors

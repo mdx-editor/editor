@@ -6,7 +6,7 @@ import { gfmTableToMarkdown } from 'mdast-util-gfm-table'
 import { MdxjsEsm, mdxToMarkdown } from 'mdast-util-mdx'
 import { Options as ToMarkdownOptions, toMarkdown } from 'mdast-util-to-markdown'
 import { LexicalExportVisitor } from './visitors'
-import { JsxComponentDescriptors } from '../types/JsxComponentDescriptors'
+import { JsxComponentDescriptor } from '../types/JsxComponentDescriptors'
 export type { Options as ToMarkdownOptions } from 'mdast-util-to-markdown'
 
 export type LexicalVisitor = LexicalExportVisitor<LexicalNode, Mdast.Content>
@@ -14,7 +14,7 @@ export type LexicalVisitor = LexicalExportVisitor<LexicalNode, Mdast.Content>
 export interface ExportLexicalTreeOptions {
   root: LexicalRootNode
   visitors: LexicalVisitor[]
-  jsxComponentDescriptors: JsxComponentDescriptors
+  jsxComponentDescriptors: JsxComponentDescriptor[]
 }
 
 function isParent(node: unknown): node is Mdast.Parent {

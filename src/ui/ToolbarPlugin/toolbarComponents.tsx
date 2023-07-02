@@ -241,6 +241,10 @@ export const ToolbarFlexWhitespace: React.FC = () => {
   return <div style={{ flex: 1 }} />
 }
 
+/**
+ * A dictionary with all built-in Toolbar components that can be used within the toolbar.
+ * @see To customize the toolbar, pass an array of what you need to the {@link MDXEditorProps.toolbarComponents}.
+ */
 export const ToolbarComponents = {
   BlockTypeSelect,
   BoldItalicUnderlineButtons,

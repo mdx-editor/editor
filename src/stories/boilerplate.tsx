@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import React from 'react'
-import { JsxComponentDescriptors, SandpackConfig, ViewMode, MDXEditor } from '../index'
+import { SandpackConfig, ViewMode, MDXEditor, JsxComponentDescriptor } from '../index'
 import dataCode from './assets/dataCode.ts?raw'
 
 const defaultSnippetContent = `
@@ -46,7 +46,7 @@ export const virtuosoSampleSandpackConfig: SandpackConfig = {
   ]
 }
 
-export const jsxDescriptors: JsxComponentDescriptors = [
+export const jsxDescriptors: JsxComponentDescriptor[] = [
   {
     name: 'MyLeaf',
     kind: 'text',

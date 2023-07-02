@@ -26,7 +26,7 @@ import {
 } from '../import'
 import { EditorSystemComponent, useEmitterValues } from '../system/EditorSystemComponent'
 import { SandpackConfig } from '../system/Sandpack'
-import { JsxComponentDescriptors } from '../types/JsxComponentDescriptors'
+import { JsxComponentDescriptor } from '../types/JsxComponentDescriptors'
 import { ViewMode } from '../types/ViewMode'
 import { LinkDialogPlugin } from './LinkDialogPlugin'
 import ListMaxIndentLevelPlugin from './ListIndentPlugin'
@@ -57,7 +57,6 @@ import styles from './styles.module.css'
 import { NodeDecoratorComponents } from '../types/ExtendedEditorConfig'
 import type { ComponentType } from 'react'
 import * as Mdast from 'mdast'
-import { Extension } from 'mdast-util-from-markdown'
 import { ToMarkdownExtension, ToMarkdownOptions } from 'mdast-util-mdx'
 
 /**
@@ -79,9 +78,9 @@ export interface MDXEditorProps {
   headMarkdown?: string
   /**
    * The configuration for the JSX components used in the markdown content.
-   * @see the {@link JsxComponentDescriptors} interface for more details.
+   * @see the {@link JsxComponentDescriptor} interface for more details.
    */
-  jsxComponentDescriptors?: JsxComponentDescriptors
+  jsxComponentDescriptors?: JsxComponentDescriptor[]
   /**
    * The list of suggestions to be shown in the link autocomplete dialog dropdown.
    */
@@ -162,8 +161,14 @@ export default function App() {
   ]
 }
 
+/**
+ * A structure that holds the default values for the options used in the markdown import/export steps.
+ *
+ * Most options are exported as records, so that you can pick a specific value using its name rather than its index which can change.
+ * The actual MDXEditor props accept arrays, so you should use the `Object.values` function to convert the records to arrays.
+ */
 export type DefaultMdxOptionValues = {
-  /** The default values for the options used in the markdown import step */
+  /** The default values for the options used in the import step */
   markdownParse: {
     defaultVisitors: Record<string, MdastImportVisitor<Mdast.Content>>
     defaultSyntaxExtensions: Record<string, SyntaxExtension>
