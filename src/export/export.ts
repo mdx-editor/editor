@@ -191,8 +191,10 @@ function fixWrappingWhitespace(node: Mdast.Parent | Mdast.Content, parentChain: 
   }
 }
 
+export type ToMarkdownExtension = NonNullable<ToMarkdownOptions['extensions']>[number]
+
 export interface ExportMarkdownFromLexicalOptions extends ExportLexicalTreeOptions {
-  toMarkdownExtensions: ToMarkdownOptions['extensions']
+  toMarkdownExtensions: Array<ToMarkdownExtension>
   toMarkdownOptions: ToMarkdownOptions
 }
 

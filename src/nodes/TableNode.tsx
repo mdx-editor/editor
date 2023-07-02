@@ -4,6 +4,9 @@ import React from 'react'
 import { noop } from '../utils/fp'
 import { ExtendedEditorConfig } from '../types/ExtendedEditorConfig'
 
+/**
+ * A serialized representation of a {@link TableNode}.
+ */
 export type SerializedTableNode = Spread<
   {
     mdastNode: Mdast.Table
@@ -13,7 +16,7 @@ export type SerializedTableNode = Spread<
 
 const EMPTY_CELL: Mdast.TableCell = { type: 'tableCell', children: [] as Mdast.PhrasingContent[] }
 
-export type CoordinatesSubscription = (coords: [colIndex: number, rowIndex: number]) => void
+type CoordinatesSubscription = (coords: [colIndex: number, rowIndex: number]) => void
 
 function coordinatesEmitter() {
   let subscription: CoordinatesSubscription = noop
@@ -27,6 +30,10 @@ function coordinatesEmitter() {
   }
 }
 
+/**
+ * A lexical node that represents a table, with features specific to the markdown tables.
+ * Use {@link "$createTableNode"} to construct one.
+ */
 export class TableNode extends DecoratorNode<JSX.Element> {
   __mdastNode: Mdast.Table
   focusEmitter = coordinatesEmitter()
@@ -170,10 +177,17 @@ export class TableNode extends DecoratorNode<JSX.Element> {
   }
 }
 
+/**
+ * Retruns true if the given node is a {@link TableNode}.
+ */
 export function $isTableNode(node: LexicalNode | null | undefined): node is TableNode {
   return node instanceof TableNode
 }
 
+/**
+ * Creates a {@link TableNode}
+ * @param mdastNode - The mdast node to create the {@link TableNode} from.
+ */
 export function $createTableNode(mdastNode: Mdast.Table): TableNode {
   return new TableNode(mdastNode)
 }

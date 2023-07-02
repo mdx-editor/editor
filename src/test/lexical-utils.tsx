@@ -34,7 +34,7 @@ import { createRef } from 'react'
 import { createRoot } from 'react-dom/client'
 import * as ReactTestUtils from 'react-dom/test-utils'
 
-import { MDXEditor, defaultMdxOptionValues } from '../'
+import { defaultMdxOptionValues } from '../'
 
 let _keyCounter = 1
 

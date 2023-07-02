@@ -3,13 +3,19 @@ import React from 'react'
 import { noop } from '../utils/fp'
 import { ExtendedEditorConfig } from '../types/ExtendedEditorConfig'
 
-export interface SandpackPayload {
+/**
+ * The options necessary to construct a {@link SandpackNode}.
+ */
+export interface CreateSandpackNodeOptions {
   code: string
   meta: string
   language: string
 }
 
-export type SerializedSandpackNode = Spread<SandpackPayload & { type: 'sandpack'; version: 1 }, SerializedLexicalNode>
+/**
+ * A serialized representation of an {@link SandpackNode}.
+ */
+export type SerializedSandpackNode = Spread<CreateSandpackNodeOptions & { type: 'sandpack'; version: 1 }, SerializedLexicalNode>
 
 function voidEmitter() {
   let subscription = noop
@@ -23,6 +29,9 @@ function voidEmitter() {
   }
 }
 
+/**
+ * A lexical node that represents a live code block that gets a preview. Use {@link "$createSandpackNode"} to construct one.
+ */
 export class SandpackNode extends DecoratorNode<JSX.Element> {
   __code: string
   __meta: string
@@ -126,10 +135,17 @@ export class SandpackNode extends DecoratorNode<JSX.Element> {
   }
 }
 
-export function $createSandpackNode({ code, language, meta }: SandpackPayload): SandpackNode {
+/**
+ * Creates a {@link SandpackNode}.
+ */
+export function $createSandpackNode(options: CreateSandpackNodeOptions): SandpackNode {
+  const { code, language, meta } = options
   return new SandpackNode(code, language, meta)
 }
 
+/**
+ * Returns true if the given node is a {@link SandpackNode}.
+ */
 export function $isSandpackNode(node: LexicalNode | null | undefined): node is SandpackNode {
   return node instanceof SandpackNode
 }

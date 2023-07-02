@@ -21,23 +21,47 @@ import { ExtendedEditorConfig } from '../types/ExtendedEditorConfig'
 
 export type updateFn = (node: LexicalNode) => void
 
-export interface JsxPayload {
+/**
+ * The payload to create a {@link JsxNode}.
+ */
+export interface CreateJsxNodeOptions {
+  /**
+   * The name of the JSX element.
+   */
   name: string
+  /**
+   * The type of the element - markdown makes a distinction between text and flow elements.
+   */
   kind: JsxKind
+  /**
+   * The attributes of the JSX element.
+   */
   attributes: Array<MdxJsxAttribute>
+  /**
+   * The tree state of the children.
+   */
   state?: SerializedEditorState
+  /**
+   * If passed, this function will be called with the root paragraph node of the editor.
+   */
   updateFn?: updateFn
 }
 
+/**
+ * A serialized representation of a {@link JsxNode}.
+ */
 export type SerializedJsxNode = Spread<
-  Omit<JsxPayload, 'updateFn'> & {
+  Omit<CreateJsxNodeOptions, 'updateFn'> & {
     version: 1
     type: 'jsx'
   },
   SerializedLexicalNode
 >
 
-export interface JsxNodeConstructorParams extends JsxPayload {
+/**
+ * The parameters of the {@link JsxNode} constructor.
+ */
+export interface JsxNodeConstructorParams extends CreateJsxNodeOptions {
   key?: NodeKey
 }
 
@@ -68,6 +92,9 @@ const EmptySerializedFlowEditorState = {
   children: []
 } as SerializedRootNode
 
+/**
+ * A lexical node that represents a JSX element. Use {@link "$createJsxNode"} to construct one.
+ */
 export class JsxNode extends DecoratorNode<JSX.Element> {
   __kind: JsxKind
   __name: string
@@ -207,10 +234,19 @@ export class JsxNode extends DecoratorNode<JSX.Element> {
   }
 }
 
-export function $createJsxNode(payload: JsxPayload): JsxNode {
-  return new JsxNode(payload)
+/**
+ * Creates a {@link JsxNode}.
+ * @param options - The payload necessary for the creation of a {@link JsxNode}.
+ *
+ * @see {@link CreateJsxNodeOptions} for more details.
+ */
+export function $createJsxNode(options: CreateJsxNodeOptions): JsxNode {
+  return new JsxNode(options)
 }
 
+/**
+ * Returns true if a node is a {@link JsxNode}.
+ */
 export function $isJsxNode(node: LexicalNode | null | undefined): node is JsxNode {
   return node instanceof JsxNode
 }

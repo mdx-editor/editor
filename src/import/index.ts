@@ -280,14 +280,24 @@ export interface MarkdownParseOptions extends Omit<MdastTreeImportOptions, 'mdas
   mdastExtensions: NonNullable<FromMarkdownOptions['mdastExtensions']>
 }
 
-export const defaultMdastExtensions: Record<string, MarkdownParseOptions['mdastExtensions'][number]> = {
+/**
+ * An extension for the `fromMarkdown` utility tree construction.
+ */
+export type MdastExtension = MarkdownParseOptions['mdastExtensions'][number]
+
+/**
+ * An extension for the `fromMarkdown` utility markdown parse.
+ */
+export type SyntaxExtension = MarkdownParseOptions['syntaxExtensions'][number]
+
+export const defaultMdastExtensions: Record<string, MdastExtension> = {
   mdxFromMarkdown: mdxFromMarkdown(),
   frontmatterFromMarkdown: frontmatterFromMarkdown('yaml'),
   directiveFromMarkdown: directiveFromMarkdown,
   gfmTableFromMarkdown: gfmTableFromMarkdown
 }
 
-export const defaultSyntaxExtensions: Record<string, MarkdownParseOptions['syntaxExtensions'][number]> = {
+export const defaultSyntaxExtensions: Record<string, SyntaxExtension> = {
   mdxjs: mdxjs(),
   frontmatter: frontmatter(),
   directive: directive(),
@@ -355,6 +365,9 @@ export function importMdastTreeToLexical({ root, mdastRoot, visitors }: MdastTre
   visit(mdastRoot, root, null)
 }
 
+/**
+ * The default set of lexical nodes used in the editor.
+ */
 export const defaultLexicalNodes: Record<string, Klass<LexicalNode>> = {
   ParagraphNode,
   LinkNode,

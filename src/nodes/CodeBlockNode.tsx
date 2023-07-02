@@ -3,7 +3,10 @@ import React from 'react'
 import { noop } from '../utils/fp'
 import { ExtendedEditorConfig } from '../types/ExtendedEditorConfig'
 
-export interface CodeBlockPayload {
+/**
+ * The options necessary to construct a {@link CodeBlockNode}.
+ */
+export interface CreateCodeBlockNodeOptions {
   /**
    * The code contents of the block.
    */
@@ -21,7 +24,7 @@ export interface CodeBlockPayload {
 /**
  * A serialized representation of an {@link CodeBlockNode}.
  */
-export type SerializedCodeBlockNode = Spread<CodeBlockPayload & { type: 'codeblock'; version: 1 }, SerializedLexicalNode>
+export type SerializedCodeBlockNode = Spread<CreateCodeBlockNodeOptions & { type: 'codeblock'; version: 1 }, SerializedLexicalNode>
 
 function voidEmitter() {
   let subscription = noop
@@ -144,10 +147,10 @@ export class CodeBlockNode extends DecoratorNode<JSX.Element> {
 
 /**
  * Creates a {@link CodeBlockNode}.
- * @param payload - The code contents, the language  (i.e. js, jsx, etc.), and the additional meta data of the block.
+ * @param options - The code contents, the language  (i.e. js, jsx, etc.), and the additional meta data of the block.
  */
-export function $createCodeBlockNode(payload: CodeBlockPayload): CodeBlockNode {
-  const { code, language, meta } = payload
+export function $createCodeBlockNode(options: CreateCodeBlockNodeOptions): CodeBlockNode {
+  const { code, language, meta } = options
   return new CodeBlockNode(code, language, meta)
 }
 

@@ -11,10 +11,13 @@ import classNames from 'classnames'
 import { $getRoot, Klass, LexicalNode } from 'lexical'
 import React from 'react'
 import { theme as contentTheme } from '../content/theme'
-import { defaultLexicalVisitors } from '../export'
+import { LexicalExportVisitor, defaultLexicalVisitors } from '../export'
 import { ExportMarkdownFromLexicalOptions, defaultExtensions, defaultToMarkdownOptions } from '../export/export'
 import {
   MarkdownParseOptions,
+  MdastExtension,
+  MdastImportVisitor,
+  SyntaxExtension,
   defaultLexicalNodes,
   defaultMdastExtensions,
   defaultMdastVisitors,
@@ -53,6 +56,9 @@ import {
 import styles from './styles.module.css'
 import { NodeDecoratorComponents } from '../types/ExtendedEditorConfig'
 import type { ComponentType } from 'react'
+import * as Mdast from 'mdast'
+import { Extension } from 'mdast-util-from-markdown'
+import { ToMarkdownExtension, ToMarkdownOptions } from 'mdast-util-mdx'
 
 /**
  * The properties of the {@link MDXEditor} react component
@@ -156,22 +162,26 @@ export default function App() {
   ]
 }
 
-// insert CM code block type rather than the default one
-
-export interface DefaultMdxOptionValues {
+export type DefaultMdxOptionValues = {
+  /** The default values for the options used in the markdown import step */
   markdownParse: {
-    defaultVisitors: typeof defaultMdastVisitors
-    defaultSyntaxExtensions: typeof defaultSyntaxExtensions
-    defaultMdastExtensions: typeof defaultMdastExtensions
+    defaultVisitors: Record<string, MdastImportVisitor<Mdast.Content>>
+    defaultSyntaxExtensions: Record<string, SyntaxExtension>
+    defaultMdastExtensions: Record<string, MdastExtension>
   }
+  /** The default values for the options used in the markdown export step */
   lexicalConvert: {
-    defaultVisitors: typeof defaultLexicalVisitors
-    defaultExtensions: typeof defaultExtensions
-    defaultMarkdownOptions: typeof defaultToMarkdownOptions
+    defaultVisitors: Record<string, LexicalExportVisitor<LexicalNode, Mdast.Content>>
+    defaultExtensions: Record<string, ToMarkdownExtension>
+    defaultMarkdownOptions: ToMarkdownOptions
   }
+  /** The default lexical nodes used by the underlying Lexical framework */
   defaultLexicalNodes: typeof defaultLexicalNodes
 }
 
+/**
+ * Exports the default values for the options used in the markdown import/export steps.
+ */
 export const defaultMdxOptionValues: DefaultMdxOptionValues = {
   markdownParse: {
     defaultVisitors: defaultMdastVisitors,
@@ -184,7 +194,7 @@ export const defaultMdxOptionValues: DefaultMdxOptionValues = {
     defaultMarkdownOptions: defaultToMarkdownOptions
   },
   defaultLexicalNodes
-}
+} as const
 
 /**
  * The interface for the {@link MDXEditor} object reference.

@@ -12,13 +12,6 @@ import type {
 
 import { DecoratorNode } from 'lexical'
 
-export interface ImagePayload {
-  altText: string
-  title?: string
-  key?: NodeKey
-  src: string
-}
-
 function convertImageElement(domNode: Node): null | DOMConversionOutput {
   if (domNode instanceof HTMLImageElement) {
     const { alt: altText, src, title } = domNode
@@ -28,6 +21,9 @@ function convertImageElement(domNode: Node): null | DOMConversionOutput {
   return null
 }
 
+/**
+ * A serialized representation of an {@link ImageNode}.
+ */
 export type SerializedImageNode = Spread<
   {
     altText: string
@@ -39,6 +35,9 @@ export type SerializedImageNode = Spread<
   SerializedLexicalNode
 >
 
+/**
+ * A lexical node that represents an image. Use {@link "$createImageNode"} to construct one.
+ */
 export class ImageNode extends DecoratorNode<JSX.Element> {
   __src: string
   __altText: string
@@ -98,7 +97,6 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     }
   }
 
-  // View
   createDOM(config: EditorConfig): HTMLElement {
     const span = document.createElement('span')
     const theme = config.theme
@@ -134,10 +132,28 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
   }
 }
 
-export function $createImageNode({ altText, title, src, key }: ImagePayload): ImageNode {
+/**
+ * The payload to create an {@link ImageNode}.
+ */
+export interface CreateImageNodeOptions {
+  altText: string
+  title?: string
+  key?: NodeKey
+  src: string
+}
+
+/**
+ * Creates an {@link ImageNode}.
+ * @param options - The payload to create an image. The keys map to the img tag attributes.
+ */
+export function $createImageNode(options: CreateImageNodeOptions): ImageNode {
+  const { altText, title, src, key } = options
   return new ImageNode(src, altText, title, key)
 }
 
+/**
+ * Retruns true if the node is an {@link ImageNode}.
+ */
 export function $isImageNode(node: LexicalNode | null | undefined): node is ImageNode {
   return node instanceof ImageNode
 }
