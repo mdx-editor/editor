@@ -214,7 +214,9 @@
 }
 
 .toolbarNodeKindSelectContainer, 
-.toolbarButtonDropdownContainer {
+.toolbarButtonDropdownContainer,
+.toolbarCodeBlockLanguageSelectContent
+{
   z-index: 60;
   width: var(--spacing-36);
   border-bottom-left-radius: var(--radius-base);
@@ -259,6 +261,12 @@
   width: auto;
   padding-inline-start: var(--spacing-2) ;
   padding-inline-end: var(--spacing-1);
+}
+
+.toolbarCodeBlockLanguageSelectTrigger, 
+.toolbarCodeBlockLanguageSelectContent 
+{
+  width: var(--spacing-48);
 }
 
 .toolbarNodeKindSelectItem {

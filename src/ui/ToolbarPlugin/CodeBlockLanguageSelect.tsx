@@ -5,9 +5,10 @@ import { useEmitterValues } from '../../system/EditorSystemComponent'
 import { $getNodeByKey } from 'lexical'
 import { CodeBlockEditorType } from '../../types/ActiveEditorType'
 import { CodeBlockNode } from '../../nodes'
+import styles from '../styles.module.css'
 
 export function CodeBlockLanguageSelect() {
-  const [activeEditorType, activeEditor] = useEmitterValues('activeEditorType', 'activeEditor')
+  const [activeEditorType, activeEditor, codeBlockLanguages] = useEmitterValues('activeEditorType', 'activeEditor', 'codeBlockLanguages')
 
   const nodeLanguage = React.useMemo(() => {
     let language!: string
@@ -31,11 +32,13 @@ export function CodeBlockLanguageSelect() {
         })
       }}
     >
-      <SelectTrigger placeholder="Language" />
-      <SelectContent>
-        <SelectItem value="js">JavaScript</SelectItem>
-        <SelectItem value="ts">TypeScript</SelectItem>
-        <SelectItem value="css">CSS</SelectItem>
+      <SelectTrigger placeholder="Language" className={styles.toolbarCodeBlockLanguageSelectTrigger} />
+      <SelectContent className={styles.toolbarCodeBlockLanguageSelectContent}>
+        {Object.entries(codeBlockLanguages).map(([value, label]) => (
+          <SelectItem key={value} value={value}>
+            {label}
+          </SelectItem>
+        ))}
       </SelectContent>
     </Select.Root>
   )

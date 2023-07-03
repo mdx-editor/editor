@@ -15,9 +15,9 @@ export const SelectItem = React.forwardRef<HTMLDivElement | null, { className?: 
   }
 )
 
-export const SelectTrigger: React.FC<{ placeholder: string }> = ({ placeholder }) => {
+export const SelectTrigger: React.FC<{ placeholder: string; className?: string }> = ({ placeholder, className }) => {
   return (
-    <Select.Trigger aria-label={placeholder} className={styles.toolbarNodeKindSelectTrigger}>
+    <Select.Trigger aria-label={placeholder} className={classNames(styles.toolbarNodeKindSelectTrigger, className)}>
       <Select.Value placeholder={placeholder} />
       <Select.Icon className={styles.toolbarNodeKindSelectDropdownArrow}>
         <DropDownIcon />
@@ -44,7 +44,7 @@ export const SelectContent: React.FC<{ children: React.ReactNode; className?: st
 export const SelectButtonTrigger: React.FC<{ children: React.ReactNode; title: string; className?: string }> = ({
   children,
   title,
-  className,
+  className
 }) => {
   return (
     <Select.Trigger className={classNames(styles.toolbarButtonSelectTrigger, className)} title={title}>

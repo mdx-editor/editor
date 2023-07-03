@@ -97,12 +97,35 @@ export interface MDXEditorProps {
    * The initial view mode for the editor. Defaults to `ViewMode.editor`.
    */
   viewMode?: ViewMode
+  /**
+   * Triggered when the markdown content changes.
+   */
   onChange?: (markdown: string) => void
+  /**
+   * The CSS class name to be applied to the wrapper element of the component.
+   */
   className?: string
+  /**
+   * The CSS class name to be applied to the content editable element.
+   */
   contentEditableClassName?: string
+  /**
+   * The options to be used when parsing the markdown content.
+   * @see the {@link MarkdownParseOptions} interface for more details.
+   */
   markdownParseOptions?: Partial<MarkdownParseOptions>
+  /**
+   * The {@link https://lexical.dev/ Lexical nodes} used by the editor.
+   */
   lexicalNodes?: Klass<LexicalNode>[]
+  /**
+   * The options used when converting the lexical tree to markdown.
+   */
   lexicalConvertOptions?: Partial<ExportMarkdownFromLexicalOptions>
+  /**
+   * The supported code block languages.
+   */
+  codeBlockLanguages?: Record<string, string>
 }
 
 const defaultNodeDecorators: NodeDecoratorComponents = {
