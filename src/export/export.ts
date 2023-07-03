@@ -194,6 +194,8 @@ function fixWrappingWhitespace(node: Mdast.Parent | Mdast.Content, parentChain: 
 export type ToMarkdownExtension = NonNullable<ToMarkdownOptions['extensions']>[number]
 
 export interface ExportMarkdownFromLexicalOptions extends ExportLexicalTreeOptions {
+  visitors: LexicalVisitor[]
+
   /**
    * the markdown extensions to use
    */
@@ -202,6 +204,25 @@ export interface ExportMarkdownFromLexicalOptions extends ExportLexicalTreeOptio
    * The options to pass to `toMarkdown`
    */
   toMarkdownOptions: ToMarkdownOptions
+}
+
+/**
+ * Configures how the lexical tree is converted to a mdast tree and then to markdown.
+ */
+export interface LexicalConvertOptions {
+  /**
+   * The visitors to use when processing the lexical tree
+   */
+  visitors?: LexicalVisitor[]
+
+  /**
+   * the markdown extensions to use
+   */
+  toMarkdownExtensions?: Array<ToMarkdownExtension>
+  /**
+   * The options to pass to `toMarkdown`
+   */
+  toMarkdownOptions?: ToMarkdownOptions
 }
 
 export const defaultExtensions = {

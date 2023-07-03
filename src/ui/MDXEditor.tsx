@@ -11,8 +11,7 @@ import classNames from 'classnames'
 import { $getRoot, Klass, LexicalNode } from 'lexical'
 import React from 'react'
 import { theme as contentTheme } from '../content/theme'
-import { LexicalExportVisitor, defaultLexicalVisitors } from '../export'
-import { ExportMarkdownFromLexicalOptions, defaultExtensions, defaultToMarkdownOptions } from '../export/export'
+import { LexicalConvertOptions, defaultExtensions, defaultToMarkdownOptions, LexicalExportVisitor, defaultLexicalVisitors } from '../export'
 import {
   MarkdownParseOptions,
   MdastExtension,
@@ -115,13 +114,14 @@ export interface MDXEditorProps {
    */
   markdownParseOptions?: Partial<MarkdownParseOptions>
   /**
-   * The {@link https://lexical.dev/ Lexical nodes} used by the editor.
+   * The {@link https://lexical.dev/ | Lexical nodes} used by the editor.
    */
   lexicalNodes?: Klass<LexicalNode>[]
   /**
    * The options used when converting the lexical tree to markdown.
+   * @see the {@link LexicalConvertOptions} interface for more details.
    */
-  lexicalConvertOptions?: Partial<ExportMarkdownFromLexicalOptions>
+  lexicalConvertOptions?: LexicalConvertOptions
   /**
    * The supported code block languages.
    */

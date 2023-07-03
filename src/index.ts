@@ -7,7 +7,7 @@
 export type { SandpackConfig, SandpackPreset } from './system/Sandpack'
 export type * from './types/JsxComponentDescriptors'
 export type { MdastTreeImportOptions, MarkdownParseOptions, MdastVisitActions, MdastVisitParams, MdastImportVisitor } from './import'
-export type { ToMarkdownOptions, LexicalVisitActions, LexicalNodeVisitParams, LexicalExportVisitor } from './export'
+export type { ToMarkdownOptions, LexicalVisitActions, LexicalNodeVisitParams, LexicalExportVisitor, LexicalConvertOptions } from './export'
 
 export * from './nodes'
 export * from './ui/MDXEditor'
