@@ -120,7 +120,7 @@ export class TableNode extends DecoratorNode<JSX.Element> {
       const row = table.children[rowIndex]
       const cells = row.children
       const cellsClone = Array.from(cells)
-      const rowClone = { ...row, hildren: cellsClone }
+      const rowClone = { ...row, children: cellsClone }
       cellsClone.splice(colIndex, 1)
       table.children[rowIndex] = rowClone
     }
