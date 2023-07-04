@@ -3,6 +3,10 @@
   @import url('@radix-ui/colors/blueDark.css');
   @import url('@radix-ui/colors/slate.css');
   @import url('@radix-ui/colors/slateDark.css');
+  @import url('@radix-ui/colors/grass.css');
+  @import url('@radix-ui/colors/cyan.css');
+  @import url('@radix-ui/colors/amber.css');
+  @import url('@radix-ui/colors/red.css');
 }
 
 @define-mixin clear-form-element {
@@ -66,6 +70,22 @@
   --baseSolidHover: var(--slate10);
   --baseText: var(--slate11);
   --baseTextContrast: var(--slate12);
+
+
+  --admonitionTipBg: var(--cyan4);
+  --admonitionTipBorder: var(--cyan8);
+  
+  --admonitionInfoBg: var(--grass4);
+  --admonitionInfoBorder: var(--grass8);
+
+  --admonitionCautionBg: var(--amber4);
+  --admonitionCautionBorder: var(--amber8);
+
+  --admonitionDangerBg: var(--red4);
+  --admonitionDangerBorder: var(--red8);
+
+  --admonitionNoteBg: var(--slate4);
+  --admonitionNoteBorder: var(--slate8);
 
   --spacing-0:0px;
   --spacing-px:1px;

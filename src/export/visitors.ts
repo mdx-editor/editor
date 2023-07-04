@@ -195,10 +195,13 @@ const LexicalQuoteVisitor: LexicalExportVisitor<QuoteNode, Mdast.Blockquote> = {
 
 const AdmonitionVisitor: LexicalExportVisitor<AdmonitionNode, ContainerDirective> = {
   testLexicalNode: $isAdmonitionNode,
-  visitLexicalNode: ({ lexicalNode, actions }) => {
-    actions.addAndStepInto('containerDirective', {
-      name: lexicalNode.getKind()
-    })
+  visitLexicalNode: ({ mdastParent, lexicalNode, actions }) => {
+    const admonition = actions.appendToParent(mdastParent, {
+      type: 'containerDirective' as const,
+      name: lexicalNode.getKind(),
+      children: [{ type: 'paragraph' as const, children: [] }]
+    }) as ContainerDirective
+    actions.visitChildren(lexicalNode, admonition.children[0] as Mdast.Paragraph)
   }
 }
 

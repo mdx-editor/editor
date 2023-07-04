@@ -28,7 +28,11 @@ export const BlockTypeSelect = () => {
         <SelectItem value="h5">Heading 5</SelectItem>
         <SelectItem value="h6">Heading 6</SelectItem>
         <Select.Separator />
+        <SelectItem value="note">Note</SelectItem>
+        <SelectItem value="tip">Tip</SelectItem>
         <SelectItem value="info">Info</SelectItem>
+        <SelectItem value="caution">Caution</SelectItem>
+        <SelectItem value="danger">Danger</SelectItem>
       </SelectContent>
     </Select.Root>
   )

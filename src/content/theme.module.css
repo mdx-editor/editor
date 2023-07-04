@@ -1,3 +1,12 @@
+@import url('@radix-ui/colors/blue.css');
+@import url('@radix-ui/colors/blueDark.css');
+@import url('@radix-ui/colors/slate.css');
+@import url('@radix-ui/colors/slateDark.css');
+@import url('@radix-ui/colors/grass.css');
+@import url('@radix-ui/colors/cyan.css');
+@import url('@radix-ui/colors/amber.css');
+@import url('@radix-ui/colors/red.css');
+
 .bold {
   font-weight: bold;
 }
@@ -52,5 +61,33 @@
 }
 
 .admonitionDanger, .admonitionInfo, .admonitionNote, .admonitionTip, .admonitionCaution {
-  border: 1px solid red;
+  padding: var(--spacing-2);
+  margin-top: var(--spacing-2);
+  margin-bottom: var(--spacing-2);
+  border-left: 3px solid var(--admonitionBorder);
+  background-color: var(--admonitionBg);
+}
+
+.admonitionInfo {
+  --admonitionBorder: var(--admonitionInfoBorder);
+  --admonitionBg: var(--admonitionInfoBg);
+}
+.admonitionTip {
+  --admonitionBorder: var(--admonitionTipBorder);
+  --admonitionBg: var(--admonitionTipBg);
+}
+
+.admonitionCaution {
+  --admonitionBorder: var(--admonitionCautionBorder);
+  --admonitionBg: var(--admonitionCautionBg);
+}
+
+.admonitionDanger {
+  --admonitionBorder: var(--admonitionDangerBorder);
+  --admonitionBg: var(--admonitionDangerBg);
+}
+
+.admonitionNote {
+  --admonitionBorder: var(--admonitionNoteBorder);
+  --admonitionBg: var(--admonitionNoteBg);
 }

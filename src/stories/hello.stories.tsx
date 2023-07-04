@@ -7,6 +7,7 @@ import './rawContents.d.ts'
 import codeBlocksMarkdown from './assets/code-blocks-markdown.md?raw'
 import initialMarkdown from './assets/kitchen-sink-markdown.md?raw'
 import jsxMarkdown from './assets/jsx.md?raw'
+import admonitionMarkdown from './assets/admonition-markdown.md?raw'
 import styles from './styles.module.css'
 
 import { WrappedLexicalEditor } from './boilerplate'
@@ -22,6 +23,10 @@ export function A3CodeBlocks() {
 
 export function A4JSX() {
   return <WrappedLexicalEditor onChange={(markdown) => console.log(markdown)} markdown={jsxMarkdown} />
+}
+
+export function A5Admonitions() {
+  return <WrappedLexicalEditor markdown={admonitionMarkdown} />
 }
 
 export function DiffMode() {
