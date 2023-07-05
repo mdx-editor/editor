@@ -239,8 +239,9 @@ export const ViewModeSwitch: React.FC = () => {
       value={viewMode}
       className={styles.toolbarModeSwitch}
     >
-      <RichTextIcon />
-      <ToggleItem value="editor" aria-label="Rich text" title="Rich text mode"></ToggleItem>
+      <ToggleItem value="editor" aria-label="Rich text" title="Rich text mode">
+        <RichTextIcon />
+      </ToggleItem>
 
       <ToggleItem value="diff" aria-label="View diff" title="Diff mode">
         <DifferenceIcon />
