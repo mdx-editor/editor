@@ -10,6 +10,7 @@ import {
 import { system } from '../gurx'
 import { getSelectedNode, getSelectionRectangle } from '../utils/lexicalHelpers'
 import { EditorSystemType } from './Editor'
+import { IS_APPLE } from '../utils/detectMac'
 
 export interface InactiveLinkDialog {
   type: 'inactive'
@@ -115,8 +116,7 @@ export const [LinkDialogSystem, LinkDialogSystemType] = system(
       return editor.registerCommand(
         KEY_MODIFIER_COMMAND,
         (event) => {
-          // TODO: handle windows
-          if (event.key === 'k' && event.metaKey) {
+          if (event.key === 'k' && IS_APPLE ? event.metaKey : event.ctrlKey) {
             r.pub(openLinkEditDialog, true)
             return true
           }

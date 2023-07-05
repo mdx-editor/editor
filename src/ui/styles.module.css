@@ -588,12 +588,12 @@
   }
 
   .tableColumnEditorTrigger, .tableRowEditorTrigger, .addRowButton, .addColumnButton, .iconButton {
-    opacity: 0;
+    opacity: .2;
   }
 
   &:hover {
     .tableColumnEditorTrigger, .tableRowEditorTrigger, .addRowButton, .addColumnButton, .iconButton {
-      opacity: .3;
+      opacity: .5;
 
       &:hover {
         opacity: 1;

@@ -103,18 +103,17 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
   const addRowToBottom = React.useCallback(() => {
     parentEditor.update(() => {
       lexicalTable.addRowToBottom()
+      setActiveCell([0, lexicalTable.getRowCount()])
     })
-
-    setActiveCellWithBoundaries([0, lexicalTable.getRowCount()])
-  }, [parentEditor, lexicalTable, setActiveCellWithBoundaries])
+  }, [parentEditor, lexicalTable])
 
   // adds column to the right and focuses the top cell of it
   const addColumnToRight = React.useCallback(() => {
     parentEditor.update(() => {
       lexicalTable.addColumnToRight()
+      setActiveCell([lexicalTable.getColCount(), 0])
     })
-    setActiveCellWithBoundaries([lexicalTable.getColCount(), 0])
-  }, [parentEditor, lexicalTable, setActiveCellWithBoundaries])
+  }, [parentEditor, lexicalTable])
 
   const [highlightedCoordinates, setHighlightedCoordinates] = React.useState<[number, number]>([-1, -1])
 

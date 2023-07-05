@@ -16,7 +16,7 @@ export const BlockTypeSelect = () => {
   const applyBlockType = usePublisher('applyBlockType')
   return (
     <Select.Root value={currentBlockType || ('' as const)} onValueChange={applyBlockType as (value: string) => void}>
-      <SelectTrigger placeholder="Block type" />
+      <SelectTrigger title="Select block type" placeholder="Block type" />
       <SelectContent>
         <SelectItem value="paragraph">Paragraph</SelectItem>
         <SelectItem value="quote">Quote</SelectItem>

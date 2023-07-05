@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import React from 'react'
-import { SandpackConfig, ViewMode, MDXEditor, JsxComponentDescriptor } from '../index'
+import { SandpackConfig, MDXEditor, JsxComponentDescriptor } from '../index'
 import dataCode from './assets/dataCode.ts?raw'
+import { ViewMode } from '../types/ViewMode'
 
 const defaultSnippetContent = `
 export default function App() {

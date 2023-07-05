@@ -37,6 +37,7 @@ const CodeBlockButtonSet: React.FC = () => {
       <CodeBlockLanguageSelect />
 
       <ToolbarButton
+        title="Remove code block"
         onClick={() => {
           activeEditor!.update(() => {
             const node = $getNodeByKey((activeEditorType as CodeBlockEditorType).nodeKey) as CodeBlockNode
@@ -56,6 +57,7 @@ const SandpackButtonSet: React.FC = () => {
   return (
     <>
       <ToolbarButton
+        title="Remove live code block"
         onClick={() => {
           activeEditor!.update(() => {
             const node = $getNodeByKey((activeEditorType as SandpackEditorType).nodeKey) as SandpackNode

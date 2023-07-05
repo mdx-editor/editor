@@ -13,6 +13,7 @@ import CheckIcon from '../icons/check.svg'
 import CloseIcon from '../icons/close.svg'
 import AddPhotoIcon from '../icons/add_photo.svg'
 import styles from '../styles.module.css'
+import { InstantTooltip } from './InstantTooltip'
 
 export const ImageButton = React.forwardRef<HTMLButtonElement, RadixToolbar.ToolbarButtonProps>((props, forwardedRef) => {
   const [editorRootElementRef, imageAutocompleteSuggestions] = useEmitterValues('editorRootElementRef', 'imageAutocompleteSuggestions')
@@ -30,9 +31,11 @@ export const ImageButton = React.forwardRef<HTMLButtonElement, RadixToolbar.Tool
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Trigger asChild>
-        <RadixToolbar.Button className={styles.toolbarButton} {...props} ref={forwardedRef}>
-          <AddPhotoIcon />
-        </RadixToolbar.Button>
+        <InstantTooltip title="Insert image">
+          <RadixToolbar.Button className={styles.toolbarButton} {...props} ref={forwardedRef}>
+            <AddPhotoIcon />
+          </RadixToolbar.Button>
+        </InstantTooltip>
       </Dialog.Trigger>
       <Dialog.Portal container={editorRootElementRef!.current}>
         <Dialog.Overlay className={styles.dialogOverlay} />

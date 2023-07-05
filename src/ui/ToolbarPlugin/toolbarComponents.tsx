@@ -23,19 +23,32 @@ import RichTextIcon from './../icons/rich_text.svg'
 import TableIcon from './../icons/table.svg'
 import { BlockTypeSelect } from './BlockTypeSelect'
 import { ImageButton } from './Image'
+import { InstantTooltip } from './InstantTooltip'
 import { SelectButtonTrigger, SelectContent, SelectItem } from './SelectPieces'
+
 export { BlockTypeSelect } from './BlockTypeSelect'
 export { ImageButton } from './Image'
+export { InstantTooltip } from './InstantTooltip'
 
-export const ToggleItem = React.forwardRef<HTMLButtonElement, RadixToolbar.ToolbarToggleItemProps>(
-  ({ className: passedClassName, ...props }, forwardedRef) => {
-    return <RadixToolbar.ToggleItem className={classNames(passedClassName, styles.toolbarToggleItem)} {...props} ref={forwardedRef} />
+export const ToggleItem = React.forwardRef<HTMLButtonElement, RadixToolbar.ToolbarToggleItemProps & { title: string }>(
+  ({ title, className: passedClassName, ...props }, forwardedRef) => {
+    return (
+      <InstantTooltip title={title}>
+        <RadixToolbar.ToggleItem className={classNames(passedClassName, styles.toolbarToggleItem)} {...props} ref={forwardedRef} />
+      </InstantTooltip>
+    )
   }
 )
 
-export const ToolbarButton = React.forwardRef<HTMLButtonElement, RadixToolbar.ToolbarButtonProps>((props, forwardedRef) => {
-  return <RadixToolbar.Button className={styles.toolbarButton} {...props} ref={forwardedRef} />
-})
+export const ToolbarButton = React.forwardRef<HTMLButtonElement, RadixToolbar.ToolbarButtonProps & { title: string }>(
+  ({ title, ...props }, forwardedRef) => {
+    return (
+      <InstantTooltip title={title}>
+        <RadixToolbar.Button className={styles.toolbarButton} {...props} ref={forwardedRef} />
+      </InstantTooltip>
+    )
+  }
+)
 
 export const ToggleSingleGroup = React.forwardRef<HTMLDivElement, Omit<RadixToolbar.ToolbarToggleGroupSingleProps, 'type'>>(
   ({ children, className, ...props }, forwardedRef) => {
@@ -54,11 +67,13 @@ export const ToggleSingleGroup = React.forwardRef<HTMLDivElement, Omit<RadixTool
 
 export const ToggleSingleGroupWithItem = React.forwardRef<
   HTMLDivElement,
-  Omit<RadixToolbar.ToolbarToggleGroupSingleProps, 'type'> & { on: boolean }
->(({ on, children, ...props }, forwardedRef) => {
+  Omit<RadixToolbar.ToolbarToggleGroupSingleProps, 'type'> & { on: boolean; title: string }
+>(({ on, title, children, ...props }, forwardedRef) => {
   return (
     <ToggleSingleGroup {...props} value={on ? 'on' : 'off'} ref={forwardedRef}>
-      <ToggleItem value="on">{children}</ToggleItem>
+      <ToggleItem title={title} value="on">
+        {children}
+      </ToggleItem>
     </ToggleSingleGroup>
   )
 })
@@ -73,21 +88,25 @@ export const BoldItalicUnderlineButtons: React.FC = () => {
   const [currentFormat] = useEmitterValues('currentFormat', 'currentListType')
   const applyFormat = usePublisher('applyFormat')
 
+  const boldIsOn = (currentFormat & IS_BOLD) !== 0
+  const italicIsOn = (currentFormat & IS_ITALIC) !== 0
+  const underlineIsOn = (currentFormat & IS_UNDERLINE) !== 0
+
+  const boldTitle = boldIsOn ? 'Remove bold' : 'Bold'
+  const italicTitle = italicIsOn ? 'Remove italic' : 'Italic'
+  const underlineTitle = underlineIsOn ? 'Remove underline' : 'Underline'
   return (
     <GroupGroup>
-      <ToggleSingleGroupWithItem aria-label="Bold" on={(currentFormat & IS_BOLD) !== 0} onValueChange={applyFormat.bind(null, 'bold')}>
+      <ToggleSingleGroupWithItem title={boldTitle} aria-label="Bold" on={boldIsOn} onValueChange={applyFormat.bind(null, 'bold')}>
         <BoldIcon />
       </ToggleSingleGroupWithItem>
-      <ToggleSingleGroupWithItem
-        aria-label="Italic"
-        on={(currentFormat & IS_ITALIC) !== 0}
-        onValueChange={applyFormat.bind(null, 'italic')}
-      >
+      <ToggleSingleGroupWithItem title={italicTitle} aria-label="Italic" on={italicIsOn} onValueChange={applyFormat.bind(null, 'italic')}>
         <ItalicIcon />
       </ToggleSingleGroupWithItem>
       <ToggleSingleGroupWithItem
         aria-label="Underline"
-        on={(currentFormat & IS_UNDERLINE) !== 0}
+        title={underlineTitle}
+        on={underlineIsOn}
         onValueChange={applyFormat.bind(null, 'underline')}
       >
         <UnderlinedIcon style={{ transform: 'translateY(2px)' }} />
@@ -99,13 +118,11 @@ export const BoldItalicUnderlineButtons: React.FC = () => {
 export const CodeFormattingButton: React.FC = () => {
   const [currentFormat] = useEmitterValues('currentFormat', 'currentListType')
   const applyFormat = usePublisher('applyFormat')
+  const codeIsOn = (currentFormat & IS_CODE) !== 0
+  const codeTitle = codeIsOn ? 'Remove inline code' : 'Inline code'
   return (
     <GroupGroup>
-      <ToggleSingleGroupWithItem
-        aria-label="Inline code"
-        on={(currentFormat & IS_CODE) !== 0}
-        onValueChange={applyFormat.bind(null, 'code')}
-      >
+      <ToggleSingleGroupWithItem title={codeTitle} aria-label="Inline code" on={codeIsOn} onValueChange={applyFormat.bind(null, 'code')}>
         <CodeIcon />
       </ToggleSingleGroupWithItem>
     </GroupGroup>
@@ -123,10 +140,10 @@ export const ListButtons: React.FC = () => {
         value={currentListType || ''}
         onFocus={(e) => e.preventDefault()}
       >
-        <ToggleItem value="bullet" aria-label="Bulleted list">
+        <ToggleItem title="Bulleted list" value="bullet" aria-label="Bulleted list">
           <BulletedListIcon />
         </ToggleItem>
-        <ToggleItem value="number" aria-label="Numbered list">
+        <ToggleItem title="Numbered list" value="number" aria-label="Numbered list">
           <NumberedListIcon />
         </ToggleItem>
       </ToggleSingleGroup>
@@ -137,7 +154,7 @@ export const ListButtons: React.FC = () => {
 export const LinkButton: React.FC = () => {
   const openLinkEditDialog = usePublisher('openLinkEditDialog')
   return (
-    <ToolbarButton onClick={openLinkEditDialog.bind(null, true)}>
+    <ToolbarButton title="Create link" onClick={openLinkEditDialog.bind(null, true)}>
       <LinkIcon />
     </ToolbarButton>
   )
@@ -146,7 +163,7 @@ export const LinkButton: React.FC = () => {
 export const TableButton: React.FC = () => {
   const insertTable = usePublisher('insertTable')
   return (
-    <ToolbarButton onClick={insertTable.bind(null, true)}>
+    <ToolbarButton title="Insert table" onClick={insertTable.bind(null, true)}>
       <TableIcon />
     </ToolbarButton>
   )
@@ -156,7 +173,7 @@ export const CodeBlockButton: React.FC = () => {
   const insertCodeBlock = usePublisher('insertCodeBlock')
 
   return (
-    <ToolbarButton onClick={insertCodeBlock.bind(null, true)}>
+    <ToolbarButton title="Insert code block" onClick={insertCodeBlock.bind(null, true)}>
       <FrameSourceIcon />
     </ToolbarButton>
   )
@@ -165,7 +182,7 @@ export const CodeBlockButton: React.FC = () => {
 export const HorizontalRuleButton: React.FC = () => {
   const insertHorizontalRule = usePublisher('insertHorizontalRule')
   return (
-    <ToolbarButton onClick={insertHorizontalRule.bind(null, true)}>
+    <ToolbarButton title="Insert horizontal rule" onClick={insertHorizontalRule.bind(null, true)}>
       <HorizontalRuleIcon />
     </ToolbarButton>
   )
@@ -177,7 +194,7 @@ export const SandpackButton: React.FC = () => {
   return (
     <>
       {sandpackConfig.presets.length === 1 ? (
-        <ToolbarButton onClick={insertSandpack.bind(null, '')}>
+        <ToolbarButton title="Insert live code block" onClick={insertSandpack.bind(null, '')}>
           <LiveCodeIcon />
         </ToolbarButton>
       ) : (
@@ -202,7 +219,7 @@ export const SandpackButton: React.FC = () => {
 export const FrontmatterButton: React.FC = () => {
   const insertFrontmatter = usePublisher('insertFrontmatter')
   return (
-    <ToolbarButton onClick={insertFrontmatter.bind(null, true)}>
+    <ToolbarButton title="Insert frontmatter editor" onClick={insertFrontmatter.bind(null, true)}>
       <FrontmatterIcon />
     </ToolbarButton>
   )
@@ -222,15 +239,14 @@ export const ViewModeSwitch: React.FC = () => {
       value={viewMode}
       className={styles.toolbarModeSwitch}
     >
-      <ToggleItem value="editor" aria-label="Rich text" title="Rich text">
-        <RichTextIcon />
-      </ToggleItem>
+      <RichTextIcon />
+      <ToggleItem value="editor" aria-label="Rich text" title="Rich text mode"></ToggleItem>
 
-      <ToggleItem value="diff" aria-label="View diff" title="Diff">
+      <ToggleItem value="diff" aria-label="View diff" title="Diff mode">
         <DifferenceIcon />
       </ToggleItem>
 
-      <ToggleItem value="markdown" aria-label="View Markdown" title="Markdown">
+      <ToggleItem value="markdown" aria-label="View Markdown" title="Markdown source mode">
         <MarkdownIcon />
       </ToggleItem>
     </ToggleSingleGroup>
