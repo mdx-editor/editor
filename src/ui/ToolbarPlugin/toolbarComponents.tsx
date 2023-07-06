@@ -33,7 +33,12 @@ export { InstantTooltip } from './InstantTooltip'
 export const ToggleItem = React.forwardRef<HTMLButtonElement, RadixToolbar.ToolbarToggleItemProps & { title: string }>(
   ({ title, children, className: passedClassName, ...props }, forwardedRef) => {
     return (
-      <RadixToolbar.ToggleItem className={classNames(passedClassName, styles.toolbarToggleItem)} {...props} ref={forwardedRef}>
+      <RadixToolbar.ToggleItem
+        data-toolbar-item={true}
+        className={classNames(passedClassName, styles.toolbarToggleItem)}
+        {...props}
+        ref={forwardedRef}
+      >
         <InstantTooltip title={title}>{children}</InstantTooltip>
       </RadixToolbar.ToggleItem>
     )
@@ -43,7 +48,7 @@ export const ToggleItem = React.forwardRef<HTMLButtonElement, RadixToolbar.Toolb
 export const ToolbarButton = React.forwardRef<HTMLButtonElement, RadixToolbar.ToolbarButtonProps & { title: string }>(
   ({ title, children, ...props }, forwardedRef) => {
     return (
-      <RadixToolbar.Button className={styles.toolbarButton} {...props} ref={forwardedRef}>
+      <RadixToolbar.Button data-toolbar-item={true} className={styles.toolbarButton} {...props} ref={forwardedRef}>
         <InstantTooltip title={title}>{children}</InstantTooltip>
       </RadixToolbar.Button>
     )

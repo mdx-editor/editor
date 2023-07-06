@@ -317,7 +317,7 @@ const CellEditor: React.FC<CellProps> = ({ activeCellTuple, parentEditor, lexica
       BLUR_COMMAND,
       (payload) => {
         const relatedTarget = payload.relatedTarget as HTMLElement | null
-        if (relatedTarget?.dataset['editorDialog'] !== undefined) {
+        if (relatedTarget?.dataset['editorDialog'] !== undefined || relatedTarget?.dataset['toolbarItem'] !== undefined) {
           return false
         }
         saveAndDispose(null)
