@@ -9,9 +9,12 @@ import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin'
 import classNames from 'classnames'
 import { $getRoot, Klass, LexicalNode } from 'lexical'
+import * as Mdast from 'mdast'
+import { ToMarkdownExtension, ToMarkdownOptions } from 'mdast-util-mdx'
+import type { ComponentType } from 'react'
 import React from 'react'
 import { theme as contentTheme } from '../content/theme'
-import { LexicalConvertOptions, defaultExtensions, defaultToMarkdownOptions, LexicalExportVisitor, defaultLexicalVisitors } from '../export'
+import { LexicalConvertOptions, LexicalExportVisitor, defaultExtensions, defaultLexicalVisitors, defaultToMarkdownOptions } from '../export'
 import {
   MarkdownParseOptions,
   MdastExtension,
@@ -25,16 +28,12 @@ import {
 } from '../import'
 import { EditorSystemComponent, useEmitterValues } from '../system/EditorSystemComponent'
 import { SandpackConfig } from '../system/Sandpack'
+import { NodeDecoratorComponents } from '../types/ExtendedEditorConfig'
 import { JsxComponentDescriptor } from '../types/JsxComponentDescriptors'
 import { ViewMode } from '../types/ViewMode'
 import { LinkDialogPlugin } from './LinkDialogPlugin'
 import ListMaxIndentLevelPlugin from './ListIndentPlugin'
 import { PatchedMarkdownShortcutPlugin } from './MarkdownShortcutPlugin'
-import { CodeBlockEditor } from './NodeDecorators/CodeBlockEditor'
-import { FrontmatterEditor } from './NodeDecorators/FrontmatterEditor'
-import { JsxEditor } from './NodeDecorators/JsxEditor'
-import { SandpackEditor } from './NodeDecorators/SandpackEditor'
-import { TableEditor } from './NodeDecorators/TableEditor'
 import { SharedHistoryPlugin } from './SharedHistoryPlugin'
 import { ViewModeToggler } from './SourcePlugin'
 import { ToolbarPlugin } from './ToolbarPlugin'
@@ -53,10 +52,6 @@ import {
   ToolbarSeparator
 } from './ToolbarPlugin/toolbarComponents'
 import styles from './styles.module.css'
-import { NodeDecoratorComponents } from '../types/ExtendedEditorConfig'
-import type { ComponentType } from 'react'
-import * as Mdast from 'mdast'
-import { ToMarkdownExtension, ToMarkdownOptions } from 'mdast-util-mdx'
 
 /**
  * The properties of the {@link MDXEditor} react component
@@ -128,12 +123,28 @@ export interface MDXEditorProps {
   codeBlockLanguages?: Record<string, string>
 }
 
+const LazyFrontmatterEditor = React.lazy(() =>
+  import('./NodeDecorators/FrontmatterEditor').then((module) => ({ default: module.FrontmatterEditor }))
+)
+
+const LazyJsxEditor = React.lazy(() => import('./NodeDecorators/JsxEditor').then((module) => ({ default: module.JsxEditor })))
+
+const LazySandpackEditor = React.lazy(() =>
+  import('./NodeDecorators/SandpackEditor').then((module) => ({ default: module.SandpackEditor }))
+)
+
+const LazyCodeBlockEditor = React.lazy(() =>
+  import('./NodeDecorators/CodeBlockEditor').then((module) => ({ default: module.CodeBlockEditor }))
+)
+
+const LazyTableEditor = React.lazy(() => import('./NodeDecorators/TableEditor').then((module) => ({ default: module.TableEditor })))
+
 const defaultNodeDecorators: NodeDecoratorComponents = {
-  FrontmatterEditor,
-  JsxEditor,
-  SandpackEditor,
-  CodeBlockEditor,
-  TableEditor
+  FrontmatterEditor: LazyFrontmatterEditor,
+  JsxEditor: LazyJsxEditor,
+  SandpackEditor: LazySandpackEditor,
+  CodeBlockEditor: LazyCodeBlockEditor,
+  TableEditor: LazyTableEditor
 }
 
 const defaultToolbarComponents = [
