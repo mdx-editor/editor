@@ -148,8 +148,8 @@
 
 .toolbarRoot {
   /* border: var(--spacing-px) solid var(--baseBorder); */
-  z-index: 50;
   margin-bottom: var(--spacing-6);
+  z-index: 1;
   display: flex;
   flex-direction: row;
   gap: var(--spacing-1);
@@ -237,7 +237,7 @@
 .toolbarButtonDropdownContainer,
 .toolbarCodeBlockLanguageSelectContent
 {
-  z-index: 60;
+  z-index: 3;
   width: var(--spacing-36);
   border-bottom-left-radius: var(--radius-base);
   border-bottom-right-radius: var(--radius-base);
@@ -533,6 +533,8 @@
 }
 
 .tooltipContent {
+  z-index: 2;
+  position: relative;
   border-radius: var(--radius-medium);
   padding: var(--spacing-1) var(--spacing-2);
   font-size: var(--text-xs);

@@ -11,7 +11,7 @@ export const InstantTooltip = React.forwardRef<HTMLButtonElement, { title: strin
     <Tooltip.Provider delayDuration={100}>
       <Tooltip.Root>
         <Tooltip.Trigger ref={ref} asChild>
-          {children}
+          <span>{children}</span>
         </Tooltip.Trigger>
         <Tooltip.Portal container={editorRootElementRef?.current}>
           <Tooltip.Content className={classNames(styles.tooltipContent)} sideOffset={10}>

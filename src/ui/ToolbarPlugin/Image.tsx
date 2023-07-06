@@ -31,11 +31,11 @@ export const ImageButton = React.forwardRef<HTMLButtonElement, RadixToolbar.Tool
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Trigger asChild>
-        <InstantTooltip title="Insert image">
-          <RadixToolbar.Button className={styles.toolbarButton} {...props} ref={forwardedRef}>
+        <RadixToolbar.Button className={styles.toolbarButton} {...props} ref={forwardedRef}>
+          <InstantTooltip title="Insert image">
             <AddPhotoIcon />
-          </RadixToolbar.Button>
-        </InstantTooltip>
+          </InstantTooltip>
+        </RadixToolbar.Button>
       </Dialog.Trigger>
       <Dialog.Portal container={editorRootElementRef!.current}>
         <Dialog.Overlay className={styles.dialogOverlay} />

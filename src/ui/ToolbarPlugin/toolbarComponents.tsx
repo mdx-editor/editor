@@ -31,21 +31,21 @@ export { ImageButton } from './Image'
 export { InstantTooltip } from './InstantTooltip'
 
 export const ToggleItem = React.forwardRef<HTMLButtonElement, RadixToolbar.ToolbarToggleItemProps & { title: string }>(
-  ({ title, className: passedClassName, ...props }, forwardedRef) => {
+  ({ title, children, className: passedClassName, ...props }, forwardedRef) => {
     return (
-      <InstantTooltip title={title}>
-        <RadixToolbar.ToggleItem className={classNames(passedClassName, styles.toolbarToggleItem)} {...props} ref={forwardedRef} />
-      </InstantTooltip>
+      <RadixToolbar.ToggleItem className={classNames(passedClassName, styles.toolbarToggleItem)} {...props} ref={forwardedRef}>
+        <InstantTooltip title={title}>{children}</InstantTooltip>
+      </RadixToolbar.ToggleItem>
     )
   }
 )
 
 export const ToolbarButton = React.forwardRef<HTMLButtonElement, RadixToolbar.ToolbarButtonProps & { title: string }>(
-  ({ title, ...props }, forwardedRef) => {
+  ({ title, children, ...props }, forwardedRef) => {
     return (
-      <InstantTooltip title={title}>
-        <RadixToolbar.Button className={styles.toolbarButton} {...props} ref={forwardedRef} />
-      </InstantTooltip>
+      <RadixToolbar.Button className={styles.toolbarButton} {...props} ref={forwardedRef}>
+        <InstantTooltip title={title}>{children}</InstantTooltip>
+      </RadixToolbar.Button>
     )
   }
 )
