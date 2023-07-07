@@ -44,6 +44,11 @@ export default defineConfig({
       }
     }),
   ],
+  server: {
+    proxy: {
+      '/uploads': 'http://localhost:65432'
+    },
+  },
   build: {
     minify: 'terser',
     cssMinify: false,

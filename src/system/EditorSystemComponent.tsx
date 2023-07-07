@@ -27,6 +27,7 @@ export const {
       lexicalNodes: 'lexicalNodes'
     },
     optional: {
+      imageUploadHandler: 'imageUploadHandler',
       editorRootElementRef: 'editorRootElementRef',
       viewMode: 'viewMode',
       linkAutocompleteSuggestions: 'linkAutocompleteSuggestions',

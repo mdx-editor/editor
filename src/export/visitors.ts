@@ -334,11 +334,17 @@ const LexicalThematicBreakVisitor: LexicalExportVisitor<HorizontalRuleNode, Mdas
 
 const LexicalImageVisitor: LexicalExportVisitor<ImageNode, Mdast.Image> = {
   testLexicalNode: $isImageNode,
-  visitLexicalNode({ lexicalNode, actions }) {
-    actions.addAndStepInto('image', {
-      url: lexicalNode.getSrc(),
-      alt: lexicalNode.getAltText(),
-      title: lexicalNode.getTitle()
+  visitLexicalNode({ mdastParent, lexicalNode, actions }) {
+    actions.appendToParent(mdastParent, {
+      type: 'paragraph',
+      children: [
+        {
+          type: 'image',
+          url: lexicalNode.getSrc(),
+          alt: lexicalNode.getAltText(),
+          title: lexicalNode.getTitle()
+        }
+      ]
     })
   }
 }

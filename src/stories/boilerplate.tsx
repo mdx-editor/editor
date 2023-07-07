@@ -72,6 +72,14 @@ interface WrappedEditorProps {
   className?: string
 }
 
+async function imageUploadHandler(image: File) {
+  const formData = new FormData()
+  formData.append('image', image)
+  const response = await fetch('/uploads/new', { method: 'POST', body: formData })
+  const json = (await response.json()) as { url: string }
+  return json.url
+}
+
 export const WrappedLexicalEditor: React.FC<WrappedEditorProps> = ({ viewMode, markdown, onChange, className }) => {
   return (
     <MDXEditor
@@ -84,6 +92,7 @@ export const WrappedLexicalEditor: React.FC<WrappedEditorProps> = ({ viewMode, m
       onChange={onChange}
       linkAutocompleteSuggestions={['https://google.com/', 'https://news.ycombinator.com/', 'https://reddit.com/']}
       imageAutoCompleteSuggestions={['https://picsum.photos/200', 'https://picsum.photos/201']}
+      imageUploadHandler={imageUploadHandler}
     />
   )
 }

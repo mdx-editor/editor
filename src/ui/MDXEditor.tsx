@@ -11,7 +11,7 @@ import classNames from 'classnames'
 import { $getRoot, Klass, LexicalNode } from 'lexical'
 import * as Mdast from 'mdast'
 import { ToMarkdownExtension, ToMarkdownOptions } from 'mdast-util-mdx'
-import type { ComponentType } from 'react'
+import type { ComponentType, PropsWithChildren } from 'react'
 import React from 'react'
 import { theme as contentTheme } from '../content/theme'
 import { LexicalConvertOptions, LexicalExportVisitor, defaultExtensions, defaultLexicalVisitors, defaultToMarkdownOptions } from '../export'
@@ -26,7 +26,7 @@ import {
   defaultSyntaxExtensions,
   importMarkdownToLexical
 } from '../import'
-import { EditorSystemComponent, useEmitterValues } from '../system/EditorSystemComponent'
+import { EditorSystemComponent, useEmitterValues, usePublisher } from '../system/EditorSystemComponent'
 import { SandpackConfig } from '../system/Sandpack'
 import { NodeDecoratorComponents } from '../types/ExtendedEditorConfig'
 import { JsxComponentDescriptor } from '../types/JsxComponentDescriptors'
@@ -52,6 +52,7 @@ import {
   ToolbarSeparator
 } from './ToolbarPlugin/toolbarComponents'
 import styles from './styles.module.css'
+import { ImagesPlugin } from './ImagesPlugin'
 
 /**
  * The properties of the {@link MDXEditor} react component
@@ -121,6 +122,21 @@ export interface MDXEditorProps {
    * The supported code block languages.
    */
   codeBlockLanguages?: Record<string, string>
+  /**
+   * Implement this so that users can drag and drop or paste images into the editor.
+   * Pass an implementation that takes a file as an argument, and returns Promise<string>, where string is the url of the image to be inserted.
+   * @example
+   * ```
+   *async function imageUploadHandler(image: File) {
+   *  const formData = new FormData()
+   *  formData.append('image', image)
+   *  const response = await fetch('/uploads/new', { method: 'POST', body: formData })
+   *  const json = (await response.json()) as { url: string }
+   *  return json.url
+   *}
+   * ```
+   */
+  imageUploadHandler?: (image: File) => Promise<string>
 }
 
 const LazyFrontmatterEditor = React.lazy(() =>
@@ -139,12 +155,15 @@ const LazyCodeBlockEditor = React.lazy(() =>
 
 const LazyTableEditor = React.lazy(() => import('./NodeDecorators/TableEditor').then((module) => ({ default: module.TableEditor })))
 
+const LazyImageEditor = React.lazy(() => import('./NodeDecorators/ImageEditor').then((module) => ({ default: module.ImageEditor })))
+
 const defaultNodeDecorators: NodeDecoratorComponents = {
   FrontmatterEditor: LazyFrontmatterEditor,
   JsxEditor: LazyJsxEditor,
   SandpackEditor: LazySandpackEditor,
   CodeBlockEditor: LazyCodeBlockEditor,
-  TableEditor: LazyTableEditor
+  TableEditor: LazyTableEditor,
+  ImageEditor: LazyImageEditor
 }
 
 const defaultToolbarComponents = [
@@ -265,6 +284,7 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>(
       className,
       contentEditableClassName,
       toolbarComponents = defaultToolbarComponents,
+      imageUploadHandler,
       markdownParseOptions: {
         syntaxExtensions = Object.values(defaultSyntaxExtensions),
         mdastExtensions = Object.values(defaultMdastExtensions),
@@ -299,7 +319,9 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>(
               nodeDecoratorComponents: defaultNodeDecorators
             },
             nodes: lexicalNodes,
-            onError: (error: Error) => console.error(error)
+            onError: (error: Error) => {
+              throw error
+            }
           }}
         >
           <EditorSystemComponent
@@ -324,6 +346,7 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>(
               toMarkdownExtensions: toMarkdownExtensions
             }}
             lexicalNodes={lexicalNodes}
+            imageUploadHandler={imageUploadHandler}
           >
             <ToolbarPlugin />
             <ViewModeToggler>
@@ -340,6 +363,7 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>(
             <TabIndentationPlugin />
             <LinkDialogPlugin />
             <SharedHistoryPlugin />
+            <ImagesPlugin />
             <PatchedMarkdownShortcutPlugin />
             <MDXMethods mdxRef={ref} />
           </EditorSystemComponent>

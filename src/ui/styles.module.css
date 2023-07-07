@@ -138,6 +138,14 @@
   color: var(--baseText);
 }
 
+.dropZone {
+  background: transparent;
+}
+
+.dropZone[data-drop-zone-active=true] {
+  background: red;
+}
+
 .editorWrapper {
   padding: var(--spacing-3);
 }
@@ -736,4 +744,15 @@
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
   }
+}
+
+.focusedImage {
+  outline: highlight solid 2px;
+}
+
+.imageWrapper[draggable=true] {
+  cursor: move; /* fallback if grab cursor is unsupported */
+  cursor: grab;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
 }

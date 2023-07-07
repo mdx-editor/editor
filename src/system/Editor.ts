@@ -21,6 +21,7 @@ import {
   LexicalCommand,
   LexicalEditor,
   LexicalNode,
+  PASTE_COMMAND,
   RangeSelection,
   SELECTION_CHANGE_COMMAND,
   TextFormatType
@@ -88,6 +89,10 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
   const lexicalNodes = r.node<Klass<LexicalNode>[]>([])
 
   const imageAutocompleteSuggestions = r.node<string[]>([])
+
+  const imageUploadHandler = r.node<(image: File) => Promise<string>>((_) => {
+    throw new Error('Image upload handling is not implemented')
+  })
 
   r.link(
     r.pipe(
@@ -294,6 +299,31 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
     )
   })
 
+  r.pub(createEditorSubscription, (theEditor) => {
+    return theEditor.registerCommand(
+      PASTE_COMMAND,
+      (event: ClipboardEvent) => {
+        let cbPayload = Array.from(event.clipboardData?.items || [])
+        cbPayload = cbPayload.filter((i) => /image/.test(i.type)) // Strip out the non-image bits
+
+        if (!cbPayload.length || cbPayload.length === 0) {
+          return false
+        } // If no image was present in the collection, bail.
+
+        const imageUploadHandlerValue = r.getValue(imageUploadHandler)
+        const theImage = cbPayload[0].getAsFile()!
+
+        imageUploadHandlerValue(theImage)
+          .then((url) => r.pub(insertImage, url))
+          .catch((e) => {
+            throw e
+          })
+        return true
+      },
+      COMMAND_PRIORITY_CRITICAL
+    )
+  })
+
   return {
     editor,
     activeEditor,
@@ -318,6 +348,7 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
     lexicalConvertOptions,
     lexicalNodes,
     imageAutocompleteSuggestions,
-    markdownSource
+    markdownSource,
+    imageUploadHandler
   }
 }, [])

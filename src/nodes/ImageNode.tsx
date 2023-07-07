@@ -4,6 +4,7 @@ import type {
   DOMConversionOutput,
   DOMExportOutput,
   EditorConfig,
+  LexicalEditor,
   LexicalNode,
   NodeKey,
   SerializedLexicalNode,
@@ -11,6 +12,7 @@ import type {
 } from 'lexical'
 
 import { DecoratorNode } from 'lexical'
+import { ExtendedEditorConfig } from '../types/ExtendedEditorConfig'
 
 function convertImageElement(domNode: Node): null | DOMConversionOutput {
   if (domNode instanceof HTMLImageElement) {
@@ -127,8 +129,15 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     this.getWritable().__title = title
   }
 
-  decorate(): JSX.Element {
-    return <img title={this.__title} src={this.__src} alt={this.__altText} />
+  decorate(
+    _parentEditor: LexicalEditor,
+    {
+      theme: {
+        nodeDecoratorComponents: { ImageEditor }
+      }
+    }: ExtendedEditorConfig
+  ): JSX.Element {
+    return <ImageEditor src={this.getSrc()} title={this.getTitle()} nodeKey={this.getKey()} />
   }
 }
 

@@ -41,3 +41,9 @@ export interface TableEditorProps {
   lexicalTable: TableNode
   mdastNode: Mdast.Table
 }
+
+export interface ImageEditorProps {
+  nodeKey: string
+  src: string
+  title?: string
+}
