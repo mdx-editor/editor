@@ -1,15 +1,15 @@
-import { $getRoot } from 'lexical'
 import { system } from '../gurx'
-import { importMarkdownToLexical } from '../import'
 import { ViewMode } from '../types/ViewMode'
-import { getStateAsMarkdown } from '../utils/lexicalHelpers'
 import { EditorSystemType } from './Editor'
 import { JsxSystemType } from './Jsx'
 
 export const [ViewModeSystem] = system(
-  (r, [{ editor, markdownParseOptions, markdownSource }, {}]) => {
+  (r, [{ markdownSource, setMarkdown }, {}]) => {
     const viewMode = r.node<ViewMode>('editor')
     const headMarkdown = r.node('')
+    const markdownSourceFromEditor = r.node('')
+
+    r.link(markdownSource, markdownSourceFromEditor)
 
     r.sub(
       r.pipe(
@@ -23,25 +23,18 @@ export const [ViewModeSystem] = system(
           },
           { current: 'editor' as ViewMode, next: 'editor' as ViewMode }
         ),
-        r.o.withLatestFrom(editor, markdownSource, markdownParseOptions)
+        r.o.withLatestFrom(markdownSourceFromEditor)
       ),
-      ([{ current }, editor, markdownSource, markdownParseOptions]) => {
+      ([{ current }, markdownSourceFromEditor]) => {
         if (current === 'markdown') {
-          // we're switching away from the markdown editor, convert the source back to lexical nodes.
-          editor?.update(() => {
-            $getRoot().clear()
-            importMarkdownToLexical({
-              root: $getRoot(),
-              markdown: markdownSource,
-              ...markdownParseOptions!
-            })
-          })
+          r.pub(setMarkdown, markdownSourceFromEditor)
         }
       }
     )
 
     return {
       viewMode,
+      markdownSourceFromEditor,
       headMarkdown
     }
   },

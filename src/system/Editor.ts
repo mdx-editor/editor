@@ -37,6 +37,7 @@ import * as Mdast from 'mdast'
 import { createEmptyHistoryState } from '@lexical/react/LexicalHistoryPlugin'
 import { MarkdownParseOptions } from '../import'
 import { ExportMarkdownFromLexicalOptions } from '../export/export'
+import { importMarkdownToLexical } from '../import'
 
 type Teardowns = Array<() => void>
 
@@ -62,6 +63,7 @@ function seedTable(): Mdast.Table {
 export const [EditorSystem, EditorSystemType] = system((r) => {
   const editor = r.node<LexicalEditor | null>(null, true)
   const markdownSource = r.node('')
+  const setMarkdown = r.node<string>()
   const historyState = r.node(createEmptyHistoryState())
   const activeEditor = r.derive(editor, null)
 
@@ -104,6 +106,18 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
     ),
     editorSubscriptions
   )
+
+  r.sub(r.pipe(setMarkdown, r.o.withLatestFrom(editor, markdownParseOptions)), ([markdown, editor, markdownParseOptions]) => {
+    r.pub(markdownSource, markdown)
+    editor?.update(() => {
+      $getRoot().clear()
+      importMarkdownToLexical({
+        root: $getRoot(),
+        markdown,
+        ...markdownParseOptions!
+      })
+    })
+  })
 
   r.sub(r.pipe(applyListType, r.o.withLatestFrom(activeEditor)), ([listType, theEditor]) => {
     theEditor?.dispatchCommand(ListTypeCommandMap.get(listType)!, undefined)
@@ -349,6 +363,7 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
     lexicalNodes,
     imageAutocompleteSuggestions,
     markdownSource,
+    setMarkdown,
     imageUploadHandler
   }
 }, [])

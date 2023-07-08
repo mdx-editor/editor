@@ -44,8 +44,8 @@ export const ViewModeToggler: React.FC<ViewModeProps> = ({ children }) => {
 }
 
 export const SourceEditor = () => {
-  const [markdown] = useEmitterValues('markdownSource')
-  const updateMarkdown = usePublisher('markdownSource')
+  const [markdown] = useEmitterValues('markdownSourceFromEditor')
+  const updateMarkdown = usePublisher('markdownSourceFromEditor')
   const codeMirrorRef = React.useRef<CodeMirrorRef>(null)
 
   return (

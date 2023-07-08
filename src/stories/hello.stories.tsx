@@ -56,3 +56,14 @@ export function GetValueWithButton() {
     </div>
   )
 }
+
+export function SetValueWithButton() {
+  const ref = React.useRef<MDXEditorMethods>(null)
+
+  return (
+    <div>
+      <button onClick={() => ref.current?.setMarkdown('bar')}>Set Markdown</button>
+      <MDXEditor markdown={'foo'} ref={ref} />
+    </div>
+  )
+}

@@ -60,6 +60,8 @@ import { ImagesPlugin } from './ImagesPlugin'
 export interface MDXEditorProps {
   /**
    * The markdown content to be edited.
+   * Notice: this is the initial value of the editor.
+   * If you want to change the value of the editor, use the `setMarkdown` method.
    */
   markdown: string
   /**
@@ -264,7 +266,15 @@ export const defaultMdxOptionValues: DefaultMdxOptionValues = {
  * ```
  */
 export interface MDXEditorMethods {
+  /**
+   * gets the current markdown value
+   */
   getMarkdown: () => string
+
+  /**
+   * Updates the markdown value
+   */
+  setMarkdown: (value: string) => void
 }
 
 /**
@@ -375,6 +385,7 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>(
 
 const MDXMethods: React.FC<{ mdxRef: React.ForwardedRef<MDXEditorMethods> }> = ({ mdxRef }) => {
   const [markdownSource] = useEmitterValues('markdownSource')
+  const setMarkdown = usePublisher('setMarkdown')
 
   React.useImperativeHandle(
     mdxRef,
@@ -382,10 +393,11 @@ const MDXMethods: React.FC<{ mdxRef: React.ForwardedRef<MDXEditorMethods> }> = (
       return {
         getMarkdown: () => {
           return markdownSource
-        }
+        },
+        setMarkdown
       }
     },
-    [markdownSource]
+    [markdownSource, setMarkdown]
   )
   return null
 }
