@@ -175,7 +175,7 @@ export function ImageEditor({ src, title, nodeKey }: ImageEditorProps): JSX.Elem
   return (
     <Suspense fallback={null}>
       <>
-        <div draggable={draggable} className={styles.imageWrapper}>
+        <div draggable={draggable} className={styles.imageWrapper} data-editor-block-type="image">
           <LazyImage
             className={classNames({
               [styles.focusedImage]: isFocused

@@ -70,9 +70,10 @@ interface WrappedEditorProps {
   onChange?: (markdown: string) => void
   viewMode?: ViewMode
   className?: string
+  imageUploadHandler?: (image: File) => Promise<string>
 }
 
-async function imageUploadHandler(image: File) {
+async function expressImageUploadHandler(image: File) {
   const formData = new FormData()
   formData.append('image', image)
   const response = await fetch('/uploads/new', { method: 'POST', body: formData })
@@ -80,7 +81,13 @@ async function imageUploadHandler(image: File) {
   return json.url
 }
 
-export const WrappedLexicalEditor: React.FC<WrappedEditorProps> = ({ viewMode, markdown, onChange, className }) => {
+export const WrappedLexicalEditor: React.FC<WrappedEditorProps> = ({
+  viewMode,
+  markdown,
+  onChange,
+  className,
+  imageUploadHandler = expressImageUploadHandler
+}) => {
   return (
     <MDXEditor
       markdown={markdown}

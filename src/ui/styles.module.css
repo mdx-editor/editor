@@ -750,6 +750,10 @@
   outline: highlight solid 2px;
 }
 
+.imageWrapper {
+  display: inline;
+}
+
 .imageWrapper[draggable=true] {
   cursor: move; /* fallback if grab cursor is unsupported */
   cursor: grab;
