@@ -1,14 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { markdown as markdownLanguageSupport } from '@codemirror/lang-markdown'
-import { SandpackProvider, CodeEditor as TheEditorFromSandpack } from '@codesandbox/sandpack-react'
-import { CodeMirrorRef } from '@codesandbox/sandpack-react/components/CodeEditor/CodeMirror'
 import React from 'react'
 import { Diff, Hunk, parseDiff } from 'react-diff-view'
 import { diffLines, formatLines } from 'unidiff'
-import { useEmitterValues, usePublisher } from '../system/EditorSystemComponent'
+import { useEmitterValues } from '../system/EditorSystemComponent'
 
 import 'react-diff-view/style/index.css'
+
+const SourceEditor = React.lazy(() => import('./SourceEditor').then((module) => ({ default: module.SourceEditor })))
 
 export function DiffViewer({ oldText, newText }: { oldText: string; newText: string }) {
   const diffText = formatLines(diffLines(oldText, newText), { context: 3 })
@@ -38,29 +37,11 @@ export const ViewModeToggler: React.FC<ViewModeProps> = ({ children }) => {
     <div>
       <div style={{ display: viewMode === 'editor' ? 'block' : 'none' }}>{children}</div>
       {viewMode === 'diff' ? <MarkdownDiffView /> : null}
-      {viewMode === 'markdown' ? <SourceEditor /> : null}
-    </div>
-  )
-}
-
-export const SourceEditor = () => {
-  const [markdown] = useEmitterValues('markdownSourceFromEditor')
-  const updateMarkdown = usePublisher('markdownSourceFromEditor')
-  const codeMirrorRef = React.useRef<CodeMirrorRef>(null)
-
-  return (
-    <div>
-      <SandpackProvider>
-        <TheEditorFromSandpack
-          showLineNumbers
-          additionalLanguages={[{ name: 'markdown', extensions: ['md'], language: markdownLanguageSupport() }]}
-          initMode="lazy"
-          filePath={`file.md`}
-          code={markdown}
-          onCodeUpdate={updateMarkdown}
-          ref={codeMirrorRef}
-        />
-      </SandpackProvider>
+      {viewMode === 'markdown' ? (
+        <React.Suspense fallback={null}>
+          <SourceEditor />
+        </React.Suspense>
+      ) : null}
     </div>
   )
 }
