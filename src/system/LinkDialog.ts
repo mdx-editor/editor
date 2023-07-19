@@ -116,7 +116,7 @@ export const [LinkDialogSystem, LinkDialogSystemType] = system(
       return editor.registerCommand(
         KEY_MODIFIER_COMMAND,
         (event) => {
-          if (event.key === 'k' && IS_APPLE ? event.metaKey : event.ctrlKey) {
+          if (event.key === 'k' && (IS_APPLE ? event.metaKey : event.ctrlKey)) {
             r.pub(openLinkEditDialog, true)
             return true
           }
