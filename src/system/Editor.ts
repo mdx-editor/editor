@@ -7,10 +7,12 @@ import {
   REMOVE_LIST_COMMAND
 } from '@lexical/list'
 import { $isHeadingNode } from '@lexical/rich-text'
-import { $findMatchingParent, $getNearestNodeOfType, $insertNodeToNearestRoot } from '@lexical/utils'
+import { $findMatchingParent, $getNearestNodeOfType, $insertNodeToNearestRoot, $wrapNodeInElement } from '@lexical/utils'
 import {
+  $createParagraphNode,
   $getRoot,
   $getSelection,
+  $insertNodes,
   $isRangeSelection,
   $isRootOrShadowRoot,
   BLUR_COMMAND,
@@ -38,6 +40,7 @@ import { createEmptyHistoryState } from '@lexical/react/LexicalHistoryPlugin'
 import { MarkdownParseOptions } from '../import'
 import { ExportMarkdownFromLexicalOptions } from '../export/export'
 import { importMarkdownToLexical } from '../import'
+import { r } from 'vitest/dist/types-ad1c3f45'
 
 type Teardowns = Array<() => void>
 
@@ -132,18 +135,11 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
   })
 
   r.sub(r.pipe(insertImage, r.o.withLatestFrom(activeEditor)), ([src, theEditor]) => {
-    theEditor?.getEditorState().read(() => {
-      const selection = $getSelection()
-
-      if ($isRangeSelection(selection)) {
-        const focusNode = selection.focus.getNode()
-
-        if (focusNode !== null) {
-          theEditor.update(() => {
-            const imageNode = $createImageNode({ altText: '', src, title: '' })
-            $insertNodeToNearestRoot(imageNode)
-          })
-        }
+    theEditor?.update(() => {
+      const imageNode = $createImageNode({ altText: '', src, title: '' })
+      $insertNodes([imageNode])
+      if ($isRootOrShadowRoot(imageNode.getParentOrThrow())) {
+        $wrapNodeInElement(imageNode, $createParagraphNode).selectEnd()
       }
     })
   })
@@ -325,10 +321,13 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
         } // If no image was present in the collection, bail.
 
         const imageUploadHandlerValue = r.getValue(imageUploadHandler)
-        const theImage = cbPayload[0].getAsFile()!
 
-        imageUploadHandlerValue(theImage)
-          .then((url) => r.pub(insertImage, url))
+        Promise.all(cbPayload.map((file) => imageUploadHandlerValue(file.getAsFile()!)))
+          .then((urls) => {
+            urls.forEach((url) => {
+              r.pub(insertImage, url)
+            })
+          })
           .catch((e) => {
             throw e
           })

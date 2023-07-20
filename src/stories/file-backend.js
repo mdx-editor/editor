@@ -11,7 +11,7 @@ import { extname } from 'path'
 // Set up the storage configuration for Multer
 const storage = diskStorage({
   destination: './uploads',
-  filename: function (req, file, callback) {
+  filename: function (_req, file, callback) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9)
     const extension = extname(file.originalname)
     callback(null, file.fieldname + '-' + uniqueSuffix + extension)
