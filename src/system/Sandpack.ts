@@ -68,6 +68,16 @@ export interface SandpackConfig {
    * The list of sandpack presets that can be used.
    */
   presets: Array<SandpackPreset>
+  /**
+   * The list of sandpack panes that will be displayed in the sandbox.
+   */
+  panes?: {
+    editor?: boolean
+    console?: boolean
+    preview?: boolean
+    test?: boolean
+  }
+  readonly?: boolean
 }
 
 const defaultSnippetContent = `
@@ -94,7 +104,11 @@ const defaultSandpackConfig: SandpackConfig = {
       snippetLanguage: 'jsx',
       initialSnippetContent: defaultSnippetContent
     }
-  ]
+  ],
+  panes: {
+    editor: true,
+    preview: true
+  }
 }
 
 const defaultCodeBlockLanguages = {
