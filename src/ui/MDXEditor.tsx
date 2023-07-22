@@ -11,12 +11,11 @@ import classNames from 'classnames'
 import { $getRoot, Klass, LexicalNode } from 'lexical'
 import * as Mdast from 'mdast'
 import { ToMarkdownExtension, ToMarkdownOptions } from 'mdast-util-mdx'
-import type { ComponentType, PropsWithChildren } from 'react'
 import React from 'react'
 import { theme as contentTheme } from '../content/theme'
 import { LexicalConvertOptions, LexicalExportVisitor, defaultExtensions, defaultLexicalVisitors, defaultToMarkdownOptions } from '../export'
+import { FromMarkdownOptions, ParseOptions } from 'mdast-util-from-markdown/lib'
 import {
-  MarkdownParseOptions,
   MdastExtension,
   MdastImportVisitor,
   SyntaxExtension,
@@ -53,6 +52,26 @@ import {
 } from './ToolbarPlugin/toolbarComponents'
 import styles from './styles.module.css'
 import { ImagesPlugin } from './ImagesPlugin'
+import { CustomLeafDirectiveEditor } from '../types/NodeDecoratorsProps'
+
+/**
+ * Options that control how the the markdown input string is parsed into a tree.
+ * @see {@link https://github.com/syntax-tree/mdast-util-from-markdown | fromMarkdown}
+ */
+export interface MarkdownParseOptions {
+  /**
+   * The visitors to process the markdown AST with.
+   */
+  visitors?: MdastImportVisitor<Mdast.Content>[]
+  /**
+   * The extensions to use for the markdown parser. Passed as the `extensions` option to the `fromMarkdown` function.
+   */
+  syntaxExtensions?: NonNullable<ParseOptions['extensions']>
+  /**
+   * The mdast extensions to use for the markdown parser. Passed as the `mdastExtensions` option to the `fromMarkdown` function.
+   */
+  mdastExtensions?: NonNullable<FromMarkdownOptions['mdastExtensions']>
+}
 
 /**
  * The properties of the {@link MDXEditor} react component
@@ -89,7 +108,7 @@ export interface MDXEditorProps {
   /**
    * The set of components to be rendered in the toolbar.
    */
-  toolbarComponents?: ComponentType[]
+  toolbarComponents?: React.ComponentType[]
   /**
    * The initial view mode for the editor. Defaults to `ViewMode.editor`.
    */
@@ -110,7 +129,7 @@ export interface MDXEditorProps {
    * The options to be used when parsing the markdown content.
    * @see the {@link MarkdownParseOptions} interface for more details.
    */
-  markdownParseOptions?: Partial<MarkdownParseOptions>
+  markdownParseOptions?: MarkdownParseOptions
   /**
    * The {@link https://lexical.dev/ | Lexical nodes} used by the editor.
    */
@@ -139,6 +158,7 @@ export interface MDXEditorProps {
    * ```
    */
   imageUploadHandler?: (image: File) => Promise<string>
+  customLeafDirectiveEditors?: CustomLeafDirectiveEditor<any>[]
 }
 
 const LazyFrontmatterEditor = React.lazy(() =>
@@ -159,13 +179,18 @@ const LazyTableEditor = React.lazy(() => import('./NodeDecorators/TableEditor').
 
 const LazyImageEditor = React.lazy(() => import('./NodeDecorators/ImageEditor').then((module) => ({ default: module.ImageEditor })))
 
+const LazyLeafDirectiveEditor = React.lazy(() =>
+  import('./NodeDecorators/LeafDirectiveEditor').then((module) => ({ default: module.LeafDirectiveEditor }))
+)
+
 const defaultNodeDecorators: NodeDecoratorComponents = {
   FrontmatterEditor: LazyFrontmatterEditor,
   JsxEditor: LazyJsxEditor,
   SandpackEditor: LazySandpackEditor,
   CodeBlockEditor: LazyCodeBlockEditor,
   TableEditor: LazyTableEditor,
-  ImageEditor: LazyImageEditor
+  ImageEditor: LazyImageEditor,
+  LeafDirectiveEditor: LazyLeafDirectiveEditor
 }
 
 const defaultToolbarComponents = [
@@ -267,18 +292,18 @@ export const defaultMdxOptionValues: DefaultMdxOptionValues = {
  */
 export interface MDXEditorMethods {
   /**
-   * gets the current markdown value
+   * Gets the current markdown value.
    */
   getMarkdown: () => string
 
   /**
-   * Updates the markdown value
+   * Updates the markdown value of the editor.
    */
   setMarkdown: (value: string) => void
 }
 
 /**
- * The MDXEditor React component
+ * The MDXEditor React component. See {@link MDXEditorProps} for the list of available props and the {@link MDXEditorMethods} for the methods exposed through the ref.
  */
 export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>(
   (
@@ -305,7 +330,8 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>(
         toMarkdownOptions = defaultToMarkdownOptions,
         visitors: exportVisitors = Object.values(defaultLexicalVisitors)
       } = {},
-      lexicalNodes = Object.values(defaultLexicalNodes)
+      lexicalNodes = Object.values(defaultLexicalNodes),
+      customLeafDirectiveEditors = []
     },
     ref
   ) => {
@@ -357,6 +383,7 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>(
             }}
             lexicalNodes={lexicalNodes}
             imageUploadHandler={imageUploadHandler}
+            customLeafDirectiveEditors={customLeafDirectiveEditors}
           >
             <ToolbarPlugin />
             <ViewModeToggler>

@@ -1,3 +1,4 @@
+import 'mdast-util-directive'
 import { SandpackProvider } from '@codesandbox/sandpack-react'
 import { $insertNodeToNearestRoot } from '@lexical/utils'
 import { $getSelection, $isRangeSelection, COMMAND_PRIORITY_LOW, FOCUS_COMMAND } from 'lexical'

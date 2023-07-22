@@ -6,9 +6,12 @@
  */
 export type { SandpackConfig, SandpackPreset } from './system/Sandpack'
 export type * from './types/JsxComponentDescriptors'
-export type { MdastTreeImportOptions, MarkdownParseOptions, MdastVisitActions, MdastVisitParams, MdastImportVisitor } from './import'
+export type { MdastTreeImportOptions, MdastVisitActions, MdastVisitParams, MdastImportVisitor } from './import'
 export type { ToMarkdownOptions, LexicalVisitActions, LexicalNodeVisitParams, LexicalExportVisitor, LexicalConvertOptions } from './export'
+export type { NestedEditorProps } from './ui/NodeDecorators/NestedEditor'
+export type { CustomLeafDirectiveEditor, LeafDirectiveEditorProps } from './types/NodeDecoratorsProps'
 
 export * from './nodes'
 export * from './ui/MDXEditor'
+export { NestedEditor, useMdastNodeUpdater } from './ui/NodeDecorators/NestedEditor'
 export { ToolbarComponents } from './ui/ToolbarPlugin/toolbarComponents'

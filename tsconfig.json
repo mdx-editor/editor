@@ -15,7 +15,8 @@
     "rootDir": "./src",
     "typeRoots": [
       "./node_modules/@types",
-      "./src/@types"
+      "./src/@types",
+      "./node_modules"
     ],
     "types": [
       "vite/client",
@@ -30,8 +31,5 @@
   },
   "include": [
     "src"
-    // "tailwind.config.ts",
-    // "postcss.config.js",
-    // "vite.config.ts"
   ]
 }

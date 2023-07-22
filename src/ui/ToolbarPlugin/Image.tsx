@@ -4,18 +4,34 @@ import { useEmitterValues, usePublisher } from '../../system/EditorSystemCompone
 
 import React from 'react'
 
-import { createCommand, LexicalCommand } from 'lexical'
-
 import classNames from 'classnames'
 import { useCombobox } from 'downshift'
+import AddPhotoIcon from '../icons/add_photo.svg'
 import DropDownIcon from '../icons/arrow_drop_down.svg'
 import CheckIcon from '../icons/check.svg'
 import CloseIcon from '../icons/close.svg'
-import AddPhotoIcon from '../icons/add_photo.svg'
 import styles from '../styles.module.css'
 import { InstantTooltip } from './InstantTooltip'
+import { DialogButton } from './DialogButton'
 
-export const ImageButton = React.forwardRef<HTMLButtonElement, RadixToolbar.ToolbarButtonProps>((props, forwardedRef) => {
+export const ImageButton = React.forwardRef<HTMLButtonElement, Record<string, never>>((_, forwardedRef) => {
+  const [imageAutocompleteSuggestions] = useEmitterValues('imageAutocompleteSuggestions')
+  const insertImage = usePublisher('insertImage')
+
+  return (
+    <DialogButton
+      ref={forwardedRef}
+      submitButtonTitle="Insert Image"
+      dialogInputPlaceholder="Paste or select image URL"
+      tooltipTitle="Insert image"
+      onSubmit={insertImage}
+      buttonContent={<AddPhotoIcon />}
+      autocompleteSuggestions={imageAutocompleteSuggestions}
+    />
+  )
+})
+
+export const OldImageButton = React.forwardRef<HTMLButtonElement, RadixToolbar.ToolbarButtonProps>((props, forwardedRef) => {
   const [editorRootElementRef, imageAutocompleteSuggestions] = useEmitterValues('editorRootElementRef', 'imageAutocompleteSuggestions')
   const [open, setOpen] = React.useState(false)
   const insertImage = usePublisher('insertImage')
@@ -46,8 +62,6 @@ export const ImageButton = React.forwardRef<HTMLButtonElement, RadixToolbar.Tool
     </Dialog.Root>
   )
 })
-
-export const OPEN_LINK_DIALOG: LexicalCommand<undefined> = createCommand()
 
 interface ImageFormProps {
   initialUrl: string

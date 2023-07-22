@@ -25,6 +25,7 @@ import { BlockTypeSelect } from './BlockTypeSelect'
 import { ImageButton } from './Image'
 import { InstantTooltip } from './InstantTooltip'
 import { SelectButtonTrigger, SelectContent, SelectItem } from './SelectPieces'
+import { DialogButton } from './DialogButton'
 
 export { BlockTypeSelect } from './BlockTypeSelect'
 export { ImageButton } from './Image'
@@ -271,9 +272,10 @@ export const ToolbarComponents = {
   BlockTypeSelect,
   BoldItalicUnderlineButtons,
   CodeBlockButton,
+  CodeFormattingButton,
   FrontmatterButton,
   GroupGroup,
-  HorizontalRuleIcon,
+  HorizontalRuleButton,
   LinkButton,
   ListButtons,
   SandpackButton,
@@ -283,5 +285,6 @@ export const ToolbarComponents = {
   ToggleSingleGroupWithItem,
   ToolbarButton,
   ToolbarSeparator,
-  ImageButton
+  ImageButton,
+  DialogButton
 }

@@ -7,10 +7,11 @@ import {
   KEY_MODIFIER_COMMAND,
   RangeSelection
 } from 'lexical'
+import 'mdast-util-directive'
 import { system } from '../gurx'
+import { IS_APPLE } from '../utils/detectMac'
 import { getSelectedNode, getSelectionRectangle } from '../utils/lexicalHelpers'
 import { EditorSystemType } from './Editor'
-import { IS_APPLE } from '../utils/detectMac'
 
 export interface InactiveLinkDialog {
   type: 'inactive'

@@ -1,6 +1,5 @@
 import { EditorThemeClasses } from 'lexical'
 import styles from './theme.module.css'
-import more from '../ui/styles.module.css'
 
 export const theme: EditorThemeClasses = {
   text: {

@@ -1,4 +1,4 @@
-# Contributing to MDX Editor
+# Contributing to MDXEditor
 
 First things first, if you're doing something in the space, [contact me over the email in my profile](https://github.com/petyosi/). 
 The project is still in its infancy, and I would love to get additional perspective.

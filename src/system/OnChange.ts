@@ -1,3 +1,4 @@
+import 'mdast-util-directive'
 import { system } from '../gurx'
 import { getStateAsMarkdown } from '../utils/lexicalHelpers'
 import { EditorSystemType } from './Editor'
@@ -18,7 +19,7 @@ export const [OnChangeSystem, OnChangeSystemType] = system(
 
       updateMarkdown()
 
-      return activeEditor.registerUpdateListener(({ dirtyElements, dirtyLeaves, prevEditorState, tags }) => {
+      return rootEditor.registerUpdateListener(({ dirtyElements, dirtyLeaves, prevEditorState, tags }) => {
         if ((dirtyElements.size === 0 && dirtyLeaves.size === 0) || tags.has('history-merge') || prevEditorState.isEmpty()) {
           return
         }

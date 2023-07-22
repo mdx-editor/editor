@@ -14,7 +14,7 @@ import {
   TextNode
 } from 'lexical'
 import * as Mdast from 'mdast'
-import { ContainerDirective } from 'mdast-util-directive'
+import { ContainerDirective, LeafDirective } from 'mdast-util-directive'
 import type { MdxJsxFlowElement, MdxJsxTextElement } from 'mdast-util-mdx-jsx'
 import {
   $isAdmonitionNode,
@@ -22,6 +22,7 @@ import {
   $isFrontmatterNode,
   $isImageNode,
   $isJsxNode,
+  $isLeafDirectiveNode,
   $isSandpackNode,
   $isTableNode,
   AdmonitionNode,
@@ -29,6 +30,7 @@ import {
   FrontmatterNode,
   ImageNode,
   JsxNode,
+  LeafDirectiveNode,
   SandpackNode,
   TableNode
 } from '../nodes'
@@ -351,6 +353,13 @@ const LexicalTableVisitor: LexicalExportVisitor<TableNode, Mdast.Table> = {
   }
 }
 
+const LexicalLeafDirectiveVisitor: LexicalExportVisitor<LeafDirectiveNode, LeafDirective> = {
+  testLexicalNode: $isLeafDirectiveNode,
+  visitLexicalNode({ actions, mdastParent, lexicalNode }) {
+    actions.appendToParent(mdastParent, lexicalNode.getMdastNode())
+  }
+}
+
 const JsxVisitor: LexicalExportVisitor<JsxNode, MdxJsxFlowElement | MdxJsxTextElement> = {
   testLexicalNode: $isJsxNode,
   visitLexicalNode({ mdastParent, lexicalNode, actions }) {
@@ -390,5 +399,6 @@ export const defaultLexicalVisitors = {
   AdmonitionVisitor,
   LexicalImageVisitor,
   JsxVisitor,
-  LexicalTableVisitor
+  LexicalTableVisitor,
+  LexicalLeafDirectiveVisitor
 }

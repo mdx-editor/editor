@@ -5,8 +5,9 @@ import { $createHorizontalRuleNode, HorizontalRuleNode } from '@lexical/react/Le
 import { $createHeadingNode, $createQuoteNode, $isQuoteNode, HeadingNode, QuoteNode } from '@lexical/rich-text'
 import { $createParagraphNode, $createTextNode, ElementNode, Klass, LexicalNode, RootNode as LexicalRootNode, ParagraphNode } from 'lexical'
 import * as Mdast from 'mdast'
-import { ContainerDirective, directiveFromMarkdown } from 'mdast-util-directive'
+import { ContainerDirective, LeafDirective, directiveFromMarkdown } from 'mdast-util-directive'
 import { fromMarkdown } from 'mdast-util-from-markdown'
+import { FromMarkdownOptions, ParseOptions } from 'mdast-util-from-markdown/lib'
 import { frontmatterFromMarkdown } from 'mdast-util-frontmatter'
 import { gfmTableFromMarkdown } from 'mdast-util-gfm-table'
 import { MdxJsxTextElement, MdxjsEsm, mdxFromMarkdown } from 'mdast-util-mdx'
@@ -21,6 +22,7 @@ import {
   $createFrontmatterNode,
   $createImageNode,
   $createJsxNode,
+  $createLeafDirectiveNode,
   $createSandpackNode,
   $createTableNode,
   $isAdmonitionNode,
@@ -30,10 +32,10 @@ import {
   FrontmatterNode,
   ImageNode,
   JsxNode,
+  LeafDirectiveNode,
   SandpackNode,
   TableNode
 } from '../nodes'
-import { FromMarkdownOptions, ParseOptions } from 'mdast-util-from-markdown/lib'
 
 /**
  * A set of actions that can be used to modify the lexical tree while visiting the mdast tree.
@@ -125,6 +127,13 @@ export const MdastAdmonitionVisitor: MdastImportVisitor<ContainerDirective> = {
   testNode: 'containerDirective',
   visitNode({ mdastNode, actions }) {
     actions.addAndStepInto($createAdmonitionNode(mdastNode.name as AdmonitionKind))
+  }
+}
+
+export const MdastLeafDirectiveVisitor: MdastImportVisitor<LeafDirective> = {
+  testNode: 'leafDirective',
+  visitNode({ lexicalParent, mdastNode }) {
+    ;(lexicalParent as ElementNode).append($createLeafDirectiveNode(mdastNode))
   }
 }
 
@@ -294,7 +303,8 @@ export const defaultMdastVisitors: Record<string, MdastImportVisitor<Mdast.Conte
   MdastAdmonitionVisitor,
   MdastMdxJsEsmVisitor,
   MdastMdxJsxElementVisitor,
-  MdastTableVisitor
+  MdastTableVisitor,
+  MdastLeafDirectiveVisitor
 }
 
 function isParent(node: unknown): node is Mdast.Parent {
@@ -310,10 +320,6 @@ export interface MdastTreeImportOptions {
   mdastRoot: Mdast.Root
 }
 
-/**
- * Options that control how the the markdown input string is parsed into a tree.
- * @see {@link https://github.com/syntax-tree/mdast-util-from-markdown | fromMarkdown}
- */
 export interface MarkdownParseOptions extends Omit<MdastTreeImportOptions, 'mdastRoot'> {
   markdown: string
   syntaxExtensions: NonNullable<ParseOptions['extensions']>
@@ -375,7 +381,8 @@ export function importMdastTreeToLexical({ root, mdastRoot, visitors }: MdastTre
       return visitor.testNode(mdastNode)
     })
     if (!visitor) {
-      throw new Error(`no unist visitor found for ${mdastNode.type}`, {
+      debugger
+      throw new Error(`no MdastImportVisitor found for ${mdastNode.type}`, {
         cause: mdastNode
       })
     }
@@ -423,5 +430,6 @@ export const defaultLexicalNodes: Record<string, Klass<LexicalNode>> = {
   AdmonitionNode,
   JsxNode,
   CodeNode, // this one should not be used, but markdown shortcuts complain about it
-  TableNode
+  TableNode,
+  LeafDirectiveNode
 }

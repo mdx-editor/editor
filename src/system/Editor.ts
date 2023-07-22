@@ -40,7 +40,8 @@ import { createEmptyHistoryState } from '@lexical/react/LexicalHistoryPlugin'
 import { MarkdownParseOptions } from '../import'
 import { ExportMarkdownFromLexicalOptions } from '../export/export'
 import { importMarkdownToLexical } from '../import'
-import { r } from 'vitest/dist/types-ad1c3f45'
+import { CustomLeafDirectiveEditor } from '../types/NodeDecoratorsProps'
+import { LeafDirective } from 'mdast-util-directive'
 
 type Teardowns = Array<() => void>
 
@@ -87,6 +88,7 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
   const activeEditorType = r.node<ActiveEditorType>({ type: 'lexical' })
   const editorRootElementRef = r.node<{ current: HTMLDivElement } | null>(null)
   const markdownParseOptions = r.node<Pick<MarkdownParseOptions, 'syntaxExtensions' | 'mdastExtensions' | 'visitors'> | null>(null)
+  const customLeafDirectiveEditors = r.node<CustomLeafDirectiveEditor<LeafDirective>[]>([])
   const lexicalConvertOptions = r.node<Pick<
     ExportMarkdownFromLexicalOptions,
     'visitors' | 'toMarkdownOptions' | 'toMarkdownExtensions'
@@ -363,6 +365,7 @@ export const [EditorSystem, EditorSystemType] = system((r) => {
     imageAutocompleteSuggestions,
     markdownSource,
     setMarkdown,
-    imageUploadHandler
+    imageUploadHandler,
+    customLeafDirectiveEditors
   }
 }, [])

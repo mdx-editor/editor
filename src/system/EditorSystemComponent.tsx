@@ -8,6 +8,7 @@ import { LinkDialogSystem } from './LinkDialog'
 import { JsxSystem } from './Jsx'
 import { OnChangeSystem } from './OnChange'
 import { ToolbarSystem } from './Toolbar'
+import 'mdast-util-directive'
 
 export const {
   Component: EditorSystemComponent,
@@ -32,7 +33,8 @@ export const {
       viewMode: 'viewMode',
       linkAutocompleteSuggestions: 'linkAutocompleteSuggestions',
       imageAutocompleteSuggestions: 'imageAutocompleteSuggestions',
-      codeBlockLanguages: 'codeBlockLanguages'
+      codeBlockLanguages: 'codeBlockLanguages',
+      customLeafDirectiveEditors: 'customLeafDirectiveEditors'
     },
     events: {
       onChange: 'onChange'

@@ -1,3 +1,4 @@
+import 'mdast-util-directive'
 import { system } from '../gurx'
 import { ViewMode } from '../types/ViewMode'
 import { EditorSystemType } from './Editor'

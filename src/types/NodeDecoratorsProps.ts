@@ -1,7 +1,10 @@
+import React from 'react'
 import { EditorThemeClasses, LexicalEditor } from 'lexical'
 import { MdxJsxAttribute } from 'mdast-util-mdx-jsx'
 import { TableNode } from '../nodes'
 import * as Mdast from 'mdast'
+import { LeafDirectiveNode } from '../nodes/LeafDirectiveNode'
+import { LeafDirective } from 'mdast-util-directive'
 
 export interface FrontmatterEditorProps {
   yaml: string
@@ -46,4 +49,18 @@ export interface ImageEditorProps {
   nodeKey: string
   src: string
   title?: string
+}
+
+export interface LeafDirectiveEditorProps<T extends LeafDirective> {
+  /** The Lexical editor that contains the node */
+  parentEditor: LexicalEditor
+  /** The Lexical node that is being edited */
+  leafDirective: LeafDirectiveNode
+  /** The MDAST node that is being edited */
+  mdastNode: T
+}
+
+export interface CustomLeafDirectiveEditor<T extends LeafDirective> {
+  testNode: (mdastNode: LeafDirective) => boolean
+  Editor: React.ComponentType<LeafDirectiveEditorProps<T>>
 }
