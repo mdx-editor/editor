@@ -1,6 +1,5 @@
 import {
   SandpackCodeEditor,
-  SandpackCodeViewer,
   SandpackConsole,
   SandpackLayout,
   SandpackPreview,
@@ -72,11 +71,7 @@ export const SandpackEditor = ({ nodeKey, code, meta, onChange, focusEmitter }: 
       }}
     >
       <SandpackLayout>
-        {config.readonly ? (
-          <SandpackCodeViewer showLineNumbers ref={codeMirrorRef} />
-        ) : (
-          <SandpackCodeEditor showLineNumbers showInlineErrors ref={codeMirrorRef} />
-        )}
+        <SandpackCodeEditor showLineNumbers showInlineErrors ref={codeMirrorRef} />
         {config.panes?.console ?? <SandpackConsole />}
         {config.panes?.preview ?? <SandpackPreview />}
       </SandpackLayout>

@@ -77,7 +77,6 @@ export interface SandpackConfig {
     preview?: boolean
     test?: boolean
   }
-  readonly?: boolean
 }
 
 const defaultSnippetContent = `
