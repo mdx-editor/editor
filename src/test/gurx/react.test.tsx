@@ -6,7 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
 import * as React from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { useState } from 'react'
-import { realmFactoryToComponent, system, getRealmFactory } from '../../gurx'
+import { realmFactoryToComponent, system, getRealmFactory, sysHooks, realmPlugin } from '../../gurx'
 
 const simpleRealm = () => {
   const [sys] = system((r) => {
@@ -19,6 +19,26 @@ const simpleRealm = () => {
 
   return getRealmFactory(sys)
 }
+
+describe('realm plugins', () => {
+  it('correctly types the hooks', () => {
+    const [sys] = system((r) => {
+      const prop = r.node<number>()
+      const depot = r.node(10)
+      r.connect({ map: (done) => (value) => done(value), sink: depot, sources: [prop] })
+
+      return { depot, prop }
+    }, [])
+
+    const [_, { useEmitterValues, usePubKeys, usePublisher }] = realmPlugin({
+      system: sys,
+      UI: () => {
+        const [value] = useEmitterValues('depot')
+        return <div>{value}</div>
+      }
+    })
+  })
+})
 
 describe('generated component', () => {
   it('loads and displays greeting', () => {

@@ -42,16 +42,22 @@ export type SystemOfSpec<Spec extends AnySystemSpec> = ReturnType<Spec['construc
 export type SSR<Spec extends AnySystemSpec> = SystemOfSpec<Spec>
 
 /** @internal **/
-export type SpecsFromTypes<ST extends SystemTypes> = ST extends unknown[] ? SpecsFromTypesRec<ST, []> : never
+export type SystemsFromTypes<ST extends SystemTypes> = ST extends unknown[] ? SpecsFromTypesRec<ST, []> : never
 type SpecsFromTypesRec<ST extends unknown[], Acc extends unknown[]> = ST extends [infer Head, ...infer Tail]
   ? SpecsFromTypesRec<Tail, [...Acc, Head extends AnySystemType ? SR<Head> : never]>
+  : Acc
+
+/** @internal **/
+export type CombinedSystem<ST extends System[]> = ST extends unknown[] ? CombinedSystemRec<ST, object> : never
+type CombinedSystemRec<ST extends unknown[], Acc extends object> = ST extends [infer Head, ...infer Tail]
+  ? CombinedSystemRec<Tail, Acc & Head>
   : Acc
 
 /**
  * The system constructor is a function which initializes and connects nodes and returns them as a [[system]].
  * If the [[system]] call specifies system dependencies, the constructor receives the dependencies as an array argument.
  */
-export type SystemConstructor<D extends SystemTypes> = (r: Realm, dependencies: SpecsFromTypes<D>) => System
+export type SystemConstructor<D extends SystemTypes> = (r: Realm, dependencies: SystemsFromTypes<D>) => System
 
 export function system<Dependencies extends LongTuple<AnySystemType>, Constructor extends SystemConstructor<Dependencies>>(
   constructor: Constructor,
