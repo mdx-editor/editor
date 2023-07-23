@@ -109,7 +109,7 @@ const defaultSandpackConfig: SandpackConfig = {
   ]
 }
 
-const defaultCodeBlockLanguages = {
+export const defaultCodeBlockLanguages = {
   js: 'JavaScript',
   ts: 'TypeScript',
   tsx: 'TypeScript (React)',
@@ -120,7 +120,7 @@ const defaultCodeBlockLanguages = {
 export const [SandpackSystem] = system(
   (r, [{ activeEditor, activeEditorType, createEditorSubscription }]) => {
     const sandpackConfig = r.node<SandpackConfig>(defaultSandpackConfig)
-    const codeBlockLanguages = r.node(defaultCodeBlockLanguages)
+    const codeBlockLanguages = r.node<Record<string, string>>(defaultCodeBlockLanguages)
     const insertSandpack = r.node<string>()
     const insertCodeBlock = r.node<true>()
 

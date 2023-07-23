@@ -26,7 +26,7 @@ import {
   importMarkdownToLexical
 } from '../import'
 import { EditorSystemComponent, useEmitterValues, usePublisher } from '../system/EditorSystemComponent'
-import { SandpackConfig } from '../system/Sandpack'
+import { SandpackConfig, defaultCodeBlockLanguages } from '../system/Sandpack'
 import { NodeDecoratorComponents } from '../types/ExtendedEditorConfig'
 import { JsxComponentDescriptor } from '../types/JsxComponentDescriptors'
 import { ViewMode } from '../types/ViewMode'
@@ -143,6 +143,7 @@ export interface MDXEditorProps {
    * The supported code block languages.
    */
   codeBlockLanguages?: Record<string, string>
+
   /**
    * Implement this so that users can drag and drop or paste images into the editor.
    * Pass an implementation that takes a file as an argument, and returns Promise<string>, where string is the url of the image to be inserted.
@@ -331,7 +332,8 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>(
         visitors: exportVisitors = Object.values(defaultLexicalVisitors)
       } = {},
       lexicalNodes = Object.values(defaultLexicalNodes),
-      customLeafDirectiveEditors = []
+      customLeafDirectiveEditors = [],
+      codeBlockLanguages = defaultCodeBlockLanguages
     },
     ref
   ) => {
@@ -361,6 +363,7 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>(
           }}
         >
           <EditorSystemComponent
+            codeBlockLanguages={codeBlockLanguages}
             markdownSource={markdown}
             headMarkdown={headMarkdown || markdown}
             jsxComponentDescriptors={jsxComponentDescriptors}
