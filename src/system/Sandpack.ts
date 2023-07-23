@@ -68,6 +68,18 @@ export interface SandpackConfig {
    * The list of sandpack presets that can be used.
    */
   presets: Array<SandpackPreset>
+
+  /**
+   * The list of sandpack panes to be displayed.
+   */
+  panes?: {
+    /** the console pane, off by defult */
+    console?: boolean
+    /** the preview pane, on by defult */
+    preview?: boolean
+    /** the tests pane, on by defult */
+    tests?: boolean
+  }
 }
 
 const defaultSnippetContent = `

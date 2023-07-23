@@ -1,4 +1,12 @@
-import { SandpackCodeEditor, SandpackLayout, SandpackPreview, SandpackProvider, useSandpack } from '@codesandbox/sandpack-react'
+import {
+  SandpackCodeEditor,
+  SandpackConsole,
+  SandpackLayout,
+  SandpackPreview,
+  SandpackProvider,
+  SandpackTests,
+  useSandpack
+} from '@codesandbox/sandpack-react'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import React from 'react'
 import { useEmitterValues, usePublisher } from '../../system/EditorSystemComponent'
@@ -65,7 +73,13 @@ export const SandpackEditor = ({ nodeKey, code, meta, onChange, focusEmitter }: 
     >
       <SandpackLayout>
         <SandpackCodeEditor showLineNumbers showInlineErrors ref={codeMirrorRef} />
-        <SandpackPreview />
+
+        {/*show console and tests if explicitly set */}
+        {config.panes?.console ? <SandpackConsole /> : null}
+        {config.panes?.tests ? <SandpackTests /> : null}
+
+        {/*show preview by default */}
+        {config.panes?.preview === false ? null : <SandpackPreview />}
       </SandpackLayout>
       <CodeUpdateEmitter onChange={wrappedOnChange} snippetFileName={preset.snippetFileName} />
     </SandpackProvider>
