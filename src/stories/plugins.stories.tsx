@@ -1,17 +1,17 @@
 import React from 'react'
 import { RealmPluginInitializer, realmPlugin, system } from '../gurx'
 
-const [coreSys, coreSysType] = system((r) => {
+const coreSys = system((r) => {
   const b = r.node<string>('hello')
   return { b }
 }, [])
 
-const [sys] = system(
+const sys = system(
   (r) => {
     const a = r.node<number>(2)
     return { a }
   },
-  [coreSysType]
+  [coreSys]
 )
 
 const [corePlugin] = realmPlugin({

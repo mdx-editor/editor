@@ -11,7 +11,7 @@ import 'mdast-util-directive'
 import { system } from '../gurx'
 import { IS_APPLE } from '../utils/detectMac'
 import { getSelectedNode, getSelectionRectangle } from '../utils/lexicalHelpers'
-import { EditorSystemType } from './Editor'
+import { EditorSystem } from './Editor'
 
 export interface InactiveLinkDialog {
   type: 'inactive'
@@ -47,7 +47,7 @@ function getLinkNodeInSelection(selection: RangeSelection) {
   return null
 }
 
-export const [LinkDialogSystem, LinkDialogSystemType] = system(
+export const LinkDialogSystem = system(
   (r, [{ activeEditor, currentSelection, createEditorSubscription }]) => {
     const dialogState = r.node(false)
     // node that publishes signals when the window gets resized or scrolled
@@ -260,5 +260,5 @@ export const [LinkDialogSystem, LinkDialogSystemType] = system(
       linkAutocompleteSuggestions
     }
   },
-  [EditorSystemType]
+  [EditorSystem]
 )

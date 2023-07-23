@@ -1,18 +1,18 @@
 import 'mdast-util-directive'
 import { system } from '../gurx'
 import { getStateAsMarkdown } from '../utils/lexicalHelpers'
-import { EditorSystemType } from './Editor'
-import { JsxSystemType } from './Jsx'
+import { EditorSystem } from './Editor'
+import { JsxSystem } from './Jsx'
 
-export const [OnChangeSystem, OnChangeSystemType] = system(
+export const OnChangeSystem = system(
   (r, [{ createEditorSubscription, lexicalConvertOptions, markdownSource }, { jsxComponentDescriptors }]) => {
     const onChange = r.node<string>()
 
-    r.pub(createEditorSubscription, (activeEditor, rootEditor) => {
+    r.pub(createEditorSubscription, (_, rootEditor) => {
       function updateMarkdown() {
         const descriptors = r.getValue(jsxComponentDescriptors)
-        const options = r.getValue(lexicalConvertOptions)
-        const markdown = getStateAsMarkdown(rootEditor, { jsxComponentDescriptors: descriptors, ...options! })
+        const options = r.getValue(lexicalConvertOptions)!
+        const markdown = getStateAsMarkdown(rootEditor, { jsxComponentDescriptors: descriptors, ...options })
         r.pub(onChange, markdown)
         r.pub(markdownSource, markdown)
       }
@@ -31,5 +31,5 @@ export const [OnChangeSystem, OnChangeSystemType] = system(
       onChange
     }
   },
-  [EditorSystemType, JsxSystemType]
+  [EditorSystem, JsxSystem]
 )

@@ -64,7 +64,7 @@ function seedTable(): Mdast.Table {
     ]
   }
 }
-export const [EditorSystem, EditorSystemType] = system((r) => {
+export const EditorSystem = system((r) => {
   const editor = r.node<LexicalEditor | null>(null, true)
   const markdownSource = r.node('')
   const setMarkdown = r.node<string>()

@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable no-use-before-define, @typescript-eslint/no-explicit-any */
@@ -9,32 +8,16 @@ import { Realm, realm, RealmNode, Subscription, UnsubscribeHandle } from './real
 // eslint-disable-next-line
 export type System = Record<string, RealmNode<any>>
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export interface SystemType<S extends System> {
-  id: string
-}
-
-/** @internal **/
-export type AnySystemType = SystemType<System>
-
-/** @internal **/
-export type SystemTypes = AnySystemType[]
-
-export type SystemFromType<T extends AnySystemType> = T extends SystemType<infer R> ? R : never
-
-// shorthand alias
-type SR<T extends AnySystemType> = SystemFromType<T>
-
 /**
  * a SystemSpec is the result from a [[system]] call. To obtain the [[system]], pass the spec to [[init]].
  */
-export interface SystemSpec<Dependencies extends SystemTypes, Constructor extends SystemConstructor<Dependencies>> {
+export interface SystemSpec<Dependencies extends AnySystemSpec[], Constructor extends SystemConstructor<Dependencies>> {
   id: string
   constructor: Constructor
   dependencies: Dependencies
 }
 
-export type AnySystemSpec = SystemSpec<SystemTypes, any>
+export type AnySystemSpec = SystemSpec<AnySystemSpec[], any>
 
 export type SystemOfSpec<Spec extends AnySystemSpec> = ReturnType<Spec['constructor']>
 
@@ -42,36 +25,26 @@ export type SystemOfSpec<Spec extends AnySystemSpec> = ReturnType<Spec['construc
 export type SSR<Spec extends AnySystemSpec> = SystemOfSpec<Spec>
 
 /** @internal **/
-export type SystemsFromTypes<ST extends SystemTypes> = ST extends unknown[] ? SpecsFromTypesRec<ST, []> : never
-type SpecsFromTypesRec<ST extends unknown[], Acc extends unknown[]> = ST extends [infer Head, ...infer Tail]
-  ? SpecsFromTypesRec<Tail, [...Acc, Head extends AnySystemType ? SR<Head> : never]>
-  : Acc
-
-/** @internal **/
-export type CombinedSystem<ST extends System[]> = ST extends unknown[] ? CombinedSystemRec<ST, object> : never
-type CombinedSystemRec<ST extends unknown[], Acc extends object> = ST extends [infer Head, ...infer Tail]
-  ? CombinedSystemRec<Tail, Acc & Head>
+export type SystemsFromSpecs<ST extends AnySystemSpec[]> = ST extends unknown[] ? SystemsFromSpecsRec<ST, []> : never
+type SystemsFromSpecsRec<ST extends unknown[], Acc extends unknown[]> = ST extends [infer Head, ...infer Tail]
+  ? SystemsFromSpecsRec<Tail, [...Acc, Head extends AnySystemSpec ? SystemOfSpec<Head> : never]>
   : Acc
 
 /**
  * The system constructor is a function which initializes and connects nodes and returns them as a [[system]].
  * If the [[system]] call specifies system dependencies, the constructor receives the dependencies as an array argument.
  */
-export type SystemConstructor<D extends SystemTypes> = (r: Realm, dependencies: SystemsFromTypes<D>) => System
+export type SystemConstructor<D extends Array<AnySystemSpec>> = (r: Realm, dependencies: SystemsFromSpecs<D>) => System
 
-export function system<Dependencies extends LongTuple<AnySystemType>, Constructor extends SystemConstructor<Dependencies>>(
+export function system<Dependencies extends LongTuple<AnySystemSpec>, Constructor extends SystemConstructor<Dependencies>>(
   constructor: Constructor,
-  dependencies: Dependencies = [] as unknown as Dependencies,
-  id = uuidv4()
-): [SystemSpec<Dependencies, Constructor>, SystemType<ReturnType<Constructor>>] {
-  return [
-    {
-      constructor,
-      dependencies,
-      id
-    },
-    { id }
-  ]
+  dependencies: Dependencies = [] as unknown as Dependencies
+): SystemSpec<Dependencies, Constructor> {
+  return {
+    constructor,
+    dependencies,
+    id: uuidv4()
+  }
 }
 
 type SystemKey<S extends System> = Extract<keyof S, string>
@@ -141,10 +114,8 @@ export function realmFactory<Specs extends LongTuple<AnySystemSpec>>(...specs: S
     if (singletons.has(id)) {
       return singletons.get(id)! as SystemOfSpec<SpecType>
     }
-    const system: any = constructor(
-      r,
-      dependencies.map((t: AnySystemType) => _init(specs.find((spec) => spec.id === t.id)!))
-    )
+    const system: any = constructor(r, dependencies.map((t: AnySystemSpec) => _init(specs.find((spec) => spec.id === t.id)!)) as any)
+
     r.label(system)
     singletons.set(id, system)
     return system
@@ -155,6 +126,6 @@ export function realmFactory<Specs extends LongTuple<AnySystemSpec>>(...specs: S
 
 export type RealmFactory<Sys extends System> = () => TypedRealm<Sys>
 
-export function getRealmFactory<Specs extends LongTuple<AnySystemSpec>>(...specs: Specs): RealmFactory<SystemOfSpecs<Specs>> {
+export function getRealmFactory<Specs extends LongTuple<AnySystemSpec>>(...specs: Specs) {
   return () => realmFactory(...specs)
 }

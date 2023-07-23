@@ -121,7 +121,6 @@ export class AdmonitionNode extends ElementNode {
  * @param kind - The kind of admonition to create. Accepts `'note' | 'tip' | 'danger' | 'info' | 'caution'`
  */
 export function $createAdmonitionNode(kind?: AdmonitionKind): AdmonitionNode {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return $applyNodeReplacement(new AdmonitionNode(kind))
 }
 

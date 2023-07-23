@@ -5,7 +5,7 @@ import { $getSelection, $isRangeSelection, COMMAND_PRIORITY_LOW, FOCUS_COMMAND }
 import React from 'react'
 import { system } from '../gurx'
 import { $createCodeBlockNode, $createSandpackNode } from '../nodes'
-import { EditorSystemType } from './Editor'
+import { EditorSystem } from './Editor'
 
 type SandpackProviderProps = React.ComponentProps<typeof SandpackProvider>
 
@@ -105,7 +105,7 @@ const defaultCodeBlockLanguages = {
   css: 'CSS'
 }
 
-export const [SandpackSystem] = system(
+export const SandpackSystem = system(
   (r, [{ activeEditor, activeEditorType, createEditorSubscription }]) => {
     const sandpackConfig = r.node<SandpackConfig>(defaultSandpackConfig)
     const codeBlockLanguages = r.node(defaultCodeBlockLanguages)
@@ -186,5 +186,5 @@ export const [SandpackSystem] = system(
       sandpackConfig
     }
   },
-  [EditorSystemType]
+  [EditorSystem]
 )

@@ -1,10 +1,10 @@
 import 'mdast-util-directive'
 import { system } from '../gurx'
 import { ViewMode } from '../types/ViewMode'
-import { EditorSystemType } from './Editor'
-import { JsxSystemType } from './Jsx'
+import { EditorSystem } from './Editor'
+import { JsxSystem } from './Jsx'
 
-export const [ViewModeSystem] = system(
+export const ViewModeSystem = system(
   (r, [{ markdownSource, setMarkdown }, {}]) => {
     const viewMode = r.node<ViewMode>('editor')
     const headMarkdown = r.node('')
@@ -39,5 +39,5 @@ export const [ViewModeSystem] = system(
       headMarkdown
     }
   },
-  [EditorSystemType, JsxSystemType]
+  [EditorSystem, JsxSystem]
 )

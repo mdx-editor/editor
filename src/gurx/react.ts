@@ -26,9 +26,7 @@ import {
   AnySystemSpec,
   SystemOfSpecs,
   realmFactory,
-  LongTuple,
-  SystemsFromTypes,
-  CombinedSystem
+  LongTuple
 } from './realmFactory'
 
 /** @internal */
@@ -299,7 +297,7 @@ export function sysHooks<Sys extends System>() {
   }
 }
 
-type SystemAndDependencies<Spec extends AnySystemSpec> = SystemOfSpecs<[Spec]> & CombinedSystem<SystemsFromTypes<Spec['dependencies']>>
+type SystemAndDependencies<Spec extends AnySystemSpec> = SystemOfSpecs<[Spec]> & SystemOfSpecs<Spec['dependencies']>
 
 interface RealmPluginParams<Spec extends AnySystemSpec, Params extends object> {
   systemSpec: Spec
@@ -332,7 +330,7 @@ export const RealmPluginInitializer = function <P extends LongTuple<ReturnType<P
   children: React.ReactNode
 }) {
   const realm = React.useMemo(() => {
-    const specs = plugins.map((plugin) => plugin.spec) as unknown as LongTuple<AnySystemSpec>
+    const specs = plugins.map((plugin) => plugin.spec) as LongTuple<AnySystemSpec>
     const realm = realmFactory(...specs)
     plugins.forEach((plugin) => {
       plugin.applyParamsToSystem?.(realm, plugin.pluginParams)
