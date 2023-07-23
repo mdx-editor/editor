@@ -6,6 +6,7 @@ export function Example() {
   return (
     <>
       <button onClick={() => setA((a) => a + 1)}>Increment</button>
+      {a}
       <MDXEditorCore />
     </>
   )
