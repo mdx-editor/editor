@@ -327,7 +327,7 @@ export const RealmPluginInitializer = function <P extends LongTuple<ReturnType<P
   children
 }: {
   plugins: P
-  children: React.ReactNode
+  children?: React.ReactNode
 }) {
   const realm = React.useMemo(() => {
     const specs = plugins.map((plugin) => plugin.spec) as LongTuple<AnySystemSpec>
