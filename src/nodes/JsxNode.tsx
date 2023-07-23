@@ -98,7 +98,7 @@ const EmptySerializedFlowEditorState = {
 export class JsxNode extends DecoratorNode<JSX.Element> {
   __kind: JsxKind
   __name: string
-  __attributes: Array<MdxJsxAttribute>
+  __attributes: MdxJsxAttribute[]
   __editor: LexicalEditor
 
   static getType(): string {
@@ -171,7 +171,7 @@ export class JsxNode extends DecoratorNode<JSX.Element> {
     this.__editor.getEditorState().read(callback)
   }
 
-  getChildren(): Array<LexicalNode> {
+  getChildren(): LexicalNode[] {
     if (this.getKey() === 'flow') {
       return $getRoot().getChildren() || []
     } else {

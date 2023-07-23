@@ -38,12 +38,12 @@ import { $createTableNode } from '../nodes'
 import * as Mdast from 'mdast'
 import { createEmptyHistoryState } from '@lexical/react/LexicalHistoryPlugin'
 import { MarkdownParseOptions } from '../import'
-import { ExportMarkdownFromLexicalOptions } from '../export/export'
+import { ExportMarkdownFromLexicalOptions } from '../export/exportMarkdownFromLexical'
 import { importMarkdownToLexical } from '../import'
 import { CustomLeafDirectiveEditor } from '../types/NodeDecoratorsProps'
 import { LeafDirective } from 'mdast-util-directive'
 
-type Teardowns = Array<() => void>
+type Teardowns = (() => void)[]
 
 const ListTypeCommandMap = new Map<ListType | '', LexicalCommand<void>>([
   ['number', INSERT_ORDERED_LIST_COMMAND],

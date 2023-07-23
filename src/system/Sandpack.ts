@@ -67,7 +67,7 @@ export interface SandpackConfig {
   /**
    * The list of sandpack presets that can be used.
    */
-  presets: Array<SandpackPreset>
+  presets: SandpackPreset[]
 }
 
 const defaultSnippetContent = `

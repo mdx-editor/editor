@@ -168,8 +168,8 @@ export function realm() {
   function sub<T1, T2>(...args: [RN<T1>, RN<T2>, Subscription<[T1, T2]>]): UnsubscribeHandle
   function sub<T1, T2, T3>(...args: [RN<T1>, RN<T2>, RN<T3>, Subscription<[T1, T2, T3]>]): UnsubscribeHandle
   function sub(...args: unknown[]): UnsubscribeHandle {
-    const [subscription] = args.slice(-1) as Array<Subscription>
-    const nodes = args.slice(0, -1) as Array<RN>
+    const [subscription] = args.slice(-1) as Subscription[]
+    const nodes = args.slice(0, -1) as RN[]
     if (nodes.length === 1) {
       return subSingle(nodes[0], subscription)
     } else {
@@ -182,7 +182,7 @@ export function realm() {
   // }
 
   function calculateExecutionMap(keys: NodeKey[]) {
-    const participatingNodeKeys: Array<NodeKey> = []
+    const participatingNodeKeys: NodeKey[] = []
     const visitedNodes = new Set()
     const pendingPulls = new SetMap<NodeKey>()
     const refCount = new RefCount()

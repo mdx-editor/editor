@@ -60,7 +60,7 @@ export interface MdastImportVisitor<UN extends Mdast.Content> {
 }
 
 function isParent(node: unknown): node is Mdast.Parent {
-  return (node as { children?: Array<any> }).children instanceof Array
+  return (node as { children?: any[] }).children instanceof Array
 }
 
 /**
@@ -68,7 +68,7 @@ function isParent(node: unknown): node is Mdast.Parent {
  */
 export interface MdastTreeImportOptions {
   root: LexicalRootNode
-  visitors: Array<MdastImportVisitor<Mdast.Content>>
+  visitors: MdastImportVisitor<Mdast.Content>[]
   mdastRoot: Mdast.Root
 }
 

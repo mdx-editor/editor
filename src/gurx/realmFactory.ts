@@ -34,7 +34,7 @@ type SystemsFromSpecsRec<ST extends unknown[], Acc extends unknown[]> = ST exten
  * The system constructor is a function which initializes and connects nodes and returns them as a [[system]].
  * If the [[system]] call specifies system dependencies, the constructor receives the dependencies as an array argument.
  */
-export type SystemConstructor<D extends Array<AnySystemSpec>> = (r: Realm, dependencies: SystemsFromSpecs<D>) => System
+export type SystemConstructor<D extends AnySystemSpec[]> = (r: Realm, dependencies: SystemsFromSpecs<D>) => System
 
 export function system<Dependencies extends LongTuple<AnySystemSpec>, Constructor extends SystemConstructor<Dependencies>>(
   constructor: Constructor,
@@ -49,14 +49,14 @@ export function system<Dependencies extends LongTuple<AnySystemSpec>, Constructo
 
 type SystemKey<S extends System> = Extract<keyof S, string>
 
-export type ValuesForKeys<S extends System, K extends Array<SystemKey<S>>> = K extends unknown[] ? ValuesForKeysRec<S, K, []> : never
+export type ValuesForKeys<S extends System, K extends SystemKey<S>[]> = K extends unknown[] ? ValuesForKeysRec<S, K, []> : never
 
 type ValuesForKeysRec<S extends Record<any, RealmNode>, K extends unknown[], Acc extends unknown[]> = K extends [infer Head, ...infer Tail]
   ? ValuesForKeysRec<S, Tail, [...Acc, S[Head] extends RealmNode<infer R> ? R : never]>
   : Acc
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export type SystemOfSpecs<Specs extends Array<AnySystemSpec>> = Specs extends unknown[] ? SystemOfSpecsRec<Specs, {}> : Specs
+export type SystemOfSpecs<Specs extends AnySystemSpec[]> = Specs extends unknown[] ? SystemOfSpecsRec<Specs, {}> : Specs
 // eslint-disable-next-line @typescript-eslint/ban-types
 type SystemOfSpecsRec<Specs extends unknown[], Acc extends {}> = Specs extends [infer Head, ...infer Tail]
   ? SystemOfSpecsRec<Tail, Head extends AnySystemSpec ? Acc & SystemOfSpec<Head> : never>

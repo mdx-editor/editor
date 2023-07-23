@@ -19,7 +19,7 @@ export function user(index = 0) {
   }
 }
 
-const generated = [] as Array<ReturnType<typeof user>>
+const generated = [] as ReturnType<typeof user>[]
 
 export const getUser = (index: number) => {
   if (!generated[index]) {

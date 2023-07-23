@@ -77,7 +77,7 @@ const InlineJsxComponent = ({ attributes, componentName, onSubmit }: InlineJsxCo
 
 interface JsxPropertyPanelProps {
   componentName: string
-  attributes: Array<MdxJsxAttribute>
+  attributes: MdxJsxAttribute[]
   onSubmit: (values: Record<string, string>) => void
 }
 

@@ -39,5 +39,5 @@ export interface JsxComponentDescriptor {
   /**
    * The properties that can be applied to the component
    */
-  props: Array<JsxPropertyDescriptor>
+  props: JsxPropertyDescriptor[]
 }

@@ -159,10 +159,10 @@ export function realmFactoryToComponent<
   type CompProps = PropsFromPropMap<Sys, M> & RootCompProps
   type CompMethods = MethodsFromPropMap<Sys, M>
 
-  const requiredPropNames = Object.keys(map.required || {}) as Array<StringKeys<M['required']>>
-  const optionalPropNames = Object.keys(map.optional || {}) as Array<StringKeys<M['optional']>>
-  const methodNames = Object.keys(map.methods || {}) as Array<keyof CompMethods>
-  const eventNames = Object.keys(map.events || {}) as Array<StringKeys<M['events']>>
+  const requiredPropNames = Object.keys(map.required || {}) as StringKeys<M['required']>[]
+  const optionalPropNames = Object.keys(map.optional || {}) as StringKeys<M['optional']>[]
+  const methodNames = Object.keys(map.methods || {}) as (keyof CompMethods)[]
+  const eventNames = Object.keys(map.events || {}) as StringKeys<M['events']>[]
   // this enables HMR in vite. Unless context is persistent, HMR breaks.
   const Context = GurxContext as unknown as React.Context<Realm | undefined>
 

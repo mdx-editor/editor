@@ -8,7 +8,7 @@ import DeleteIcon from './icons/delete.svg'
 import classNames from 'classnames'
 import styles from '../styles.module.css'
 
-type YamlConfig = Array<{ key: string; value: string }>
+type YamlConfig = { key: string; value: string }[]
 
 export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) => {
   const [expanded, setExpanded] = React.useState(true)

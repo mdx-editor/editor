@@ -8,6 +8,8 @@ import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary'
 import classNames from 'classnames'
+import { ToMarkdownOptions } from './export'
+import { noop } from './utils/fp'
 
 const LexicalProvider: React.FC<{ children: JSX.Element | string | (JSX.Element | string)[] }> = ({ children }) => {
   const [initialRootEditorState, nodes] = corePluginHooks.useEmitterValues('initialRootEditorState', 'usedLexicalNodes')
@@ -42,6 +44,12 @@ const RichTextEditor: React.FC = () => {
 interface MDXEditorCoreProps {
   contentEditableClassName?: string
   markdown: string
+  onChange?: (markdown: string) => void
+  toMarkdownOptions?: ToMarkdownOptions
+}
+
+const DEFAULT_MARKDOWN_OPTIONS: ToMarkdownOptions = {
+  listItemIndent: 'one'
 }
 
 export const MDXEditorCore: React.FC<MDXEditorCoreProps> = (props) => {
@@ -50,7 +58,9 @@ export const MDXEditorCore: React.FC<MDXEditorCoreProps> = (props) => {
       plugins={[
         corePlugin({
           contentEditableClassName: props.contentEditableClassName ?? '',
-          initialMarkdown: props.markdown
+          initialMarkdown: props.markdown,
+          onChange: props.onChange ?? noop,
+          toMarkdownOptions: props.toMarkdownOptions ?? DEFAULT_MARKDOWN_OPTIONS
         })
       ]}
     >
