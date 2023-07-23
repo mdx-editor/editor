@@ -3,8 +3,6 @@ import { RealmPluginInitializer } from './gurx'
 import { corePlugin, corePluginHooks } from './plugins/core/realmPlugin'
 import { theme as contentTheme } from './content/theme'
 import { LexicalComposer } from '@lexical/react/LexicalComposer'
-import { $createParagraphNode, $createTextNode, $getRoot, ParagraphNode, TextNode } from 'lexical'
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import styles from './ui/styles.module.css'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
@@ -12,15 +10,14 @@ import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary'
 import classNames from 'classnames'
 
 const LexicalProvider: React.FC<{ children: JSX.Element | string | (JSX.Element | string)[] }> = ({ children }) => {
+  const [initialRootEditorState, nodes] = corePluginHooks.useEmitterValues('initialRootEditorState', 'usedLexicalNodes')
   return (
     <LexicalComposer
       initialConfig={{
-        editorState: () => {
-          $getRoot().append($createParagraphNode().append($createTextNode('Hello')))
-        },
+        editorState: initialRootEditorState,
         namespace: 'MDXEditor',
         theme: contentTheme,
-        nodes: [ParagraphNode, TextNode],
+        nodes: nodes,
         onError: (error: Error) => {
           throw error
         }
@@ -29,13 +26,6 @@ const LexicalProvider: React.FC<{ children: JSX.Element | string | (JSX.Element 
       {children}
     </LexicalComposer>
   )
-}
-
-const CaptureLexicalEditor: React.FC = () => {
-  const setEditor = corePluginHooks.usePublisher('rootEditor')
-  const [lexicalEditor] = useLexicalComposerContext()
-  React.useEffect(() => setEditor(lexicalEditor), [lexicalEditor, setEditor])
-  return null
 }
 
 const RichTextEditor: React.FC = () => {
@@ -51,6 +41,7 @@ const RichTextEditor: React.FC = () => {
 
 interface MDXEditorCoreProps {
   contentEditableClassName?: string
+  markdown: string
 }
 
 export const MDXEditorCore: React.FC<MDXEditorCoreProps> = (props) => {
@@ -58,13 +49,13 @@ export const MDXEditorCore: React.FC<MDXEditorCoreProps> = (props) => {
     <RealmPluginInitializer
       plugins={[
         corePlugin({
-          contentEditableClassName: props.contentEditableClassName ?? ''
+          contentEditableClassName: props.contentEditableClassName ?? '',
+          initialMarkdown: props.markdown
         })
       ]}
     >
       <LexicalProvider>
         <RichTextEditor />
-        <CaptureLexicalEditor />
       </LexicalProvider>
     </RealmPluginInitializer>
   )

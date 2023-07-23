@@ -5,9 +5,7 @@ export function Example() {
   const [a, setA] = React.useState(10)
   return (
     <>
-      <button onClick={() => setA((a) => a + 1)}>Increment</button>
-      {a}
-      <MDXEditorCore />
+      <MDXEditorCore markdown={`Hello world`} />
     </>
   )
 }

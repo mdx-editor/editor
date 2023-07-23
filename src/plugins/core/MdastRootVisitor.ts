@@ -1,8 +1,7 @@
 import * as Mdast from 'mdast'
-import { MdastImportVisitor } from './importMarkdownToLexical'
+import { MdastImportVisitor } from '../../import/importMarkdownToLexical'
 
 // the generic should be Mdast.Root, but that doesn't work
-
 export const MdastRootVisitor: MdastImportVisitor<Mdast.Content> = {
   testNode: 'root',
   visitNode({ actions, mdastNode, lexicalParent }) {

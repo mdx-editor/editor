@@ -28,24 +28,24 @@ import { MdastListItemVisitor } from './MdastListItemVisitor'
 import { MdastListVisitor } from './MdastListVisitor'
 import { MdastMdxJsEsmVisitor } from './MdastMdxJsEsmVisitor'
 import { MdastMdxJsxElementVisitor } from './MdastMdxJsxElementVisitor'
-import { MdastParagraphVisitor } from './MdastParagraphVisitor'
-import { MdastRootVisitor } from './MdastRootVisitor'
+import { MdastParagraphVisitor } from '../plugins/core/MdastParagraphVisitor'
+import { MdastRootVisitor } from '../plugins/core/MdastRootVisitor'
 import { MdastTableVisitor } from './MdastTableVisitor'
-import { MdastTextVisitor } from './MdastTextVisitor'
+import { MdastTextVisitor } from '../plugins/core/MdastTextVisitor'
 import { MdastThematicBreakVisitor } from './MdastThematicBreakVisitor'
 import { MdastExtension, MdastImportVisitor, SyntaxExtension } from './importMarkdownToLexical'
 
-export {
+export type {
   MarkdownParseOptions,
   MdastExtension,
   MdastImportVisitor,
   MdastTreeImportOptions,
   MdastVisitActions,
   MdastVisitParams,
-  SyntaxExtension,
-  importMarkdownToLexical,
-  importMdastTreeToLexical
+  SyntaxExtension
 } from './importMarkdownToLexical'
+
+export { importMarkdownToLexical, importMdastTreeToLexical } from './importMarkdownToLexical'
 
 export const defaultMdastVisitors: Record<string, MdastImportVisitor<Mdast.Content>> = {
   MdastRootVisitor,

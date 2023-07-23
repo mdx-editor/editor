@@ -1,6 +1,6 @@
 import { $createParagraphNode } from 'lexical'
 import * as Mdast from 'mdast'
-import { MdastImportVisitor } from './importMarkdownToLexical'
+import { MdastImportVisitor } from '../../import/importMarkdownToLexical'
 
 const lexicalTypesThatShouldSkipParagraphs = ['listItem', 'quote', 'admonition']
 

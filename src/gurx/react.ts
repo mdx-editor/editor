@@ -302,20 +302,20 @@ type SystemAndDependencies<Spec extends AnySystemSpec> = SystemOfSpecs<[Spec]> &
 interface RealmPluginParams<Spec extends AnySystemSpec, Params extends object> {
   systemSpec: Spec
   applyParamsToSystem?: (realm: TypedRealm<SystemAndDependencies<Spec>>, props: Params) => void
+  init?: (realm: TypedRealm<SystemAndDependencies<Spec>>, props: Params) => void
 }
 
-type PluginConstructor<Spec extends AnySystemSpec, Params extends object> = (params?: Params) => {
-  spec: Spec
-  pluginParams?: Params
-  applyParamsToSystem?: (realm: TypedRealm<SystemAndDependencies<Spec>>, props: Params) => void
-}
+type PluginConstructor<Spec extends AnySystemSpec, Params extends object> = (
+  params?: Params
+) => { pluginParams?: Params } & RealmPluginParams<Spec, Params>
 
 export function realmPlugin<Spec extends AnySystemSpec, Params extends object>(params: RealmPluginParams<Spec, Params>) {
   const plugin: PluginConstructor<Spec, Params> = (pluginParams?: Params) => {
     return {
-      spec: params.systemSpec,
+      systemSpec: params.systemSpec,
       pluginParams,
-      applyParamsToSystem: params.applyParamsToSystem
+      applyParamsToSystem: params.applyParamsToSystem,
+      init: params.init
     }
   }
 
@@ -330,9 +330,10 @@ export const RealmPluginInitializer = function <P extends LongTuple<ReturnType<P
   children?: React.ReactNode
 }) {
   const realm = React.useMemo(() => {
-    const specs = plugins.map((plugin) => plugin.spec) as LongTuple<AnySystemSpec>
+    const specs = plugins.map((plugin) => plugin.systemSpec) as LongTuple<AnySystemSpec>
     const realm = realmFactory(...specs)
     plugins.forEach((plugin) => {
+      plugin.init?.(realm, plugin.pluginParams)
       plugin.applyParamsToSystem?.(realm, plugin.pluginParams)
     })
     return realm
