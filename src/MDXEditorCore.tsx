@@ -46,6 +46,7 @@ interface MDXEditorCoreProps {
   markdown: string
   onChange?: (markdown: string) => void
   toMarkdownOptions?: ToMarkdownOptions
+  plugins?: React.ComponentProps<typeof RealmPluginInitializer>['plugins']
 }
 
 const DEFAULT_MARKDOWN_OPTIONS: ToMarkdownOptions = {
@@ -82,7 +83,8 @@ export const MDXEditorCore = React.forwardRef<MDXEditorMethods, MDXEditorCorePro
           initialMarkdown: props.markdown,
           onChange: props.onChange ?? noop,
           toMarkdownOptions: props.toMarkdownOptions ?? DEFAULT_MARKDOWN_OPTIONS
-        })
+        }),
+        ...(props.plugins || [])
       ]}
     >
       <LexicalProvider>

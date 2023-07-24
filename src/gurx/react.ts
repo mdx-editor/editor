@@ -327,7 +327,7 @@ export function realmPlugin<Spec extends AnySystemSpec, Params extends object>(p
   return [plugin, sysHooks<SystemAndDependencies<Spec>>()] as const
 }
 
-export const RealmPluginInitializer = function <P extends LongTuple<ReturnType<PluginConstructor<AnySystemSpec, any>>>>({
+export const RealmPluginInitializer = function <P extends Array<ReturnType<PluginConstructor<AnySystemSpec, any>>>>({
   plugins,
   children
 }: {

@@ -11,6 +11,7 @@ import { LexicalRootVisitor } from './LexicalRootVisitor'
 import { LexicalParagraphVisitor } from './LexicalParagraphVisitor'
 import { LexicalTextVisitor } from './LexicalTextVisitor'
 import { MdastFormattingVisitor } from './MdastFormattingVisitor'
+import { JsxComponentDescriptor } from '../../types/JsxComponentDescriptors'
 
 export const coreSystem = system((r) => {
   const rootEditor = r.node<LexicalEditor | null>(null)
@@ -32,7 +33,9 @@ export const coreSystem = system((r) => {
   const toMarkdownExtensions = r.node<NonNullable<LexicalConvertOptions['toMarkdownExtensions']>>([])
   const toMarkdownOptions = r.node<NonNullable<LexicalConvertOptions['toMarkdownOptions']>>({}, true)
 
+  // the JSX plugin will fill in these
   const jsxIsAvailable = r.node<boolean>(false)
+  const jsxComponentDescriptors = r.node<JsxComponentDescriptor[]>([])
 
   function createAppendNodeFor<T>(node: RealmNode<T[]>) {
     const appendNode = r.node<T>()
@@ -119,6 +122,7 @@ export const coreSystem = system((r) => {
 
   return {
     jsxIsAvailable,
+    jsxComponentDescriptors,
     contentEditableClassName,
     initialRootEditorState,
     rootEditor,
