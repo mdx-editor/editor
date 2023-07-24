@@ -281,7 +281,8 @@ const CellEditor: React.FC<CellProps> = ({ activeCellTuple, parentEditor, lexica
         const mdast = exportLexicalTreeToMdast({
           root: $getRoot(),
           jsxComponentDescriptors,
-          ...lexicalConvertOptions!
+          ...lexicalConvertOptions!,
+          jsxIsAvailable: true
         })
         parentEditor.update(() => {
           lexicalTable.updateCellContents(colIndex, rowIndex, (mdast.children[0] as Mdast.Paragraph).children)

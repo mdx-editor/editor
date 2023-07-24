@@ -12,7 +12,7 @@ export const OnChangeSystem = system(
       function updateMarkdown() {
         const descriptors = r.getValue(jsxComponentDescriptors)
         const options = r.getValue(lexicalConvertOptions)!
-        const markdown = getStateAsMarkdown(rootEditor, { jsxComponentDescriptors: descriptors, ...options })
+        const markdown = getStateAsMarkdown(rootEditor, { jsxComponentDescriptors: descriptors, ...options, jsxIsAvailable: true })
         r.pub(onChange, markdown)
         r.pub(markdownSource, markdown)
       }

@@ -17,7 +17,7 @@ import { AdmonitionNode, CodeBlockNode, FrontmatterNode, ImageNode, JsxNode, Lea
 import { MdastAdmonitionVisitor } from './MdastAdmonitionVisitor'
 import { MdastBlockQuoteVisitor } from './MdastBlockQuoteVisitor'
 import { MdastCodeVisitor } from './MdastCodeVisitor'
-import { MdastFormattingVisitor } from './MdastFormattingVisitor'
+import { MdastFormattingVisitor } from '../plugins/core/MdastFormattingVisitor'
 import { MdastFrontmatterVisitor } from './MdastFrontmatterVisitor'
 import { MdastHeadingVisitor } from './MdastHeadingVisitor'
 import { MdastImageVisitor } from './MdastImageVisitor'

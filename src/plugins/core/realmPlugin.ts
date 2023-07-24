@@ -10,13 +10,14 @@ import { LexicalConvertOptions, exportMarkdownFromLexical } from '../../export/e
 import { LexicalRootVisitor } from './LexicalRootVisitor'
 import { LexicalParagraphVisitor } from './LexicalParagraphVisitor'
 import { LexicalTextVisitor } from './LexicalTextVisitor'
+import { MdastFormattingVisitor } from './MdastFormattingVisitor'
 
 export const coreSystem = system((r) => {
   const rootEditor = r.node<LexicalEditor | null>(null)
   const contentEditableClassName = r.node<string>('')
 
   const initialMarkdown = r.node<string>('')
-  const markdown = r.node<string>('')
+  const markdown = r.node<string>('', true)
   r.link(initialMarkdown, markdown)
 
   // import configuration
@@ -30,6 +31,8 @@ export const coreSystem = system((r) => {
   const exportVisitors = r.node<NonNullable<LexicalConvertOptions['visitors']>>([])
   const toMarkdownExtensions = r.node<NonNullable<LexicalConvertOptions['toMarkdownExtensions']>>([])
   const toMarkdownOptions = r.node<NonNullable<LexicalConvertOptions['toMarkdownOptions']>>({}, true)
+
+  const jsxIsAvailable = r.node<boolean>(false)
 
   function createAppendNodeFor<T>(node: RealmNode<T[]>) {
     const appendNode = r.node<T>()
@@ -49,12 +52,14 @@ export const coreSystem = system((r) => {
     )
     return appendNode
   }
+
   const addLexicalNode = createAppendNodeFor(usedLexicalNodes)
   const addImportVisitor = createAppendNodeFor(importVisitors)
   const addSyntaxExtension = createAppendNodeFor(syntaxExtensions)
   const addMdastExtension = createAppendNodeFor(mdastExtensions)
   const addExportVisitor = createAppendNodeFor(exportVisitors)
   const addToMarkdownExtension = createAppendNodeFor(toMarkdownExtensions)
+  const setMarkdown = r.node<string>()
 
   const initialRootEditorState = r.node<InitialEditorStateType>((theRootEditor) => {
     r.pub(rootEditor, theRootEditor)
@@ -62,26 +67,26 @@ export const coreSystem = system((r) => {
     ////////////////////////
     // setup Export
     ////////////////////////
-    function updateMarkdown() {
+
+    theRootEditor.registerUpdateListener(({ dirtyElements, dirtyLeaves, editorState }) => {
+      if (dirtyElements.size === 0 && dirtyLeaves.size === 0) {
+        return
+      }
+
       let theNewMarkdownValue!: string
-      theRootEditor.getEditorState().read(() => {
+
+      editorState.read(() => {
         theNewMarkdownValue = exportMarkdownFromLexical({
           root: $getRoot(),
           visitors: r.getValue(exportVisitors),
           jsxComponentDescriptors: [],
           toMarkdownExtensions: r.getValue(toMarkdownExtensions),
-          toMarkdownOptions: r.getValue(toMarkdownOptions)
+          toMarkdownOptions: r.getValue(toMarkdownOptions),
+          jsxIsAvailable: r.getValue(jsxIsAvailable)
         })
       })
 
-      r.pub(markdown, theNewMarkdownValue)
-    }
-
-    theRootEditor.registerUpdateListener(({ dirtyElements, dirtyLeaves, prevEditorState, tags }) => {
-      if ((dirtyElements.size === 0 && dirtyLeaves.size === 0) || tags.has('history-merge') || prevEditorState.isEmpty()) {
-        return
-      }
-      updateMarkdown()
+      r.pub(markdown, theNewMarkdownValue.trim())
     })
 
     ////////////////////////
@@ -96,7 +101,24 @@ export const coreSystem = system((r) => {
     })
   })
 
+  r.sub(
+    r.pipe(setMarkdown, r.o.withLatestFrom(rootEditor, importVisitors, mdastExtensions, syntaxExtensions)),
+    ([theNewMarkdownValue, editor, importVisitors, mdastExtensions, syntaxExtensions]) => {
+      editor?.update(() => {
+        $getRoot().clear()
+        importMarkdownToLexical({
+          root: $getRoot(),
+          visitors: importVisitors,
+          mdastExtensions,
+          markdown: theNewMarkdownValue,
+          syntaxExtensions
+        })
+      })
+    }
+  )
+
   return {
+    jsxIsAvailable,
     contentEditableClassName,
     initialRootEditorState,
     rootEditor,
@@ -114,6 +136,7 @@ export const coreSystem = system((r) => {
     toMarkdownExtensions,
     addExportVisitor,
     addToMarkdownExtension,
+    setMarkdown,
     markdown
   }
 }, [])
@@ -135,12 +158,13 @@ export const [corePlugin, corePluginHooks] = realmPlugin({
   },
 
   init(realm, params: CorePluginParams) {
-    realm.pubKey('initialMarkdown', params.initialMarkdown)
+    realm.pubKey('initialMarkdown', params.initialMarkdown.trim())
 
     // core import visitors
     realm.pubKey('addImportVisitor', MdastRootVisitor)
     realm.pubKey('addImportVisitor', MdastParagraphVisitor)
     realm.pubKey('addImportVisitor', MdastTextVisitor)
+    realm.pubKey('addImportVisitor', MdastFormattingVisitor)
 
     // basic lexical nodes
     realm.pubKey('addLexicalNode', ParagraphNode)

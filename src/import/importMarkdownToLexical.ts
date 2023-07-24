@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { ElementNode, LexicalNode, RootNode as LexicalRootNode } from 'lexical'
 import * as Mdast from 'mdast'
 import { fromMarkdown } from 'mdast-util-from-markdown'
@@ -22,8 +23,13 @@ export interface MdastVisitActions {
    * Adds formatting as a context for the current node and its children.
    * This is necessary due to mdast treating formatting as a node, while lexical considering it an attribute of a node.
    */
-  addFormatting(format: typeof IS_BOLD | typeof IS_ITALIC | typeof IS_UNDERLINE): void
+  addFormatting(format: typeof IS_BOLD | typeof IS_ITALIC | typeof IS_UNDERLINE, node?: Mdast.Content): void
 
+  /**
+   * Adds formatting as a context for the current node and its children.
+   * This is necessary due to mdast treating formatting as a node, while lexical considering it an attribute of a node.
+   */
+  removeFormatting(format: typeof IS_BOLD | typeof IS_ITALIC | typeof IS_UNDERLINE, node?: Mdast.Content): void
   /**
    * Access the current formatting context.
    */
@@ -39,6 +45,7 @@ export interface MdastVisitActions {
  */
 export interface MdastVisitParams<T extends Mdast.Content> {
   mdastNode: T
+  mdastParent: Mdast.Parent | null
   lexicalParent: LexicalNode
   actions: MdastVisitActions
 }
@@ -129,6 +136,7 @@ export function importMdastTreeToLexical({ root, mdastRoot, visitors }: MdastTre
       //@ts-expect-error root type is glitching
       mdastNode,
       lexicalParent,
+      mdastParent,
       actions: {
         visitChildren,
         addAndStepInto(lexicalNode) {
@@ -137,8 +145,11 @@ export function importMdastTreeToLexical({ root, mdastRoot, visitors }: MdastTre
             visitChildren(mdastNode, lexicalNode)
           }
         },
-        addFormatting(format) {
-          formattingMap.set(mdastNode, format | (formattingMap.get(mdastParent!) ?? 0))
+        addFormatting(format, node = mdastNode as any) {
+          formattingMap.set(node, format | (formattingMap.get(mdastParent!) ?? 0))
+        },
+        removeFormatting(format, node = mdastNode as any) {
+          formattingMap.set(node, format ^ (formattingMap.get(mdastParent!) ?? 0))
         },
         getParentFormatting() {
           return formattingMap.get(mdastParent!) ?? 0

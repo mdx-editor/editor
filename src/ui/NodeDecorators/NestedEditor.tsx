@@ -115,7 +115,8 @@ export const NestedEditor = function <T extends Mdast.Content>(props: NestedEdit
         const mdast = exportLexicalTreeToMdast({
           root: $getRoot(),
           jsxComponentDescriptors,
-          ...lexicalConvertOptions!
+          ...lexicalConvertOptions!,
+          jsxIsAvailable: true
         })
         const rootParagraph = mdast.children[0]! as Mdast.Paragraph
         updateMdastNode(getUpdatedMdastNode(mdastNode as any, rootParagraph.children))

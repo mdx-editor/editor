@@ -88,13 +88,19 @@ export interface ExportLexicalTreeOptions {
   root: LexicalRootNode
   visitors: LexicalVisitor[]
   jsxComponentDescriptors: JsxComponentDescriptor[]
+  jsxIsAvailable: boolean
 }
 
 function isParent(node: unknown): node is Mdast.Parent {
   return (node as { children?: any[] }).children instanceof Array
 }
 
-export function exportLexicalTreeToMdast({ root, visitors, jsxComponentDescriptors }: ExportLexicalTreeOptions): Mdast.Root {
+export function exportLexicalTreeToMdast({
+  root,
+  visitors,
+  jsxComponentDescriptors,
+  jsxIsAvailable
+}: ExportLexicalTreeOptions): Mdast.Root {
   let unistRoot: Mdast.Root | null = null
   const referredComponents = new Set<string>()
   visit(root, null)
@@ -219,7 +225,27 @@ export function exportLexicalTreeToMdast({ root, visitors, jsxComponentDescripto
 
   fixWrappingWhitespace(typedRoot, [])
 
+  if (!jsxIsAvailable) {
+    convertUnderlineJsxToHtml(typedRoot)
+  }
+
   return typedRoot
+}
+
+function convertUnderlineJsxToHtml(node: Mdast.Parent | Mdast.Content) {
+  if (Object.hasOwn(node, 'children')) {
+    const nodeAsParent = node as Mdast.Parent
+    const newChildren = [] as Mdast.Content[]
+    nodeAsParent.children.forEach((child) => {
+      if (child.type === 'mdxJsxTextElement' && child.name === 'u') {
+        newChildren.push(...[{ type: 'html', value: '<u>' } as const, ...child.children, { type: 'html', value: '</u>' } as const])
+      } else {
+        newChildren.push(child)
+        convertUnderlineJsxToHtml(child)
+      }
+    })
+    nodeAsParent.children = newChildren
+  }
 }
 
 const TRAILING_WHITESPACE_REGEXP = /\s+$/
@@ -303,9 +329,10 @@ export function exportMarkdownFromLexical({
   toMarkdownOptions,
   toMarkdownExtensions,
   visitors,
-  jsxComponentDescriptors
+  jsxComponentDescriptors,
+  jsxIsAvailable
 }: ExportMarkdownFromLexicalOptions): string {
-  return toMarkdown(exportLexicalTreeToMdast({ root, visitors, jsxComponentDescriptors }), {
+  return toMarkdown(exportLexicalTreeToMdast({ root, visitors, jsxComponentDescriptors, jsxIsAvailable }), {
     extensions: toMarkdownExtensions,
     ...toMarkdownOptions
   })

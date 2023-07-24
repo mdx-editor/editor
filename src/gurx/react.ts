@@ -289,7 +289,12 @@ export function sysHooks<Sys extends System>() {
     useIsomorphicLayoutEffect(() => realm.subKey(key, callback), [callback])
   }
 
+  const useRealmContext = () => {
+    return useContext(Context)!
+  }
+
   return {
+    useRealmContext,
     useEmitter,
     useEmitterValues,
     usePubKeys,

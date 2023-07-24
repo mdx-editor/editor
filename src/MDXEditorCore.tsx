@@ -52,7 +52,28 @@ const DEFAULT_MARKDOWN_OPTIONS: ToMarkdownOptions = {
   listItemIndent: 'one'
 }
 
-export const MDXEditorCore: React.FC<MDXEditorCoreProps> = (props) => {
+/**
+ * The interface for the {@link MDXEditor} object reference.
+ *
+ * @example
+ * ```tsx
+ *  const mdxEditorRef = React.useRef<MDXEditorMethods>(null)
+ *  <MDXEditor ref={mdxEditorRef} />
+ * ```
+ */
+export interface MDXEditorMethods {
+  /**
+   * Gets the current markdown value.
+   */
+  getMarkdown: () => string
+
+  /**
+   * Updates the markdown value of the editor.
+   */
+  setMarkdown: (value: string) => void
+}
+
+export const MDXEditorCore = React.forwardRef<MDXEditorMethods, MDXEditorCoreProps>((props, ref) => {
   return (
     <RealmPluginInitializer
       plugins={[
@@ -67,6 +88,27 @@ export const MDXEditorCore: React.FC<MDXEditorCoreProps> = (props) => {
       <LexicalProvider>
         <RichTextEditor />
       </LexicalProvider>
+      <Methods mdxRef={ref} />
     </RealmPluginInitializer>
   )
+})
+
+const Methods: React.FC<{ mdxRef: React.ForwardedRef<MDXEditorMethods> }> = ({ mdxRef }) => {
+  const realm = corePluginHooks.useRealmContext()
+
+  React.useImperativeHandle(
+    mdxRef,
+    () => {
+      return {
+        getMarkdown: () => {
+          return realm.getKeyValue('markdown')
+        },
+        setMarkdown: (markdown) => {
+          realm.pubKey('setMarkdown', markdown)
+        }
+      }
+    },
+    [realm]
+  )
+  return null
 }
