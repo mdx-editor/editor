@@ -40,4 +40,8 @@ export interface JsxComponentDescriptor {
    * The properties that can be applied to the component
    */
   props: JsxPropertyDescriptor[]
+  /**
+   * Wether or not the component has children
+   */
+  hasChildren?: boolean
 }

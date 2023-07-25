@@ -12,6 +12,7 @@ import { LexicalParagraphVisitor } from './LexicalParagraphVisitor'
 import { LexicalTextVisitor } from './LexicalTextVisitor'
 import { MdastFormattingVisitor } from './MdastFormattingVisitor'
 import { JsxComponentDescriptor } from '../../types/JsxComponentDescriptors'
+import React from 'react'
 
 export const coreSystem = system((r) => {
   const rootEditor = r.node<LexicalEditor | null>(null)
@@ -36,6 +37,9 @@ export const coreSystem = system((r) => {
   // the JSX plugin will fill in these
   const jsxIsAvailable = r.node<boolean>(false)
   const jsxComponentDescriptors = r.node<JsxComponentDescriptor[]>([])
+
+  // used for the various popups, dialogs, and tooltips
+  const editorRootElementRef = r.node<React.RefObject<HTMLDivElement> | null>(null)
 
   function createAppendNodeFor<T>(node: RealmNode<T[]>) {
     const appendNode = r.node<T>()
@@ -82,7 +86,7 @@ export const coreSystem = system((r) => {
         theNewMarkdownValue = exportMarkdownFromLexical({
           root: $getRoot(),
           visitors: r.getValue(exportVisitors),
-          jsxComponentDescriptors: [],
+          jsxComponentDescriptors: r.getValue(jsxComponentDescriptors),
           toMarkdownExtensions: r.getValue(toMarkdownExtensions),
           toMarkdownOptions: r.getValue(toMarkdownOptions),
           jsxIsAvailable: r.getValue(jsxIsAvailable)
@@ -121,12 +125,15 @@ export const coreSystem = system((r) => {
   )
 
   return {
+    // jsx
     jsxIsAvailable,
     jsxComponentDescriptors,
-    contentEditableClassName,
+
+    // lexical editor
     initialRootEditorState,
     rootEditor,
-    initialMarkdown,
+
+    // import
     importVisitors,
     syntaxExtensions,
     mdastExtensions,
@@ -135,13 +142,22 @@ export const coreSystem = system((r) => {
     addLexicalNode,
     addSyntaxExtension,
     addMdastExtension,
-    exportVisitors,
-    toMarkdownOptions,
+
+    // export
     toMarkdownExtensions,
-    addExportVisitor,
+    toMarkdownOptions,
     addToMarkdownExtension,
+    addExportVisitor,
+    exportVisitors,
+
+    // markdown strings
+    initialMarkdown,
     setMarkdown,
-    markdown
+    markdown,
+
+    // DOM
+    editorRootElementRef,
+    contentEditableClassName
   }
 }, [])
 

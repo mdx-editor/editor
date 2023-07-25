@@ -59,7 +59,7 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
 
       {expanded && (
         <form>
-          <table className={styles.frontmatterEditorTable}>
+          <table className={styles.propertyEditorTable}>
             <colgroup>
               <col />
               <col />
@@ -118,5 +118,5 @@ const TableInput = React.forwardRef<
   React.HTMLAttributes<HTMLInputElement> & { autofocusIfEmpty?: boolean; autoFocus?: boolean; value?: string }
 >(({ className, autofocusIfEmpty, ...props }, ref) => {
   props.autoFocus = Boolean(!props.value && autofocusIfEmpty)
-  return <input className={classNames(styles.frontmatterInput, className)} {...props} ref={ref} />
+  return <input className={classNames(styles.propertyEditorInput, className)} {...props} ref={ref} />
 })

@@ -47,6 +47,7 @@ interface MDXEditorCoreProps {
   onChange?: (markdown: string) => void
   toMarkdownOptions?: ToMarkdownOptions
   plugins?: React.ComponentProps<typeof RealmPluginInitializer>['plugins']
+  className?: string
 }
 
 const DEFAULT_MARKDOWN_OPTIONS: ToMarkdownOptions = {
@@ -87,13 +88,29 @@ export const MDXEditorCore = React.forwardRef<MDXEditorMethods, MDXEditorCorePro
         ...(props.plugins || [])
       ]}
     >
-      <LexicalProvider>
-        <RichTextEditor />
-      </LexicalProvider>
+      <EditorRootElement>
+        <LexicalProvider>
+          <RichTextEditor />
+        </LexicalProvider>
+      </EditorRootElement>
       <Methods mdxRef={ref} />
     </RealmPluginInitializer>
   )
 })
+
+const EditorRootElement: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className }) => {
+  const editorRootElementRef = React.useRef<HTMLDivElement>(null)
+  const setEditorRootElementRef = corePluginHooks.usePublisher('editorRootElementRef')
+
+  React.useEffect(() => {
+    setEditorRootElementRef(editorRootElementRef)
+  }, [editorRootElementRef, setEditorRootElementRef])
+  return (
+    <div className={classNames(styles.editorRoot, styles.editorWrapper, className)} ref={editorRootElementRef}>
+      {children}
+    </div>
+  )
+}
 
 const Methods: React.FC<{ mdxRef: React.ForwardedRef<MDXEditorMethods> }> = ({ mdxRef }) => {
   const realm = corePluginHooks.useRealmContext()

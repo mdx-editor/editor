@@ -11,6 +11,7 @@ import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import { theme } from '../../content/theme'
 import { exportLexicalTreeToMdast } from '../../export/exportMarkdownFromLexical'
 import { importMdastTreeToLexical } from '../../import/importMarkdownToLexical'
+import styles from '../../ui/styles.module.css'
 // TODO:
 // import { SharedHistoryPlugin } from '../SharedHistoryPlugin'
 
@@ -24,7 +25,7 @@ interface NestedEditorsContextValue<T extends Node> {
 
 export const NestedEditorsContext = React.createContext<NestedEditorsContextValue<Node> | undefined>(undefined)
 
-const useNestedEditorContext = <T extends Mdast.Content>() => {
+export const useNestedEditorContext = <T extends Mdast.Content>() => {
   const context = React.useContext(NestedEditorsContext) as NestedEditorsContextValue<T> | undefined
   if (!context) {
     throw new Error('useNestedEditor must be used within a NestedEditorsProvider')
@@ -36,11 +37,11 @@ const useNestedEditorContext = <T extends Mdast.Content>() => {
  * A hook that returns a function that can be used to update the mdast node. Use this in your custom editor components.
  */
 export function useMdastNodeUpdater<T extends Mdast.Content>() {
-  const { parentEditor, lexicalNode } = useNestedEditorContext<T>()
+  const { parentEditor, lexicalNode, mdastNode } = useNestedEditorContext<T>()
 
-  return function updateMdastNode(node: T) {
+  return function updateMdastNode(node: Partial<T>) {
     parentEditor.update(() => {
-      lexicalNode.setMdastNode(node)
+      lexicalNode.setMdastNode({ ...mdastNode, ...node })
     })
   }
 }
@@ -64,6 +65,11 @@ export interface NestedEditorProps<T extends Mdast.Content> {
    * Props passed to the {@link https://github.com/facebook/lexical/blob/main/packages/lexical-react/src/LexicalContentEditable.tsx | ContentEditable} component.
    */
   contentEditableProps?: React.ComponentProps<typeof ContentEditable>
+
+  /**
+   * Whether or not the editor edits blocks (multiple paragraphs)
+   */
+  block?: boolean
 }
 
 /**
@@ -83,7 +89,7 @@ export interface NestedEditorProps<T extends Mdast.Content> {
  * ```
  */
 export const NestedLexicalEditor = function <T extends Mdast.Content>(props: NestedEditorProps<T>) {
-  const { getContent, getUpdatedMdastNode, contentEditableProps } = props
+  const { getContent, getUpdatedMdastNode, contentEditableProps, block = false } = props
   const { mdastNode } = useNestedEditorContext<T>()
   const updateMdastNode = useMdastNodeUpdater<T>()
 
@@ -102,9 +108,20 @@ export const NestedLexicalEditor = function <T extends Mdast.Content>(props: Nes
     })
 
     editor.update(() => {
+      let content: Mdast.PhrasingContent[] | Mdast.Content[] = getContent(mdastNode as any)
+      if (block) {
+        if (content.length === 0) {
+          content = [{ type: 'paragraph', children: [] }]
+        }
+      } else {
+        content = [{ type: 'paragraph', children: content as Mdast.PhrasingContent[] }]
+      }
       importMdastTreeToLexical({
         root: $getRoot(),
-        mdastRoot: { type: 'root', children: [{ type: 'paragraph', children: getContent(mdastNode as any) }] },
+        mdastRoot: {
+          type: 'root',
+          children: content
+        },
         visitors: importVisitors
       })
     })
@@ -121,17 +138,17 @@ export const NestedLexicalEditor = function <T extends Mdast.Content>(props: Nes
           jsxComponentDescriptors,
           jsxIsAvailable
         })
-        const rootParagraph = mdast.children[0]! as Mdast.Paragraph
-        updateMdastNode(getUpdatedMdastNode(mdastNode as any, rootParagraph.children))
+        const content: Mdast.Content[] = block ? mdast.children : (mdast.children[0] as Mdast.Paragraph)!.children
+        updateMdastNode(getUpdatedMdastNode(mdastNode as any, content as any))
       })
     })
-  }, [editor, exportVisitors, getUpdatedMdastNode, jsxComponentDescriptors, jsxIsAvailable, mdastNode, updateMdastNode])
+  }, [block, editor, exportVisitors, getUpdatedMdastNode, jsxComponentDescriptors, jsxIsAvailable, mdastNode, updateMdastNode])
 
   return (
     <LexicalNestedComposer initialEditor={editor}>
       <RichTextPlugin
-        contentEditable={<ContentEditable {...contentEditableProps} />}
-        placeholder={<div></div>}
+        contentEditable={<ContentEditable {...contentEditableProps} className={styles.nestedEditor} />}
+        placeholder={null}
         ErrorBoundary={LexicalErrorBoundary}
       />
     </LexicalNestedComposer>

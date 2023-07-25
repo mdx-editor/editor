@@ -5,7 +5,7 @@ import { DecoratorNode } from 'lexical'
 import { MdxJsxTextElement, MdxJsxFlowElement } from 'mdast-util-mdx'
 import { JsxEditor } from './JsxEditor'
 
-type MdastJsx = MdxJsxTextElement | MdxJsxFlowElement
+export type MdastJsx = MdxJsxTextElement | MdxJsxFlowElement
 
 /**
  * A serialized representation of an {@link LexicalJsxNode}.

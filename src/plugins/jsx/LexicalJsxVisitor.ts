@@ -2,9 +2,11 @@ import { MdxJsxFlowElement, MdxJsxTextElement } from 'mdast-util-mdx-jsx'
 import { $isLexicalJsxNode, LexicalJsxNode } from './LexicalJsxNode'
 import { LexicalExportVisitor } from '../../export/exportMarkdownFromLexical'
 
-export const LexicalJsxVisitor: LexicalExportVisitor<MdxJsxFlowElement | MdxJsxTextElement, LexicalJsxNode> = {
+export const LexicalJsxVisitor: LexicalExportVisitor<LexicalJsxNode, MdxJsxFlowElement | MdxJsxTextElement> = {
   testLexicalNode: $isLexicalJsxNode,
   visitLexicalNode({ actions, mdastParent, lexicalNode }) {
-    actions.appendToParent(mdastParent, lexicalNode.getMdastNode())
+    const mdastNode = lexicalNode.getMdastNode()
+    actions.registerReferredComponent(mdastNode.name!)
+    actions.appendToParent(mdastParent, mdastNode)
   }
 }

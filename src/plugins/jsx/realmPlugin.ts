@@ -6,7 +6,7 @@ import { coreSystem } from '../core/realmPlugin'
 import { MdastMdxJsxElementVisitor } from './MdastMdxJsxElementVisitor'
 import { MdastMdxJsEsmVisitor } from './MdastMdxJsEsmVisitor'
 import { LexicalJsxNode } from './LexicalJsxNode'
-import { LexicalJsxVisitor } from './LexicalLeafDirectiveVisitor'
+import { LexicalJsxVisitor } from './LexicalJsxVisitor'
 
 export const jsxSystem = system(
   (_) => {
@@ -25,7 +25,7 @@ export const [jsxPlugin, jsxPluginHooks] = realmPlugin({
     realm.pubKey('jsxComponentDescriptors', params?.jsxComponentDescriptors || [])
   },
 
-  init: (realm) => {
+  init: (realm, _: JsxPluginParams) => {
     realm.pubKey('jsxIsAvailable', true)
 
     // import

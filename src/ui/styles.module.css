@@ -20,7 +20,7 @@
 }
 
 @define-mixin drop-shadow-sm {
-  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.05));
+  filter: drop-shadow(0 2px 2px rgb(0 0 0 / 0.20));
 }
 
 @define-mixin icon-button {
@@ -354,9 +354,16 @@
   font-size: var(--text-sm);
 }
 
-.frontmatterEditorTable {
+.propertyPanelTitle {
+  font-size: var(--text-xs);
+  font-weight: 400;
+  margin: 0;
+  padding-top: var(--spacing-2);
+  padding-left: var(--spacing-2);
+}
+
+.propertyEditorTable {
   table-layout: fixed;
-  margin-top: var(--spacing-3);
   border-spacing: var(--spacing-2);
   & th {
     text-align: left;
@@ -376,9 +383,27 @@
     margin-left: var(--spacing-4);
     margin-right: var(--spacing-4);
   }
+
+  & .readOnlyColumnCell {
+    padding-left: 0;
+  }
 }
 
-.frontmatterInput {
+.propertyEditorLabelCell {
+  font-weight: 400;
+}
+
+.readOnlyColumnCell {
+  padding-left: 0;
+}
+
+.buttonsFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-2);
+}
+
+.propertyEditorInput {
   @mixin clear-form-element;
   width: 100%;
   padding: var(--spacing-2) var(--spacing-3);
@@ -393,7 +418,7 @@
   color:var(--baseText);
 }
 
-.primaryButton {
+.primaryButton, .secondaryButton {
   @mixin clear-form-element;
   padding: var(--spacing-2) var(--spacing-3);
   border: 1px solid var(--accentBorder);
@@ -401,6 +426,12 @@
   color:var(--baseBase);
   font-size: var(--text-sm);
   border-radius: var(--radius-medium);
+}
+
+.secondaryButton {
+  border: 1px solid var(--baseBorder);
+  background-color: var(--baseSolidHover);
+  color:var(--baseBase);
 }
 
 .linkDialogEditForm {
@@ -514,6 +545,21 @@
   background-color: var(--baseBgSubtle);
   padding:var(--spacing-2) var(--spacing-2);
   font-size: var(--text-sm);
+}
+
+.popoverContent {
+  @mixin drop-shadow-sm;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-0_5);
+  border-radius:var(--radius-medium);
+  background-color: var(--baseBgSubtle);
+  padding:var(--spacing-2) var(--spacing-2);
+  font-size: var(--text-sm);
+}
+
+.popoverArrow {
+  fill: var(--baseBgSubtle);
 }
 
 
@@ -759,4 +805,46 @@
   cursor: grab;
   cursor: -moz-grab;
   cursor: -webkit-grab;
+}
+
+.inlineEditor {
+  display: inline-flex;
+  border-radius: var(--radius-medium);
+  padding: var(--spacing-1);
+  gap: var(--spacing-2);
+  align-items: center;
+  background: var(--baseBg);
+}
+
+.blockEditor {
+  display: flex;
+  justify-content: stretch;
+  border-radius: var(--radius-medium);
+  padding: var(--spacing-2);
+  gap: var(--spacing-2);
+  align-items: center;
+  background: var(--baseBg);
+
+  & .nestedEditor {
+    flex-grow: 1;
+  }
+}
+
+.nestedEditor {
+  background: white;
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-medium);
+  & > p {
+    margin: 0;
+  }
+  &:focus {
+    outline: none;
+  }
+}
+
+.jsxComponentTitle {
+  font-size: var(--text-sm);
+  color: var(--baseText);
+  padding-right: var(--spacing-2);
+
 }
