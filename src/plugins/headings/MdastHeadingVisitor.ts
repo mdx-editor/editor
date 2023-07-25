@@ -1,6 +1,6 @@
 import { $createHeadingNode } from '@lexical/rich-text'
 import * as Mdast from 'mdast'
-import { MdastImportVisitor } from './importMarkdownToLexical'
+import { MdastImportVisitor } from '../../import'
 
 export const MdastHeadingVisitor: MdastImportVisitor<Mdast.Heading> = {
   testNode: 'heading',

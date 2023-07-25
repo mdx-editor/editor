@@ -4,6 +4,8 @@ import jsxMarkdown from './assets/jsx.md?raw'
 import { jsxPlugin } from '../plugins/jsx/realmPlugin'
 import { JsxComponentDescriptor } from '../types/JsxComponentDescriptors'
 import { GenericJsxEditor } from '../jsx-editors/GenericJsxEditor'
+import { headingsPlugin } from '../plugins/headings/realmPlugin'
+import { thematicBreakPlugin, thematicBreakSystem } from '../plugins/thematic-break/realmPlugin'
 
 export function Core() {
   const ref = React.useRef<MDXEditorMethods>(null)
@@ -57,4 +59,17 @@ export function Jsx() {
       <MDXEditorCore ref={ref} markdown={jsxMarkdown} onChange={console.log} plugins={[jsxPlugin({ jsxComponentDescriptors })]} />
     </>
   )
+}
+
+export function Headings() {
+  return <MDXEditorCore markdown="# hello world" plugins={[headingsPlugin()]} />
+}
+const breakMarkdown = `hello 
+
+----------------
+
+world`
+
+export function ThematicBreaks() {
+  return <MDXEditorCore markdown={breakMarkdown} plugins={[thematicBreakPlugin()]} />
 }

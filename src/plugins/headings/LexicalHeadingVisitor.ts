@@ -1,6 +1,6 @@
 import { $isHeadingNode, HeadingNode } from '@lexical/rich-text'
 import * as Mdast from 'mdast'
-import { LexicalExportVisitor } from './exportMarkdownFromLexical'
+import { LexicalExportVisitor } from '../../export'
 
 export const LexicalHeadingVisitor: LexicalExportVisitor<HeadingNode, Mdast.Heading> = {
   testLexicalNode: $isHeadingNode,
