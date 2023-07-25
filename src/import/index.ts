@@ -13,28 +13,30 @@ import { directive } from 'micromark-extension-directive'
 import { frontmatter } from 'micromark-extension-frontmatter'
 import { gfmTable } from 'micromark-extension-gfm-table'
 import { mdxjs } from 'micromark-extension-mdxjs'
-import { AdmonitionNode, CodeBlockNode, FrontmatterNode, ImageNode, JsxNode, LeafDirectiveNode, SandpackNode, TableNode } from '../nodes'
+import { AdmonitionNode, CodeBlockNode, FrontmatterNode, ImageNode, JsxNode, LeafDirectiveNode, SandpackNode } from '../nodes'
+import { MdastFormattingVisitor } from '../plugins/core/MdastFormattingVisitor'
+import { MdastInlineCodeVisitor } from '../plugins/core/MdastInlineCodeVisitor'
+import { MdastParagraphVisitor } from '../plugins/core/MdastParagraphVisitor'
+import { MdastRootVisitor } from '../plugins/core/MdastRootVisitor'
+import { MdastTextVisitor } from '../plugins/core/MdastTextVisitor'
+import { MdastHeadingVisitor } from '../plugins/headings/MdastHeadingVisitor'
+import { MdastMdxJsEsmVisitor } from '../plugins/jsx/MdastMdxJsEsmVisitor'
+import { MdastMdxJsxElementVisitor } from '../plugins/jsx/MdastMdxJsxElementVisitor'
+import { MdastListItemVisitor } from '../plugins/lists/MdastListItemVisitor'
+import { MdastListVisitor } from '../plugins/lists/MdastListVisitor'
+import { MdastTableVisitor } from '../plugins/table/MdastTableVisitor'
+import { MdastThematicBreakVisitor } from '../plugins/thematic-break/MdastThematicBreakVisitor'
 import { MdastAdmonitionVisitor } from './MdastAdmonitionVisitor'
 import { MdastBlockQuoteVisitor } from './MdastBlockQuoteVisitor'
 import { MdastCodeVisitor } from './MdastCodeVisitor'
-import { MdastFormattingVisitor } from '../plugins/core/MdastFormattingVisitor'
 import { MdastFrontmatterVisitor } from './MdastFrontmatterVisitor'
 import { MdastImageVisitor } from './MdastImageVisitor'
 import { MdastLeafDirectiveVisitor } from './MdastLeafDirectiveVisitor'
 import { MdastLinkVisitor } from './MdastLinkVisitor'
-import { MdastParagraphVisitor } from '../plugins/core/MdastParagraphVisitor'
-import { MdastRootVisitor } from '../plugins/core/MdastRootVisitor'
-import { MdastTableVisitor } from './MdastTableVisitor'
-import { MdastTextVisitor } from '../plugins/core/MdastTextVisitor'
 import { MdastExtension, MdastImportVisitor, SyntaxExtension } from './importMarkdownToLexical'
-import { MdastMdxJsEsmVisitor } from '../plugins/jsx/MdastMdxJsEsmVisitor'
-import { MdastMdxJsxElementVisitor } from '../plugins/jsx/MdastMdxJsxElementVisitor'
-import { MdastInlineCodeVisitor } from '../plugins/core/MdastInlineCodeVisitor'
-import { MdastHeadingVisitor } from '../plugins/headings/MdastHeadingVisitor'
-import { MdastThematicBreakVisitor } from '../plugins/thematic-break/MdastThematicBreakVisitor'
-import { MdastListItemVisitor } from '../plugins/lists/MdastListItemVisitor'
-import { MdastListVisitor } from '../plugins/lists/MdastListVisitor'
+import { TableNode } from '../plugins/table/TableNode'
 
+export { importMarkdownToLexical, importMdastTreeToLexical } from './importMarkdownToLexical'
 export type {
   MarkdownParseOptions,
   MdastExtension,
@@ -44,8 +46,6 @@ export type {
   MdastVisitParams,
   SyntaxExtension
 } from './importMarkdownToLexical'
-
-export { importMarkdownToLexical, importMdastTreeToLexical } from './importMarkdownToLexical'
 
 export const defaultMdastVisitors: Record<string, MdastImportVisitor<Mdast.Content>> = {
   MdastRootVisitor,

@@ -1,6 +1,4 @@
----
-title: Hello World
----
+Table:
 
 | Syntax      | Description   | Profit |
 | ----------- | ------------- | ------:|

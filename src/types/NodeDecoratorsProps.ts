@@ -1,8 +1,6 @@
 import React from 'react'
 import { EditorThemeClasses, LexicalEditor } from 'lexical'
 import { MdxJsxAttribute } from 'mdast-util-mdx-jsx'
-import { TableNode } from '../nodes'
-import * as Mdast from 'mdast'
 import { LeafDirectiveNode } from '../nodes/LeafDirectiveNode'
 import { LeafDirective } from 'mdast-util-directive'
 
@@ -37,12 +35,6 @@ export interface SandpackEditorProps {
 
 export interface CodeBlockEditorProps extends SandpackEditorProps {
   language: string
-}
-
-export interface TableEditorProps {
-  parentEditor: LexicalEditor
-  lexicalTable: TableNode
-  mdastNode: Mdast.Table
 }
 
 export interface ImageEditorProps {

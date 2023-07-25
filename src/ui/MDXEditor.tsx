@@ -175,8 +175,6 @@ const LazyCodeBlockEditor = React.lazy(() =>
   import('./NodeDecorators/CodeBlockEditor').then((module) => ({ default: module.CodeBlockEditor }))
 )
 
-const LazyTableEditor = React.lazy(() => import('./NodeDecorators/TableEditor').then((module) => ({ default: module.TableEditor })))
-
 const LazyImageEditor = React.lazy(() => import('./NodeDecorators/ImageEditor').then((module) => ({ default: module.ImageEditor })))
 
 const LazyLeafDirectiveEditor = React.lazy(() =>
@@ -188,7 +186,6 @@ const defaultNodeDecorators: NodeDecoratorComponents = {
   JsxEditor: LazyJsxEditor,
   SandpackEditor: LazySandpackEditor,
   CodeBlockEditor: LazyCodeBlockEditor,
-  TableEditor: LazyTableEditor,
   ImageEditor: LazyImageEditor,
   LeafDirectiveEditor: LazyLeafDirectiveEditor
 }

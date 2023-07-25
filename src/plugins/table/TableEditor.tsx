@@ -2,6 +2,7 @@ import { ContentEditable } from '@lexical/react/LexicalContentEditable'
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary'
 import { LexicalNestedComposer } from '@lexical/react/LexicalNestedComposer'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
+import * as RadixPopover from '@radix-ui/react-popover'
 import {
   $createParagraphNode,
   $getRoot,
@@ -15,34 +16,37 @@ import {
 import * as Mdast from 'mdast'
 import React, { useEffect } from 'react'
 import { theme } from '../../content/theme'
-import { exportLexicalTreeToMdast } from '../../export'
-import { importMdastTreeToLexical } from '../../import'
-import { TableNode } from '../../nodes'
-import { TableEditorProps } from '../../types/NodeDecoratorsProps'
-import { MarkdownAstRenderer } from '../MarkdownAstRenderer'
-import * as RadixPopover from '@radix-ui/react-popover'
-import MoreHorizIcon from './icons/more_horiz.svg'
-import AlignLeftIcon from './icons/format_align_left.svg'
-import AlignCenterIcon from './icons/format_align_center.svg'
-import AlignRightIcon from './icons/format_align_right.svg'
-import InsertColLeftIcon from './icons/insert_col_left.svg'
-import InsertColRightIcon from './icons/insert_col_right.svg'
-import DeleteSmallIcon from './icons/delete_small.svg'
-import InsertRowAboveIcon from './icons/insert_row_above.svg'
-import InsertRowBelowIcon from './icons/insert_row_below.svg'
-import AddRowIcon from './icons/add_row.svg'
-import AddColumnIcon from './icons/add_column.svg'
+import { exportLexicalTreeToMdast } from '../../export/exportMarkdownFromLexical'
+import { importMdastTreeToLexical } from '../../import/importMarkdownToLexical'
+import AddColumnIcon from '../../ui/icons/add_column.svg'
+import AddRowIcon from '../../ui/icons/add_row.svg'
+import DeleteSmallIcon from '../../ui/icons/delete_small.svg'
+import AlignCenterIcon from '../../ui/icons/format_align_center.svg'
+import AlignLeftIcon from '../../ui/icons/format_align_left.svg'
+import AlignRightIcon from '../../ui/icons/format_align_right.svg'
+import InsertColLeftIcon from '../../ui/icons/insert_col_left.svg'
+import InsertColRightIcon from '../../ui/icons/insert_col_right.svg'
+import InsertRowAboveIcon from '../../ui/icons/insert_row_above.svg'
+import InsertRowBelowIcon from '../../ui/icons/insert_row_below.svg'
+import MoreHorizIcon from '../../ui/icons/more_horiz.svg'
+import { MarkdownAstRenderer } from './MarkdownAstRenderer'
+import { TableNode } from './TableNode'
 
-import styles from '../styles.module.css'
-import classNames from 'classnames'
 import * as RadixToolbar from '@radix-ui/react-toolbar'
-import { useEmitterValues } from '../../system/EditorSystemComponent'
-import { SharedHistoryPlugin } from '../SharedHistoryPlugin'
+import classNames from 'classnames'
+import styles from '../../ui/styles.module.css'
+import { corePluginHooks } from '../core/realmPlugin'
 
 const AlignToTailwindClassMap = {
   center: styles.centeredCell,
   left: styles.leftAlignedCell,
   right: styles.rightAlignedCell
+}
+
+export interface TableEditorProps {
+  parentEditor: LexicalEditor
+  lexicalTable: TableNode
+  mdastNode: Mdast.Table
 }
 
 export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEditor, lexicalTable }) => {
@@ -259,16 +263,18 @@ const Cell: React.FC<CellProps> = ({ align, ...props }) => {
 }
 
 const CellEditor: React.FC<CellProps> = ({ activeCellTuple, parentEditor, lexicalTable, contents, colIndex, rowIndex }) => {
-  const [markdownParseOptions, lexicalConvertOptions, jsxComponentDescriptors, lexicalNodes] = useEmitterValues(
-    'markdownParseOptions',
-    'lexicalConvertOptions',
+  const [importVisitors, exportVisitors, usedLexicalNodes, jsxComponentDescriptors, jsxIsAvailable] = corePluginHooks.useEmitterValues(
+    'importVisitors',
+    'exportVisitors',
+    'usedLexicalNodes',
     'jsxComponentDescriptors',
-    'lexicalNodes'
+    'jsxIsAvailable'
   )
+
   const [editor] = React.useState(() => {
     let disposed = false
     const editor = createEditor({
-      nodes: lexicalNodes,
+      nodes: usedLexicalNodes,
       theme: theme
     })
 
@@ -281,8 +287,8 @@ const CellEditor: React.FC<CellProps> = ({ activeCellTuple, parentEditor, lexica
         const mdast = exportLexicalTreeToMdast({
           root: $getRoot(),
           jsxComponentDescriptors,
-          ...lexicalConvertOptions!,
-          jsxIsAvailable: true
+          visitors: exportVisitors,
+          jsxIsAvailable
         })
         parentEditor.update(() => {
           lexicalTable.updateCellContents(colIndex, rowIndex, (mdast.children[0] as Mdast.Paragraph).children)
@@ -337,7 +343,7 @@ const CellEditor: React.FC<CellProps> = ({ activeCellTuple, parentEditor, lexica
       importMdastTreeToLexical({
         root: $getRoot(),
         mdastRoot: { type: 'root', children: [{ type: 'paragraph', children: contents }] },
-        visitors: markdownParseOptions!.visitors
+        visitors: importVisitors
       })
     })
 
@@ -347,7 +353,6 @@ const CellEditor: React.FC<CellProps> = ({ activeCellTuple, parentEditor, lexica
   return (
     <LexicalNestedComposer initialEditor={editor}>
       <RichTextPlugin contentEditable={<ContentEditable autoFocus />} placeholder={<div></div>} ErrorBoundary={LexicalErrorBoundary} />
-      <SharedHistoryPlugin />
     </LexicalNestedComposer>
   )
 }
@@ -369,7 +374,7 @@ const ColumnEditor: React.FC<ColumnEditorProps> = ({
   colIndex,
   setActiveCellWithBoundaries
 }) => {
-  const [editorRootElementRef] = useEmitterValues('editorRootElementRef')
+  const [editorRootElementRef] = corePluginHooks.useEmitterValues('editorRootElementRef')
 
   const insertColumnAt = React.useCallback(
     (colIndex: number) => {
@@ -465,7 +470,7 @@ const RowEditor: React.FC<RowEditorProps> = ({
   rowIndex,
   setActiveCellWithBoundaries
 }) => {
-  const [editorRootElementRef] = useEmitterValues('editorRootElementRef')
+  const [editorRootElementRef] = corePluginHooks.useEmitterValues('editorRootElementRef')
 
   const insertRowAt = React.useCallback(
     (rowIndex: number) => {

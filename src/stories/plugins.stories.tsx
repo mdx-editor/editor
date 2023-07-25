@@ -1,12 +1,14 @@
 import React from 'react'
 import { MDXEditorCore, MDXEditorMethods } from '../MDXEditorCore'
 import jsxMarkdown from './assets/jsx.md?raw'
+import tableMarkdown from './assets/table-markdown.md?raw'
 import { jsxPlugin } from '../plugins/jsx/realmPlugin'
 import { JsxComponentDescriptor } from '../types/JsxComponentDescriptors'
 import { GenericJsxEditor } from '../jsx-editors/GenericJsxEditor'
 import { headingsPlugin } from '../plugins/headings/realmPlugin'
-import { thematicBreakPlugin, thematicBreakSystem } from '../plugins/thematic-break/realmPlugin'
+import { thematicBreakPlugin } from '../plugins/thematic-break/realmPlugin'
 import { listsPlugin } from '../plugins/lists/realmPlugin'
+import { tablePlugin } from '../plugins/table/realmPlugin'
 
 export function Core() {
   const ref = React.useRef<MDXEditorMethods>(null)
@@ -89,4 +91,8 @@ const listsMarkdown = `
 
 export function Lists() {
   return <MDXEditorCore markdown={listsMarkdown} plugins={[listsPlugin()]} />
+}
+
+export function Table() {
+  return <MDXEditorCore markdown={tableMarkdown} plugins={[tablePlugin()]} />
 }

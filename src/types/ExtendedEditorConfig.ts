@@ -4,7 +4,6 @@ import {
   JsxEditorProps,
   SandpackEditorProps,
   CodeBlockEditorProps,
-  TableEditorProps,
   ImageEditorProps,
   LeafDirectiveEditorProps
 } from './NodeDecoratorsProps'
@@ -15,7 +14,6 @@ export interface NodeDecoratorComponents {
   JsxEditor: React.FC<JsxEditorProps>
   SandpackEditor: React.FC<SandpackEditorProps>
   CodeBlockEditor: React.FC<CodeBlockEditorProps>
-  TableEditor: React.FC<TableEditorProps>
   ImageEditor: React.FC<ImageEditorProps>
   LeafDirectiveEditor: React.FC<LeafDirectiveEditorProps<LeafDirective>>
 }

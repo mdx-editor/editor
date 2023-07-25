@@ -1,8 +1,8 @@
 import { DecoratorNode, LexicalEditor, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
 import * as Mdast from 'mdast'
 import React from 'react'
-import { noop } from '../utils/fp'
-import { ExtendedEditorConfig } from '../types/ExtendedEditorConfig'
+import { noop } from '../../utils/fp'
+import { TableEditor } from './TableEditor'
 
 /**
  * A serialized representation of a {@link TableNode}.
@@ -157,14 +157,7 @@ export class TableNode extends DecoratorNode<JSX.Element> {
     table.align[colIndex] = align
   }
 
-  decorate(
-    parentEditor: LexicalEditor,
-    {
-      theme: {
-        nodeDecoratorComponents: { TableEditor }
-      }
-    }: ExtendedEditorConfig
-  ): JSX.Element {
+  decorate(parentEditor: LexicalEditor): JSX.Element {
     return <TableEditor lexicalTable={this} mdastNode={this.__mdastNode} parentEditor={parentEditor} />
   }
 
