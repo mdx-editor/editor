@@ -13,6 +13,7 @@ import { LexicalTextVisitor } from './LexicalTextVisitor'
 import { MdastFormattingVisitor } from './MdastFormattingVisitor'
 import { JsxComponentDescriptor } from '../../types/JsxComponentDescriptors'
 import React from 'react'
+import { MdastInlineCodeVisitor } from './MdastInlineCodeVisitor'
 
 export const coreSystem = system((r) => {
   const rootEditor = r.node<LexicalEditor | null>(null)
@@ -185,6 +186,7 @@ export const [corePlugin, corePluginHooks] = realmPlugin({
     realm.pubKey('addImportVisitor', MdastParagraphVisitor)
     realm.pubKey('addImportVisitor', MdastTextVisitor)
     realm.pubKey('addImportVisitor', MdastFormattingVisitor)
+    realm.pubKey('addImportVisitor', MdastInlineCodeVisitor)
 
     // basic lexical nodes
     realm.pubKey('addLexicalNode', ParagraphNode)
