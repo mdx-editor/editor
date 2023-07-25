@@ -1,7 +1,6 @@
 export * from './AdmonitionNode'
 export * from './CodeBlockNode'
 export * from './FrontmatterNode'
-export * from './ImageNode'
 export * from './JsxNode'
 export * from './SandpackNode'
 export * from './LeafDirectiveNode'

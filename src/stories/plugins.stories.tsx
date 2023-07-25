@@ -2,6 +2,7 @@ import React from 'react'
 import { MDXEditorCore, MDXEditorMethods } from '../MDXEditorCore'
 import jsxMarkdown from './assets/jsx.md?raw'
 import tableMarkdown from './assets/table-markdown.md?raw'
+import imageMarkdown from './assets/image-markdown.md?raw'
 import { jsxPlugin } from '../plugins/jsx/realmPlugin'
 import { JsxComponentDescriptor } from '../types/JsxComponentDescriptors'
 import { GenericJsxEditor } from '../jsx-editors/GenericJsxEditor'
@@ -10,6 +11,7 @@ import { thematicBreakPlugin } from '../plugins/thematic-break/realmPlugin'
 import { listsPlugin } from '../plugins/lists/realmPlugin'
 import { tablePlugin } from '../plugins/table/realmPlugin'
 import { linkPlugin } from '../plugins/link/realmPlugin'
+import { imagePlugin } from '../plugins/image/realmPlugin'
 
 export function Core() {
   const ref = React.useRef<MDXEditorMethods>(null)
@@ -100,4 +102,11 @@ export function Table() {
 
 export function Link() {
   return <MDXEditorCore markdown={'some [hello](https://google.com) link'} plugins={[linkPlugin()]} />
+}
+
+export function Images() {
+  // eslint-disable-next-line @typescript-eslint/require-await
+  return (
+    <MDXEditorCore markdown={imageMarkdown} plugins={[imagePlugin({ imageUploadHandler: async () => 'https://picsum.photos/200/300' })]} />
+  )
 }

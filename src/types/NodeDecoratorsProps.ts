@@ -37,12 +37,6 @@ export interface CodeBlockEditorProps extends SandpackEditorProps {
   language: string
 }
 
-export interface ImageEditorProps {
-  nodeKey: string
-  src: string
-  title?: string
-}
-
 export interface LeafDirectiveEditorProps<T extends LeafDirective> {
   /** The Lexical editor that contains the node */
   parentEditor: LexicalEditor

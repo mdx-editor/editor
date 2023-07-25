@@ -20,10 +20,15 @@ import {
   SELECTION_CHANGE_COMMAND
 } from 'lexical'
 import { Suspense, useCallback, useEffect, useRef, useState } from 'react'
-import { ImageEditorProps } from '../../types/NodeDecoratorsProps'
-import { $isImageNode } from '../../nodes'
-import styles from '../styles.module.css'
+import styles from '../../ui/styles.module.css'
 import classNames from 'classnames'
+import { $isImageNode } from './ImageNode'
+
+export interface ImageEditorProps {
+  nodeKey: string
+  src: string
+  title?: string
+}
 
 const imageCache = new Set()
 

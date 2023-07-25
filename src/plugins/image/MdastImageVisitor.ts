@@ -1,6 +1,6 @@
 import * as Mdast from 'mdast'
-import { $createImageNode } from '../nodes'
-import { MdastImportVisitor } from './importMarkdownToLexical'
+import { MdastImportVisitor } from '../../import'
+import { $createImageNode } from './ImageNode'
 
 export const MdastImageVisitor: MdastImportVisitor<Mdast.Image> = {
   testNode: 'image',

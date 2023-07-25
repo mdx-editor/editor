@@ -1,5 +1,9 @@
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { $wrapNodeInElement, mergeRegister } from '@lexical/utils'
+import { realmPlugin, system } from '../../gurx'
+import { coreSystem } from '../core/realmPlugin'
+import { MdastImageVisitor } from './MdastImageVisitor'
+import { LexicalImageVisitor } from './LexicalImageVisitor'
+import { $createImageNode, $isImageNode, CreateImageNodeOptions, ImageNode } from './ImageNode'
+import { $wrapNodeInElement } from '@lexical/utils'
 import {
   $createParagraphNode,
   $createRangeSelection,
@@ -8,6 +12,7 @@ import {
   $isNodeSelection,
   $isRootOrShadowRoot,
   $setSelection,
+  COMMAND_PRIORITY_CRITICAL,
   COMMAND_PRIORITY_EDITOR,
   COMMAND_PRIORITY_HIGH,
   COMMAND_PRIORITY_LOW,
@@ -16,28 +21,32 @@ import {
   DRAGSTART_COMMAND,
   DROP_COMMAND,
   LexicalCommand,
-  LexicalEditor
+  LexicalEditor,
+  PASTE_COMMAND
 } from 'lexical'
-import { useEffect } from 'react'
-import * as React from 'react'
 
-import { $createImageNode, $isImageNode, ImageNode, CreateImageNodeOptions } from '../nodes/ImageNode'
-import { CAN_USE_DOM } from '../utils/detectMac'
-import { useEmitterValues } from '../system/EditorSystemComponent'
+import { CAN_USE_DOM } from '../../utils/detectMac'
 
-export type InsertImagePayload = Readonly<CreateImageNodeOptions>
+export const imageSystem = system(
+  (r, [{ rootEditor }]) => {
+    const insertImage = r.node<string>()
 
-const getDOMSelection = (targetWindow: Window | null): Selection | null => (CAN_USE_DOM ? (targetWindow || window).getSelection() : null)
+    const imageUploadHandler = r.node<(image: File) => Promise<string>>((_) => {
+      throw new Error('Image upload handling is not implemented')
+    })
 
-export const INSERT_IMAGE_COMMAND: LexicalCommand<InsertImagePayload> = createCommand('INSERT_IMAGE_COMMAND')
+    r.sub(r.pipe(insertImage, r.o.withLatestFrom(rootEditor)), ([src, theEditor]) => {
+      theEditor?.update(() => {
+        const imageNode = $createImageNode({ altText: '', src, title: '' })
+        $insertNodes([imageNode])
+        if ($isRootOrShadowRoot(imageNode.getParentOrThrow())) {
+          $wrapNodeInElement(imageNode, $createParagraphNode).selectEnd()
+        }
+      })
+    })
 
-export const ImagesPlugin: React.FC = () => {
-  const [editor] = useLexicalComposerContext()
-  const [imageUploadHandler] = useEmitterValues('imageUploadHandler')
-
-  useEffect(() => {
-    return mergeRegister(
-      editor.registerCommand<InsertImagePayload>(
+    r.sub(rootEditor, (editor) => {
+      editor?.registerCommand<InsertImagePayload>(
         INSERT_IMAGE_COMMAND,
         (payload) => {
           const imageNode = $createImageNode(payload)
@@ -49,33 +58,88 @@ export const ImagesPlugin: React.FC = () => {
           return true
         },
         COMMAND_PRIORITY_EDITOR
-      ),
-      editor.registerCommand<DragEvent>(
+      )
+      editor?.registerCommand<DragEvent>(
         DRAGSTART_COMMAND,
         (event) => {
           return onDragStart(event)
         },
         COMMAND_PRIORITY_HIGH
-      ),
-      editor.registerCommand<DragEvent>(
+      )
+      editor?.registerCommand<DragEvent>(
         DRAGOVER_COMMAND,
         (event) => {
           return onDragover(event)
         },
         COMMAND_PRIORITY_LOW
-      ),
-      editor.registerCommand<DragEvent>(
+      )
+
+      editor?.registerCommand<DragEvent>(
         DROP_COMMAND,
         (event) => {
-          return onDrop(event, editor, imageUploadHandler)
+          return onDrop(event, editor, r.getValue(imageUploadHandler))
         },
         COMMAND_PRIORITY_HIGH
       )
-    )
-  }, [editor, imageUploadHandler])
 
-  return null
+      editor?.registerCommand(
+        PASTE_COMMAND,
+        (event: ClipboardEvent) => {
+          let cbPayload = Array.from(event.clipboardData?.items || [])
+          cbPayload = cbPayload.filter((i) => /image/.test(i.type)) // Strip out the non-image bits
+
+          if (!cbPayload.length || cbPayload.length === 0) {
+            return false
+          } // If no image was present in the collection, bail.
+
+          const imageUploadHandlerValue = r.getValue(imageUploadHandler)
+
+          Promise.all(cbPayload.map((file) => imageUploadHandlerValue(file.getAsFile()!)))
+            .then((urls) => {
+              urls.forEach((url) => {
+                r.pub(insertImage, url)
+              })
+            })
+            .catch((e) => {
+              throw e
+            })
+          return true
+        },
+        COMMAND_PRIORITY_CRITICAL
+      )
+    })
+
+    return {
+      imageUploadHandler,
+      insertImage
+    }
+  },
+  [coreSystem]
+)
+
+interface ImagePluginParams {
+  imageUploadHandler: (image: File) => Promise<string>
 }
+
+export const [imagePlugin] = realmPlugin({
+  systemSpec: imageSystem,
+
+  applyParamsToSystem: (realm, params: ImagePluginParams) => {
+    realm.pubKey('imageUploadHandler', params.imageUploadHandler)
+  },
+
+  init: (realm) => {
+    realm.pubKey('addImportVisitor', MdastImageVisitor)
+    realm.pubKey('addLexicalNode', ImageNode)
+    realm.pubKey('addExportVisitor', LexicalImageVisitor)
+  }
+})
+
+export type InsertImagePayload = Readonly<CreateImageNodeOptions>
+
+const getDOMSelection = (targetWindow: Window | null): Selection | null => (CAN_USE_DOM ? (targetWindow || window).getSelection() : null)
+
+export const INSERT_IMAGE_COMMAND: LexicalCommand<InsertImagePayload> = createCommand('INSERT_IMAGE_COMMAND')
 
 const TRANSPARENT_IMAGE = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
 

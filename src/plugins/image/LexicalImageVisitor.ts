@@ -1,6 +1,6 @@
 import * as Mdast from 'mdast'
-import { $isImageNode, ImageNode } from '../nodes'
-import { LexicalExportVisitor } from './exportMarkdownFromLexical'
+import { LexicalExportVisitor } from '../../export/exportMarkdownFromLexical'
+import { ImageNode, $isImageNode } from './ImageNode'
 
 export const LexicalImageVisitor: LexicalExportVisitor<ImageNode, Mdast.Image> = {
   testLexicalNode: $isImageNode,

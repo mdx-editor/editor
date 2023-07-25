@@ -51,7 +51,6 @@ import {
   ToolbarSeparator
 } from './ToolbarPlugin/toolbarComponents'
 import styles from './styles.module.css'
-import { ImagesPlugin } from './ImagesPlugin'
 import { CustomLeafDirectiveEditor } from '../types/NodeDecoratorsProps'
 
 /**
@@ -175,8 +174,6 @@ const LazyCodeBlockEditor = React.lazy(() =>
   import('./NodeDecorators/CodeBlockEditor').then((module) => ({ default: module.CodeBlockEditor }))
 )
 
-const LazyImageEditor = React.lazy(() => import('./NodeDecorators/ImageEditor').then((module) => ({ default: module.ImageEditor })))
-
 const LazyLeafDirectiveEditor = React.lazy(() =>
   import('./NodeDecorators/LeafDirectiveEditor').then((module) => ({ default: module.LeafDirectiveEditor }))
 )
@@ -186,7 +183,6 @@ const defaultNodeDecorators: NodeDecoratorComponents = {
   JsxEditor: LazyJsxEditor,
   SandpackEditor: LazySandpackEditor,
   CodeBlockEditor: LazyCodeBlockEditor,
-  ImageEditor: LazyImageEditor,
   LeafDirectiveEditor: LazyLeafDirectiveEditor
 }
 
@@ -397,7 +393,6 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>(
             <TabIndentationPlugin />
             <LinkDialogPlugin />
             <SharedHistoryPlugin />
-            <ImagesPlugin />
             <PatchedMarkdownShortcutPlugin />
             <MDXMethods mdxRef={ref} />
           </EditorSystemComponent>

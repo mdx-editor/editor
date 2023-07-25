@@ -7,12 +7,10 @@ import {
   REMOVE_LIST_COMMAND
 } from '@lexical/list'
 import { $isHeadingNode } from '@lexical/rich-text'
-import { $findMatchingParent, $getNearestNodeOfType, $wrapNodeInElement } from '@lexical/utils'
+import { $findMatchingParent, $getNearestNodeOfType } from '@lexical/utils'
 import {
-  $createParagraphNode,
   $getRoot,
   $getSelection,
-  $insertNodes,
   $isRangeSelection,
   $isRootOrShadowRoot,
   BLUR_COMMAND,
@@ -29,12 +27,11 @@ import {
   TextFormatType
 } from 'lexical'
 import { system } from '../gurx'
-import { $createFrontmatterNode, $createImageNode, $isAdmonitionNode, $isFrontmatterNode, AdmonitionKind } from '../nodes'
+import { $createFrontmatterNode, $isAdmonitionNode, $isFrontmatterNode, AdmonitionKind } from '../nodes'
 import { BlockType, HeadingType } from '../ui/ToolbarPlugin/BlockTypeSelect'
 import { formatAdmonition, formatHeading, formatParagraph, formatQuote } from '../ui/ToolbarPlugin/BlockTypeSelect/blockFormatters'
 import { INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontalRuleNode'
 import { ActiveEditorType } from '../types/ActiveEditorType'
-import * as Mdast from 'mdast'
 import { createEmptyHistoryState } from '@lexical/react/LexicalHistoryPlugin'
 import { MarkdownParseOptions } from '../import'
 import { ExportMarkdownFromLexicalOptions } from '../export/exportMarkdownFromLexical'
@@ -52,17 +49,6 @@ const ListTypeCommandMap = new Map<ListType | '', LexicalCommand<void>>([
 
 type EditorSubscription = (activeEditor: LexicalEditor, rootEditor: LexicalEditor) => () => void
 
-function seedTable(): Mdast.Table {
-  return {
-    type: 'table',
-    children: [
-      {
-        type: 'tableRow',
-        children: [{ type: 'tableCell', children: [] }]
-      }
-    ]
-  }
-}
 export const EditorSystem = system((r) => {
   const editor = r.node<LexicalEditor | null>(null, true)
   const markdownSource = r.node('')
@@ -133,16 +119,6 @@ export const EditorSystem = system((r) => {
 
   r.sub(r.pipe(insertHorizontalRule, r.o.withLatestFrom(activeEditor)), ([, theEditor]) => {
     theEditor?.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, undefined)
-  })
-
-  r.sub(r.pipe(insertImage, r.o.withLatestFrom(activeEditor)), ([src, theEditor]) => {
-    theEditor?.update(() => {
-      const imageNode = $createImageNode({ altText: '', src, title: '' })
-      $insertNodes([imageNode])
-      if ($isRootOrShadowRoot(imageNode.getParentOrThrow())) {
-        $wrapNodeInElement(imageNode, $createParagraphNode).selectEnd()
-      }
-    })
   })
 
   r.sub(r.pipe(insertFrontmatter, r.o.withLatestFrom(activeEditor)), ([, theEditor]) => {
