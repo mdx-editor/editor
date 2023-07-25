@@ -1,6 +1,6 @@
 import { DecoratorNode, EditorConfig, LexicalEditor, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
 import React from 'react'
-import { ExtendedEditorConfig } from '../types/ExtendedEditorConfig'
+import { FrontmatterEditor } from './FrontmatterEditor'
 
 /**
  * A serialized representation of an {@link FrontmatterNode}.
@@ -66,14 +66,7 @@ export class FrontmatterNode extends DecoratorNode<JSX.Element> {
     }
   }
 
-  decorate(
-    editor: LexicalEditor,
-    {
-      theme: {
-        nodeDecoratorComponents: { FrontmatterEditor }
-      }
-    }: ExtendedEditorConfig
-  ): JSX.Element {
+  decorate(editor: LexicalEditor): JSX.Element {
     return (
       <FrontmatterEditor
         yaml={this.getYaml()}

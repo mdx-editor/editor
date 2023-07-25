@@ -1,14 +1,18 @@
 import YamlParser from 'js-yaml'
 import React from 'react'
-import { FrontmatterEditorProps } from '../../types/NodeDecoratorsProps'
 import { useForm, useFieldArray } from 'react-hook-form'
-import ArrowRight from './icons/arrow_right.svg'
-import ArrowDown from './icons/arrow_drop_down.svg'
-import DeleteIcon from './icons/delete.svg'
+import ArrowRight from '../../ui/icons/arrow_right.svg'
+import ArrowDown from '../../ui/icons/arrow_drop_down.svg'
+import DeleteIcon from '../../ui/icons/delete.svg'
 import classNames from 'classnames'
-import styles from '../styles.module.css'
+import styles from '../../ui/styles.module.css'
 
 type YamlConfig = { key: string; value: string }[]
+
+export interface FrontmatterEditorProps {
+  yaml: string
+  onChange: (yaml: string) => void
+}
 
 export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) => {
   const [expanded, setExpanded] = React.useState(true)

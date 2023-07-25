@@ -1,15 +1,8 @@
 import { EditorConfig } from 'lexical'
-import {
-  FrontmatterEditorProps,
-  JsxEditorProps,
-  SandpackEditorProps,
-  CodeBlockEditorProps,
-  LeafDirectiveEditorProps
-} from './NodeDecoratorsProps'
+import { JsxEditorProps, SandpackEditorProps, CodeBlockEditorProps, LeafDirectiveEditorProps } from './NodeDecoratorsProps'
 import { LeafDirective } from 'mdast-util-directive'
 
 export interface NodeDecoratorComponents {
-  FrontmatterEditor: React.FC<FrontmatterEditorProps>
   JsxEditor: React.FC<JsxEditorProps>
   SandpackEditor: React.FC<SandpackEditorProps>
   CodeBlockEditor: React.FC<CodeBlockEditorProps>

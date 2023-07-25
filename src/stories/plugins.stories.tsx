@@ -12,6 +12,7 @@ import { listsPlugin } from '../plugins/lists/realmPlugin'
 import { tablePlugin } from '../plugins/table/realmPlugin'
 import { linkPlugin } from '../plugins/link/realmPlugin'
 import { imagePlugin } from '../plugins/image/realmPlugin'
+import { frontmatterPlugin } from '../plugins/frontmatter/realmPlugin'
 
 export function Core() {
   const ref = React.useRef<MDXEditorMethods>(null)
@@ -107,6 +108,21 @@ export function Link() {
 export function Images() {
   // eslint-disable-next-line @typescript-eslint/require-await
   return (
-    <MDXEditorCore markdown={imageMarkdown} plugins={[imagePlugin({ imageUploadHandler: async () => 'https://picsum.photos/200/300' })]} />
+    <MDXEditorCore
+      markdown={imageMarkdown}
+      plugins={[imagePlugin({ imageUploadHandler: async () => Promise.resolve('https://picsum.photos/200/300') })]}
+    />
   )
+}
+
+const frontmatterMarkdown = `
+---
+hello: world
+---
+
+this is a cool markdown
+`
+
+export function Frontmatter() {
+  return <MDXEditorCore markdown={frontmatterMarkdown} plugins={[frontmatterPlugin()]} />
 }

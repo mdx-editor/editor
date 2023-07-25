@@ -2,6 +2,7 @@ import { LexicalLinebreakVisitor } from '../plugins/core/LexicalLinebreakVisitor
 import { LexicalParagraphVisitor } from '../plugins/core/LexicalParagraphVisitor'
 import { LexicalRootVisitor } from '../plugins/core/LexicalRootVisitor'
 import { LexicalTextVisitor } from '../plugins/core/LexicalTextVisitor'
+import { LexicalFrontmatterVisitor } from '../plugins/frontmatter/LexicalFrontmatterVisitor'
 import { LexicalHeadingVisitor } from '../plugins/headings/LexicalHeadingVisitor'
 import { LexicalImageVisitor } from '../plugins/image/LexicalImageVisitor'
 import { LexicalLinkVisitor } from '../plugins/link/LexicalLinkVisitor'
@@ -13,7 +14,6 @@ import { LexicalThematicBreakVisitor } from '../plugins/thematic-break/LexicalTh
 import { AdmonitionVisitor } from './AdmonitionVisitor'
 import { CodeBlockVisitor } from './CodeBlockVisitor'
 import { JsxVisitor } from './JsxVisitor'
-import { LexicalFrontmatterVisitor } from './LexicalFrontmatterVisitor'
 import { LexicalLeafDirectiveVisitor } from './LexicalLeafDirectiveVisitor'
 import { SandpackNodeVisitor } from './SandpackNodeVisitor'
 

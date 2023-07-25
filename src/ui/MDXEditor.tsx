@@ -160,10 +160,6 @@ export interface MDXEditorProps {
   customLeafDirectiveEditors?: CustomLeafDirectiveEditor<any>[]
 }
 
-const LazyFrontmatterEditor = React.lazy(() =>
-  import('./NodeDecorators/FrontmatterEditor').then((module) => ({ default: module.FrontmatterEditor }))
-)
-
 const LazyJsxEditor = React.lazy(() => import('./NodeDecorators/JsxEditor').then((module) => ({ default: module.JsxEditor })))
 
 const LazySandpackEditor = React.lazy(() =>
@@ -179,7 +175,6 @@ const LazyLeafDirectiveEditor = React.lazy(() =>
 )
 
 const defaultNodeDecorators: NodeDecoratorComponents = {
-  FrontmatterEditor: LazyFrontmatterEditor,
   JsxEditor: LazyJsxEditor,
   SandpackEditor: LazySandpackEditor,
   CodeBlockEditor: LazyCodeBlockEditor,

@@ -4,11 +4,6 @@ import { MdxJsxAttribute } from 'mdast-util-mdx-jsx'
 import { LeafDirectiveNode } from '../nodes/LeafDirectiveNode'
 import { LeafDirective } from 'mdast-util-directive'
 
-export interface FrontmatterEditorProps {
-  yaml: string
-  onChange: (yaml: string) => void
-}
-
 export type JsxKind = 'text' | 'flow'
 
 export interface JsxEditorProps {

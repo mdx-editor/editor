@@ -27,7 +27,7 @@ import {
   TextFormatType
 } from 'lexical'
 import { system } from '../gurx'
-import { $createFrontmatterNode, $isAdmonitionNode, $isFrontmatterNode, AdmonitionKind } from '../nodes'
+import { $isAdmonitionNode, AdmonitionKind } from '../nodes'
 import { BlockType, HeadingType } from '../ui/ToolbarPlugin/BlockTypeSelect'
 import { formatAdmonition, formatHeading, formatParagraph, formatQuote } from '../ui/ToolbarPlugin/BlockTypeSelect/blockFormatters'
 import { INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontalRuleNode'
@@ -119,20 +119,6 @@ export const EditorSystem = system((r) => {
 
   r.sub(r.pipe(insertHorizontalRule, r.o.withLatestFrom(activeEditor)), ([, theEditor]) => {
     theEditor?.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, undefined)
-  })
-
-  r.sub(r.pipe(insertFrontmatter, r.o.withLatestFrom(activeEditor)), ([, theEditor]) => {
-    theEditor?.update(() => {
-      const firstItem = $getRoot().getFirstChild()
-      if (!$isFrontmatterNode(firstItem)) {
-        const fmNode = $createFrontmatterNode('"": ""')
-        if (firstItem) {
-          firstItem.insertBefore(fmNode)
-        } else {
-          $getRoot().append(fmNode)
-        }
-      }
-    })
   })
 
   r.sub(r.pipe(applyBlockType, r.o.withLatestFrom(activeEditor)), ([type, theEditor]) => {
