@@ -22,8 +22,6 @@ import { MdastFrontmatterVisitor } from './MdastFrontmatterVisitor'
 import { MdastImageVisitor } from './MdastImageVisitor'
 import { MdastLeafDirectiveVisitor } from './MdastLeafDirectiveVisitor'
 import { MdastLinkVisitor } from './MdastLinkVisitor'
-import { MdastListItemVisitor } from './MdastListItemVisitor'
-import { MdastListVisitor } from './MdastListVisitor'
 import { MdastParagraphVisitor } from '../plugins/core/MdastParagraphVisitor'
 import { MdastRootVisitor } from '../plugins/core/MdastRootVisitor'
 import { MdastTableVisitor } from './MdastTableVisitor'
@@ -34,6 +32,8 @@ import { MdastMdxJsxElementVisitor } from '../plugins/jsx/MdastMdxJsxElementVisi
 import { MdastInlineCodeVisitor } from '../plugins/core/MdastInlineCodeVisitor'
 import { MdastHeadingVisitor } from '../plugins/headings/MdastHeadingVisitor'
 import { MdastThematicBreakVisitor } from '../plugins/thematic-break/MdastThematicBreakVisitor'
+import { MdastListItemVisitor } from '../plugins/lists/MdastListItemVisitor'
+import { MdastListVisitor } from '../plugins/lists/MdastListVisitor'
 
 export type {
   MarkdownParseOptions,

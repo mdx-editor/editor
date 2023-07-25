@@ -6,6 +6,7 @@ import { JsxComponentDescriptor } from '../types/JsxComponentDescriptors'
 import { GenericJsxEditor } from '../jsx-editors/GenericJsxEditor'
 import { headingsPlugin } from '../plugins/headings/realmPlugin'
 import { thematicBreakPlugin, thematicBreakSystem } from '../plugins/thematic-break/realmPlugin'
+import { listsPlugin } from '../plugins/lists/realmPlugin'
 
 export function Core() {
   const ref = React.useRef<MDXEditorMethods>(null)
@@ -64,6 +65,7 @@ export function Jsx() {
 export function Headings() {
   return <MDXEditorCore markdown="# hello world" plugins={[headingsPlugin()]} />
 }
+
 const breakMarkdown = `hello 
 
 ----------------
@@ -72,4 +74,19 @@ world`
 
 export function ThematicBreaks() {
   return <MDXEditorCore markdown={breakMarkdown} plugins={[thematicBreakPlugin()]} />
+}
+
+const listsMarkdown = `
+* hello
+* world
+  * indented
+  * more
+* back
+
+1. more
+2. more
+`
+
+export function Lists() {
+  return <MDXEditorCore markdown={listsMarkdown} plugins={[listsPlugin()]} />
 }
