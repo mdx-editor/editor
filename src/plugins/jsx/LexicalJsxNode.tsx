@@ -2,10 +2,8 @@ import React from 'react'
 import type { LexicalEditor, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
 
 import { DecoratorNode } from 'lexical'
-import { MdxJsxTextElement, MdxJsxFlowElement } from 'mdast-util-mdx'
-import { JsxEditor } from './JsxEditor'
-
-export type MdastJsx = MdxJsxTextElement | MdxJsxFlowElement
+import { JsxEditorContainer } from './JsxEditorContainer'
+import { MdastJsx } from '../../types/JsxComponentDescriptors'
 
 /**
  * A serialized representation of an {@link LexicalJsxNode}.
@@ -67,7 +65,7 @@ export class LexicalJsxNode extends DecoratorNode<JSX.Element> {
   }
 
   decorate(parentEditor: LexicalEditor): JSX.Element {
-    return <JsxEditor lexicalJsxNode={this} mdastNode={this.getMdastNode()} parentEditor={parentEditor} />
+    return <JsxEditorContainer lexicalJsxNode={this} mdastNode={this.getMdastNode()} parentEditor={parentEditor} />
   }
 
   isInline(): boolean {

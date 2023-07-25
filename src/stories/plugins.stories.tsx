@@ -3,6 +3,7 @@ import { MDXEditorCore, MDXEditorMethods } from '../MDXEditorCore'
 import jsxMarkdown from './assets/jsx.md?raw'
 import { jsxPlugin } from '../plugins/jsx/realmPlugin'
 import { JsxComponentDescriptor } from '../types/JsxComponentDescriptors'
+import { GenericJsxEditor } from '../jsx-editors/GenericJsxEditor'
 
 export function Core() {
   const ref = React.useRef<MDXEditorMethods>(null)
@@ -25,21 +26,24 @@ const jsxComponentDescriptors: JsxComponentDescriptor[] = [
       { name: 'foo', type: 'string' },
       { name: 'bar', type: 'string' }
     ],
-    hasChildren: true
+    hasChildren: true,
+    Editor: GenericJsxEditor
   },
   {
     name: 'Marker',
     kind: 'text',
     source: './external',
     props: [{ name: 'type', type: 'string' }],
-    hasChildren: false
+    hasChildren: false,
+    Editor: GenericJsxEditor
   },
   {
     name: 'BlockNode',
     kind: 'flow',
     source: './external',
     props: [],
-    hasChildren: true
+    hasChildren: true,
+    Editor: GenericJsxEditor
   }
 ]
 

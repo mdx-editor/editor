@@ -1,3 +1,9 @@
+import { LexicalEditor } from 'lexical'
+import type { MdxJsxTextElement, MdxJsxFlowElement } from 'mdast-util-mdx-jsx'
+import React from 'react'
+
+export type MdastJsx = MdxJsxTextElement | MdxJsxFlowElement
+
 /**
  * Defines the structure of a JSX component property.
  */
@@ -44,4 +50,18 @@ export interface JsxComponentDescriptor {
    * Wether or not the component has children
    */
   hasChildren?: boolean
+
+  /**
+   * The editor to use for editing the component
+   */
+  Editor: React.ComponentType<JsxEditorProps>
+}
+
+/**
+ * The properties passed to a JSX Editor component.
+ */
+export interface JsxEditorProps {
+  /** The MDAST node to edit */
+  mdastNode: MdastJsx
+  descriptor: JsxComponentDescriptor
 }

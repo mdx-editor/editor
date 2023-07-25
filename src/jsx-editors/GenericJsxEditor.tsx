@@ -2,72 +2,45 @@
 import * as RadixPopover from '@radix-ui/react-popover'
 import { MdxJsxAttribute, MdxJsxFlowElement, MdxJsxTextElement } from 'mdast-util-mdx-jsx'
 import React from 'react'
-// import ExtensionIcon from '../../ui/icons/extension.svg'
-import { LexicalEditor } from 'lexical'
-import { NestedLexicalEditor, NestedEditorsContext, useMdastNodeUpdater, useNestedEditorContext } from '../core/NestedLexicalEditor'
+import { NestedLexicalEditor, useMdastNodeUpdater } from '../plugins/core/NestedLexicalEditor'
 import { PhrasingContent } from 'mdast'
 import { useForm } from 'react-hook-form'
-import SettingsIcon from '../../ui/icons/settings.svg'
-import { jsxPluginHooks } from './realmPlugin'
-import { MdastJsx } from './LexicalJsxNode'
-import styles from '../../ui/styles.module.css'
-import { PopoverPortal, PopoverContent } from '../core/ui/PopoverUtils'
+import styles from '../ui/styles.module.css'
+import { PopoverPortal, PopoverContent } from '../plugins/core/ui/PopoverUtils'
+import { JsxComponentDescriptor, JsxEditorProps, MdastJsx } from '../types/JsxComponentDescriptors'
+import SettingsIcon from '../ui/icons/settings.svg'
 
-function useJsxDescriptor(mdastNode: MdastJsx) {
-  const [jsxComponentDescriptors] = jsxPluginHooks.useEmitterValues('jsxComponentDescriptors')
-  return jsxComponentDescriptors.find((descriptor) => descriptor.name === mdastNode.name)!
-}
-
-export interface JsxEditorProps {
-  /** The Lexical editor that contains the node */
-  parentEditor: LexicalEditor
-  /** The Lexical node that is being edited */
-  lexicalJsxNode: {
-    setMdastNode: (mdastNode: MdxJsxTextElement | MdxJsxFlowElement) => void
-  }
-  /** The MDAST node that is being edited */
-  mdastNode: MdxJsxTextElement | MdxJsxFlowElement
-}
-
-export function JsxEditor(props: JsxEditorProps) {
-  const { mdastNode } = props
-  const descriptor = useJsxDescriptor(mdastNode)
-
+export const GenericJsxEditor: React.FC<JsxEditorProps> = ({ mdastNode, descriptor }) => {
   return (
-    <NestedEditorsContext.Provider
-      value={{
-        mdastNode: mdastNode,
-        parentEditor: props.parentEditor,
-        lexicalNode: props.lexicalJsxNode
-      }}
-    >
-      <div className={descriptor.kind === 'text' ? styles.inlineEditor : styles.blockEditor}>
-        {descriptor.props.length == 0 && descriptor.hasChildren && descriptor.kind === 'flow' ? (
-          <span className={styles.jsxComponentTitle}>{mdastNode.name}</span>
-        ) : null}
+    <div className={descriptor.kind === 'text' ? styles.inlineEditor : styles.blockEditor}>
+      {descriptor.props.length == 0 && descriptor.hasChildren && descriptor.kind === 'flow' ? (
+        <span className={styles.jsxComponentTitle}>{mdastNode.name}</span>
+      ) : null}
 
-        {descriptor.props.length > 0 ? <PropertyPopover /> : null}
-        {descriptor.hasChildren ? (
-          <NestedLexicalEditor<MdxJsxTextElement | MdxJsxFlowElement>
-            block={descriptor.kind === 'flow'}
-            getContent={(node) => node.children as PhrasingContent[]}
-            getUpdatedMdastNode={(mdastNode, children) => {
-              return { ...mdastNode, children } as any
-            }}
-          />
-        ) : (
-          <span className={styles.jsxComponentTitle}>{mdastNode.name}</span>
-        )}
-      </div>
-    </NestedEditorsContext.Provider>
+      {descriptor.props.length > 0 ? <PropertyPopover descriptor={descriptor} mdastNode={mdastNode} /> : null}
+      {descriptor.hasChildren ? (
+        <NestedLexicalEditor<MdxJsxTextElement | MdxJsxFlowElement>
+          block={descriptor.kind === 'flow'}
+          getContent={(node) => node.children as PhrasingContent[]}
+          getUpdatedMdastNode={(mdastNode, children) => {
+            return { ...mdastNode, children } as any
+          }}
+        />
+      ) : (
+        <span className={styles.jsxComponentTitle}>{mdastNode.name}</span>
+      )}
+    </div>
   )
 }
 
-const PropertyPopover: React.FC = () => {
+interface PropertyPopoverProps {
+  descriptor: JsxComponentDescriptor
+  mdastNode: MdastJsx
+}
+
+const PropertyPopover: React.FC<PropertyPopoverProps> = ({ mdastNode, descriptor }) => {
   const [open, setOpen] = React.useState(false)
-  const mdastNode = useNestedEditorContext<MdastJsx>().mdastNode
   const updateMdastNode = useMdastNodeUpdater()
-  const descriptor = useJsxDescriptor(mdastNode)
 
   const defaultValues = React.useMemo(() => {
     return descriptor.props.reduce((acc, descriptor) => {
