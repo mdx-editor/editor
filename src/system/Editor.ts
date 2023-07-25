@@ -7,7 +7,7 @@ import {
   REMOVE_LIST_COMMAND
 } from '@lexical/list'
 import { $isHeadingNode } from '@lexical/rich-text'
-import { $findMatchingParent, $getNearestNodeOfType, $insertNodeToNearestRoot, $wrapNodeInElement } from '@lexical/utils'
+import { $findMatchingParent, $getNearestNodeOfType, $wrapNodeInElement } from '@lexical/utils'
 import {
   $createParagraphNode,
   $getRoot,
@@ -34,7 +34,6 @@ import { BlockType, HeadingType } from '../ui/ToolbarPlugin/BlockTypeSelect'
 import { formatAdmonition, formatHeading, formatParagraph, formatQuote } from '../ui/ToolbarPlugin/BlockTypeSelect/blockFormatters'
 import { INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontalRuleNode'
 import { ActiveEditorType } from '../types/ActiveEditorType'
-import { $createTableNode } from '../nodes'
 import * as Mdast from 'mdast'
 import { createEmptyHistoryState } from '@lexical/react/LexicalHistoryPlugin'
 import { MarkdownParseOptions } from '../import'
@@ -155,26 +154,6 @@ export const EditorSystem = system((r) => {
           firstItem.insertBefore(fmNode)
         } else {
           $getRoot().append(fmNode)
-        }
-      }
-    })
-  })
-
-  r.sub(r.pipe(insertTable, r.o.withLatestFrom(activeEditor)), ([, theEditor]) => {
-    theEditor?.getEditorState().read(() => {
-      const selection = $getSelection()
-
-      if ($isRangeSelection(selection)) {
-        const focusNode = selection.focus.getNode()
-
-        if (focusNode !== null) {
-          theEditor.update(() => {
-            const tableNode = $createTableNode(seedTable())
-            $insertNodeToNearestRoot(tableNode)
-            setTimeout(() => {
-              tableNode.select([0, 0])
-            }, 50)
-          })
         }
       }
     })

@@ -3,6 +3,7 @@ import React from 'react'
 import { SandpackConfig, MDXEditor, JsxComponentDescriptor } from '../index'
 import dataCode from './assets/dataCode.ts?raw'
 import { ViewMode } from '../types/ViewMode'
+import { GenericJsxEditor } from '../jsx-editors/GenericJsxEditor'
 
 const defaultSnippetContent = `
 export default function App() {
@@ -55,13 +56,15 @@ export const jsxDescriptors: JsxComponentDescriptor[] = [
     props: [
       { name: 'foo', type: 'string' },
       { name: 'bar', type: 'string' }
-    ]
+    ],
+    Editor: GenericJsxEditor
   },
   {
     name: 'BlockNode',
     kind: 'flow',
     source: './external',
-    props: []
+    props: [],
+    Editor: GenericJsxEditor
   }
 ]
 

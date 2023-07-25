@@ -1,6 +1,6 @@
 import { $createQuoteNode } from '@lexical/rich-text'
 import * as Mdast from 'mdast'
-import { MdastImportVisitor } from './importMarkdownToLexical'
+import { MdastImportVisitor } from '../../import'
 
 export const MdastBlockQuoteVisitor: MdastImportVisitor<Mdast.Blockquote> = {
   testNode: 'blockquote',

@@ -9,6 +9,7 @@ import { headingsPlugin } from '../plugins/headings/realmPlugin'
 import { thematicBreakPlugin } from '../plugins/thematic-break/realmPlugin'
 import { listsPlugin } from '../plugins/lists/realmPlugin'
 import { tablePlugin } from '../plugins/table/realmPlugin'
+import { linkPlugin } from '../plugins/link/realmPlugin'
 
 export function Core() {
   const ref = React.useRef<MDXEditorMethods>(null)
@@ -95,4 +96,8 @@ export function Lists() {
 
 export function Table() {
   return <MDXEditorCore markdown={tableMarkdown} plugins={[tablePlugin()]} />
+}
+
+export function Link() {
+  return <MDXEditorCore markdown={'some [hello](https://google.com) link'} plugins={[linkPlugin()]} />
 }
