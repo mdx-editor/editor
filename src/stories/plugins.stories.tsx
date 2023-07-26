@@ -18,6 +18,7 @@ import { CodeBlockEditorDescriptor, codeBlockPlugin } from '../plugins/codeblock
 import { useCodeBlockEditorContext } from '../plugins/codeblock/CodeBlockEditorContainer'
 import { virtuosoSampleSandpackConfig } from './boilerplate'
 import { sandpackPlugin } from '../plugins/sandpack/realmPlugin'
+import { codeMirrorPlugin } from '../plugins/codemirror/realmPlugin'
 
 export function Core() {
   const ref = React.useRef<MDXEditorMethods>(null)
@@ -153,7 +154,8 @@ export function CodeBlock() {
       markdown={codeBlocksMarkdown}
       plugins={[
         codeBlockPlugin({ codeBlockEditorDescriptors: [PlainTextCodeEditorDescriptor] }),
-        sandpackPlugin({ sandpackConfig: virtuosoSampleSandpackConfig })
+        sandpackPlugin({ sandpackConfig: virtuosoSampleSandpackConfig }),
+        codeMirrorPlugin({ codeBlockLanguages: { js: 'JavaScript', css: 'CSS' } })
       ]}
     />
   )

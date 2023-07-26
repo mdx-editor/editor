@@ -13,7 +13,7 @@ import { directive } from 'micromark-extension-directive'
 import { frontmatter } from 'micromark-extension-frontmatter'
 import { gfmTable } from 'micromark-extension-gfm-table'
 import { mdxjs } from 'micromark-extension-mdxjs'
-import { AdmonitionNode, JsxNode, LeafDirectiveNode } from '../nodes'
+import { AdmonitionNode, LeafDirectiveNode } from '../nodes'
 import { CodeBlockNode } from '../plugins/codeblock/CodeBlockNode'
 import { MdastCodeVisitor } from '../plugins/codeblock/MdastCodeVisitor'
 import { MdastFormattingVisitor } from '../plugins/core/MdastFormattingVisitor'
@@ -38,6 +38,7 @@ import { MdastThematicBreakVisitor } from '../plugins/thematic-break/MdastThemat
 import { MdastAdmonitionVisitor } from './MdastAdmonitionVisitor'
 import { MdastLeafDirectiveVisitor } from './MdastLeafDirectiveVisitor'
 import { MdastExtension, MdastImportVisitor, SyntaxExtension } from './importMarkdownToLexical'
+import { LexicalJsxNode } from '../plugins/jsx/LexicalJsxNode'
 
 export { importMarkdownToLexical, importMdastTreeToLexical } from './importMarkdownToLexical'
 export type {
@@ -101,7 +102,7 @@ export const defaultLexicalNodes: Record<string, Klass<LexicalNode>> = {
   CodeBlockNode,
   FrontmatterNode,
   AdmonitionNode,
-  JsxNode,
+  LexicalJsxNode,
   CodeNode, // this one should not be used, but markdown shortcuts complain about it
   TableNode,
   LeafDirectiveNode

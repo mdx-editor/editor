@@ -95,18 +95,9 @@ const defaultSandpackConfig: SandpackConfig = {
   ]
 }
 
-const defaultCodeBlockLanguages = {
-  js: 'JavaScript',
-  ts: 'TypeScript',
-  tsx: 'TypeScript (React)',
-  jsx: 'JavaScript (React)',
-  css: 'CSS'
-}
-
 export const sandpackSystem = system(
   (r, [, { insertCodeBlock }]) => {
     const sandpackConfig = r.node<SandpackConfig>(defaultSandpackConfig)
-    const codeBlockLanguages = r.node(defaultCodeBlockLanguages)
     const insertSandpack = r.node<string>()
 
     r.link(
@@ -132,9 +123,7 @@ export const sandpackSystem = system(
     )
 
     return {
-      codeBlockLanguages,
       insertSandpack,
-      insertCodeBlock,
       sandpackConfig
     }
   },
