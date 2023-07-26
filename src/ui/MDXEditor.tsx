@@ -14,7 +14,6 @@ import { ToMarkdownExtension, ToMarkdownOptions } from 'mdast-util-mdx'
 import React from 'react'
 import { theme as contentTheme } from '../content/theme'
 import { LexicalConvertOptions, LexicalExportVisitor, defaultExtensions, defaultLexicalVisitors, defaultToMarkdownOptions } from '../export'
-import { FromMarkdownOptions, ParseOptions } from 'mdast-util-from-markdown/lib'
 import {
   MdastExtension,
   MdastImportVisitor,
@@ -52,6 +51,8 @@ import {
 import styles from './styles.module.css'
 import { CustomLeafDirectiveEditor } from '../types/NodeDecoratorsProps'
 import { SandpackConfig } from '../plugins/sandpack/realmPlugin'
+import type { ParseOptions } from 'micromark-util-types'
+import type { MdastExtensions } from '../import/importMarkdownToLexical'
 
 /**
  * Options that control how the the markdown input string is parsed into a tree.
@@ -69,7 +70,7 @@ export interface MarkdownParseOptions {
   /**
    * The mdast extensions to use for the markdown parser. Passed as the `mdastExtensions` option to the `fromMarkdown` function.
    */
-  mdastExtensions?: NonNullable<FromMarkdownOptions['mdastExtensions']>
+  mdastExtensions?: NonNullable<MdastExtensions>
 }
 
 /**
@@ -160,14 +161,11 @@ export interface MDXEditorProps {
   customLeafDirectiveEditors?: CustomLeafDirectiveEditor<any>[]
 }
 
-const LazyJsxEditor = React.lazy(() => import('./NodeDecorators/JsxEditor').then((module) => ({ default: module.JsxEditor })))
-
 const LazyLeafDirectiveEditor = React.lazy(() =>
   import('./NodeDecorators/LeafDirectiveEditor').then((module) => ({ default: module.LeafDirectiveEditor }))
 )
 
 const defaultNodeDecorators: NodeDecoratorComponents = {
-  JsxEditor: LazyJsxEditor,
   LeafDirectiveEditor: LazyLeafDirectiveEditor
 }
 

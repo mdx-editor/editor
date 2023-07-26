@@ -2,9 +2,10 @@
 import { ElementNode, LexicalNode, RootNode as LexicalRootNode } from 'lexical'
 import * as Mdast from 'mdast'
 import { fromMarkdown } from 'mdast-util-from-markdown'
-import { FromMarkdownOptions, ParseOptions } from 'mdast-util-from-markdown/lib'
+import { ParseOptions } from 'micromark-util-types'
 import { IS_BOLD, IS_ITALIC, IS_UNDERLINE } from '../FormatConstants'
 
+export type MdastExtensions = NonNullable<Parameters<typeof fromMarkdown>[1]>['mdastExtensions']
 /**
  * A set of actions that can be used to modify the lexical tree while visiting the mdast tree.
  */
@@ -82,13 +83,13 @@ export interface MdastTreeImportOptions {
 export interface MarkdownParseOptions extends Omit<MdastTreeImportOptions, 'mdastRoot'> {
   markdown: string
   syntaxExtensions: NonNullable<ParseOptions['extensions']>
-  mdastExtensions: NonNullable<FromMarkdownOptions['mdastExtensions']>
+  mdastExtensions: MdastExtensions
 }
 
 /**
  * An extension for the `fromMarkdown` utility tree construction.
  */
-export type MdastExtension = MarkdownParseOptions['mdastExtensions'][number]
+export type MdastExtension = NonNullable<MdastExtensions>[number]
 
 /**
  * An extension for the `fromMarkdown` utility markdown parse.

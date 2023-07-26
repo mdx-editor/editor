@@ -5,4 +5,4 @@ The project is still in its infancy, and I would love to get additional perspect
 
 Bundling is done with Vite, and tests are using Vitest. Ladle is used for examples.
 
-To preview the available examples in the browser, run `pnpm dev`.
+To preview the available examples in the browser, run `npm dev`.

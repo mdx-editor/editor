@@ -304,7 +304,7 @@ export function sysHooks<Sys extends System>() {
 
 type SystemAndDependencies<Spec extends AnySystemSpec> = SystemOfSpecs<[Spec]> & SystemOfSpecs<Spec['dependencies']>
 
-interface RealmPluginParams<Spec extends AnySystemSpec, Params extends object> {
+export interface RealmPluginParams<Spec extends AnySystemSpec, Params extends object> {
   systemSpec: Spec
   applyParamsToSystem?: (realm: TypedRealm<SystemAndDependencies<Spec>>, props: Params) => void
   init?: (realm: TypedRealm<SystemAndDependencies<Spec>>, props: Params) => void

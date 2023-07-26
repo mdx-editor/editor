@@ -1,3 +1,5 @@
+import 'mdast-util-directive'
+import 'mdast-util-mdx-jsx'
 import { CodeBlockVisitor } from '../plugins/codeblock/CodeBlockVisitor'
 import { LexicalLinebreakVisitor } from '../plugins/core/LexicalLinebreakVisitor'
 import { LexicalParagraphVisitor } from '../plugins/core/LexicalParagraphVisitor'
