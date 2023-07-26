@@ -8,12 +8,7 @@ import { MdastMdxJsEsmVisitor } from './MdastMdxJsEsmVisitor'
 import { LexicalJsxNode } from './LexicalJsxNode'
 import { LexicalJsxVisitor } from './LexicalJsxVisitor'
 
-export const jsxSystem = system(
-  (_) => {
-    return {}
-  },
-  [coreSystem]
-)
+export const jsxSystem = system((_) => ({}), [coreSystem])
 
 export interface JsxPluginParams {
   jsxComponentDescriptors: JsxComponentDescriptor[]

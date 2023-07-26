@@ -20,18 +20,6 @@ export interface VoidEmitter {
   subscribe: (callback: () => void) => void
 }
 
-export interface SandpackEditorProps {
-  code: string
-  nodeKey: string
-  meta: string
-  onChange: (code: string) => void
-  focusEmitter: VoidEmitter
-}
-
-export interface CodeBlockEditorProps extends SandpackEditorProps {
-  language: string
-}
-
 export interface LeafDirectiveEditorProps<T extends LeafDirective> {
   /** The Lexical editor that contains the node */
   parentEditor: LexicalEditor

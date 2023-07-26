@@ -3,6 +3,7 @@ import { MDXEditorCore, MDXEditorMethods } from '../MDXEditorCore'
 import jsxMarkdown from './assets/jsx.md?raw'
 import tableMarkdown from './assets/table-markdown.md?raw'
 import imageMarkdown from './assets/image-markdown.md?raw'
+import codeBlocksMarkdown from './assets/code-blocks-markdown.md?raw'
 import { jsxPlugin } from '../plugins/jsx/realmPlugin'
 import { JsxComponentDescriptor } from '../types/JsxComponentDescriptors'
 import { GenericJsxEditor } from '../jsx-editors/GenericJsxEditor'
@@ -13,6 +14,8 @@ import { tablePlugin } from '../plugins/table/realmPlugin'
 import { linkPlugin } from '../plugins/link/realmPlugin'
 import { imagePlugin } from '../plugins/image/realmPlugin'
 import { frontmatterPlugin } from '../plugins/frontmatter/realmPlugin'
+import { CodeBlockEditorDescriptor, codeBlockPlugin } from '../plugins/codeblock/realmPlugin'
+import { useCodeBlockEditorContext } from '../plugins/codeblock/CodeBlockEditorContainer'
 
 export function Core() {
   const ref = React.useRef<MDXEditorMethods>(null)
@@ -125,4 +128,28 @@ this is a cool markdown
 
 export function Frontmatter() {
   return <MDXEditorCore markdown={frontmatterMarkdown} plugins={[frontmatterPlugin()]} />
+}
+
+const PlainTextCodeEditorDescriptor: CodeBlockEditorDescriptor = {
+  match: () => true,
+  priority: 0,
+
+  Editor: (props) => {
+    const up = useCodeBlockEditorContext()
+    return (
+      <div onKeyDown={(e) => e.nativeEvent.stopImmediatePropagation()}>
+        <textarea rows={3} cols={20} defaultValue={props.code} onChange={(e) => up.setCode(e.target.value)} />
+      </div>
+    )
+  }
+}
+
+export function CodeBlock() {
+  return (
+    <MDXEditorCore
+      onChange={(md) => console.log(md)}
+      markdown={codeBlocksMarkdown}
+      plugins={[codeBlockPlugin({ codeBlockEditorDescriptors: [PlainTextCodeEditorDescriptor] })]}
+    />
+  )
 }

@@ -1,7 +1,8 @@
 import { DecoratorNode, EditorConfig, LexicalEditor, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
 import React from 'react'
-import { noop } from '../utils/fp'
-import { ExtendedEditorConfig } from '../types/ExtendedEditorConfig'
+import { noop } from '../../utils/fp'
+import { ExtendedEditorConfig } from '../../types/ExtendedEditorConfig'
+import { CodeBlockEditorContainer } from './CodeBlockEditorContainer'
 
 /**
  * The options necessary to construct a {@link CodeBlockNode}.
@@ -12,13 +13,13 @@ export interface CreateCodeBlockNodeOptions {
    */
   code: string
   /**
-   * The additional meta data of the block.
-   */
-  meta: string
-  /**
    * The language of the code block (i.e. `js`, `jsx`, etc.). This is used for syntax highlighting.
    */
   language: string
+  /**
+   * The additional meta data of the block.
+   */
+  meta: string
 }
 
 /**
@@ -102,44 +103,36 @@ export class CodeBlockNode extends DecoratorNode<JSX.Element> {
     return this.getLatest().__language
   }
 
-  setCode(code: string) {
+  setCode = (code: string) => {
     if (code !== this.__code) {
       this.getWritable().__code = code
     }
   }
 
-  setMeta(meta: string) {
+  setMeta = (meta: string) => {
     if (meta !== this.__meta) {
       this.getWritable().__meta = meta
     }
   }
 
-  setLanguage(language: string) {
+  setLanguage = (language: string) => {
     if (language !== this.__language) {
       this.getWritable().__language = language
     }
   }
 
-  select() {
+  select = () => {
     this.__focusEmitter.publish()
   }
 
-  decorate(
-    _editor: LexicalEditor,
-    {
-      theme: {
-        nodeDecoratorComponents: { CodeBlockEditor }
-      }
-    }: ExtendedEditorConfig
-  ): JSX.Element {
+  decorate(editor: LexicalEditor): JSX.Element {
     return (
-      <CodeBlockEditor
-        nodeKey={this.getKey()}
+      <CodeBlockEditorContainer
+        parentEditor={editor}
         code={this.getCode()}
         meta={this.getMeta()}
         language={this.getLanguage()}
-        onChange={(code) => this.setCode(code)}
-        focusEmitter={this.__focusEmitter}
+        codeBlockNode={this}
       />
     )
   }

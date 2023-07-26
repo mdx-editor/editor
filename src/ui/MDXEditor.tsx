@@ -162,22 +162,12 @@ export interface MDXEditorProps {
 
 const LazyJsxEditor = React.lazy(() => import('./NodeDecorators/JsxEditor').then((module) => ({ default: module.JsxEditor })))
 
-const LazySandpackEditor = React.lazy(() =>
-  import('./NodeDecorators/SandpackEditor').then((module) => ({ default: module.SandpackEditor }))
-)
-
-const LazyCodeBlockEditor = React.lazy(() =>
-  import('./NodeDecorators/CodeBlockEditor').then((module) => ({ default: module.CodeBlockEditor }))
-)
-
 const LazyLeafDirectiveEditor = React.lazy(() =>
   import('./NodeDecorators/LeafDirectiveEditor').then((module) => ({ default: module.LeafDirectiveEditor }))
 )
 
 const defaultNodeDecorators: NodeDecoratorComponents = {
   JsxEditor: LazyJsxEditor,
-  SandpackEditor: LazySandpackEditor,
-  CodeBlockEditor: LazyCodeBlockEditor,
   LeafDirectiveEditor: LazyLeafDirectiveEditor
 }
 

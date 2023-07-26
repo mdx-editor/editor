@@ -1,13 +1,14 @@
-# Block of code:
+Blocks of code
 
-## JS
+JavaScript:
+
 ```js
 export default function App() {
   return <h1>Hello world from a markdown</h1>
 }
 ```
 
-## CSS
+CSS:
 
 ```css
 body {
@@ -15,7 +16,7 @@ body {
 }
 ```
 
-## React sandpack:
+React Sandpack:
 
 ```tsx live react
 export default function App() {
@@ -23,7 +24,7 @@ export default function App() {
 }
 ```
 
-## Virtuoso Sandpack:
+Virtuoso Sandpack:
 
 ```tsx live virtuoso
 import { Virtuoso } from 'react-virtuoso'

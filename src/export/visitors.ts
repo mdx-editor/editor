@@ -1,3 +1,4 @@
+import { CodeBlockVisitor } from '../plugins/codeblock/CodeBlockVisitor'
 import { LexicalLinebreakVisitor } from '../plugins/core/LexicalLinebreakVisitor'
 import { LexicalParagraphVisitor } from '../plugins/core/LexicalParagraphVisitor'
 import { LexicalRootVisitor } from '../plugins/core/LexicalRootVisitor'
@@ -12,10 +13,8 @@ import { LexicalQuoteVisitor } from '../plugins/quote/LexicalQuoteVisitor'
 import { LexicalTableVisitor } from '../plugins/table/LexicalTableVisitor'
 import { LexicalThematicBreakVisitor } from '../plugins/thematic-break/LexicalThematicBreakVisitor'
 import { AdmonitionVisitor } from './AdmonitionVisitor'
-import { CodeBlockVisitor } from './CodeBlockVisitor'
 import { JsxVisitor } from './JsxVisitor'
 import { LexicalLeafDirectiveVisitor } from './LexicalLeafDirectiveVisitor'
-import { SandpackNodeVisitor } from './SandpackNodeVisitor'
 
 export type { Options as ToMarkdownOptions } from 'mdast-util-to-markdown'
 
@@ -30,7 +29,6 @@ export const defaultLexicalVisitors = {
   LexicalListVisitor,
   LexicalListItemVisitor,
   LexicalQuoteVisitor,
-  SandpackNodeVisitor,
   CodeBlockVisitor,
   LexicalThematicBreakVisitor,
   AdmonitionVisitor,

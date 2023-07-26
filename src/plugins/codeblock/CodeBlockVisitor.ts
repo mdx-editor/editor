@@ -1,6 +1,6 @@
 import * as Mdast from 'mdast'
-import { $isCodeBlockNode, CodeBlockNode } from '../nodes'
-import { LexicalExportVisitor } from './exportMarkdownFromLexical'
+import { $isCodeBlockNode, CodeBlockNode } from './CodeBlockNode'
+import { LexicalExportVisitor } from '../../export/exportMarkdownFromLexical'
 
 export const CodeBlockVisitor: LexicalExportVisitor<CodeBlockNode, Mdast.Code> = {
   testLexicalNode: $isCodeBlockNode,
