@@ -1,21 +1,28 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 import React from 'react'
 import { LexicalEditor } from 'lexical'
-import { codeBlockPluginHooks } from './realmPlugin'
+import { CodeBlockEditorProps, codeBlockPluginHooks } from './realmPlugin'
 
-interface CodeBlockOperations {
+export interface CodeBlockOperations {
   setCode: (code: string) => void
   setLanguage: (language: string) => void
   setMeta: (meta: string) => void
 }
 
-const CodeBlockEditorContext = React.createContext<CodeBlockOperations | null>(null)
+export interface CodeBlockEditorContainerProps extends CodeBlockEditorProps {
+  /** The Lexical editor that contains the node */
+  parentEditor: LexicalEditor
+  /** The Lexical node that is being edited */
+  codeBlockNode: CodeBlockOperations
+}
 
-type CodeBlockContextProviderProps = {
+export type CodeBlockContextProviderProps = {
   parentEditor: LexicalEditor
   lexicalNode: CodeBlockOperations
   children: React.ReactNode
 }
+
+const CodeBlockEditorContext = React.createContext<CodeBlockOperations | null>(null)
 
 const CodeBlockEditorContextProvider = ({ parentEditor, lexicalNode, children }: CodeBlockContextProviderProps) => {
   return (
@@ -51,28 +58,24 @@ export function useCodeBlockEditorContext() {
   return context
 }
 
-export interface CodeBlockEditorContainerProps {
-  /** The Lexical editor that contains the node */
-  parentEditor: LexicalEditor
-  /** The Lexical node that is being edited */
-  codeBlockNode: CodeBlockOperations
-  code: string
-  language: string
-  meta: string
-}
-
 export function CodeBlockEditorContainer(props: CodeBlockEditorContainerProps) {
   const [codeBlockEditorDescriptors] = codeBlockPluginHooks.useEmitterValues('codeBlockEditorDescriptors')
-  const descriptor = codeBlockEditorDescriptors.find((descriptor) => descriptor.match(props.language, props.meta))
+
+  const descriptor = codeBlockEditorDescriptors
+    .sort((a, b) => b.priority - a.priority)
+    .find((descriptor) => descriptor.match(props.language || '', props.meta || ''))
+
   if (!descriptor) {
     throw new Error(`No CodeBlockEditor registered for language=${props.language} meta=${props.meta}`)
   }
 
   const Editor = descriptor.Editor
 
+  const { codeBlockNode: _, parentEditor: __, ...restProps } = props
+
   return (
     <CodeBlockEditorContextProvider parentEditor={props.parentEditor} lexicalNode={props.codeBlockNode}>
-      <Editor code={props.code} meta={props.meta} language={props.language} />
+      <Editor {...restProps} />
     </CodeBlockEditorContextProvider>
   )
 }

@@ -1,9 +1,7 @@
 import { DecoratorNode, EditorConfig, LexicalEditor, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
 import React from 'react'
 import { noop } from '../../utils/fp'
-import { ExtendedEditorConfig } from '../../types/ExtendedEditorConfig'
 import { CodeBlockEditorContainer } from './CodeBlockEditorContainer'
-
 /**
  * The options necessary to construct a {@link CodeBlockNode}.
  */
@@ -133,6 +131,8 @@ export class CodeBlockNode extends DecoratorNode<JSX.Element> {
         meta={this.getMeta()}
         language={this.getLanguage()}
         codeBlockNode={this}
+        nodeKey={this.getKey()}
+        focusEmitter={this.__focusEmitter}
       />
     )
   }

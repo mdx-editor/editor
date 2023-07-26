@@ -1,11 +1,6 @@
-import { SandpackProvider, CodeEditor as TheEditorFromSandpack } from '@codesandbox/sandpack-react'
-import React from 'react'
-import { useEmitterValues, usePublisher } from '../../system/EditorSystemComponent'
-import { CodeBlockEditorProps } from '../../types/NodeDecoratorsProps'
-import styles from '../styles.module.css'
-import { useCodeMirrorRef } from './useCodeMirrorRef'
-
-export const CodeBlockEditor = ({ nodeKey, code, language, onChange, focusEmitter }: CodeBlockEditorProps) => {
+export const CodeBlockEditor = () => {
+  return null
+  /*
   const [activeEditor] = useEmitterValues('activeEditor')
   const codeMirrorRef = useCodeMirrorRef(nodeKey, 'codeblock', language)
   const setActiveEditorType = usePublisher('activeEditorType')
@@ -41,4 +36,5 @@ export const CodeBlockEditor = ({ nodeKey, code, language, onChange, focusEmitte
       </SandpackProvider>
     </div>
   )
+  */
 }

@@ -26,7 +26,6 @@ import {
   importMarkdownToLexical
 } from '../import'
 import { EditorSystemComponent, useEmitterValues, usePublisher } from '../system/EditorSystemComponent'
-import { SandpackConfig } from '../system/Sandpack'
 import { NodeDecoratorComponents } from '../types/ExtendedEditorConfig'
 import { JsxComponentDescriptor } from '../types/JsxComponentDescriptors'
 import { ViewMode } from '../types/ViewMode'
@@ -52,6 +51,7 @@ import {
 } from './ToolbarPlugin/toolbarComponents'
 import styles from './styles.module.css'
 import { CustomLeafDirectiveEditor } from '../types/NodeDecoratorsProps'
+import { SandpackConfig } from '../plugins/sandpack/realmPlugin'
 
 /**
  * Options that control how the the markdown input string is parsed into a tree.
@@ -342,7 +342,8 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>(
             markdownSource={markdown}
             headMarkdown={headMarkdown || markdown}
             jsxComponentDescriptors={jsxComponentDescriptors}
-            sandpackConfig={sandpackConfig}
+            // TODO: figure this out
+            //sandpackConfig={sandpackConfig}
             onChange={onChange}
             viewMode={viewMode}
             linkAutocompleteSuggestions={linkAutocompleteSuggestions}

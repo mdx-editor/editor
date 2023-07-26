@@ -26,6 +26,7 @@ import { ImageButton } from './Image'
 import { InstantTooltip } from './InstantTooltip'
 import { SelectButtonTrigger, SelectContent, SelectItem } from './SelectPieces'
 import { DialogButton } from './DialogButton'
+import { SandpackConfig } from '../../plugins/sandpack/realmPlugin'
 
 export { BlockTypeSelect } from './BlockTypeSelect'
 export { ImageButton } from './Image'
@@ -176,7 +177,10 @@ export const TableButton: React.FC = () => {
 }
 
 export const CodeBlockButton: React.FC = () => {
-  const insertCodeBlock = usePublisher('insertCodeBlock')
+  //TODO
+  const insertCodeBlock = () => {
+    throw new Error('')
+  }
 
   return (
     <ToolbarButton title="Insert code block" onClick={insertCodeBlock.bind(null, true)}>
@@ -195,8 +199,14 @@ export const HorizontalRuleButton: React.FC = () => {
 }
 
 export const SandpackButton: React.FC = () => {
-  const insertSandpack = usePublisher('insertSandpack')
-  const [sandpackConfig] = useEmitterValues('sandpackConfig')
+  // TODO:
+  const insertSandpack = () => {
+    throw new Error('')
+  }
+  // TODO:
+  // const [sandpackConfig] = useEmitterValues('sandpackConfig')
+  const sandpackConfig: SandpackConfig = { defaultPreset: '', presets: [] }
+
   return (
     <>
       {sandpackConfig.presets.length === 1 ? (

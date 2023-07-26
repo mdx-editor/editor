@@ -4,8 +4,8 @@
  *
  * @packageDocumentation
  */
-export type { SandpackConfig, SandpackPreset } from './system/Sandpack'
 export type * from './types/JsxComponentDescriptors'
+export type { SandpackConfig, SandpackPreset } from './plugins/sandpack/realmPlugin'
 export type { MdastTreeImportOptions, MdastVisitActions, MdastVisitParams, MdastImportVisitor } from './import'
 export type { ToMarkdownOptions, LexicalVisitActions, LexicalNodeVisitParams, LexicalExportVisitor, LexicalConvertOptions } from './export'
 export type { NestedEditorProps } from './ui/NodeDecorators/NestedEditor'

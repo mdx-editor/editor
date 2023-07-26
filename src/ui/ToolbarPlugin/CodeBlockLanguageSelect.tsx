@@ -4,12 +4,13 @@ import { SelectItem, SelectTrigger, SelectContent } from './SelectPieces'
 import { useEmitterValues } from '../../system/EditorSystemComponent'
 import { $getNodeByKey } from 'lexical'
 import { CodeBlockEditorType } from '../../types/ActiveEditorType'
-import { CodeBlockNode } from '../../nodes'
+import { CodeBlockNode } from '../../plugins/codeblock/CodeBlockNode'
 import styles from '../styles.module.css'
 
 export function CodeBlockLanguageSelect() {
-  const [activeEditorType, activeEditor, codeBlockLanguages] = useEmitterValues('activeEditorType', 'activeEditor', 'codeBlockLanguages')
+  const [activeEditorType, activeEditor] = useEmitterValues('activeEditorType', 'activeEditor')
 
+  const codeBlockLanguages = ['css', 'js']
   const nodeLanguage = React.useMemo(() => {
     let language!: string
     activeEditor!.getEditorState().read(() => {

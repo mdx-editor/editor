@@ -16,6 +16,8 @@ import { imagePlugin } from '../plugins/image/realmPlugin'
 import { frontmatterPlugin } from '../plugins/frontmatter/realmPlugin'
 import { CodeBlockEditorDescriptor, codeBlockPlugin } from '../plugins/codeblock/realmPlugin'
 import { useCodeBlockEditorContext } from '../plugins/codeblock/CodeBlockEditorContainer'
+import { virtuosoSampleSandpackConfig } from './boilerplate'
+import { sandpackPlugin } from '../plugins/sandpack/realmPlugin'
 
 export function Core() {
   const ref = React.useRef<MDXEditorMethods>(null)
@@ -149,7 +151,10 @@ export function CodeBlock() {
     <MDXEditorCore
       onChange={(md) => console.log(md)}
       markdown={codeBlocksMarkdown}
-      plugins={[codeBlockPlugin({ codeBlockEditorDescriptors: [PlainTextCodeEditorDescriptor] })]}
+      plugins={[
+        codeBlockPlugin({ codeBlockEditorDescriptors: [PlainTextCodeEditorDescriptor] }),
+        sandpackPlugin({ sandpackConfig: virtuosoSampleSandpackConfig })
+      ]}
     />
   )
 }

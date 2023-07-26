@@ -2,7 +2,7 @@
 import * as RadixToolbar from '@radix-ui/react-toolbar'
 import { $getNodeByKey } from 'lexical'
 import React from 'react'
-import { CodeBlockNode, SandpackNode } from '../../nodes'
+import { CodeBlockNode } from '../../plugins/codeblock/CodeBlockNode'
 import { useEmitterValues } from '../../system/EditorSystemComponent'
 import { CodeBlockEditorType, SandpackEditorType } from '../../types/ActiveEditorType'
 import styles from '../styles.module.css'
@@ -60,7 +60,7 @@ const SandpackButtonSet: React.FC = () => {
         title="Remove live code block"
         onClick={() => {
           activeEditor!.update(() => {
-            const node = $getNodeByKey((activeEditorType as SandpackEditorType).nodeKey) as SandpackNode
+            const node = $getNodeByKey((activeEditorType as SandpackEditorType).nodeKey) as CodeBlockNode
             node.selectNext()
             node.remove()
           })

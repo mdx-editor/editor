@@ -1,11 +1,11 @@
 import { CodeMirrorRef } from '@codesandbox/sandpack-react/dist/components/CodeEditor/CodeMirror'
 import { $createParagraphNode, $getNodeByKey } from 'lexical'
 import React from 'react'
-import { useEmitterValues, usePublisher } from '../../system/EditorSystemComponent'
+import { corePluginHooks } from '../core/realmPlugin'
 
 export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'sandpack', language: string) {
-  const [activeEditor] = useEmitterValues('activeEditor')
-  const setActiveEditorType = usePublisher('activeEditorType')
+  const [theEditor] = corePluginHooks.useEmitterValues('rootEditor')
+  // const setActiveEditorType = usePublisher('activeEditorType')
   const codeMirrorRef = React.useRef<CodeMirrorRef>(null)
 
   // these flags escape the editor with arrows.
@@ -14,8 +14,8 @@ export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'san
   const atTop = React.useRef(false)
 
   const onFocusHandler = React.useCallback(() => {
-    setActiveEditorType({ type: editorType, nodeKey })
-  }, [nodeKey, setActiveEditorType, editorType])
+    // setActiveEditorType({ type: editorType, nodeKey })
+  }, [])
 
   const onKeyDownHandler = React.useCallback(
     (e: KeyboardEvent) => {
@@ -31,7 +31,7 @@ export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'san
               atBottom.current = true
             } else {
               // escaping twice
-              activeEditor?.update(() => {
+              theEditor?.update(() => {
                 const node = $getNodeByKey(nodeKey)!
                 const nextSibling = node.getNextSibling()
                 if (nextSibling) {
@@ -56,7 +56,7 @@ export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'san
               atTop.current = true
             } else {
               // escaping twice
-              activeEditor?.update(() => {
+              theEditor?.update(() => {
                 const node = $getNodeByKey(nodeKey)!
                 const previousSibling = node.getPreviousSibling()
                 if (previousSibling) {
@@ -74,7 +74,7 @@ export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'san
         e.stopPropagation()
       }
     },
-    [activeEditor, nodeKey]
+    [theEditor, nodeKey]
   )
 
   React.useEffect(() => {
