@@ -1,7 +1,7 @@
-import { DecoratorNode, EditorConfig, LexicalEditor, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
 import React from 'react'
+import { DecoratorNode, EditorConfig, LexicalEditor, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
 import { noop } from '../../utils/fp'
-import { CodeBlockEditorContainer } from './CodeBlockEditorContainer'
+import { CodeBlockEditorProps, codeBlockPluginHooks } from './realmPlugin'
 /**
  * The options necessary to construct a {@link CodeBlockNode}.
  */
@@ -136,6 +136,77 @@ export class CodeBlockNode extends DecoratorNode<JSX.Element> {
       />
     )
   }
+}
+
+interface CodeBlockEditorContainerProps extends CodeBlockEditorProps {
+  /** The Lexical editor that contains the node */
+  parentEditor: LexicalEditor
+  /** The Lexical node that is being edited */
+  codeBlockNode: CodeBlockNode
+}
+
+type CodeBlockContextProviderProps = {
+  parentEditor: LexicalEditor
+  lexicalNode: CodeBlockNode
+  children: React.ReactNode
+}
+
+const CodeBlockEditorContext = React.createContext<Pick<CodeBlockNode, 'setCode' | 'setLanguage' | 'setMeta'> | null>(null)
+
+const CodeBlockEditorContextProvider = ({ parentEditor, lexicalNode, children }: CodeBlockContextProviderProps) => {
+  return (
+    <CodeBlockEditorContext.Provider
+      value={{
+        setCode: (code: string) => {
+          parentEditor.update(() => {
+            lexicalNode.setCode(code)
+          })
+        },
+        setLanguage: (language: string) => {
+          parentEditor.update(() => {
+            lexicalNode.setLanguage(language)
+          })
+        },
+        setMeta: (meta: string) => {
+          parentEditor.update(() => {
+            lexicalNode.setMeta(meta)
+          })
+        }
+      }}
+    >
+      {children}
+    </CodeBlockEditorContext.Provider>
+  )
+}
+
+export function useCodeBlockEditorContext() {
+  const context = React.useContext(CodeBlockEditorContext)
+  if (!context) {
+    throw new Error('useCodeBlockEditor must be used within a CodeBlockEditor')
+  }
+  return context
+}
+
+export function CodeBlockEditorContainer(props: CodeBlockEditorContainerProps) {
+  const [codeBlockEditorDescriptors] = codeBlockPluginHooks.useEmitterValues('codeBlockEditorDescriptors')
+
+  const descriptor = codeBlockEditorDescriptors
+    .sort((a, b) => b.priority - a.priority)
+    .find((descriptor) => descriptor.match(props.language || '', props.meta || ''))
+
+  if (!descriptor) {
+    throw new Error(`No CodeBlockEditor registered for language=${props.language} meta=${props.meta}`)
+  }
+
+  const Editor = descriptor.Editor
+
+  const { codeBlockNode: _, parentEditor: __, ...restProps } = props
+
+  return (
+    <CodeBlockEditorContextProvider parentEditor={props.parentEditor} lexicalNode={props.codeBlockNode}>
+      <Editor {...restProps} />
+    </CodeBlockEditorContextProvider>
+  )
 }
 
 /**

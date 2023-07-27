@@ -4,15 +4,36 @@
  *
  * @packageDocumentation
  */
-export type * from './types/JsxComponentDescriptors'
-export type { SandpackConfig, SandpackPreset } from './plugins/sandpack/realmPlugin'
-export type { MdastTreeImportOptions, MdastVisitActions, MdastVisitParams, MdastImportVisitor } from './import'
-export type { ToMarkdownOptions, LexicalVisitActions, LexicalNodeVisitParams, LexicalExportVisitor, LexicalConvertOptions } from './export'
-export type { NestedEditorProps } from './ui/NodeDecorators/NestedEditor'
-export type { CustomLeafDirectiveEditor, LeafDirectiveEditorProps } from './types/NodeDecoratorsProps'
 
-export * from './nodes'
-export * from './ui/MDXEditor'
-export { NestedEditor, useMdastNodeUpdater } from './ui/NodeDecorators/NestedEditor'
-export { ToolbarComponents } from './ui/ToolbarPlugin/toolbarComponents'
+export type { MDXEditorMethods, MDXEditorCoreProps } from './MDXEditorCore'
+export type { JsxComponentDescriptor, JsxPropertyDescriptor } from './plugins/jsx/realmPlugin'
+export type { SandpackConfig, SandpackPreset } from './plugins/sandpack/realmPlugin'
+export type { CodeBlockEditorDescriptor } from './plugins/codeblock/realmPlugin'
+
+// Basics
 export { MDXEditorCore } from './MDXEditorCore'
+export { headingsPlugin } from './plugins/headings/realmPlugin'
+export { thematicBreakPlugin } from './plugins/thematic-break/realmPlugin'
+export { listsPlugin } from './plugins/lists/realmPlugin'
+export { tablePlugin } from './plugins/table/realmPlugin'
+export { linkPlugin } from './plugins/link/realmPlugin'
+export { imagePlugin } from './plugins/image/realmPlugin'
+export { frontmatterPlugin } from './plugins/frontmatter/realmPlugin'
+
+// JSX
+export { jsxPlugin } from './plugins/jsx/realmPlugin'
+export { GenericJsxEditor } from './jsx-editors/GenericJsxEditor'
+
+// code blocks
+export { sandpackPlugin } from './plugins/sandpack/realmPlugin'
+export { codeMirrorPlugin } from './plugins/codemirror/realmPlugin'
+export { codeBlockPlugin } from './plugins/codeblock/realmPlugin'
+export { useCodeBlockEditorContext } from './plugins/codeblock/CodeBlockNode'
+
+// directives
+export { directivesPlugin } from './plugins/directives/realmPlugin'
+export { AdmonitionDirectiveDescriptor } from './directive-editors/AdmonitionDirectiveDescriptor'
+export { GenericDirectiveEditor } from './directive-editors/GenericDirectiveEditor'
+
+// UI
+export { linkDialogPlugin } from './plugins/link-dialog/realmPlugin'

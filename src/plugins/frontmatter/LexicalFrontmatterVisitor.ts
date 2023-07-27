@@ -1,5 +1,5 @@
 import * as Mdast from 'mdast'
-import { LexicalExportVisitor } from '../../export/exportMarkdownFromLexical'
+import { LexicalExportVisitor } from '../../exportMarkdownFromLexical'
 import { FrontmatterNode, $isFrontmatterNode } from './FrontmatterNode'
 
 export const LexicalFrontmatterVisitor: LexicalExportVisitor<FrontmatterNode, Mdast.YAML> = {

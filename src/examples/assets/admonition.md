@@ -1,13 +1,13 @@
 
 :::note
 
-Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+foo
 
 :::
 
 :::tip
 
-Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
+Some **content** with _Markdown_ `syntax`. Check [this `api`](https://google.com/).
 
 :::
 
@@ -28,3 +28,5 @@ Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
 Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
 
 :::
+
+some content

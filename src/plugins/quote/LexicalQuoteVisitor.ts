@@ -1,6 +1,6 @@
 import { $isQuoteNode, QuoteNode } from '@lexical/rich-text'
 import * as Mdast from 'mdast'
-import { LexicalExportVisitor } from '../../export'
+import { LexicalExportVisitor } from '../../exportMarkdownFromLexical'
 
 export const LexicalQuoteVisitor: LexicalExportVisitor<QuoteNode, Mdast.Blockquote> = {
   testLexicalNode: $isQuoteNode,

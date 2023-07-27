@@ -1,6 +1,6 @@
 import { $isRootNode, RootNode as LexicalRootNode } from 'lexical'
 import * as Mdast from 'mdast'
-import { LexicalExportVisitor } from '../../export/exportMarkdownFromLexical'
+import { LexicalExportVisitor } from '../../exportMarkdownFromLexical'
 
 export const LexicalRootVisitor: LexicalExportVisitor<LexicalRootNode, Mdast.Content> = {
   testLexicalNode: $isRootNode,

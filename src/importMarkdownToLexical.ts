@@ -3,7 +3,7 @@ import { ElementNode, LexicalNode, RootNode as LexicalRootNode } from 'lexical'
 import * as Mdast from 'mdast'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { ParseOptions } from 'micromark-util-types'
-import { IS_BOLD, IS_ITALIC, IS_UNDERLINE } from '../FormatConstants'
+import { IS_BOLD, IS_ITALIC, IS_UNDERLINE } from './FormatConstants'
 
 export type MdastExtensions = NonNullable<Parameters<typeof fromMarkdown>[1]>['mdastExtensions']
 /**

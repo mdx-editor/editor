@@ -1,7 +1,7 @@
 import { $createTextNode } from 'lexical'
 import * as Mdast from 'mdast'
 import { IS_CODE } from '../../FormatConstants'
-import { MdastImportVisitor } from '../../import/importMarkdownToLexical'
+import { MdastImportVisitor } from '../../importMarkdownToLexical'
 
 export const MdastInlineCodeVisitor: MdastImportVisitor<Mdast.InlineCode> = {
   testNode: 'inlineCode',

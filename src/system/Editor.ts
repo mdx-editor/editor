@@ -34,7 +34,7 @@ import { INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontal
 import { ActiveEditorType } from '../types/ActiveEditorType'
 import { createEmptyHistoryState } from '@lexical/react/LexicalHistoryPlugin'
 import { MarkdownParseOptions } from '../import'
-import { ExportMarkdownFromLexicalOptions } from '../export/exportMarkdownFromLexical'
+import { ExportMarkdownFromLexicalOptions } from '../exportMarkdownFromLexical'
 import { importMarkdownToLexical } from '../import'
 import { CustomLeafDirectiveEditor } from '../types/NodeDecoratorsProps'
 import { LeafDirective } from 'mdast-util-directive'

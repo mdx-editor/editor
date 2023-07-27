@@ -1,7 +1,7 @@
 import { $isTextNode, TextNode } from 'lexical'
 import * as Mdast from 'mdast'
 import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from '../../FormatConstants'
-import { LexicalExportVisitor } from '../../export/exportMarkdownFromLexical'
+import { LexicalExportVisitor } from '../../exportMarkdownFromLexical'
 
 export function isMdastText(mdastNode: Mdast.Content): mdastNode is Mdast.Text {
   return mdastNode.type === 'text'

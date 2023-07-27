@@ -1,33 +1,36 @@
 import React from 'react'
 import { MDXEditorCore, MDXEditorMethods } from '../MDXEditorCore'
+import codeBlocksMarkdown from './assets/code-blocks.md?raw'
+import imageMarkdown from './assets/image.md?raw'
 import jsxMarkdown from './assets/jsx.md?raw'
-import tableMarkdown from './assets/table-markdown.md?raw'
-import imageMarkdown from './assets/image-markdown.md?raw'
-import codeBlocksMarkdown from './assets/code-blocks-markdown.md?raw'
-import { jsxPlugin } from '../plugins/jsx/realmPlugin'
-import { JsxComponentDescriptor } from '../types/JsxComponentDescriptors'
-import { GenericJsxEditor } from '../jsx-editors/GenericJsxEditor'
-import { headingsPlugin } from '../plugins/headings/realmPlugin'
-import { thematicBreakPlugin } from '../plugins/thematic-break/realmPlugin'
-import { listsPlugin } from '../plugins/lists/realmPlugin'
-import { tablePlugin } from '../plugins/table/realmPlugin'
-import { linkPlugin } from '../plugins/link/realmPlugin'
-import { imagePlugin } from '../plugins/image/realmPlugin'
-import { frontmatterPlugin } from '../plugins/frontmatter/realmPlugin'
-import { CodeBlockEditorDescriptor, codeBlockPlugin } from '../plugins/codeblock/realmPlugin'
-import { useCodeBlockEditorContext } from '../plugins/codeblock/CodeBlockEditorContainer'
-import { virtuosoSampleSandpackConfig } from './boilerplate'
-import { sandpackPlugin } from '../plugins/sandpack/realmPlugin'
-import { codeMirrorPlugin } from '../plugins/codemirror/realmPlugin'
+import tableMarkdown from './assets/table.md?raw'
 
-export function Core() {
+import {
+  CodeBlockEditorDescriptor,
+  GenericJsxEditor,
+  JsxComponentDescriptor,
+  codeBlockPlugin,
+  codeMirrorPlugin,
+  frontmatterPlugin,
+  headingsPlugin,
+  imagePlugin,
+  jsxPlugin,
+  linkPlugin,
+  listsPlugin,
+  sandpackPlugin,
+  tablePlugin,
+  thematicBreakPlugin,
+  useCodeBlockEditorContext
+} from '../'
+import { virtuosoSampleSandpackConfig } from './_boilerplate'
+
+export function Bare() {
   const ref = React.useRef<MDXEditorMethods>(null)
   return (
     <>
       <button onClick={() => ref.current?.setMarkdown('new markdown')}>Set new markdown</button>
       <button onClick={() => console.log(ref.current?.getMarkdown())}>Get markdown</button>
-
-      <MDXEditorCore ref={ref} markdown={`Hello <u>world am **here**</u> more <u>under</u> line`} onChange={(md) => console.log({ md })} />
+      <MDXEditorCore ref={ref} markdown={`Hello <u>world am **here**</u> more <u>under</u> line`} onChange={console.log} />
     </>
   )
 }
@@ -150,7 +153,7 @@ const PlainTextCodeEditorDescriptor: CodeBlockEditorDescriptor = {
 export function CodeBlock() {
   return (
     <MDXEditorCore
-      onChange={(md) => console.log(md)}
+      onChange={console.log}
       markdown={codeBlocksMarkdown}
       plugins={[
         codeBlockPlugin({ codeBlockEditorDescriptors: [PlainTextCodeEditorDescriptor] }),

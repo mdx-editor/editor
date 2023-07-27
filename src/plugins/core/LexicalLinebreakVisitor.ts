@@ -1,6 +1,6 @@
 import { $isLineBreakNode, LineBreakNode } from 'lexical'
 import * as Mdast from 'mdast'
-import { LexicalExportVisitor } from '../../export'
+import { LexicalExportVisitor } from '../../exportMarkdownFromLexical'
 
 export const LexicalLinebreakVisitor: LexicalExportVisitor<LineBreakNode, Mdast.Text> = {
   testLexicalNode: $isLineBreakNode,

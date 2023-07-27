@@ -1,10 +1,10 @@
+import classNames from 'classnames'
 import YamlParser from 'js-yaml'
 import React from 'react'
-import { useForm, useFieldArray } from 'react-hook-form'
-import ArrowRight from '../../ui/icons/arrow_right.svg'
-import ArrowDown from '../../ui/icons/arrow_drop_down.svg'
-import DeleteIcon from '../../ui/icons/delete.svg'
-import classNames from 'classnames'
+import { useFieldArray, useForm } from 'react-hook-form'
+import ArrowDown from '../../icons/arrow_drop_down.svg'
+import ArrowRight from '../../icons/arrow_right.svg'
+import DeleteIcon from '../../icons/delete.svg'
 import styles from '../../ui/styles.module.css'
 
 type YamlConfig = { key: string; value: string }[]

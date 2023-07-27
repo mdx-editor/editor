@@ -4,8 +4,6 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { EditorSystem } from './Editor'
 import { ViewModeSystem } from './ViewMode'
 import { LinkDialogSystem } from './LinkDialog'
-import { JsxSystem } from './Jsx'
-import { OnChangeSystem } from './OnChange'
 import { ToolbarSystem } from './Toolbar'
 import 'mdast-util-directive'
 
@@ -14,27 +12,23 @@ export const {
   usePublisher,
   useEmitterValues
 } = realmFactoryToComponent(
-  getRealmFactory(EditorSystem, ViewModeSystem, LinkDialogSystem, JsxSystem, OnChangeSystem, ToolbarSystem),
+  getRealmFactory(EditorSystem, ViewModeSystem, LinkDialogSystem, ToolbarSystem),
   {
     required: {
       markdownSource: 'markdownSource',
-      headMarkdown: 'headMarkdown',
-      jsxComponentDescriptors: 'jsxComponentDescriptors',
+      headMarkdown: 'headMarkdown'
+    },
+    optional: {
       toolbarComponents: 'toolbarComponents',
       markdownParseOptions: 'markdownParseOptions',
       lexicalConvertOptions: 'lexicalConvertOptions',
-      lexicalNodes: 'lexicalNodes'
-    },
-    optional: {
+      lexicalNodes: 'lexicalNodes',
       imageUploadHandler: 'imageUploadHandler',
       editorRootElementRef: 'editorRootElementRef',
       viewMode: 'viewMode',
       linkAutocompleteSuggestions: 'linkAutocompleteSuggestions',
       imageAutocompleteSuggestions: 'imageAutocompleteSuggestions',
       customLeafDirectiveEditors: 'customLeafDirectiveEditors'
-    },
-    events: {
-      onChange: 'onChange'
     }
   },
   ({ children }: React.PropsWithChildren) => {

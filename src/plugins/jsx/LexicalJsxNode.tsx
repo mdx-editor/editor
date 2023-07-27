@@ -1,9 +1,9 @@
-import React from 'react'
-import type { LexicalEditor, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
-
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+import type { EditorConfig, LexicalEditor, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
 import { DecoratorNode } from 'lexical'
-import { JsxEditorContainer } from './JsxEditorContainer'
-import { MdastJsx } from '../../types/JsxComponentDescriptors'
+import React from 'react'
+import { NestedEditorsContext } from '../core/NestedLexicalEditor'
+import { MdastJsx, jsxPluginHooks } from './realmPlugin'
 
 /**
  * A serialized representation of an {@link LexicalJsxNode}.
@@ -64,17 +64,45 @@ export class LexicalJsxNode extends DecoratorNode<JSX.Element> {
     this.getWritable().__mdastNode = mdastNode
   }
 
-  decorate(parentEditor: LexicalEditor): JSX.Element {
-    return <JsxEditorContainer lexicalJsxNode={this} mdastNode={this.getMdastNode()} parentEditor={parentEditor} />
+  decorate(parentEditor: LexicalEditor, config: EditorConfig): JSX.Element {
+    return <JsxEditorContainer lexicalJsxNode={this} config={config} mdastNode={this.getMdastNode()} parentEditor={parentEditor} />
   }
 
   isInline(): boolean {
-    return false
+    return this.__mdastNode.type === 'mdxJsxTextElement'
   }
 
   isKeyboardSelectable(): boolean {
     return true
   }
+}
+
+export function JsxEditorContainer(props: {
+  /** The Lexical editor that contains the node */
+  parentEditor: LexicalEditor
+  /** The Lexical node that is being edited */
+  lexicalJsxNode: LexicalJsxNode
+  /** The MDAST node that is being edited */
+  mdastNode: MdastJsx
+  config: EditorConfig
+}) {
+  const { mdastNode } = props
+  const [jsxComponentDescriptors] = jsxPluginHooks.useEmitterValues('jsxComponentDescriptors')
+  const descriptor = jsxComponentDescriptors.find((descriptor) => descriptor.name === mdastNode.name)!
+  const Editor = descriptor.Editor
+
+  return (
+    <NestedEditorsContext.Provider
+      value={{
+        config: props.config,
+        mdastNode: mdastNode,
+        parentEditor: props.parentEditor,
+        lexicalNode: props.lexicalJsxNode
+      }}
+    >
+      <Editor descriptor={descriptor} mdastNode={mdastNode} />
+    </NestedEditorsContext.Provider>
+  )
 }
 
 /**

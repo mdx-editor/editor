@@ -1,7 +1,7 @@
 import * as Mdast from 'mdast'
 import { MdxJsxTextElement } from 'mdast-util-mdx'
 import { IS_BOLD, IS_ITALIC, IS_UNDERLINE } from '../../FormatConstants'
-import { MdastImportVisitor } from '../../import/importMarkdownToLexical'
+import { MdastImportVisitor } from '../../importMarkdownToLexical'
 
 interface OpeningHTMLUnderlineNode extends Mdast.HTML {
   type: 'html'

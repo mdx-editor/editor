@@ -1,6 +1,6 @@
 import { $createLinkNode } from '@lexical/link'
 import * as Mdast from 'mdast'
-import { MdastImportVisitor } from '../../import'
+import { MdastImportVisitor } from '../../importMarkdownToLexical'
 
 export const MdastLinkVisitor: MdastImportVisitor<Mdast.Link> = {
   testNode: 'link',

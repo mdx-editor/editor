@@ -1,9 +1,9 @@
 import React from 'react'
-import type { LexicalEditor, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
-
+import type { EditorConfig, LexicalEditor, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
 import { DecoratorNode } from 'lexical'
-import { ContainerDirective, Directive, LeafDirective } from 'mdast-util-directive'
-import { TextDirective } from 'mdast-util-directive/lib'
+import { Directive } from 'mdast-util-directive'
+import { NestedEditorsContext } from '../core/NestedLexicalEditor'
+import { directivesPluginHooks } from './realmPlugin'
 
 /**
  * A serialized representation of an {@link DirectiveNode}.
@@ -17,10 +17,11 @@ export type SerializedDirectiveNode = Spread<
   SerializedLexicalNode
 >
 
+let GENERATION = 0
 /**
  * A lexical node that represents an image. Use {@link "$createDirectiveNode"} to construct one.
  */
-export class DirectiveNode extends DecoratorNode<Directive> {
+export class DirectiveNode extends DecoratorNode<React.JSX.Element> {
   __mdastNode: Directive
 
   static getType(): string {
@@ -28,7 +29,7 @@ export class DirectiveNode extends DecoratorNode<Directive> {
   }
 
   static clone(node: DirectiveNode): DirectiveNode {
-    return new DirectiveNode(structuredClone(node.__mdastNode))
+    return new DirectiveNode(structuredClone(node.__mdastNode), node.__key)
   }
 
   static importJSON(serializedNode: SerializedDirectiveNode): DirectiveNode {
@@ -38,6 +39,7 @@ export class DirectiveNode extends DecoratorNode<Directive> {
   constructor(mdastNode: Directive, key?: NodeKey) {
     super(key)
     this.__mdastNode = mdastNode
+    this.generation = GENERATION++
   }
 
   getMdastNode(): Directive {
@@ -46,14 +48,14 @@ export class DirectiveNode extends DecoratorNode<Directive> {
 
   exportJSON(): SerializedDirectiveNode {
     return {
-      mdastNode: this.getMdastNode(),
+      mdastNode: structuredClone(this.__mdastNode),
       type: 'directive',
       version: 1
     }
   }
 
   createDOM(): HTMLElement {
-    return document.createElement('div')
+    return document.createElement(this.__mdastNode.type === 'textDirective' ? 'span' : 'div')
   }
 
   updateDOM(): false {
@@ -64,12 +66,12 @@ export class DirectiveNode extends DecoratorNode<Directive> {
     this.getWritable().__mdastNode = mdastNode
   }
 
-  decorate(parentEditor: LexicalEditor): JSX.Element {
-    return <DirectiveEditor leafDirective={this} mdastNode={this.getMdastNode()} parentEditor={parentEditor} />
+  decorate(parentEditor: LexicalEditor, config: EditorConfig): JSX.Element {
+    return <DirectiveEditorContainer lexicalNode={this} mdastNode={this.getMdastNode()} parentEditor={parentEditor} config={config} />
   }
 
   isInline(): boolean {
-    return false
+    return this.__mdastNode.type === 'textDirective'
   }
 
   isKeyboardSelectable(): boolean {
@@ -77,11 +79,33 @@ export class DirectiveNode extends DecoratorNode<Directive> {
   }
 }
 
+export function DirectiveEditorContainer(props: {
+  parentEditor: LexicalEditor
+  lexicalNode: DirectiveNode
+  mdastNode: Directive
+  config: EditorConfig
+}) {
+  const { mdastNode } = props
+  const [directiveDescriptors] = directivesPluginHooks.useEmitterValues('directiveDescriptors')
+  const descriptor = directiveDescriptors.find((descriptor) => descriptor.testNode(mdastNode))
+  if (!descriptor) {
+    throw new Error(`No descriptor found for directive ${mdastNode.name}`)
+  }
+
+  const Editor = descriptor.Editor
+
+  return (
+    <NestedEditorsContext.Provider value={props}>
+      <Editor descriptor={descriptor} mdastNode={mdastNode} lexicalNode={props.lexicalNode} parentEditor={props.parentEditor} />
+    </NestedEditorsContext.Provider>
+  )
+}
+
 /**
  * Creates an {@link DirectiveNode}.
  */
-export function $createDirectiveNode(mdastNode: Directive): DirectiveNode {
-  return new DirectiveNode(mdastNode)
+export function $createDirectiveNode(mdastNode: Directive, key?: NodeKey): DirectiveNode {
+  return new DirectiveNode(mdastNode, key)
 }
 
 /**

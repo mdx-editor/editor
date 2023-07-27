@@ -1,24 +1,140 @@
-import { $getRoot, Klass, LexicalEditor, LexicalNode, ParagraphNode, TextNode } from 'lexical'
-import { RealmNode, realmPlugin, system } from '../../gurx'
 import { InitialEditorStateType } from '@lexical/react/LexicalComposer'
-import { MarkdownParseOptions, MdastImportVisitor, importMarkdownToLexical } from '../../import/importMarkdownToLexical'
+import {
+  $getRoot,
+  $getSelection,
+  $isRangeSelection,
+  BLUR_COMMAND,
+  COMMAND_PRIORITY_CRITICAL,
+  COMMAND_PRIORITY_LOW,
+  Klass,
+  LexicalEditor,
+  LexicalNode,
+  ParagraphNode,
+  RangeSelection,
+  SELECTION_CHANGE_COMMAND,
+  TextNode
+} from 'lexical'
 import * as Mdast from 'mdast'
-import { MdastRootVisitor } from './MdastRootVisitor'
-import { MdastParagraphVisitor } from './MdastParagraphVisitor'
-import { MdastTextVisitor } from './MdastTextVisitor'
-import { LexicalConvertOptions, exportMarkdownFromLexical } from '../../export/exportMarkdownFromLexical'
-import { LexicalRootVisitor } from './LexicalRootVisitor'
+import React from 'react'
+import { LexicalConvertOptions, exportMarkdownFromLexical } from '../../exportMarkdownFromLexical'
+import { RealmNode, realmPlugin, system } from '../../gurx'
+import { MarkdownParseOptions, MdastImportVisitor, importMarkdownToLexical } from '../../importMarkdownToLexical'
+import type { JsxComponentDescriptor } from '../jsx/realmPlugin'
+import { LexicalLinebreakVisitor } from './LexicalLinebreakVisitor'
 import { LexicalParagraphVisitor } from './LexicalParagraphVisitor'
+import { LexicalRootVisitor } from './LexicalRootVisitor'
 import { LexicalTextVisitor } from './LexicalTextVisitor'
 import { MdastFormattingVisitor } from './MdastFormattingVisitor'
-import { JsxComponentDescriptor } from '../../types/JsxComponentDescriptors'
-import React from 'react'
 import { MdastInlineCodeVisitor } from './MdastInlineCodeVisitor'
-import { LexicalLinebreakVisitor } from './LexicalLinebreakVisitor'
+import { MdastParagraphVisitor } from './MdastParagraphVisitor'
+import { MdastRootVisitor } from './MdastRootVisitor'
+import { MdastTextVisitor } from './MdastTextVisitor'
+import { createEmptyHistoryState } from '@lexical/react/LexicalHistoryPlugin'
+import { SharedHistoryPlugin } from './SharedHistoryPlugin'
+
+export type EditorSubscription = (activeEditor: LexicalEditor) => () => void
+type Teardowns = (() => void)[]
 
 export const coreSystem = system((r) => {
+  function createAppendNodeFor<T>(node: RealmNode<T[]>) {
+    const appendNode = r.node<T>()
+
+    r.link(
+      r.pipe(
+        appendNode,
+        r.o.withLatestFrom(node),
+        r.o.map(([newValue, values]) => {
+          if (values.includes(newValue)) {
+            return values
+          }
+          return [...values, newValue]
+        })
+      ),
+      node
+    )
+    return appendNode
+  }
+
   const rootEditor = r.node<LexicalEditor | null>(null)
+  const activeEditor = r.node<LexicalEditor | null>(null, true)
   const contentEditableClassName = r.node<string>('')
+  const inFocus = r.node(false, true)
+  const currentFormat = r.node(0, true)
+  const currentSelection = r.node<RangeSelection | null>(null)
+
+  const activeEditorSubscriptions = r.node<EditorSubscription[]>([])
+  const rootEditorSubscriptions = r.node<EditorSubscription[]>([])
+
+  const rebind = () =>
+    r.o.scan((teardowns, [subs, activeEditorValue]: [EditorSubscription[], LexicalEditor]) => {
+      teardowns.forEach((teardown) => {
+        if (!teardown) {
+          throw new Error('You have a subscription that does not return a teardown')
+        }
+        teardown()
+      })
+      return activeEditorValue ? subs.map((s) => s(activeEditorValue)) : []
+    }, [] as Teardowns)
+
+  r.pipe(r.combine(activeEditorSubscriptions, activeEditor), rebind())
+  r.pipe(r.combine(rootEditorSubscriptions, rootEditor), rebind())
+
+  const createRootEditorSubscription = createAppendNodeFor(rootEditorSubscriptions)
+  const createActiveEditorSubscription = createAppendNodeFor(activeEditorSubscriptions)
+
+  function handleSelectionChange() {
+    const selection = $getSelection()
+    if ($isRangeSelection(selection)) {
+      r.pubKeys({
+        currentSelection: selection,
+        currentFormat: selection.format
+      })
+    }
+  }
+
+  ////////////////////////
+  // track the active editor - this is necessary for the nested editors
+  ////////////////////////
+  r.pub(createRootEditorSubscription, (theRootEditor) => {
+    return theRootEditor.registerCommand(
+      SELECTION_CHANGE_COMMAND,
+      (_, theActiveEditor) => {
+        r.pubIn({
+          [activeEditor.key]: theActiveEditor,
+          [inFocus.key]: true
+        })
+        handleSelectionChange()
+
+        return false
+      },
+      COMMAND_PRIORITY_CRITICAL
+    )
+  })
+
+  // Export handler
+  r.pub(createRootEditorSubscription, (theRootEditor) => {
+    console.log('meh')
+    return theRootEditor.registerUpdateListener(({ dirtyElements, dirtyLeaves, editorState }) => {
+      if (dirtyElements.size === 0 && dirtyLeaves.size === 0) {
+        return
+      }
+
+      let theNewMarkdownValue!: string
+
+      editorState.read(() => {
+        theNewMarkdownValue = exportMarkdownFromLexical({
+          root: $getRoot(),
+          visitors: r.getValue(exportVisitors),
+          jsxComponentDescriptors: r.getValue(jsxComponentDescriptors),
+          toMarkdownExtensions: r.getValue(toMarkdownExtensions),
+          toMarkdownOptions: r.getValue(toMarkdownOptions),
+          jsxIsAvailable: r.getValue(jsxIsAvailable)
+        })
+      })
+
+      r.pub(markdown, theNewMarkdownValue.trim())
+    })
+  })
 
   const initialMarkdown = r.node<string>('')
   const markdown = r.node<string>('', true)
@@ -43,25 +159,6 @@ export const coreSystem = system((r) => {
   // used for the various popups, dialogs, and tooltips
   const editorRootElementRef = r.node<React.RefObject<HTMLDivElement> | null>(null)
 
-  function createAppendNodeFor<T>(node: RealmNode<T[]>) {
-    const appendNode = r.node<T>()
-
-    r.link(
-      r.pipe(
-        appendNode,
-        r.o.withLatestFrom(node),
-        r.o.map(([newValue, values]) => {
-          if (values.includes(newValue)) {
-            return values
-          }
-          return [...values, newValue]
-        })
-      ),
-      node
-    )
-    return appendNode
-  }
-
   const addLexicalNode = createAppendNodeFor(usedLexicalNodes)
   const addImportVisitor = createAppendNodeFor(importVisitors)
   const addSyntaxExtension = createAppendNodeFor(syntaxExtensions)
@@ -69,46 +166,6 @@ export const coreSystem = system((r) => {
   const addExportVisitor = createAppendNodeFor(exportVisitors)
   const addToMarkdownExtension = createAppendNodeFor(toMarkdownExtensions)
   const setMarkdown = r.node<string>()
-
-  const initialRootEditorState = r.node<InitialEditorStateType>((theRootEditor) => {
-    r.pub(rootEditor, theRootEditor)
-
-    ////////////////////////
-    // setup Export
-    ////////////////////////
-
-    theRootEditor.registerUpdateListener(({ dirtyElements, dirtyLeaves, editorState }) => {
-      if (dirtyElements.size === 0 && dirtyLeaves.size === 0) {
-        return
-      }
-
-      let theNewMarkdownValue!: string
-
-      editorState.read(() => {
-        theNewMarkdownValue = exportMarkdownFromLexical({
-          root: $getRoot(),
-          visitors: r.getValue(exportVisitors),
-          jsxComponentDescriptors: r.getValue(jsxComponentDescriptors),
-          toMarkdownExtensions: r.getValue(toMarkdownExtensions),
-          toMarkdownOptions: r.getValue(toMarkdownOptions),
-          jsxIsAvailable: r.getValue(jsxIsAvailable)
-        })
-      })
-
-      r.pub(markdown, theNewMarkdownValue.trim())
-    })
-
-    ////////////////////////
-    // Import initial value
-    ////////////////////////
-    importMarkdownToLexical({
-      root: $getRoot(),
-      visitors: r.getValue(importVisitors),
-      mdastExtensions: r.getValue(mdastExtensions),
-      markdown: r.getValue(initialMarkdown),
-      syntaxExtensions: r.getValue(syntaxExtensions)
-    })
-  })
 
   r.sub(
     r.pipe(setMarkdown, r.o.withLatestFrom(rootEditor, importVisitors, mdastExtensions, syntaxExtensions)),
@@ -126,7 +183,60 @@ export const coreSystem = system((r) => {
     }
   )
 
+  // gets bound to the root editor state getter
+  const initialRootEditorState = r.node<InitialEditorStateType>((theRootEditor) => {
+    r.pub(rootEditor, theRootEditor)
+    r.pub(activeEditor, theRootEditor)
+
+    ////////////////////////
+    // Import initial value
+    ////////////////////////
+    importMarkdownToLexical({
+      root: $getRoot(),
+      visitors: r.getValue(importVisitors),
+      mdastExtensions: r.getValue(mdastExtensions),
+      markdown: r.getValue(initialMarkdown),
+      syntaxExtensions: r.getValue(syntaxExtensions)
+    })
+  })
+
+  r.pub(createActiveEditorSubscription, (editor) => {
+    return editor.registerUpdateListener(({ editorState }) => {
+      editorState.read(() => {
+        handleSelectionChange()
+      })
+    })
+  })
+
+  r.pub(createActiveEditorSubscription, (theEditor) => {
+    return theEditor.registerCommand(
+      BLUR_COMMAND,
+      (payload) => {
+        const theRootEditor = r.getValue(rootEditor)
+        if (theRootEditor) {
+          const movingOutside = !theRootEditor.getRootElement()?.contains(payload.relatedTarget as Node)
+          if (movingOutside) {
+            r.pub(inFocus, false)
+          }
+        }
+        return false
+      },
+      COMMAND_PRIORITY_LOW
+    )
+  })
+
+  const composerChildren = r.node<React.ComponentType[]>([])
+  const addComposerChild = createAppendNodeFor(composerChildren)
+
+  const historyState = r.node(createEmptyHistoryState())
   return {
+    // state
+    activeEditor,
+    inFocus,
+    currentFormat,
+    historyState,
+    currentSelection,
+
     // jsx
     jsxIsAvailable,
     jsxComponentDescriptors,
@@ -134,6 +244,8 @@ export const coreSystem = system((r) => {
     // lexical editor
     initialRootEditorState,
     rootEditor,
+    createRootEditorSubscription,
+    createActiveEditorSubscription,
 
     // import
     importVisitors,
@@ -159,7 +271,11 @@ export const coreSystem = system((r) => {
 
     // DOM
     editorRootElementRef,
-    contentEditableClassName
+    contentEditableClassName,
+
+    // child controls
+    composerChildren,
+    addComposerChild
   }
 }, [])
 
@@ -198,5 +314,6 @@ export const [corePlugin, corePluginHooks] = realmPlugin({
     realm.pubKey('addExportVisitor', LexicalParagraphVisitor)
     realm.pubKey('addExportVisitor', LexicalTextVisitor)
     realm.pubKey('addExportVisitor', LexicalLinebreakVisitor)
+    realm.pubKey('addComposerChild', SharedHistoryPlugin)
   }
 })

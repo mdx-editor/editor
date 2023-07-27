@@ -842,9 +842,8 @@
   }
 }
 
-.jsxComponentTitle {
+.genericComponentName {
   font-size: var(--text-sm);
   color: var(--baseText);
   padding-right: var(--spacing-2);
-
 }

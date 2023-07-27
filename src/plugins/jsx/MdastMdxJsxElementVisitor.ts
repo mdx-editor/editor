@@ -1,7 +1,7 @@
 import { ElementNode } from 'lexical'
 import { MdxJsxTextElement } from 'mdast-util-mdx'
 import { $createLexicalJsxNode } from './LexicalJsxNode'
-import { MdastImportVisitor } from '../../import/importMarkdownToLexical'
+import { MdastImportVisitor } from '../../importMarkdownToLexical'
 
 export const MdastMdxJsxElementVisitor: MdastImportVisitor<MdxJsxTextElement> = {
   testNode: (node) => {

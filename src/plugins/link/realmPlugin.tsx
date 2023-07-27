@@ -1,17 +1,20 @@
+import React from 'react'
 import { realmPlugin, system } from '../../gurx'
 import { coreSystem } from '../core/realmPlugin'
 import { MdastLinkVisitor } from './MdastLinkVisitor'
 import { LexicalLinkVisitor } from './LexicalLinkVisitor'
 import { LinkNode } from '@lexical/link'
+import { LinkPlugin as LexicalLinkPlugin } from '@lexical/react/LexicalLinkPlugin'
 
 export const linkSystem = system((_) => ({}), [coreSystem])
 
 export const [linkPlugin] = realmPlugin({
   systemSpec: linkSystem,
 
-  init: (realm) => {
+  init: (realm, params: { validateUrl: React.ComponentProps<typeof LexicalLinkPlugin>['validateUrl'] }) => {
     realm.pubKey('addImportVisitor', MdastLinkVisitor)
     realm.pubKey('addLexicalNode', LinkNode)
     realm.pubKey('addExportVisitor', LexicalLinkVisitor)
+    realm.pubKey('addComposerChild', () => <LexicalLinkPlugin validateUrl={params?.validateUrl || (() => false)} />)
   }
 })

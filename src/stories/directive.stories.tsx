@@ -3,7 +3,8 @@ import { $createParagraphNode, $insertNodes } from 'lexical'
 import * as Mdast from 'mdast'
 import { LeafDirective } from 'mdast-util-directive'
 import React from 'react'
-import { CustomLeafDirectiveEditor, $createLeafDirectiveNode, MDXEditor, NestedEditor, ToolbarComponents, useMdastNodeUpdater } from '../'
+import { CustomLeafDirectiveEditor, MDXEditor, NestedEditor, ToolbarComponents, useMdastNodeUpdater } from '../'
+import { DirectiveDescriptor } from '../plugins/directives/realmPlugin'
 
 export default {
   title: 'Custom directive editors'
@@ -30,16 +31,16 @@ interface YoutubeDirectiveNode extends LeafDirective {
   attributes: { id: string }
 }
 
-const YoutubeEditor: CustomLeafDirectiveEditor<YoutubeDirectiveNode> = {
-  testNode: (mdastNode) => mdastNode.name === 'youtube',
-  Editor: ({ mdastNode, leafDirective, parentEditor }) => {
+const YoutubeDirectiveDescriptor: DirectiveDescriptor<YoutubeDirectiveNode> = {
+  name: 'youtube',
+  Editor: ({ mdastNode, directive, parentEditor }) => {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
         <button
           onClick={() => {
             parentEditor.update(() => {
-              leafDirective.selectNext()
-              leafDirective.remove()
+              directive.selectNext()
+              directive.remove()
             })
           }}
         >

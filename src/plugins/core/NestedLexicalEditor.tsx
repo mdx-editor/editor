@@ -1,5 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-import { $getRoot, LexicalEditor, createEditor } from 'lexical'
+import {
+  $addUpdateTag,
+  $getRoot,
+  BLUR_COMMAND,
+  COMMAND_PRIORITY_CRITICAL,
+  DecoratorNode,
+  EditorConfig,
+  LexicalEditor,
+  createEditor
+} from 'lexical'
 import * as Mdast from 'mdast'
 import { Node } from 'unist'
 import React from 'react'
@@ -9,16 +18,20 @@ import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary'
 import { LexicalNestedComposer } from '@lexical/react/LexicalNestedComposer'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import { theme } from '../../content/theme'
-import { exportLexicalTreeToMdast } from '../../export/exportMarkdownFromLexical'
-import { importMdastTreeToLexical } from '../../import/importMarkdownToLexical'
+import { exportLexicalTreeToMdast } from '../../exportMarkdownFromLexical'
+import { importMdastTreeToLexical } from '../../importMarkdownToLexical'
 import styles from '../../ui/styles.module.css'
+import { SharedHistoryPlugin } from './SharedHistoryPlugin'
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
 // TODO:
 // import { SharedHistoryPlugin } from '../SharedHistoryPlugin'
 
 interface NestedEditorsContextValue<T extends Node> {
   parentEditor: LexicalEditor
+  config: EditorConfig
   mdastNode: T
-  lexicalNode: {
+  lexicalNode: DecoratorNode<any> & {
     setMdastNode: (mdastNode: any) => void
   }
 }
@@ -37,11 +50,12 @@ export const useNestedEditorContext = <T extends Mdast.Content>() => {
  * A hook that returns a function that can be used to update the mdast node. Use this in your custom editor components.
  */
 export function useMdastNodeUpdater<T extends Mdast.Content>() {
-  const { parentEditor, lexicalNode, mdastNode } = useNestedEditorContext<T>()
+  const { parentEditor, lexicalNode } = useNestedEditorContext<T>()
 
   return function updateMdastNode(node: Partial<T>) {
     parentEditor.update(() => {
-      lexicalNode.setMdastNode({ ...mdastNode, ...node })
+      $addUpdateTag('history-push')
+      lexicalNode.setMdastNode(node)
     })
   }
 }
@@ -54,12 +68,12 @@ export interface NestedEditorProps<T extends Mdast.Content> {
   /**
    * A function that returns the phrasing content of the mdast node. In most cases, this will be the `children` property of the mdast node, but you can also have multiple nested nodes with their own children.
    */
-  getContent: (mdastNode: T) => Mdast.PhrasingContent[]
+  getContent: (mdastNode: T) => Mdast.Content[]
 
   /**
    * A function that should return the updated mdast node based on the original mdast node and the new content (serialized as mdast tree) produced by the editor.
    */
-  getUpdatedMdastNode: (mdastNode: T, children: Mdast.PhrasingContent[]) => T
+  getUpdatedMdastNode: (mdastNode: T, children: Mdast.Content[]) => T
 
   /**
    * Props passed to the {@link https://github.com/facebook/lexical/blob/main/packages/lexical-react/src/LexicalContentEditable.tsx | ContentEditable} component.
@@ -92,6 +106,7 @@ export const NestedLexicalEditor = function <T extends Mdast.Content>(props: Nes
   const { getContent, getUpdatedMdastNode, contentEditableProps, block = false } = props
   const { mdastNode } = useNestedEditorContext<T>()
   const updateMdastNode = useMdastNodeUpdater<T>()
+  const content = getContent(mdastNode)
 
   const [importVisitors, exportVisitors, usedLexicalNodes, jsxComponentDescriptors, jsxIsAvailable] = corePluginHooks.useEmitterValues(
     'importVisitors',
@@ -106,42 +121,51 @@ export const NestedLexicalEditor = function <T extends Mdast.Content>(props: Nes
       nodes: usedLexicalNodes,
       theme: theme
     })
-
-    editor.update(() => {
-      let content: Mdast.PhrasingContent[] | Mdast.Content[] = getContent(mdastNode as any)
-      if (block) {
-        if (content.length === 0) {
-          content = [{ type: 'paragraph', children: [] }]
-        }
-      } else {
-        content = [{ type: 'paragraph', children: content as Mdast.PhrasingContent[] }]
-      }
-      importMdastTreeToLexical({
-        root: $getRoot(),
-        mdastRoot: {
-          type: 'root',
-          children: content
-        },
-        visitors: importVisitors
-      })
-    })
-
     return editor
   })
 
   React.useEffect(() => {
-    return editor.registerUpdateListener(({ editorState }) => {
-      editorState.read(() => {
-        const mdast = exportLexicalTreeToMdast({
-          root: $getRoot(),
-          visitors: exportVisitors,
-          jsxComponentDescriptors,
-          jsxIsAvailable
-        })
-        const content: Mdast.Content[] = block ? mdast.children : (mdast.children[0] as Mdast.Paragraph)!.children
-        updateMdastNode(getUpdatedMdastNode(mdastNode as any, content as any))
+    editor.update(() => {
+      $getRoot().clear()
+      let theContent: Mdast.PhrasingContent[] | Mdast.Content[] = content
+      if (block) {
+        if (theContent.length === 0) {
+          theContent = [{ type: 'paragraph', children: [] }]
+        }
+      } else {
+        theContent = [{ type: 'paragraph', children: content as Mdast.PhrasingContent[] }]
+      }
+
+      importMdastTreeToLexical({
+        root: $getRoot(),
+        mdastRoot: {
+          type: 'root',
+          children: theContent
+        },
+        visitors: importVisitors
       })
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editor, block, importVisitors])
+
+  React.useEffect(() => {
+    return editor.registerCommand(
+      BLUR_COMMAND,
+      () => {
+        editor.getEditorState().read(() => {
+          const mdast = exportLexicalTreeToMdast({
+            root: $getRoot(),
+            visitors: exportVisitors,
+            jsxComponentDescriptors,
+            jsxIsAvailable
+          })
+          const content: Mdast.Content[] = block ? mdast.children : (mdast.children[0] as Mdast.Paragraph)!.children
+          updateMdastNode(getUpdatedMdastNode(structuredClone(mdastNode) as any, content as any))
+        })
+        return true
+      },
+      COMMAND_PRIORITY_CRITICAL
+    )
   }, [block, editor, exportVisitors, getUpdatedMdastNode, jsxComponentDescriptors, jsxIsAvailable, mdastNode, updateMdastNode])
 
   return (
@@ -151,6 +175,7 @@ export const NestedLexicalEditor = function <T extends Mdast.Content>(props: Nes
         placeholder={null}
         ErrorBoundary={LexicalErrorBoundary}
       />
+      <SharedHistoryPlugin />
     </LexicalNestedComposer>
   )
 }

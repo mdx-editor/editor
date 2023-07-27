@@ -8,7 +8,7 @@ import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary'
 import classNames from 'classnames'
-import { ToMarkdownOptions } from './export'
+import { ToMarkdownOptions } from './exportMarkdownFromLexical'
 import { noop } from './utils/fp'
 
 const LexicalProvider: React.FC<{ children: JSX.Element | string | (JSX.Element | string)[] }> = ({ children }) => {
@@ -31,17 +31,22 @@ const LexicalProvider: React.FC<{ children: JSX.Element | string | (JSX.Element 
 }
 
 const RichTextEditor: React.FC = () => {
-  const [contentEditableClassName] = corePluginHooks.useEmitterValues('contentEditableClassName')
+  const [contentEditableClassName, composerChildren] = corePluginHooks.useEmitterValues('contentEditableClassName', 'composerChildren')
   return (
-    <RichTextPlugin
-      contentEditable={<ContentEditable className={classNames(styles.contentEditable, contentEditableClassName)} />}
-      placeholder={<div></div>}
-      ErrorBoundary={LexicalErrorBoundary}
-    />
+    <>
+      <RichTextPlugin
+        contentEditable={<ContentEditable className={classNames(styles.contentEditable, contentEditableClassName)} />}
+        placeholder={<div></div>}
+        ErrorBoundary={LexicalErrorBoundary}
+      ></RichTextPlugin>
+      {composerChildren.map((Child, index) => (
+        <Child key={index} />
+      ))}
+    </>
   )
 }
 
-interface MDXEditorCoreProps {
+export interface MDXEditorCoreProps {
   contentEditableClassName?: string
   markdown: string
   onChange?: (markdown: string) => void

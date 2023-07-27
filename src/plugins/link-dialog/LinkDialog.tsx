@@ -6,17 +6,18 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import React from 'react'
 
 import { createCommand, LexicalCommand } from 'lexical'
-import { useEmitterValues, usePublisher } from '../system/EditorSystemComponent'
-import CheckIcon from './icons/check.svg'
-import CloseIcon from './icons/close.svg'
-import CopyIcon from './icons/content_copy.svg'
-import EditIcon from './icons/edit.svg'
-import LinkOffIcon from './icons/link_off.svg'
-import OpenInNewIcon from './icons/open_in_new.svg'
-import DropDownIcon from './icons/arrow_drop_down.svg'
+import CheckIcon from '../../icons/check.svg'
+import CloseIcon from '../../icons/close.svg'
+import CopyIcon from '../../icons/content_copy.svg'
+import EditIcon from '../../icons/edit.svg'
+import LinkOffIcon from '../../icons/link_off.svg'
+import OpenInNewIcon from '../../icons/open_in_new.svg'
+import DropDownIcon from '../../icons/arrow_drop_down.svg'
 import classNames from 'classnames'
 import { useCombobox } from 'downshift'
-import styles from './styles.module.css'
+import styles from '../../ui/styles.module.css'
+import { corePluginHooks } from '../core/realmPlugin'
+import { linkDialogPluginHooks } from './realmPlugin'
 
 export const OPEN_LINK_DIALOG: LexicalCommand<undefined> = createCommand()
 
@@ -119,19 +120,20 @@ export function LinkEditForm({ initialUrl, onSubmit, onCancel, linkAutocompleteS
   )
 }
 
-export function LinkDialogPlugin() {
-  const [editorRootElementRef] = useEmitterValues('editorRootElementRef')
-  const publishWindowChange = usePublisher('onWindowChange')
-  const [linkDialogState, linkAutocompleteSuggestions, activeEditor] = useEmitterValues(
+export const LinkDialog: React.FC = () => {
+  const [editorRootElementRef] = corePluginHooks.useEmitterValues('editorRootElementRef')
+  const publishWindowChange = linkDialogPluginHooks.usePublisher('onWindowChange')
+  const [activeEditor] = corePluginHooks.useEmitterValues('activeEditor')
+
+  const [linkDialogState, linkAutocompleteSuggestions] = linkDialogPluginHooks.useEmitterValues(
     'linkDialogState',
-    'linkAutocompleteSuggestions',
-    'activeEditor'
+    'linkAutocompleteSuggestions'
   )
-  const updateLinkUrl = usePublisher('updateLinkUrl')
-  const cancelLinkEdit = usePublisher('cancelLinkEdit')
-  const switchFromPreviewToLinkEdit = usePublisher('switchFromPreviewToLinkEdit')
-  const removeLink = usePublisher('removeLink')
-  const applyLinkChanges = usePublisher('applyLinkChanges')
+  const updateLinkUrl = linkDialogPluginHooks.usePublisher('updateLinkUrl')
+  const cancelLinkEdit = linkDialogPluginHooks.usePublisher('cancelLinkEdit')
+  const switchFromPreviewToLinkEdit = linkDialogPluginHooks.usePublisher('switchFromPreviewToLinkEdit')
+  const removeLink = linkDialogPluginHooks.usePublisher('removeLink')
+  const applyLinkChanges = linkDialogPluginHooks.usePublisher('applyLinkChanges')
 
   React.useEffect(() => {
     const update = () => {

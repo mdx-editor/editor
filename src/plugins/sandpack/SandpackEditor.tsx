@@ -3,7 +3,7 @@ import { SandpackPreset } from './realmPlugin'
 import { CodeBlockEditorProps } from '../codeblock/realmPlugin'
 import { useCodeMirrorRef } from './useCodeMirrorRef'
 import { SandpackCodeEditor, SandpackLayout, SandpackPreview, SandpackProvider, useSandpack } from '@codesandbox/sandpack-react'
-import { useCodeBlockEditorContext } from '../codeblock/CodeBlockEditorContainer'
+import { useCodeBlockEditorContext } from '../codeblock/CodeBlockNode'
 
 interface CodeUpdateEmitterProps {
   snippetFileName: string

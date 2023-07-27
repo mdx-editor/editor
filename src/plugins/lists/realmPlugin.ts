@@ -8,6 +8,8 @@ import { ListItemNode, ListNode } from '@lexical/list'
 import type { RangeSelection } from 'lexical'
 import { $getListDepth, $isListItemNode, $isListNode } from '@lexical/list'
 import { $getSelection, $isElementNode, $isRangeSelection, COMMAND_PRIORITY_CRITICAL, ElementNode, INDENT_CONTENT_COMMAND } from 'lexical'
+import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin'
+import { ListPlugin } from '@lexical/react/LexicalListPlugin'
 
 export const listsSystem = system((_) => ({}), [coreSystem])
 
@@ -23,6 +25,8 @@ export const [listsPlugin] = realmPlugin({
     realm.pubKey('addExportVisitor', LexicalListItemVisitor)
 
     realm.getKeyValue('rootEditor')?.registerCommand(INDENT_CONTENT_COMMAND, () => !isIndentPermitted(7), COMMAND_PRIORITY_CRITICAL)
+    realm.pubKey('addComposerChild', TabIndentationPlugin)
+    realm.pubKey('addComposerChild', ListPlugin)
   }
 })
 
