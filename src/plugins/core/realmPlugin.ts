@@ -113,7 +113,6 @@ export const coreSystem = system((r) => {
 
   // Export handler
   r.pub(createRootEditorSubscription, (theRootEditor) => {
-    console.log('meh')
     return theRootEditor.registerUpdateListener(({ dirtyElements, dirtyLeaves, editorState }) => {
       if (dirtyElements.size === 0 && dirtyLeaves.size === 0) {
         return

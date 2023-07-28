@@ -15,6 +15,7 @@ export const [linkPlugin] = realmPlugin({
     realm.pubKey('addImportVisitor', MdastLinkVisitor)
     realm.pubKey('addLexicalNode', LinkNode)
     realm.pubKey('addExportVisitor', LexicalLinkVisitor)
-    realm.pubKey('addComposerChild', () => <LexicalLinkPlugin validateUrl={params?.validateUrl || (() => false)} />)
+    const linkPluginProps = params?.validateUrl ? { validateUrl: params.validateUrl } : {}
+    realm.pubKey('addComposerChild', () => <LexicalLinkPlugin {...linkPluginProps} />)
   }
 })
