@@ -227,6 +227,9 @@ export const coreSystem = system((r) => {
   const composerChildren = r.node<React.ComponentType[]>([])
   const addComposerChild = createAppendNodeFor(composerChildren)
 
+  const topAreaChildren = r.node<React.ComponentType[]>([])
+  const addTopAreaChild = createAppendNodeFor(topAreaChildren)
+
   const historyState = r.node(createEmptyHistoryState())
   return {
     // state
@@ -274,7 +277,10 @@ export const coreSystem = system((r) => {
 
     // child controls
     composerChildren,
-    addComposerChild
+    addComposerChild,
+
+    topAreaChildren,
+    addTopAreaChild
   }
 }, [])
 

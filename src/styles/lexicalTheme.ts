@@ -1,7 +1,7 @@
 import { EditorThemeClasses } from 'lexical'
-import styles from './theme.module.css'
+import styles from './lexical-theme.module.css'
 
-export const theme: EditorThemeClasses = {
+export const lexicalTheme: EditorThemeClasses = {
   text: {
     bold: styles.bold,
     italic: styles.italic,

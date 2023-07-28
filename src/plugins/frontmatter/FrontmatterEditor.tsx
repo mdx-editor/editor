@@ -5,7 +5,7 @@ import { useFieldArray, useForm } from 'react-hook-form'
 import ArrowDown from '../../icons/arrow_drop_down.svg'
 import ArrowRight from '../../icons/arrow_right.svg'
 import DeleteIcon from '../../icons/delete.svg'
-import styles from '../../ui/styles.module.css'
+import styles from '../../styles/ui.module.css'
 
 type YamlConfig = { key: string; value: string }[]
 

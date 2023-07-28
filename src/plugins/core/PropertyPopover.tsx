@@ -3,7 +3,8 @@ import * as RadixPopover from '@radix-ui/react-popover'
 import React from 'react'
 import { useForm } from 'react-hook-form'
 import SettingsIcon from '../../icons/settings.svg'
-import styles from '../../ui/styles.module.css'
+import styles from '../../styles/ui.module.css'
+
 import { PopoverContent, PopoverPortal } from './ui/PopoverUtils'
 
 interface PropertyPopoverProps {

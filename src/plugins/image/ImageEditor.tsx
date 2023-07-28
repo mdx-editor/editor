@@ -19,8 +19,7 @@ import {
   KEY_ESCAPE_COMMAND,
   SELECTION_CHANGE_COMMAND
 } from 'lexical'
-import { Suspense, useCallback, useEffect, useRef, useState } from 'react'
-import styles from '../../ui/styles.module.css'
+import styles from '../../styles/ui.module.css'
 import classNames from 'classnames'
 import { $isImageNode } from './ImageNode'
 
@@ -61,14 +60,14 @@ function LazyImage({
 }
 
 export function ImageEditor({ src, title, nodeKey }: ImageEditorProps): JSX.Element {
-  const imageRef = useRef<null | HTMLImageElement>(null)
-  const buttonRef = useRef<HTMLButtonElement | null>(null)
+  const imageRef = React.useRef<null | HTMLImageElement>(null)
+  const buttonRef = React.useRef<HTMLButtonElement | null>(null)
   const [isSelected, setSelected, clearSelection] = useLexicalNodeSelection(nodeKey)
   const [editor] = useLexicalComposerContext()
-  const [selection, setSelection] = useState<RangeSelection | NodeSelection | GridSelection | null>(null)
-  const activeEditorRef = useRef<LexicalEditor | null>(null)
+  const [selection, setSelection] = React.useState<RangeSelection | NodeSelection | GridSelection | null>(null)
+  const activeEditorRef = React.useRef<LexicalEditor | null>(null)
 
-  const onDelete = useCallback(
+  const onDelete = React.useCallback(
     (payload: KeyboardEvent) => {
       if (isSelected && $isNodeSelection($getSelection())) {
         const event: KeyboardEvent = payload
@@ -83,7 +82,7 @@ export function ImageEditor({ src, title, nodeKey }: ImageEditorProps): JSX.Elem
     [isSelected, nodeKey]
   )
 
-  const onEnter = useCallback(
+  const onEnter = React.useCallback(
     (event: KeyboardEvent) => {
       const latestSelection = $getSelection()
       const buttonElem = buttonRef.current
@@ -99,7 +98,7 @@ export function ImageEditor({ src, title, nodeKey }: ImageEditorProps): JSX.Elem
     [isSelected]
   )
 
-  const onEscape = useCallback(
+  const onEscape = React.useCallback(
     (event: KeyboardEvent) => {
       if (buttonRef.current === event.target) {
         $setSelection(null)
@@ -117,7 +116,7 @@ export function ImageEditor({ src, title, nodeKey }: ImageEditorProps): JSX.Elem
     [editor, setSelected]
   )
 
-  useEffect(() => {
+  React.useEffect(() => {
     let isMounted = true
     const unregister = mergeRegister(
       editor.registerUpdateListener(({ editorState }) => {
@@ -178,7 +177,7 @@ export function ImageEditor({ src, title, nodeKey }: ImageEditorProps): JSX.Elem
   const draggable = $isNodeSelection(selection)
   const isFocused = isSelected
   return (
-    <Suspense fallback={null}>
+    <React.Suspense fallback={null}>
       <>
         <div draggable={draggable} className={styles.imageWrapper} data-editor-block-type="image">
           <LazyImage
@@ -191,6 +190,6 @@ export function ImageEditor({ src, title, nodeKey }: ImageEditorProps): JSX.Elem
           />
         </div>
       </>
-    </Suspense>
+    </React.Suspense>
   )
 }

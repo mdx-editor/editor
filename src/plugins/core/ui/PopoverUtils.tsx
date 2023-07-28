@@ -1,7 +1,7 @@
 import React from 'react'
 import * as RadixPopover from '@radix-ui/react-popover'
 import { corePluginHooks } from '../realmPlugin'
-import styles from '../../../ui/styles.module.css'
+import styles from '../../../styles/ui.module.css'
 
 export const PopoverPortal = (props: RadixPopover.PopoverPortalProps) => {
   const [editorRootElementRef] = corePluginHooks.useEmitterValues('editorRootElementRef')

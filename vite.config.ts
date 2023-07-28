@@ -21,9 +21,6 @@ const externalPackages = [
   ...Object.keys(packageJson.dependencies),
   ...Object.keys(packageJson.peerDependencies),
   /@lexical\/react\/.*/,
-  // '@lexical/react/LexicalHorizontalRuleNode',
-  // '@lexical/react/LexicalHorizontalRulePlugin',
-  // '@lexical/react/LexicalComposerContext',
 ]
 
 // https://vitejs.dev/config/

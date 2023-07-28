@@ -15,7 +15,7 @@ import OpenInNewIcon from '../../icons/open_in_new.svg'
 import DropDownIcon from '../../icons/arrow_drop_down.svg'
 import classNames from 'classnames'
 import { useCombobox } from 'downshift'
-import styles from '../../ui/styles.module.css'
+import styles from '../../styles/ui.module.css'
 import { corePluginHooks } from '../core/realmPlugin'
 import { linkDialogPluginHooks } from './realmPlugin'
 

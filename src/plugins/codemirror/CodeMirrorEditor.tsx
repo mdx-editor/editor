@@ -3,7 +3,7 @@ import { CodeBlockEditorProps } from '../codeblock/realmPlugin'
 import { useCodeMirrorRef } from '../sandpack/useCodeMirrorRef'
 import { CodeEditor as TheEditorFromSandpack, SandpackProvider } from '@codesandbox/sandpack-react'
 import { useCodeBlockEditorContext } from '../codeblock/CodeBlockNode'
-import styles from '../../ui/styles.module.css'
+import styles from '../../styles/ui.module.css'
 
 export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: CodeBlockEditorProps) => {
   const codeMirrorRef = useCodeMirrorRef(nodeKey, 'sandpack', 'jsx')

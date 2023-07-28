@@ -1,9 +1,9 @@
 import React from 'react'
 import { RealmPluginInitializer } from './gurx'
 import { corePlugin, corePluginHooks } from './plugins/core/realmPlugin'
-import { theme as contentTheme } from './content/theme'
+import { lexicalTheme } from './styles/lexicalTheme'
 import { LexicalComposer } from '@lexical/react/LexicalComposer'
-import styles from './ui/styles.module.css'
+import styles from './styles/ui.module.css'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary'
@@ -18,7 +18,7 @@ const LexicalProvider: React.FC<{ children: JSX.Element | string | (JSX.Element 
       initialConfig={{
         editorState: initialRootEditorState,
         namespace: 'MDXEditor',
-        theme: contentTheme,
+        theme: lexicalTheme,
         nodes: nodes,
         onError: (error: Error) => {
           throw error
@@ -31,9 +31,16 @@ const LexicalProvider: React.FC<{ children: JSX.Element | string | (JSX.Element 
 }
 
 const RichTextEditor: React.FC = () => {
-  const [contentEditableClassName, composerChildren] = corePluginHooks.useEmitterValues('contentEditableClassName', 'composerChildren')
+  const [contentEditableClassName, composerChildren, topAreaChildren] = corePluginHooks.useEmitterValues(
+    'contentEditableClassName',
+    'composerChildren',
+    'topAreaChildren'
+  )
   return (
     <>
+      {topAreaChildren.map((Child, index) => (
+        <Child key={index} />
+      ))}
       <RichTextPlugin
         contentEditable={<ContentEditable className={classNames(styles.contentEditable, contentEditableClassName)} />}
         placeholder={<div></div>}

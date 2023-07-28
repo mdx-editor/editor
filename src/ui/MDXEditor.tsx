@@ -7,7 +7,7 @@ import { HorizontalRulePlugin } from '@lexical/react/LexicalHorizontalRulePlugin
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import classNames from 'classnames'
 import React from 'react'
-import { theme as contentTheme } from '../content/theme'
+import { lexicalTheme } from '../styles/lexicalTheme'
 import { EditorSystemComponent, useEmitterValues, usePublisher } from '../system/EditorSystemComponent'
 import { ViewMode } from '../types/ViewMode'
 import { ViewModeToggler } from './SourcePlugin'
@@ -188,7 +188,7 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>(
         <LexicalComposer
           initialConfig={{
             namespace: 'MDXEditor',
-            theme: contentTheme,
+            theme: lexicalTheme,
             onError: (error: Error) => {
               throw error
             }

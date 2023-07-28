@@ -4,7 +4,7 @@ import { MdxJsxAttribute, MdxJsxFlowElement, MdxJsxTextElement } from 'mdast-uti
 import React from 'react'
 import { NestedLexicalEditor, useMdastNodeUpdater } from '../plugins/core/NestedLexicalEditor'
 import { PropertyPopover } from '../plugins/core/PropertyPopover'
-import styles from '../ui/styles.module.css'
+import styles from '../styles/ui.module.css'
 import { JsxEditorProps } from '../plugins/jsx/realmPlugin'
 
 export const GenericJsxEditor: React.FC<JsxEditorProps> = ({ mdastNode, descriptor }) => {

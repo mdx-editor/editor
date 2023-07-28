@@ -16,8 +16,8 @@ import {
   createEditor
 } from 'lexical'
 import * as Mdast from 'mdast'
-import React, { useEffect } from 'react'
-import { theme } from '../../content/theme'
+import React from 'react'
+import { lexicalTheme } from '../../styles/lexicalTheme'
 import { exportLexicalTreeToMdast } from '../../exportMarkdownFromLexical'
 import { importMdastTreeToLexical } from '../../importMarkdownToLexical'
 import AddColumnIcon from '../../icons/add_column.svg'
@@ -35,7 +35,7 @@ import { TableNode } from './TableNode'
 
 import * as RadixToolbar from '@radix-ui/react-toolbar'
 import classNames from 'classnames'
-import styles from '../../ui/styles.module.css'
+import styles from '../../styles/ui.module.css'
 import { corePluginHooks } from '../core/realmPlugin'
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
 import { mergeRegister } from '@lexical/utils'
@@ -104,7 +104,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
     },
     [lexicalTable, parentEditor]
   )
-  useEffect(() => {
+  React.useEffect(() => {
     lexicalTable.focusEmitter.subscribe(setActiveCellWithBoundaries)
   }, [lexicalTable, setActiveCellWithBoundaries])
 
@@ -287,7 +287,7 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
   const [editor] = React.useState(() => {
     const editor = createEditor({
       nodes: usedLexicalNodes,
-      theme: theme
+      theme: lexicalTheme
     })
 
     editor.update(() => {

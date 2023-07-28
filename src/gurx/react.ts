@@ -1,18 +1,4 @@
-import * as React from 'react'
-import {
-  ComponentType,
-  createContext,
-  createElement,
-  forwardRef,
-  ForwardRefExoticComponent,
-  ReactNode,
-  RefAttributes,
-  useContext,
-  useImperativeHandle,
-  useState,
-  useCallback,
-  useMemo
-} from 'react'
+import React from 'react'
 import { always, tap } from '../utils/fp'
 import { RealmNode } from './realm'
 
@@ -131,9 +117,9 @@ export type MethodsFromPropMap<Sys extends System, Map extends SystemPropsMap<Sy
  *
  * @typeParam T the type of the component
  */
-export type RefHandle<T> = T extends ForwardRefExoticComponent<RefAttributes<infer Handle>> ? Handle : never
+export type RefHandle<T> = T extends React.ForwardRefExoticComponent<React.RefAttributes<infer Handle>> ? Handle : never
 
-const GurxContext = createContext(undefined)
+const GurxContext = React.createContext(undefined)
 /**
  * Converts a system spec to React component by mapping the system streams to component properties, events and methods. Returns hooks for querying and modifying
  * the system streams from the component's child components.
@@ -155,7 +141,7 @@ export function realmFactoryToComponent<
   Realm extends TypedRealm<Sys> = TypedRealm<Sys>,
   M extends SystemPropsMap<Sys> = SystemPropsMap<Sys>
 >(realmFactory: RF, map: M, Root?: RootComp) {
-  type RootCompProps = RootComp extends ComponentType<infer RP> ? RP : { children?: ReactNode }
+  type RootCompProps = RootComp extends React.ComponentType<infer RP> ? RP : { children?: React.ReactNode }
   type CompProps = PropsFromPropMap<Sys, M> & RootCompProps
   type CompMethods = MethodsFromPropMap<Sys, M>
 
@@ -196,8 +182,8 @@ export function realmFactoryToComponent<
     }, {} as CompMethods)
   }
 
-  const Component = forwardRef<CompMethods, CompProps>((props, ref) => {
-    const realm = useMemo(() => {
+  const Component = React.forwardRef<CompMethods, CompProps>((props, ref) => {
+    const realm = React.useMemo(() => {
       return tap<Realm>(realmFactory() as Realm, (realm) => applyPropsToRealm(realm, props))
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
@@ -215,16 +201,16 @@ export function realmFactoryToComponent<
       }
     }, [props])
 
-    useImperativeHandle(ref, always(buildMethods(realm)))
+    React.useImperativeHandle(ref, always(buildMethods(realm)))
 
-    const children = (props as unknown as { children?: ReactNode }).children
+    const children = (props as unknown as { children?: React.ReactNode }).children
 
-    return createElement(
+    return React.createElement(
       Context.Provider,
       { value: realm },
       Root
-        ? createElement(
-            Root as unknown as ComponentType,
+        ? React.createElement(
+            Root as unknown as React.ComponentType,
             omit([...requiredPropNames, ...optionalPropNames, ...eventNames], props),
             children
           )
@@ -246,7 +232,7 @@ export function sysHooks<Sys extends System>() {
 
   const usePublisher = <K extends keyof Sys>(key: K) => {
     const realm = React.useContext(Context)!
-    return useCallback(
+    return React.useCallback(
       (value: ValueForKey<Sys, K>) => {
         realm.pubKey(key, value)
       },
@@ -259,8 +245,8 @@ export function sysHooks<Sys extends System>() {
    * Returns the values emitted from the nodes.
    */
   const useEmitterValues = <K extends SystemKeys<Sys>>(...keys: K) => {
-    const realm = useContext(Context)!
-    const [values, setValues] = useState(() => realm.getKeyValues(keys))
+    const realm = React.useContext(Context)!
+    const [values, setValues] = React.useState(() => realm.getKeyValues(keys))
 
     useIsomorphicLayoutEffect(
       () =>
@@ -281,16 +267,16 @@ export function sysHooks<Sys extends System>() {
   }
 
   const usePubKeys = () => {
-    return useContext(Context)!.pubKeys
+    return React.useContext(Context)!.pubKeys
   }
 
   const useEmitter = <K extends StringKeys<Sys>>(key: K, callback: (value: ValueForKey<Sys, K>) => void) => {
-    const realm = useContext(Context)!
+    const realm = React.useContext(Context)!
     useIsomorphicLayoutEffect(() => realm.subKey(key, callback), [callback])
   }
 
   const useRealmContext = () => {
-    return useContext(Context)!
+    return React.useContext(Context)!
   }
 
   return {

@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 import {
   $addUpdateTag,
+  $getNodeByKey,
   $getRoot,
   BLUR_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
   DecoratorNode,
   EditorConfig,
+  KEY_BACKSPACE_COMMAND,
   LexicalEditor,
   createEditor
 } from 'lexical'
@@ -17,15 +19,12 @@ import { ContentEditable } from '@lexical/react/LexicalContentEditable'
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary'
 import { LexicalNestedComposer } from '@lexical/react/LexicalNestedComposer'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
-import { theme } from '../../content/theme'
+import { lexicalTheme } from '../../styles/lexicalTheme'
 import { exportLexicalTreeToMdast } from '../../exportMarkdownFromLexical'
 import { importMdastTreeToLexical } from '../../importMarkdownToLexical'
-import styles from '../../ui/styles.module.css'
+import styles from '../../styles/ui.module.css'
 import { SharedHistoryPlugin } from './SharedHistoryPlugin'
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
-// TODO:
-// import { SharedHistoryPlugin } from '../SharedHistoryPlugin'
+import { mergeRegister } from '@lexical/utils'
 
 interface NestedEditorsContextValue<T extends Node> {
   parentEditor: LexicalEditor
@@ -55,7 +54,26 @@ export function useMdastNodeUpdater<T extends Mdast.Content>() {
   return function updateMdastNode(node: Partial<T>) {
     parentEditor.update(() => {
       $addUpdateTag('history-push')
-      lexicalNode.setMdastNode(node)
+      const currentNode = $getNodeByKey(lexicalNode.getKey())
+      if (currentNode) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+        currentNode.setMdastNode(node)
+      }
+    })
+  }
+}
+
+/**
+ * A hook that returns a function that removes the lexical node from the editor.
+ */
+export function useLexicalNodeRemove() {
+  const { parentEditor, lexicalNode } = useNestedEditorContext()
+
+  return () => {
+    parentEditor.update(() => {
+      const node = $getNodeByKey(lexicalNode.getKey())
+      node!.selectNext()
+      node!.remove()
     })
   }
 }
@@ -106,6 +124,7 @@ export const NestedLexicalEditor = function <T extends Mdast.Content>(props: Nes
   const { getContent, getUpdatedMdastNode, contentEditableProps, block = false } = props
   const { mdastNode } = useNestedEditorContext<T>()
   const updateMdastNode = useMdastNodeUpdater<T>()
+  const removeNode = useLexicalNodeRemove()
   const content = getContent(mdastNode)
 
   const [importVisitors, exportVisitors, usedLexicalNodes, jsxComponentDescriptors, jsxIsAvailable] = corePluginHooks.useEmitterValues(
@@ -119,7 +138,7 @@ export const NestedLexicalEditor = function <T extends Mdast.Content>(props: Nes
   const [editor] = React.useState(() => {
     const editor = createEditor({
       nodes: usedLexicalNodes,
-      theme: theme
+      theme: lexicalTheme
     })
     return editor
   })
@@ -149,24 +168,39 @@ export const NestedLexicalEditor = function <T extends Mdast.Content>(props: Nes
   }, [editor, block, importVisitors])
 
   React.useEffect(() => {
-    return editor.registerCommand(
-      BLUR_COMMAND,
-      () => {
-        editor.getEditorState().read(() => {
-          const mdast = exportLexicalTreeToMdast({
-            root: $getRoot(),
-            visitors: exportVisitors,
-            jsxComponentDescriptors,
-            jsxIsAvailable
+    return mergeRegister(
+      editor.registerCommand(
+        BLUR_COMMAND,
+        () => {
+          editor.getEditorState().read(() => {
+            const mdast = exportLexicalTreeToMdast({
+              root: $getRoot(),
+              visitors: exportVisitors,
+              jsxComponentDescriptors,
+              jsxIsAvailable
+            })
+            const content: Mdast.Content[] = block ? mdast.children : (mdast.children[0] as Mdast.Paragraph)!.children
+            updateMdastNode(getUpdatedMdastNode(structuredClone(mdastNode) as any, content as any))
           })
-          const content: Mdast.Content[] = block ? mdast.children : (mdast.children[0] as Mdast.Paragraph)!.children
-          updateMdastNode(getUpdatedMdastNode(structuredClone(mdastNode) as any, content as any))
-        })
-        return true
-      },
-      COMMAND_PRIORITY_CRITICAL
+          return true
+        },
+        COMMAND_PRIORITY_CRITICAL
+      ),
+      editor.registerCommand(
+        KEY_BACKSPACE_COMMAND,
+        (_, editor) => {
+          const editorElement = editor.getRootElement()
+          // the innerText here is actually the text before backspace takes effect.
+          if (editorElement?.innerText === '\n') {
+            removeNode()
+            return true
+          }
+          return false
+        },
+        COMMAND_PRIORITY_CRITICAL
+      )
     )
-  }, [block, editor, exportVisitors, getUpdatedMdastNode, jsxComponentDescriptors, jsxIsAvailable, mdastNode, updateMdastNode])
+  }, [block, editor, exportVisitors, getUpdatedMdastNode, jsxComponentDescriptors, jsxIsAvailable, mdastNode, removeNode, updateMdastNode])
 
   return (
     <LexicalNestedComposer initialEditor={editor}>

@@ -3,7 +3,7 @@ import { PhrasingContent } from 'mdast'
 import React from 'react'
 import { NestedLexicalEditor, useMdastNodeUpdater } from '../plugins/core/NestedLexicalEditor'
 import { PropertyPopover } from '../plugins/core/PropertyPopover'
-import styles from '../ui/styles.module.css'
+import styles from '../styles/ui.module.css'
 import { DirectiveEditorProps } from '../plugins/directives/realmPlugin'
 import { Directive } from 'mdast-util-directive'
 
