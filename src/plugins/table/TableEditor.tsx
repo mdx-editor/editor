@@ -8,6 +8,8 @@ import {
   $getRoot,
   BLUR_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
+  COMMAND_PRIORITY_LOW,
+  FOCUS_COMMAND,
   KEY_ENTER_COMMAND,
   KEY_TAB_COMMAND,
   LexicalEditor,
@@ -299,7 +301,7 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
     return editor
   })
 
-  const saveAndDispose = React.useCallback(
+  const saveAndFocus = React.useCallback(
     (nextCell: [number, number] | null) => {
       editor.getEditorState().read(() => {
         const mdast = exportLexicalTreeToMdast({
@@ -325,10 +327,19 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
         (payload) => {
           payload.preventDefault()
           const nextCell: [number, number] = payload.shiftKey ? [colIndex - 1, rowIndex] : [colIndex + 1, rowIndex]
-          saveAndDispose(nextCell)
+          saveAndFocus(nextCell)
           return true
         },
         COMMAND_PRIORITY_CRITICAL
+      ),
+
+      editor.registerCommand(
+        FOCUS_COMMAND,
+        () => {
+          setActiveCell([colIndex, rowIndex])
+          return false
+        },
+        COMMAND_PRIORITY_LOW
       ),
 
       editor.registerCommand(
@@ -336,7 +347,7 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
         (payload) => {
           payload?.preventDefault()
           const nextCell: [number, number] = payload?.shiftKey ? [colIndex, rowIndex - 1] : [colIndex, rowIndex + 1]
-          saveAndDispose(nextCell)
+          saveAndFocus(nextCell)
           return true
         },
         COMMAND_PRIORITY_CRITICAL
@@ -349,13 +360,13 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
           if (relatedTarget?.dataset['editorDialog'] !== undefined || relatedTarget?.dataset['toolbarItem'] !== undefined) {
             return false
           }
-          saveAndDispose(null)
+          saveAndFocus(null)
           return true
         },
         COMMAND_PRIORITY_CRITICAL
       )
     )
-  }, [colIndex, editor, rowIndex, saveAndDispose])
+  }, [colIndex, editor, rowIndex, saveAndFocus, setActiveCell])
 
   React.useEffect(() => {
     focus && editor?.focus()
