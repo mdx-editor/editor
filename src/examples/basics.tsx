@@ -23,14 +23,17 @@ import {
   useCodeBlockEditorContext
 } from '../'
 import { virtuosoSampleSandpackConfig } from './_boilerplate'
+import { markdownShorcutPlugin } from '../plugins/markdown-shortcut/realmPlugin'
+import { quotePlugin } from '../plugins/quote/realmPlugin'
 
+const helloMarkdown = `Hello <u>world am **here**</u> more <u>under</u> line`
 export function Bare() {
   const ref = React.useRef<MDXEditorMethods>(null)
   return (
     <>
       <button onClick={() => ref.current?.setMarkdown('new markdown')}>Set new markdown</button>
       <button onClick={() => console.log(ref.current?.getMarkdown())}>Get markdown</button>
-      <MDXEditorCore ref={ref} markdown={`Hello <u>world am **here**</u> more <u>under</u> line`} onChange={console.log} />
+      <MDXEditorCore ref={ref} markdown={helloMarkdown} onChange={console.log} />
     </>
   )
 }
@@ -159,6 +162,23 @@ export function CodeBlock() {
         codeBlockPlugin({ codeBlockEditorDescriptors: [PlainTextCodeEditorDescriptor] }),
         sandpackPlugin({ sandpackConfig: virtuosoSampleSandpackConfig }),
         codeMirrorPlugin({ codeBlockLanguages: { js: 'JavaScript', css: 'CSS' } })
+      ]}
+    />
+  )
+}
+
+export function MarkdownShortcuts() {
+  return (
+    <MDXEditorCore
+      onChange={console.log}
+      markdown={helloMarkdown}
+      plugins={[
+        codeBlockPlugin({ codeBlockEditorDescriptors: [PlainTextCodeEditorDescriptor] }),
+        headingsPlugin(),
+        listsPlugin(),
+        linkPlugin(),
+        quotePlugin(),
+        markdownShorcutPlugin()
       ]}
     />
   )

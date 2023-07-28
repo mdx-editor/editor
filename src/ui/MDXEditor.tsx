@@ -10,7 +10,6 @@ import React from 'react'
 import { theme as contentTheme } from '../content/theme'
 import { EditorSystemComponent, useEmitterValues, usePublisher } from '../system/EditorSystemComponent'
 import { ViewMode } from '../types/ViewMode'
-import { PatchedMarkdownShortcutPlugin } from './MarkdownShortcutPlugin'
 import { ViewModeToggler } from './SourcePlugin'
 import { ToolbarPlugin } from './ToolbarPlugin'
 import {
@@ -217,7 +216,6 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>(
               />
             </ViewModeToggler>
             <HorizontalRulePlugin />
-            <PatchedMarkdownShortcutPlugin />
             <MDXMethods mdxRef={ref} />
           </EditorSystemComponent>
         </LexicalComposer>
