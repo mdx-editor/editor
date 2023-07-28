@@ -29,13 +29,14 @@ import InsertColRightIcon from '../../icons/insert_col_right.svg'
 import InsertRowAboveIcon from '../../icons/insert_row_above.svg'
 import InsertRowBelowIcon from '../../icons/insert_row_below.svg'
 import MoreHorizIcon from '../../icons/more_horiz.svg'
-import { MarkdownAstRenderer } from './MarkdownAstRenderer'
 import { TableNode } from './TableNode'
 
 import * as RadixToolbar from '@radix-ui/react-toolbar'
 import classNames from 'classnames'
 import styles from '../../ui/styles.module.css'
 import { corePluginHooks } from '../core/realmPlugin'
+import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
+import { mergeRegister } from '@lexical/utils'
 
 const AlignToTailwindClassMap = {
   center: styles.centeredCell,
@@ -55,6 +56,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
   const setActiveCellWithBoundaries = React.useCallback(
     (cell: [number, number] | null) => {
       const colCount = lexicalTable.getColCount()
+
       if (cell === null) {
         setActiveCell(null)
         return
@@ -204,7 +206,14 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
                     align={mdastNode.align?.[colIndex]}
                     key={colIndex}
                     contents={mdastCell.children}
-                    {...{ rowIndex, colIndex, lexicalTable, parentEditor, activeCellTuple: [activeCell, setActiveCellWithBoundaries] }}
+                    setActiveCell={setActiveCellWithBoundaries}
+                    {...{
+                      rowIndex,
+                      colIndex,
+                      lexicalTable,
+                      parentEditor,
+                      activeCell
+                    }}
                   />
                 )
               })}
@@ -241,12 +250,14 @@ export interface CellProps {
   colIndex: number
   rowIndex: number
   align?: Mdast.AlignType
-  activeCellTuple: [[number, number] | null, (cell: [number, number] | null) => void]
+  activeCell: [number, number] | null
+  setActiveCell: (cell: [number, number] | null) => void
+  focus: boolean
 }
 
-const Cell: React.FC<CellProps> = ({ align, ...props }) => {
-  const [activeCell, setActiveCell] = props.activeCellTuple
-  const isActive = activeCell && activeCell[0] === props.colIndex && activeCell[1] === props.rowIndex
+const Cell: React.FC<Omit<CellProps, 'focus'>> = ({ align, ...props }) => {
+  const { activeCell, setActiveCell } = props
+  const isActive = Boolean(activeCell && activeCell[0] === props.colIndex && activeCell[1] === props.rowIndex)
 
   const className = AlignToTailwindClassMap[align || 'left']
   return (
@@ -257,12 +268,12 @@ const Cell: React.FC<CellProps> = ({ align, ...props }) => {
         setActiveCell([props.colIndex, props.rowIndex])
       }}
     >
-      {isActive ? <CellEditor {...props} /> : <MarkdownAstRenderer mdastChildren={props.contents} />}
+      <CellEditor {...props} focus={isActive} />
     </td>
   )
 }
 
-const CellEditor: React.FC<CellProps> = ({ activeCellTuple, parentEditor, lexicalTable, contents, colIndex, rowIndex }) => {
+const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, lexicalTable, contents, colIndex, rowIndex }) => {
   const [importVisitors, exportVisitors, usedLexicalNodes, jsxComponentDescriptors, jsxIsAvailable] = corePluginHooks.useEmitterValues(
     'importVisitors',
     'exportVisitors',
@@ -272,71 +283,9 @@ const CellEditor: React.FC<CellProps> = ({ activeCellTuple, parentEditor, lexica
   )
 
   const [editor] = React.useState(() => {
-    let disposed = false
     const editor = createEditor({
       nodes: usedLexicalNodes,
       theme: theme
-    })
-
-    function saveAndDispose(nextCell: [number, number] | null) {
-      if (disposed) {
-        return
-      }
-      disposed = true
-      editor.getEditorState().read(() => {
-        const mdast = exportLexicalTreeToMdast({
-          root: $getRoot(),
-          jsxComponentDescriptors,
-          visitors: exportVisitors,
-          jsxIsAvailable
-        })
-        parentEditor.update(() => {
-          lexicalTable.updateCellContents(colIndex, rowIndex, (mdast.children[0] as Mdast.Paragraph).children)
-        })
-      })
-
-      activeCellTuple[1](nextCell)
-    }
-
-    editor.registerCommand(
-      KEY_TAB_COMMAND,
-      (payload) => {
-        payload.preventDefault()
-        const nextCell: [number, number] = payload.shiftKey ? [colIndex - 1, rowIndex] : [colIndex + 1, rowIndex]
-        saveAndDispose(nextCell)
-        return true
-      },
-      COMMAND_PRIORITY_CRITICAL
-    )
-
-    editor.registerCommand(
-      KEY_ENTER_COMMAND,
-      (payload) => {
-        payload?.preventDefault()
-        const nextCell: [number, number] = payload?.shiftKey ? [colIndex, rowIndex - 1] : [colIndex, rowIndex + 1]
-        saveAndDispose(nextCell)
-        return true
-      },
-      COMMAND_PRIORITY_CRITICAL
-    )
-
-    editor.registerCommand(
-      BLUR_COMMAND,
-      (payload) => {
-        const relatedTarget = payload.relatedTarget as HTMLElement | null
-        if (relatedTarget?.dataset['editorDialog'] !== undefined || relatedTarget?.dataset['toolbarItem'] !== undefined) {
-          return false
-        }
-        saveAndDispose(null)
-        return true
-      },
-      COMMAND_PRIORITY_CRITICAL
-    )
-
-    editor.registerRootListener((element) => {
-      if (element) {
-        editor.focus()
-      }
     })
 
     editor.update(() => {
@@ -350,9 +299,72 @@ const CellEditor: React.FC<CellProps> = ({ activeCellTuple, parentEditor, lexica
     return editor
   })
 
+  const saveAndDispose = React.useCallback(
+    (nextCell: [number, number] | null) => {
+      editor.getEditorState().read(() => {
+        const mdast = exportLexicalTreeToMdast({
+          root: $getRoot(),
+          jsxComponentDescriptors,
+          visitors: exportVisitors,
+          jsxIsAvailable
+        })
+        parentEditor.update(() => {
+          lexicalTable.updateCellContents(colIndex, rowIndex, (mdast.children[0] as Mdast.Paragraph).children)
+        })
+      })
+
+      setActiveCell(nextCell)
+    },
+    [colIndex, editor, exportVisitors, jsxComponentDescriptors, jsxIsAvailable, lexicalTable, parentEditor, rowIndex, setActiveCell]
+  )
+
+  React.useEffect(() => {
+    return mergeRegister(
+      editor.registerCommand(
+        KEY_TAB_COMMAND,
+        (payload) => {
+          payload.preventDefault()
+          const nextCell: [number, number] = payload.shiftKey ? [colIndex - 1, rowIndex] : [colIndex + 1, rowIndex]
+          saveAndDispose(nextCell)
+          return true
+        },
+        COMMAND_PRIORITY_CRITICAL
+      ),
+
+      editor.registerCommand(
+        KEY_ENTER_COMMAND,
+        (payload) => {
+          payload?.preventDefault()
+          const nextCell: [number, number] = payload?.shiftKey ? [colIndex, rowIndex - 1] : [colIndex, rowIndex + 1]
+          saveAndDispose(nextCell)
+          return true
+        },
+        COMMAND_PRIORITY_CRITICAL
+      ),
+
+      editor.registerCommand(
+        BLUR_COMMAND,
+        (payload) => {
+          const relatedTarget = payload.relatedTarget as HTMLElement | null
+          if (relatedTarget?.dataset['editorDialog'] !== undefined || relatedTarget?.dataset['toolbarItem'] !== undefined) {
+            return false
+          }
+          saveAndDispose(null)
+          return true
+        },
+        COMMAND_PRIORITY_CRITICAL
+      )
+    )
+  }, [colIndex, editor, rowIndex, saveAndDispose])
+
+  React.useEffect(() => {
+    focus && editor?.focus()
+  }, [focus, editor])
+
   return (
     <LexicalNestedComposer initialEditor={editor}>
-      <RichTextPlugin contentEditable={<ContentEditable autoFocus />} placeholder={<div></div>} ErrorBoundary={LexicalErrorBoundary} />
+      <RichTextPlugin contentEditable={<ContentEditable />} placeholder={<div></div>} ErrorBoundary={LexicalErrorBoundary} />
+      <HistoryPlugin />
     </LexicalNestedComposer>
   )
 }
