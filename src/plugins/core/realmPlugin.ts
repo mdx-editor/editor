@@ -6,12 +6,14 @@ import {
   BLUR_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
   COMMAND_PRIORITY_LOW,
+  FORMAT_TEXT_COMMAND,
   Klass,
   LexicalEditor,
   LexicalNode,
   ParagraphNode,
   RangeSelection,
   SELECTION_CHANGE_COMMAND,
+  TextFormatType,
   TextNode
 } from 'lexical'
 import * as Mdast from 'mdast'
@@ -60,6 +62,8 @@ export const coreSystem = system((r) => {
   const contentEditableClassName = r.node<string>('')
   const inFocus = r.node(false, true)
   const currentFormat = r.node(0, true)
+
+  const applyFormat = r.node<TextFormatType>()
   const currentSelection = r.node<RangeSelection | null>(null)
 
   const activeEditorSubscriptions = r.node<EditorSubscription[]>([])
@@ -231,11 +235,15 @@ export const coreSystem = system((r) => {
   const addTopAreaChild = createAppendNodeFor(topAreaChildren)
 
   const historyState = r.node(createEmptyHistoryState())
+
+  r.sub(r.pipe(applyFormat, r.o.withLatestFrom(activeEditor)), ([format, theEditor]) => {
+    theEditor?.dispatchCommand(FORMAT_TEXT_COMMAND, format)
+  })
+
   return {
     // state
     activeEditor,
     inFocus,
-    currentFormat,
     historyState,
     currentSelection,
 
@@ -280,7 +288,11 @@ export const coreSystem = system((r) => {
     addComposerChild,
 
     topAreaChildren,
-    addTopAreaChild
+    addTopAreaChild,
+
+    // editor content state and commands
+    currentFormat,
+    applyFormat
   }
 }, [])
 
