@@ -66,14 +66,14 @@ export const ToggleSingleGroupWithItem = React.forwardRef<
   )
 })
 
-interface ToggleItem {
-  title: string
-  contents: React.ReactNode
-  active: boolean
-  onChange: (active: boolean) => void
-}
-
-export const MultipleChoiceToggleGroup: React.FC<{ items: ToggleItem[] }> = ({ items }) => {
+export const MultipleChoiceToggleGroup: React.FC<{
+  items: {
+    title: string
+    contents: React.ReactNode
+    active: boolean
+    onChange: (active: boolean) => void
+  }[]
+}> = ({ items }) => {
   return (
     <div className={styles.toolbarGroupOfGroups}>
       {items.map((item, index) => (
