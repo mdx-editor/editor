@@ -104,12 +104,12 @@ export const sandpackSystem = system(
       r.pipe(
         insertSandpack,
         r.o.withLatestFrom(sandpackConfig),
-        r.o.map(([meta, sandpackConfig]) => {
-          const preset = meta
-            ? sandpackConfig.presets.find((preset) => preset.meta === meta)
+        r.o.map(([presetName, sandpackConfig]) => {
+          const preset = presetName
+            ? sandpackConfig.presets.find((preset) => preset.name === presetName)
             : sandpackConfig.presets.find((preset) => preset.name == sandpackConfig.defaultPreset)
           if (!preset) {
-            throw new Error(`No sandpack preset found with ${meta}`)
+            throw new Error(`No sandpack preset found with name ${presetName}`)
           }
 
           return {

@@ -1,8 +1,10 @@
-import React from 'react'
+import * as RadixSelect from '@radix-ui/react-select'
 import * as RadixToolbar from '@radix-ui/react-toolbar'
 import classNames from 'classnames'
+import React from 'react'
 import styles from '../../../styles/ui.module.css'
 import { TooltipWrap } from './TooltipWrap'
+import { SelectButtonTrigger, SelectContent, SelectItem } from './select'
 
 function decorate<P extends { className?: string | undefined }>(Component: React.ComponentType<P>, decoratedProps: P) {
   return (props: P) => {
@@ -112,6 +114,36 @@ export const SingleChoiceToggleGroup = <T extends string>({ value, onChange, ite
         ))}
       </RadixToolbar.ToggleGroup>
     </div>
+  )
+}
+export interface ButtonOrDropdownButtonProps<T extends string> {
+  children: React.ReactNode
+  title: string
+  onChoose: (T: string) => void
+  items: { value: T; label: string }[]
+}
+
+export const ButtonOrDropdownButton = <T extends string>(props: ButtonOrDropdownButtonProps<T>) => {
+  return (
+    <>
+      {props.items.length === 1 ? (
+        <ButtonWithTooltip title={props.title} onClick={() => props.onChoose('')}>
+          {props.children}
+        </ButtonWithTooltip>
+      ) : (
+        <RadixSelect.Root value="" onValueChange={props.onChoose}>
+          <SelectButtonTrigger title="Insert live code snippet">{props.children}</SelectButtonTrigger>
+
+          <SelectContent className={styles.toolbarButtonDropdownContainer}>
+            {props.items.map((item, index) => (
+              <SelectItem key={index} value={item.value}>
+                {item.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </RadixSelect.Root>
+      )}
+    </>
   )
 }
 

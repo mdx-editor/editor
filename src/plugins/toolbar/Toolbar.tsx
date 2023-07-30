@@ -10,6 +10,7 @@ import { InsertTable } from './InsertTable'
 import { InsertThematicBreak } from './InsertThematicBreak'
 import { InsertFrontmatter } from './InsertFrontmatter'
 import { InsertCodeBlock } from './InsertCodeBlock'
+import { InsertSandpack } from './InsertSandpack'
 
 export const Toolbar: React.FC = () => {
   return (
@@ -29,6 +30,7 @@ export const Toolbar: React.FC = () => {
       <InsertThematicBreak />
       <InsertFrontmatter />
       <InsertCodeBlock />
+      <InsertSandpack />
     </Root>
   )
 }

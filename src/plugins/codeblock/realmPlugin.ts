@@ -4,7 +4,7 @@ import { MdastCodeVisitor } from './MdastCodeVisitor'
 import { coreSystem } from '../core/realmPlugin'
 import { $createCodeBlockNode, CodeBlockNode, CreateCodeBlockNodeOptions } from './CodeBlockNode'
 import { $insertNodeToNearestRoot } from '@lexical/utils'
-import { $getSelection, $isRangeSelection } from 'lexical'
+import { $getRoot, $getSelection, $isRangeSelection } from 'lexical'
 
 export interface VoidEmitter {
   subscribe: (cb: () => void) => void
@@ -34,26 +34,31 @@ export const codeBlockSystem = system(
     r.sub(
       r.pipe(insertCodeBlock, r.o.withLatestFrom(rootEditor, defaultCodeBlockLanguage)),
       ([payload, theEditor, defaultCodeBlockLanguage]) => {
-        theEditor?.getEditorState().read(() => {
-          const selection = $getSelection()
+        theEditor?.focus(
+          () => {
+            theEditor.getEditorState().read(() => {
+              const selection = $getSelection()
+              console.log({ selection })
+              if ($isRangeSelection(selection)) {
+                const focusNode = selection.focus.getNode()
 
-          if ($isRangeSelection(selection)) {
-            const focusNode = selection.focus.getNode()
+                if (focusNode !== null) {
+                  if (!payload.language) {
+                    payload.language = defaultCodeBlockLanguage
+                  }
+                  theEditor.update(() => {
+                    const codeBlockNode = $createCodeBlockNode(payload)
 
-            if (focusNode !== null) {
-              if (!payload.language) {
-                payload.language = defaultCodeBlockLanguage
+                    $insertNodeToNearestRoot(codeBlockNode)
+                    // TODO: hack, the editor decorations are not synchronous ;(
+                    setTimeout(() => codeBlockNode.select(), 80)
+                  })
+                }
               }
-              theEditor.update(() => {
-                const codeBlockNode = $createCodeBlockNode(payload)
-
-                $insertNodeToNearestRoot(codeBlockNode)
-                // TODO: hack, the editor decorations are not synchronous ;(
-                setTimeout(() => codeBlockNode.select(), 80)
-              })
-            }
-          }
-        })
+            })
+          },
+          { defaultSelection: 'rootEnd' }
+        )
       }
     )
 
