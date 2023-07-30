@@ -1,6 +1,7 @@
 import React from 'react'
 import {
   MDXEditorCore,
+  frontmatterPlugin,
   headingsPlugin,
   imagePlugin,
   linkDialogPlugin,
@@ -25,7 +26,8 @@ export const Basics = () => {
         linkDialogPlugin(),
         imagePlugin(),
         tablePlugin(),
-        thematicBreakPlugin()
+        thematicBreakPlugin(),
+        frontmatterPlugin()
       ]}
     />
   )
