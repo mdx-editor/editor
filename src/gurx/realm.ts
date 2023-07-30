@@ -605,7 +605,13 @@ export function realm() {
   }
 
   function getKeyValues(keys: string[]) {
-    return keys.map((key) => state.get(labels[key].key))
+    return keys.map((key) => {
+      const label = labels[key]
+      if (!label) {
+        throw new Error(`No label for key ${key}`)
+      }
+      return state.get(label.key)
+    })
   }
 
   return {

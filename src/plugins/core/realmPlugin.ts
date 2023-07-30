@@ -3,6 +3,7 @@ import {
   $getRoot,
   $getSelection,
   $isRangeSelection,
+  $isRootOrShadowRoot,
   BLUR_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
   COMMAND_PRIORITY_LOW,
@@ -33,9 +34,14 @@ import { MdastRootVisitor } from './MdastRootVisitor'
 import { MdastTextVisitor } from './MdastTextVisitor'
 import { createEmptyHistoryState } from '@lexical/react/LexicalHistoryPlugin'
 import { SharedHistoryPlugin } from './SharedHistoryPlugin'
+import { $isHeadingNode } from '@lexical/rich-text'
+import { $findMatchingParent } from '@lexical/utils'
 
 export type EditorSubscription = (activeEditor: LexicalEditor) => () => void
 type Teardowns = (() => void)[]
+
+export type HeadingType = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
+export type BlockType = 'paragraph' | 'code' | 'quote' | HeadingType
 
 export const coreSystem = system((r) => {
   function createAppendNodeFor<T>(node: RealmNode<T[]>) {
@@ -240,6 +246,37 @@ export const coreSystem = system((r) => {
     theEditor?.dispatchCommand(FORMAT_TEXT_COMMAND, format)
   })
 
+  const currentBlockType = r.node<BlockType | null>(null)
+  const applyBlockType = r.node<BlockType>()
+
+  r.sub(r.pipe(currentSelection, r.o.withLatestFrom(activeEditor)), ([selection, theEditor]) => {
+    if (!selection || !theEditor) {
+      return
+    }
+
+    const anchorNode = selection.anchor.getNode()
+    let element =
+      anchorNode.getKey() === 'root'
+        ? anchorNode
+        : $findMatchingParent(anchorNode, (e) => {
+            const parent = e.getParent()
+            return parent !== null && $isRootOrShadowRoot(parent)
+          })
+
+    if (element === null) {
+      element = anchorNode.getTopLevelElementOrThrow()
+    }
+
+    const elementKey = element.getKey()
+    const elementDOM = theEditor.getElementByKey(elementKey)
+
+    if (elementDOM !== null) {
+      const blockType = $isHeadingNode(element) ? element.getTag() : (element.getType() as BlockType)
+      console.log(blockType)
+      r.pub(currentBlockType, blockType)
+    }
+  })
+
   return {
     // state
     activeEditor,
@@ -292,7 +329,9 @@ export const coreSystem = system((r) => {
 
     // editor content state and commands
     currentFormat,
-    applyFormat
+    applyFormat,
+    currentBlockType,
+    applyBlockType
   }
 }, [])
 

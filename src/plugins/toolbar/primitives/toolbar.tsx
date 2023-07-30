@@ -85,17 +85,22 @@ export const MultipleChoiceToggleGroup: React.FC<{
   )
 }
 
-export const SingleChoiceToggleGroup: React.FC<{
-  items: { title: string; value: string; contents: React.ReactNode }[]
-  onChange: (value: string) => void
-  value: string
-}> = ({ value = '', onChange, items }) => {
+interface SingleChoiceToggleGroupProps<T extends string> {
+  items: {
+    title: string
+    value: T
+    contents: React.ReactNode
+  }[]
+  onChange: (value: T) => void
+  value: T
+}
+
+export const SingleChoiceToggleGroup = <T extends string>({ value, onChange, items }: SingleChoiceToggleGroupProps<T>) => {
   return (
     <div className={styles.toolbarGroupOfGroups}>
       <RadixToolbar.ToggleGroup
         type="single"
         className={styles.toolbarToggleSingleGroup}
-        aria-label="List type"
         onValueChange={onChange}
         value={value || ''}
         onFocus={(e) => e.preventDefault()}

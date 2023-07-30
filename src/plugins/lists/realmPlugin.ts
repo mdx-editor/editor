@@ -4,16 +4,74 @@ import { MdastListVisitor } from './MdastListVisitor'
 import { MdastListItemVisitor } from './MdastListItemVisitor'
 import { LexicalListVisitor } from './LexicalListVisitor'
 import { LexicalListItemVisitor } from './LexicalListItemVisitor'
-import { ListItemNode, ListNode } from '@lexical/list'
-import type { RangeSelection } from 'lexical'
+import {
+  INSERT_ORDERED_LIST_COMMAND,
+  INSERT_UNORDERED_LIST_COMMAND,
+  ListItemNode,
+  ListNode,
+  ListType,
+  REMOVE_LIST_COMMAND
+} from '@lexical/list'
+import { $isRootOrShadowRoot, LexicalCommand, RangeSelection } from 'lexical'
 import { $getListDepth, $isListItemNode, $isListNode } from '@lexical/list'
 import { $getSelection, $isElementNode, $isRangeSelection, COMMAND_PRIORITY_CRITICAL, ElementNode, INDENT_CONTENT_COMMAND } from 'lexical'
 import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin'
 import { ListPlugin } from '@lexical/react/LexicalListPlugin'
+import { $findMatchingParent, $getNearestNodeOfType } from '@lexical/utils'
 
-export const listsSystem = system((_) => ({}), [coreSystem])
+const ListTypeCommandMap = new Map<ListType | '', LexicalCommand<void>>([
+  ['number', INSERT_ORDERED_LIST_COMMAND],
+  ['bullet', INSERT_UNORDERED_LIST_COMMAND],
+  ['', REMOVE_LIST_COMMAND]
+])
 
-export const [listsPlugin] = realmPlugin({
+export const listsSystem = system(
+  (r, [{ activeEditor, currentSelection }]) => {
+    const currentListType = r.node<ListType | ''>('')
+    const applyListType = r.node<ListType | ''>()
+
+    r.sub(r.pipe(applyListType, r.o.withLatestFrom(activeEditor)), ([listType, theEditor]) => {
+      theEditor?.dispatchCommand(ListTypeCommandMap.get(listType)!, undefined)
+    })
+
+    r.sub(r.pipe(currentSelection, r.o.withLatestFrom(activeEditor)), ([selection, theEditor]) => {
+      if (!selection || !theEditor) {
+        return
+      }
+
+      const anchorNode = selection.anchor.getNode()
+      let element =
+        anchorNode.getKey() === 'root'
+          ? anchorNode
+          : $findMatchingParent(anchorNode, (e) => {
+              const parent = e.getParent()
+              return parent !== null && $isRootOrShadowRoot(parent)
+            })
+
+      if (element === null) {
+        element = anchorNode.getTopLevelElementOrThrow()
+      }
+
+      const elementKey = element.getKey()
+      const elementDOM = theEditor.getElementByKey(elementKey)
+
+      if (elementDOM !== null) {
+        if ($isListNode(element)) {
+          const parentList = $getNearestNodeOfType<ListNode>(anchorNode, ListNode)
+          const type = parentList ? parentList.getListType() : element.getListType()
+          r.pub(currentListType, type)
+        } else {
+          r.pub(currentListType, null)
+        }
+      }
+    })
+
+    return { currentListType, applyListType }
+  },
+  [coreSystem]
+)
+
+export const [listsPlugin, listsPluginHooks] = realmPlugin({
   systemSpec: listsSystem,
 
   init: (realm) => {
