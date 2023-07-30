@@ -590,7 +590,15 @@ export function realm() {
 
   function pubKeys(values: Record<string, unknown>) {
     const valuesWithInternalKeys = Object.entries(values).reduce(
-      (acc, [key, value]) => tap(acc, (acc) => (acc[labels[key].key] = value)),
+      (acc, [key, value]) =>
+        tap(acc, (acc) => {
+          const label = labels[key]
+          if (!label) {
+            throw new Error(`No label for key ${key}. Do you miss a plugin?`)
+          }
+          acc[label.key] = value
+          return value
+        }),
       {} as Record<string, unknown>
     )
     pubIn(valuesWithInternalKeys)
@@ -608,7 +616,7 @@ export function realm() {
     return keys.map((key) => {
       const label = labels[key]
       if (!label) {
-        throw new Error(`No label for key ${key}`)
+        throw new Error(`No label for key ${key}. Do you miss a plugin?`)
       }
       return state.get(label.key)
     })

@@ -1,4 +1,8 @@
 import { InitialEditorStateType } from '@lexical/react/LexicalComposer'
+import { createEmptyHistoryState } from '@lexical/react/LexicalHistoryPlugin'
+import { $isHeadingNode, HeadingTagType } from '@lexical/rich-text'
+import { $setBlocksType } from '@lexical/selection'
+import { $findMatchingParent } from '@lexical/utils'
 import {
   $getRoot,
   $getSelection,
@@ -7,6 +11,7 @@ import {
   BLUR_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
   COMMAND_PRIORITY_LOW,
+  ElementNode,
   FORMAT_TEXT_COMMAND,
   Klass,
   LexicalEditor,
@@ -32,16 +37,12 @@ import { MdastInlineCodeVisitor } from './MdastInlineCodeVisitor'
 import { MdastParagraphVisitor } from './MdastParagraphVisitor'
 import { MdastRootVisitor } from './MdastRootVisitor'
 import { MdastTextVisitor } from './MdastTextVisitor'
-import { createEmptyHistoryState } from '@lexical/react/LexicalHistoryPlugin'
 import { SharedHistoryPlugin } from './SharedHistoryPlugin'
-import { $isHeadingNode } from '@lexical/rich-text'
-import { $findMatchingParent } from '@lexical/utils'
 
 export type EditorSubscription = (activeEditor: LexicalEditor) => () => void
 type Teardowns = (() => void)[]
 
-export type HeadingType = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
-export type BlockType = 'paragraph' | 'code' | 'quote' | HeadingType
+export type BlockType = 'paragraph' | 'quote' | HeadingTagType | ''
 
 export const coreSystem = system((r) => {
   function createAppendNodeFor<T>(node: RealmNode<T[]>) {
@@ -246,7 +247,7 @@ export const coreSystem = system((r) => {
     theEditor?.dispatchCommand(FORMAT_TEXT_COMMAND, format)
   })
 
-  const currentBlockType = r.node<BlockType | null>(null)
+  const currentBlockType = r.node<BlockType | ''>('')
   const applyBlockType = r.node<BlockType>()
 
   r.sub(r.pipe(currentSelection, r.o.withLatestFrom(activeEditor)), ([selection, theEditor]) => {
@@ -272,9 +273,22 @@ export const coreSystem = system((r) => {
 
     if (elementDOM !== null) {
       const blockType = $isHeadingNode(element) ? element.getTag() : (element.getType() as BlockType)
-      console.log(blockType)
       r.pub(currentBlockType, blockType)
     }
+  })
+
+  const convertSelectionToNode = r.node<() => ElementNode>()
+
+  r.sub(r.pipe(convertSelectionToNode, r.o.withLatestFrom(activeEditor)), ([factory, editor]) => {
+    editor?.update(() => {
+      const selection = $getSelection()
+      if ($isRangeSelection(selection)) {
+        $setBlocksType(selection, factory)
+        setTimeout(() => {
+          editor.focus()
+        })
+      }
+    })
   })
 
   return {
@@ -331,7 +345,8 @@ export const coreSystem = system((r) => {
     currentFormat,
     applyFormat,
     currentBlockType,
-    applyBlockType
+    applyBlockType,
+    convertSelectionToNode
   }
 }, [])
 

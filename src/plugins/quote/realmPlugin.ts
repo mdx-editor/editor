@@ -4,9 +4,11 @@ import { QuoteNode } from '@lexical/rich-text'
 import { MdastBlockQuoteVisitor } from './MdastBlockQuoteVisitor'
 import { LexicalQuoteVisitor } from './LexicalQuoteVisitor'
 
-export const quoteSystem = system((_) => ({}), [coreSystem])
+export const quoteSystem = system(() => {
+  return {}
+}, [coreSystem])
 
-export const [quotePlugin] = realmPlugin({
+export const [quotePlugin, quotePluginHooks] = realmPlugin({
   systemSpec: quoteSystem,
 
   init: (realm) => {
