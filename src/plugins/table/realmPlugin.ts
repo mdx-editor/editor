@@ -52,7 +52,7 @@ export const tableSystem = system(
   [coreSystem]
 )
 
-export const [tablePlugin] = realmPlugin({
+export const [tablePlugin, tablePluginHooks] = realmPlugin({
   systemSpec: tableSystem,
 
   init: (realm) => {

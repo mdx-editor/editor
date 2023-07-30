@@ -19,6 +19,7 @@ export { tablePlugin } from './plugins/table/realmPlugin'
 export { linkPlugin } from './plugins/link/realmPlugin'
 export { imagePlugin } from './plugins/image/realmPlugin'
 export { frontmatterPlugin } from './plugins/frontmatter/realmPlugin'
+export { quotePlugin } from './plugins/quote/realmPlugin'
 
 // JSX
 export { jsxPlugin } from './plugins/jsx/realmPlugin'
@@ -37,3 +38,5 @@ export { GenericDirectiveEditor } from './directive-editors/GenericDirectiveEdit
 
 // UI
 export { linkDialogPlugin } from './plugins/link-dialog/realmPlugin'
+
+export { toolbarPlugin } from './plugins/toolbar/realmPlugin'
