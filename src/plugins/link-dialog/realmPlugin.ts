@@ -268,8 +268,8 @@ export const linkDialogSystem = system(
 
 export const [linkDialogPlugin, linkDialogPluginHooks] = realmPlugin({
   systemSpec: linkDialogSystem,
-  applyParamsToSystem(r, params: { linkAutocompleteSuggestions: string[] }) {
-    r.pubKey('linkAutocompleteSuggestions', params.linkAutocompleteSuggestions)
+  applyParamsToSystem(r, params: { linkAutocompleteSuggestions?: string[] } = {}) {
+    r.pubKey('linkAutocompleteSuggestions', params.linkAutocompleteSuggestions || [])
   },
   init(r) {
     r.pubKey('addComposerChild', LinkDialog)

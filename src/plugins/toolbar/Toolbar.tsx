@@ -4,6 +4,7 @@ import { BoldItalicUnderlineToggles } from './BoldItalicUnderlineToggles'
 import { CodeToggle } from './CodeToggle'
 import { ListsToggle } from './ListsToggle'
 import { BlockTypeSelect } from './BlockTypeSelect'
+import { Createlink } from './CreateLink'
 
 export const Toolbar: React.FC = () => {
   return (
@@ -15,6 +16,8 @@ export const Toolbar: React.FC = () => {
       <ListsToggle />
       <Separator />
       <BlockTypeSelect />
+      <Separator />
+      <Createlink />
     </Root>
   )
 }
