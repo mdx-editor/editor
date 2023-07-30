@@ -1,16 +1,16 @@
 import * as Dialog from '@radix-ui/react-dialog'
 import * as RadixToolbar from '@radix-ui/react-toolbar'
-import { useEmitterValues } from '../../system/EditorSystemComponent'
 
 import React from 'react'
 
 import classNames from 'classnames'
 import { useCombobox } from 'downshift'
-import DropDownIcon from '../icons/arrow_drop_down.svg'
-import CheckIcon from '../icons/check.svg'
-import CloseIcon from '../icons/close.svg'
-import styles from '../styles.module.css'
-import { InstantTooltip } from './InstantTooltip'
+import DropDownIcon from '../../../icons/arrow_drop_down.svg'
+import CheckIcon from '../../../icons/check.svg'
+import CloseIcon from '../../../icons/close.svg'
+import { corePluginHooks } from '../../core/realmPlugin'
+import styles from '../../../styles/ui.module.css'
+import { TooltipWrap } from './TooltipWrap'
 
 export interface DialogButtonProps {
   autocompleteSuggestions?: string[]
@@ -26,7 +26,7 @@ const MAX_SUGGESTIONS = 20
 
 export const DialogButton = React.forwardRef<HTMLButtonElement, DialogButtonProps>(
   ({ autocompleteSuggestions = [], submitButtonTitle, dialogInputPlaceholder, onSubmit, tooltipTitle, buttonContent }, forwardedRef) => {
-    const [editorRootElementRef] = useEmitterValues('editorRootElementRef')
+    const [editorRootElementRef] = corePluginHooks.useEmitterValues('editorRootElementRef')
     const [open, setOpen] = React.useState(false)
 
     const onSubmitCallback = React.useCallback(
@@ -41,10 +41,10 @@ export const DialogButton = React.forwardRef<HTMLButtonElement, DialogButtonProp
       <Dialog.Root open={open} onOpenChange={setOpen}>
         <Dialog.Trigger asChild>
           <RadixToolbar.Button className={styles.toolbarButton} ref={forwardedRef}>
-            <InstantTooltip title={tooltipTitle}>{buttonContent}</InstantTooltip>
+            <TooltipWrap title={tooltipTitle}>{buttonContent}</TooltipWrap>
           </RadixToolbar.Button>
         </Dialog.Trigger>
-        <Dialog.Portal container={editorRootElementRef!.current}>
+        <Dialog.Portal container={editorRootElementRef?.current}>
           <Dialog.Overlay className={styles.dialogOverlay} />
           <Dialog.Content className={styles.dialogContent}>
             <DialogForm

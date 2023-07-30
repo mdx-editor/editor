@@ -1,4 +1,4 @@
-import { realmPlugin, system } from '../../gurx'
+import { defaultComparator, realmPlugin, system } from '../../gurx'
 import { coreSystem } from '../core/realmPlugin'
 import { MdastImageVisitor } from './MdastImageVisitor'
 import { LexicalImageVisitor } from './LexicalImageVisitor'
@@ -30,6 +30,7 @@ import { CAN_USE_DOM } from '../../utils/detectMac'
 export const imageSystem = system(
   (r, [{ rootEditor }]) => {
     const insertImage = r.node<string>()
+    const imageAutocompleteSuggestions = r.node<string[]>([])
 
     const imageUploadHandler = r.node<(image: File) => Promise<string>>((_) => {
       throw new Error('Image upload handling is not implemented')
@@ -111,6 +112,7 @@ export const imageSystem = system(
 
     return {
       imageUploadHandler,
+      imageAutocompleteSuggestions,
       insertImage
     }
   },
@@ -119,13 +121,21 @@ export const imageSystem = system(
 
 interface ImagePluginParams {
   imageUploadHandler: (image: File) => Promise<string>
+  imageAutocompleteSuggestions?: string[]
 }
 
-export const [imagePlugin] = realmPlugin({
+const defaultParams: ImagePluginParams = {
+  imageUploadHandler: () => {
+    throw new Error('Image upload handling is not implemented')
+  }
+}
+
+export const [imagePlugin, imagePluginHooks] = realmPlugin({
   systemSpec: imageSystem,
 
-  applyParamsToSystem: (realm, params: ImagePluginParams) => {
+  applyParamsToSystem: (realm, params: ImagePluginParams = defaultParams) => {
     realm.pubKey('imageUploadHandler', params.imageUploadHandler)
+    realm.pubKey('imageAutocompleteSuggestions', params.imageAutocompleteSuggestions || [])
   },
 
   init: (realm) => {

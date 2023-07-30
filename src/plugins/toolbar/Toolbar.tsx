@@ -5,6 +5,7 @@ import { CodeToggle } from './CodeToggle'
 import { ListsToggle } from './ListsToggle'
 import { BlockTypeSelect } from './BlockTypeSelect'
 import { Createlink } from './CreateLink'
+import { InsertImage } from './InsertImage'
 
 export const Toolbar: React.FC = () => {
   return (
@@ -18,6 +19,8 @@ export const Toolbar: React.FC = () => {
       <BlockTypeSelect />
       <Separator />
       <Createlink />
+      <Separator />
+      <InsertImage />
     </Root>
   )
 }
