@@ -9,6 +9,7 @@ import { InsertImage } from './InsertImage'
 import { InsertTable } from './InsertTable'
 import { InsertThematicBreak } from './InsertThematicBreak'
 import { InsertFrontmatter } from './InsertFrontmatter'
+import { InsertCodeBlock } from './InsertCodeBlock'
 
 export const Toolbar: React.FC = () => {
   return (
@@ -27,6 +28,7 @@ export const Toolbar: React.FC = () => {
       <InsertTable />
       <InsertThematicBreak />
       <InsertFrontmatter />
+      <InsertCodeBlock />
     </Root>
   )
 }

@@ -28,27 +28,34 @@ export const codeBlockSystem = system(
   (r, [{ rootEditor }]) => {
     const codeBlockEditorDescriptors = r.node<CodeBlockEditorDescriptor[]>([])
     const appendCodeBlockEditorDescriptor = r.node<CodeBlockEditorDescriptor>()
-    const insertCodeBlock = r.node<CreateCodeBlockNodeOptions>()
+    const insertCodeBlock = r.node<Partial<CreateCodeBlockNodeOptions>>()
+    const defaultCodeBlockLanguage = r.node<string>('')
 
-    r.sub(r.pipe(insertCodeBlock, r.o.withLatestFrom(rootEditor)), ([payload, theEditor]) => {
-      theEditor?.getEditorState().read(() => {
-        const selection = $getSelection()
+    r.sub(
+      r.pipe(insertCodeBlock, r.o.withLatestFrom(rootEditor, defaultCodeBlockLanguage)),
+      ([payload, theEditor, defaultCodeBlockLanguage]) => {
+        theEditor?.getEditorState().read(() => {
+          const selection = $getSelection()
 
-        if ($isRangeSelection(selection)) {
-          const focusNode = selection.focus.getNode()
+          if ($isRangeSelection(selection)) {
+            const focusNode = selection.focus.getNode()
 
-          if (focusNode !== null) {
-            theEditor.update(() => {
-              const codeBlockNode = $createCodeBlockNode(payload)
+            if (focusNode !== null) {
+              if (!payload.language) {
+                payload.language = defaultCodeBlockLanguage
+              }
+              theEditor.update(() => {
+                const codeBlockNode = $createCodeBlockNode(payload)
 
-              $insertNodeToNearestRoot(codeBlockNode)
-              // TODO: hack, the editor decorations are not synchronous ;(
-              setTimeout(() => codeBlockNode.select(), 80)
-            })
+                $insertNodeToNearestRoot(codeBlockNode)
+                // TODO: hack, the editor decorations are not synchronous ;(
+                setTimeout(() => codeBlockNode.select(), 80)
+              })
+            }
           }
-        }
-      })
-    })
+        })
+      }
+    )
 
     r.link(
       r.pipe(
@@ -66,6 +73,7 @@ export const codeBlockSystem = system(
 
     return {
       codeBlockEditorDescriptors,
+      defaultCodeBlockLanguage,
       appendCodeBlockEditorDescriptor,
       insertCodeBlock
     }
@@ -75,13 +83,18 @@ export const codeBlockSystem = system(
 
 export interface CodeBlockPluginParams {
   codeBlockEditorDescriptors?: CodeBlockEditorDescriptor[]
+  defaultCodeBlockLanguage?: string
 }
 
 export const [codeBlockPlugin, codeBlockPluginHooks] = realmPlugin({
   systemSpec: codeBlockSystem,
 
+  applyParamsToSystem(realm, params?: CodeBlockPluginParams) {
+    realm.pubKey('defaultCodeBlockLanguage', params?.defaultCodeBlockLanguage || '')
+  },
+
   init: (realm, params: CodeBlockPluginParams) => {
-    realm.pubKey('codeBlockEditorDescriptors', params.codeBlockEditorDescriptors || [])
+    realm.pubKey('codeBlockEditorDescriptors', params?.codeBlockEditorDescriptors || [])
     // import
     realm.pubKey('addImportVisitor', MdastCodeVisitor)
     // export

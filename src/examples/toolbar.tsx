@@ -1,6 +1,8 @@
 import React from 'react'
 import {
   MDXEditorCore,
+  codeBlockPlugin,
+  codeMirrorPlugin,
   frontmatterPlugin,
   headingsPlugin,
   imagePlugin,
@@ -8,10 +10,12 @@ import {
   linkPlugin,
   listsPlugin,
   quotePlugin,
+  sandpackPlugin,
   tablePlugin,
   thematicBreakPlugin,
   toolbarPlugin
 } from '..'
+import { virtuosoSampleSandpackConfig } from './_boilerplate'
 
 export const Basics = () => {
   return (
@@ -27,7 +31,10 @@ export const Basics = () => {
         imagePlugin(),
         tablePlugin(),
         thematicBreakPlugin(),
-        frontmatterPlugin()
+        frontmatterPlugin(),
+        codeBlockPlugin({ defaultCodeBlockLanguage: 'txt' }),
+        sandpackPlugin({ sandpackConfig: virtuosoSampleSandpackConfig }),
+        codeMirrorPlugin({ codeBlockLanguages: { js: 'JavaScript', css: 'CSS', txt: 'text' } })
       ]}
     />
   )

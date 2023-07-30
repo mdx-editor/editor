@@ -213,8 +213,8 @@ export function CodeBlockEditorContainer(props: CodeBlockEditorContainerProps) {
  * Creates a {@link CodeBlockNode}.
  * @param options - The code contents, the language  (i.e. js, jsx, etc.), and the additional meta data of the block.
  */
-export function $createCodeBlockNode(options: CreateCodeBlockNodeOptions): CodeBlockNode {
-  const { code, language, meta } = options
+export function $createCodeBlockNode(options: Partial<CreateCodeBlockNodeOptions>): CodeBlockNode {
+  const { code = '', language = '', meta = '' } = options
   return new CodeBlockNode(code, language, meta)
 }
 
