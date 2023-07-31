@@ -11,12 +11,15 @@ import { InsertThematicBreak } from './InsertThematicBreak'
 import { InsertFrontmatter } from './InsertFrontmatter'
 import { InsertCodeBlock } from './InsertCodeBlock'
 import { InsertSandpack } from './InsertSandpack'
+import { InsertAdmonition } from './InsertAdmonition'
+import { UndoRedo } from './UndoRedo'
 
 export const Toolbar: React.FC = () => {
   return (
     <Root>
-      <BoldItalicUnderlineToggles />
+      <UndoRedo />
       <Separator />
+      <BoldItalicUnderlineToggles />
       <CodeToggle />
       <Separator />
       <ListsToggle />
@@ -31,6 +34,7 @@ export const Toolbar: React.FC = () => {
       <InsertFrontmatter />
       <InsertCodeBlock />
       <InsertSandpack />
+      <InsertAdmonition />
     </Root>
   )
 }

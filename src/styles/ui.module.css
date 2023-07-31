@@ -231,6 +231,11 @@
   &[data-state=on], &:active {
     background-color: var(--accentBgActive);
   }
+
+  &[data-disabled] {
+    pointer-events: none;
+    color: var(--baseBorderHover);
+  }
 }
 
 .toolbarButton {

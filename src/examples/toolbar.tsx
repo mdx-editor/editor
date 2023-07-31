@@ -13,9 +13,11 @@ import {
   sandpackPlugin,
   tablePlugin,
   thematicBreakPlugin,
-  toolbarPlugin
+  toolbarPlugin,
+  directivesPlugin,
+  AdmonitionDirectiveDescriptor
 } from '..'
-import { virtuosoSampleSandpackConfig } from './_boilerplate'
+import { virtuosoSampleSandpackConfig, YoutubeDirectiveDescriptor } from './_boilerplate'
 
 export const Basics = () => {
   return (
@@ -34,7 +36,8 @@ export const Basics = () => {
         frontmatterPlugin(),
         codeBlockPlugin({ defaultCodeBlockLanguage: 'txt' }),
         sandpackPlugin({ sandpackConfig: virtuosoSampleSandpackConfig }),
-        codeMirrorPlugin({ codeBlockLanguages: { js: 'JavaScript', css: 'CSS', txt: 'text' } })
+        codeMirrorPlugin({ codeBlockLanguages: { js: 'JavaScript', css: 'CSS', txt: 'text' } }),
+        directivesPlugin({ directiveDescriptors: [YoutubeDirectiveDescriptor, AdmonitionDirectiveDescriptor] })
       ]}
     />
   )

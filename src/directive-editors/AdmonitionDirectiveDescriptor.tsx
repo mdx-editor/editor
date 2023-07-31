@@ -5,7 +5,7 @@ import { NestedLexicalEditor, useNestedEditorContext } from '../plugins/core/Nes
 import { DirectiveDescriptor } from '../plugins/directives/realmPlugin'
 import { ContainerDirective } from 'mdast-util-directive'
 
-const ADMONITION_TYPES = ['note', 'tip', 'danger', 'info', 'caution'] as const
+export const ADMONITION_TYPES = ['note', 'tip', 'danger', 'info', 'caution'] as const
 export type AdmonitionKind = (typeof ADMONITION_TYPES)[number]
 
 export const AdmonitionDirectiveDescriptor: DirectiveDescriptor = {
@@ -16,10 +16,14 @@ export const AdmonitionDirectiveDescriptor: DirectiveDescriptor = {
     return ADMONITION_TYPES.includes(node.name as AdmonitionKind)
   },
   Editor({ mdastNode }) {
-    const { theme } = useNestedEditorContext().config
+    const {
+      config: { theme },
+      focusEmitter
+    } = useNestedEditorContext()
     return (
       <div className={theme.admonition[mdastNode.name]}>
         <NestedLexicalEditor<ContainerDirective>
+          focusEmitter={focusEmitter}
           getContent={(node) => node.children}
           getUpdatedMdastNode={(mdastNode, children: any) => ({ ...mdastNode, children })}
         />

@@ -51,8 +51,8 @@ export const SingleToggleGroup = decorateWithRef(RadixToolbar.ToggleGroup, {
 
 export const ToggleSingleGroupWithItem = React.forwardRef<
   HTMLDivElement,
-  Omit<RadixToolbar.ToolbarToggleGroupSingleProps, 'type'> & { on: boolean; title: string }
->(({ on, title, children, ...props }, forwardedRef) => {
+  Omit<RadixToolbar.ToolbarToggleGroupSingleProps, 'type'> & { on: boolean; title: string; disabled?: boolean }
+>(({ on, title, children, disabled, ...props }, forwardedRef) => {
   return (
     <RadixToolbar.ToggleGroup
       type="single"
@@ -61,7 +61,7 @@ export const ToggleSingleGroupWithItem = React.forwardRef<
       value={on ? 'on' : 'off'}
       ref={forwardedRef}
     >
-      <ToolbarToggleItem title={title} value="on">
+      <ToolbarToggleItem title={title} value="on" disabled={disabled}>
         <TooltipWrap title={title}>{children}</TooltipWrap>
       </ToolbarToggleItem>
     </RadixToolbar.ToggleGroup>
@@ -74,12 +74,19 @@ export const MultipleChoiceToggleGroup: React.FC<{
     contents: React.ReactNode
     active: boolean
     onChange: (active: boolean) => void
+    disabled?: boolean
   }[]
 }> = ({ items }) => {
   return (
     <div className={styles.toolbarGroupOfGroups}>
       {items.map((item, index) => (
-        <ToggleSingleGroupWithItem key={index} title={item.title} on={item.active} onValueChange={(v) => item.onChange(v === 'on')}>
+        <ToggleSingleGroupWithItem
+          key={index}
+          title={item.title}
+          on={item.active}
+          onValueChange={(v) => item.onChange(v === 'on')}
+          disabled={item.disabled}
+        >
           {item.contents}
         </ToggleSingleGroupWithItem>
       ))}
@@ -132,7 +139,7 @@ export const ButtonOrDropdownButton = <T extends string>(props: ButtonOrDropdown
         </ButtonWithTooltip>
       ) : (
         <RadixSelect.Root value="" onValueChange={props.onChoose}>
-          <SelectButtonTrigger title="Insert live code snippet">{props.children}</SelectButtonTrigger>
+          <SelectButtonTrigger title={props.title}>{props.children}</SelectButtonTrigger>
 
           <SelectContent className={styles.toolbarButtonDropdownContainer}>
             {props.items.map((item, index) => (

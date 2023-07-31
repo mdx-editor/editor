@@ -25,6 +25,7 @@ import { importMdastTreeToLexical } from '../../importMarkdownToLexical'
 import styles from '../../styles/ui.module.css'
 import { SharedHistoryPlugin } from './SharedHistoryPlugin'
 import { mergeRegister } from '@lexical/utils'
+import { VoidEmitter } from '../../utils/voidEmitter'
 
 interface NestedEditorsContextValue<T extends Node> {
   parentEditor: LexicalEditor
@@ -33,6 +34,7 @@ interface NestedEditorsContextValue<T extends Node> {
   lexicalNode: DecoratorNode<any> & {
     setMdastNode: (mdastNode: any) => void
   }
+  focusEmitter: VoidEmitter
 }
 
 export const NestedEditorsContext = React.createContext<NestedEditorsContextValue<Node> | undefined>(undefined)
@@ -102,6 +104,11 @@ export interface NestedEditorProps<T extends Mdast.Content> {
    * Whether or not the editor edits blocks (multiple paragraphs)
    */
   block?: boolean
+
+  /**
+   * An emitter (usually constructed in the lexical node) that will activate the editor when the node is focused.
+   */
+  focusEmitter?: VoidEmitter
 }
 
 /**
@@ -142,6 +149,12 @@ export const NestedLexicalEditor = function <T extends Mdast.Content>(props: Nes
     })
     return editor
   })
+
+  React.useEffect(() => {
+    props.focusEmitter?.subscribe(() => {
+      editor.focus()
+    })
+  }, [editor, props.focusEmitter])
 
   React.useEffect(() => {
     editor.update(() => {

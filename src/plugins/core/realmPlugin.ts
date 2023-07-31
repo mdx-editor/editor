@@ -2,7 +2,7 @@ import { InitialEditorStateType } from '@lexical/react/LexicalComposer'
 import { createEmptyHistoryState } from '@lexical/react/LexicalHistoryPlugin'
 import { $isHeadingNode, HeadingTagType } from '@lexical/rich-text'
 import { $setBlocksType } from '@lexical/selection'
-import { $findMatchingParent } from '@lexical/utils'
+import { $findMatchingParent, $insertNodeToNearestRoot } from '@lexical/utils'
 import {
   $getRoot,
   $getSelection,
@@ -11,6 +11,7 @@ import {
   BLUR_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
   COMMAND_PRIORITY_LOW,
+  DecoratorNode,
   ElementNode,
   FORMAT_TEXT_COMMAND,
   Klass,
@@ -291,6 +292,33 @@ export const coreSystem = system((r) => {
     })
   })
 
+  const insertDecoratorNode = r.node<() => DecoratorNode<unknown>>()
+
+  r.sub(r.pipe(insertDecoratorNode, r.o.withLatestFrom(rootEditor)), ([nodeFactory, theEditor]) => {
+    theEditor?.focus(
+      () => {
+        theEditor.getEditorState().read(() => {
+          const selection = $getSelection()
+          if ($isRangeSelection(selection)) {
+            const focusNode = selection.focus.getNode()
+
+            if (focusNode !== null) {
+              theEditor.update(() => {
+                const node = nodeFactory()
+                $insertNodeToNearestRoot(node)
+                if (Object.hasOwn(node, 'select') && typeof node.select === 'function') {
+                  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+                  setTimeout(() => node.select(), 80)
+                }
+              })
+            }
+          }
+        })
+      },
+      { defaultSelection: 'rootEnd' }
+    )
+  })
+
   return {
     // state
     activeEditor,
@@ -346,7 +374,8 @@ export const coreSystem = system((r) => {
     applyFormat,
     currentBlockType,
     applyBlockType,
-    convertSelectionToNode
+    convertSelectionToNode,
+    insertDecoratorNode
   }
 }, [])
 

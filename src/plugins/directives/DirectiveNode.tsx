@@ -4,6 +4,7 @@ import { DecoratorNode } from 'lexical'
 import { Directive } from 'mdast-util-directive'
 import { NestedEditorsContext } from '../core/NestedLexicalEditor'
 import { directivesPluginHooks } from './realmPlugin'
+import { VoidEmitter, voidEmitter } from '../../utils/voidEmitter'
 
 /**
  * A serialized representation of an {@link DirectiveNode}.
@@ -23,6 +24,7 @@ let GENERATION = 0
  */
 export class DirectiveNode extends DecoratorNode<React.JSX.Element> {
   __mdastNode: Directive
+  __focusEmitter = voidEmitter()
 
   static getType(): string {
     return 'directive'
@@ -66,8 +68,20 @@ export class DirectiveNode extends DecoratorNode<React.JSX.Element> {
     this.getWritable().__mdastNode = mdastNode
   }
 
+  select = () => {
+    this.__focusEmitter.publish()
+  }
+
   decorate(parentEditor: LexicalEditor, config: EditorConfig): JSX.Element {
-    return <DirectiveEditorContainer lexicalNode={this} mdastNode={this.getMdastNode()} parentEditor={parentEditor} config={config} />
+    return (
+      <DirectiveEditorContainer
+        lexicalNode={this}
+        mdastNode={this.getMdastNode()}
+        parentEditor={parentEditor}
+        config={config}
+        focusEmitter={this.__focusEmitter}
+      />
+    )
   }
 
   isInline(): boolean {
@@ -84,6 +98,7 @@ export function DirectiveEditorContainer(props: {
   lexicalNode: DirectiveNode
   mdastNode: Directive
   config: EditorConfig
+  focusEmitter: VoidEmitter
 }) {
   const { mdastNode } = props
   const [directiveDescriptors] = directivesPluginHooks.useEmitterValues('directiveDescriptors')

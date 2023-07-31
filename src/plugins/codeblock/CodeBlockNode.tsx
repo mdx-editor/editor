@@ -2,6 +2,7 @@ import React from 'react'
 import { DecoratorNode, EditorConfig, LexicalEditor, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
 import { noop } from '../../utils/fp'
 import { CodeBlockEditorProps, codeBlockPluginHooks } from './realmPlugin'
+import { voidEmitter } from '../../utils/voidEmitter'
 /**
  * The options necessary to construct a {@link CodeBlockNode}.
  */
@@ -24,19 +25,6 @@ export interface CreateCodeBlockNodeOptions {
  * A serialized representation of an {@link CodeBlockNode}.
  */
 export type SerializedCodeBlockNode = Spread<CreateCodeBlockNodeOptions & { type: 'codeblock'; version: 1 }, SerializedLexicalNode>
-
-function voidEmitter() {
-  let subscription = noop
-  return {
-    publish: () => {
-      subscription()
-    },
-    subscribe: (cb: () => void) => {
-      subscription = cb
-    }
-  }
-}
-
 /**
  * A lexical node that represents a fenced code block. Use {@link "$createCodeBlockNode"} to construct one.
  */

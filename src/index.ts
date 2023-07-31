@@ -9,6 +9,7 @@ export type { MDXEditorMethods, MDXEditorCoreProps } from './MDXEditorCore'
 export type { JsxComponentDescriptor, JsxPropertyDescriptor } from './plugins/jsx/realmPlugin'
 export type { SandpackConfig, SandpackPreset } from './plugins/sandpack/realmPlugin'
 export type { CodeBlockEditorDescriptor } from './plugins/codeblock/realmPlugin'
+export type { DirectiveDescriptor } from './plugins/directives/realmPlugin'
 
 // Basics
 export { MDXEditorCore } from './MDXEditorCore'

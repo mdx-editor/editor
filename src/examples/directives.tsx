@@ -1,11 +1,11 @@
 import React from 'react'
 import { MDXEditorCore } from '../MDXEditorCore'
-import { DirectiveDescriptor, directivesPlugin } from '../plugins/directives/realmPlugin'
-import { GenericDirectiveEditor } from '../directive-editors/GenericDirectiveEditor'
-import { LeafDirective } from 'mdast-util-directive'
 import { AdmonitionDirectiveDescriptor } from '../directive-editors/AdmonitionDirectiveDescriptor'
-import admonitionMarkdown from './assets/admonition.md?raw'
+import { GenericDirectiveEditor } from '../directive-editors/GenericDirectiveEditor'
+import { DirectiveDescriptor, directivesPlugin } from '../plugins/directives/realmPlugin'
 import { linkPlugin } from '../plugins/link/realmPlugin'
+import { YoutubeDirectiveDescriptor } from './_boilerplate'
+import admonitionMarkdown from './assets/admonition.md?raw'
 
 const youtubeMarkdown = `
 This should be an youtube video:
@@ -23,46 +23,8 @@ const GenericDirectiveDescriptor: DirectiveDescriptor = {
   Editor: GenericDirectiveEditor
 }
 
-interface YoutubeDirectiveNode extends LeafDirective {
-  name: 'youtube'
-  attributes: { id: string }
-}
-
-const youtubeDirectiveDescriptor: DirectiveDescriptor<YoutubeDirectiveNode> = {
-  name: 'youtube',
-  testNode(node) {
-    return node.name === 'youtube'
-  },
-  attributes: ['id'],
-  hasChildren: false,
-  Editor: ({ mdastNode, lexicalNode, parentEditor }) => {
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-        <button
-          onClick={() => {
-            parentEditor.update(() => {
-              lexicalNode.selectNext()
-              lexicalNode.remove()
-            })
-          }}
-        >
-          delete
-        </button>
-        <iframe
-          width="560"
-          height="315"
-          src={`https://www.youtube.com/embed/${mdastNode.attributes?.id}`}
-          title="YouTube video player"
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-        ></iframe>
-      </div>
-    )
-  }
-}
-
 export const Youtube: React.FC = () => {
-  return <MDXEditorCore markdown={youtubeMarkdown} plugins={[directivesPlugin({ directiveDescriptors: [youtubeDirectiveDescriptor] })]} />
+  return <MDXEditorCore markdown={youtubeMarkdown} plugins={[directivesPlugin({ directiveDescriptors: [YoutubeDirectiveDescriptor] })]} />
 }
 
 const genericMarkdown = `
