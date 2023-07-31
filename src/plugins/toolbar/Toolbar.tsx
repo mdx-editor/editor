@@ -13,28 +13,31 @@ import { InsertCodeBlock } from './InsertCodeBlock'
 import { InsertSandpack } from './InsertSandpack'
 import { InsertAdmonition } from './InsertAdmonition'
 import { UndoRedo } from './UndoRedo'
+import { DiffSourceToggleWrapper } from './DiffSourceToggleWrapper'
 
 export const Toolbar: React.FC = () => {
   return (
     <Root>
-      <UndoRedo />
-      <Separator />
-      <BoldItalicUnderlineToggles />
-      <CodeToggle />
-      <Separator />
-      <ListsToggle />
-      <Separator />
-      <BlockTypeSelect />
-      <Separator />
-      <Createlink />
-      <Separator />
-      <InsertImage />
-      <InsertTable />
-      <InsertThematicBreak />
-      <InsertFrontmatter />
-      <InsertCodeBlock />
-      <InsertSandpack />
-      <InsertAdmonition />
+      <DiffSourceToggleWrapper>
+        <UndoRedo />
+        <Separator />
+        <BoldItalicUnderlineToggles />
+        <CodeToggle />
+        <Separator />
+        <ListsToggle />
+        <Separator />
+        <BlockTypeSelect />
+        <Separator />
+        <Createlink />
+        <Separator />
+        <InsertImage />
+        <InsertTable />
+        <InsertThematicBreak />
+        <InsertFrontmatter />
+        <InsertCodeBlock />
+        <InsertSandpack />
+        <InsertAdmonition />
+      </DiffSourceToggleWrapper>
     </Root>
   )
 }

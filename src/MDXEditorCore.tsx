@@ -31,21 +31,24 @@ const LexicalProvider: React.FC<{ children: JSX.Element | string | (JSX.Element 
 }
 
 const RichTextEditor: React.FC = () => {
-  const [contentEditableClassName, composerChildren, topAreaChildren] = corePluginHooks.useEmitterValues(
+  const [contentEditableClassName, composerChildren, topAreaChildren, editorWrappers] = corePluginHooks.useEmitterValues(
     'contentEditableClassName',
     'composerChildren',
-    'topAreaChildren'
+    'topAreaChildren',
+    'editorWrappers'
   )
   return (
     <>
       {topAreaChildren.map((Child, index) => (
         <Child key={index} />
       ))}
-      <RichTextPlugin
-        contentEditable={<ContentEditable className={classNames(styles.contentEditable, contentEditableClassName)} />}
-        placeholder={<div></div>}
-        ErrorBoundary={LexicalErrorBoundary}
-      ></RichTextPlugin>
+      <RenderRecurisveWrappers wrappers={editorWrappers}>
+        <RichTextPlugin
+          contentEditable={<ContentEditable className={classNames(styles.contentEditable, contentEditableClassName)} />}
+          placeholder={<div></div>}
+          ErrorBoundary={LexicalErrorBoundary}
+        ></RichTextPlugin>
+      </RenderRecurisveWrappers>
       {composerChildren.map((Child, index) => (
         <Child key={index} />
       ))}
@@ -109,6 +112,21 @@ export const MDXEditorCore = React.forwardRef<MDXEditorMethods, MDXEditorCorePro
     </RealmPluginInitializer>
   )
 })
+
+const RenderRecurisveWrappers: React.FC<{ wrappers: React.ComponentType<{ children: React.ReactNode }>[]; children: React.ReactNode }> = ({
+  wrappers,
+  children
+}) => {
+  if (wrappers.length === 0) {
+    return <>{children}</>
+  }
+  const Wrapper = wrappers[0]
+  return (
+    <Wrapper>
+      <RenderRecurisveWrappers wrappers={wrappers.slice(1)}>{children}</RenderRecurisveWrappers>
+    </Wrapper>
+  )
+}
 
 const EditorRootElement: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className }) => {
   const editorRootElementRef = React.useRef<HTMLDivElement>(null)

@@ -102,14 +102,15 @@ interface SingleChoiceToggleGroupProps<T extends string> {
   }[]
   onChange: (value: T) => void
   value: T
+  className?: string
 }
 
-export const SingleChoiceToggleGroup = <T extends string>({ value, onChange, items }: SingleChoiceToggleGroupProps<T>) => {
+export const SingleChoiceToggleGroup = <T extends string>({ value, onChange, className, items }: SingleChoiceToggleGroupProps<T>) => {
   return (
     <div className={styles.toolbarGroupOfGroups}>
       <RadixToolbar.ToggleGroup
         type="single"
-        className={styles.toolbarToggleSingleGroup}
+        className={classNames(styles.toolbarToggleSingleGroup, className)}
         onValueChange={onChange}
         value={value || ''}
         onFocus={(e) => e.preventDefault()}

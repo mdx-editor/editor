@@ -857,3 +857,11 @@
   color: var(--baseText);
   padding-right: var(--spacing-2);
 }
+
+.diffSourceToggle {
+  border: 1px solid var(--baseBorder);
+  border-radius: var(--radius-medium);
+  .toolbarToggleItem {
+    padding: var(--spacing-1) var(--spacing-3);
+  }
+}

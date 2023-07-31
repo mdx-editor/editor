@@ -242,6 +242,9 @@ export const coreSystem = system((r) => {
   const topAreaChildren = r.node<React.ComponentType[]>([])
   const addTopAreaChild = createAppendNodeFor(topAreaChildren)
 
+  const editorWrappers = r.node<React.ComponentType<{ children: React.ReactNode }>[]>([])
+  const addEditorWrapper = createAppendNodeFor(editorWrappers)
+
   const historyState = r.node(createEmptyHistoryState())
 
   r.sub(r.pipe(applyFormat, r.o.withLatestFrom(activeEditor)), ([format, theEditor]) => {
@@ -368,6 +371,9 @@ export const coreSystem = system((r) => {
 
     topAreaChildren,
     addTopAreaChild,
+
+    editorWrappers,
+    addEditorWrapper,
 
     // editor content state and commands
     currentFormat,

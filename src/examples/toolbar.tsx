@@ -18,6 +18,7 @@ import {
   AdmonitionDirectiveDescriptor
 } from '..'
 import { virtuosoSampleSandpackConfig, YoutubeDirectiveDescriptor } from './_boilerplate'
+import { diffSourcePlugin } from '../plugins/diff-source/realmPlugin'
 
 export const Basics = () => {
   return (
@@ -37,7 +38,8 @@ export const Basics = () => {
         codeBlockPlugin({ defaultCodeBlockLanguage: 'txt' }),
         sandpackPlugin({ sandpackConfig: virtuosoSampleSandpackConfig }),
         codeMirrorPlugin({ codeBlockLanguages: { js: 'JavaScript', css: 'CSS', txt: 'text' } }),
-        directivesPlugin({ directiveDescriptors: [YoutubeDirectiveDescriptor, AdmonitionDirectiveDescriptor] })
+        directivesPlugin({ directiveDescriptors: [YoutubeDirectiveDescriptor, AdmonitionDirectiveDescriptor] }),
+        diffSourcePlugin({ viewMode: 'diff', diffMarkdown: 'boo' })
       ]}
     />
   )
