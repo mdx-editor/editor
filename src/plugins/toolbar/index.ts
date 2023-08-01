@@ -1,5 +1,5 @@
 import { realmPlugin, system } from '../../gurx'
-import { coreSystem } from '../core/realmPlugin'
+import { coreSystem } from '../core'
 import { Toolbar } from './Toolbar'
 
 export const toolbarSystem = system((_) => ({}), [coreSystem])

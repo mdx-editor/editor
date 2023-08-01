@@ -1,6 +1,6 @@
 import React from 'react'
-import { SandpackPreset } from './realmPlugin'
-import { CodeBlockEditorProps } from '../codeblock/realmPlugin'
+import { SandpackPreset } from '.'
+import { CodeBlockEditorProps } from '../codeblock'
 import { useCodeMirrorRef } from './useCodeMirrorRef'
 import { SandpackCodeEditor, SandpackLayout, SandpackPreview, SandpackProvider, useSandpack } from '@codesandbox/sandpack-react'
 import { useCodeBlockEditorContext } from '../codeblock/CodeBlockNode'

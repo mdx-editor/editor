@@ -5,8 +5,8 @@ import { Diff, Hunk, parseDiff } from 'react-diff-view'
 import { diffLines, formatLines } from 'unidiff'
 
 import 'react-diff-view/style/index.css'
-import { corePluginHooks } from '../core/realmPlugin'
-import { diffSourcePluginHooks } from './realmPlugin'
+import { corePluginHooks } from '../core'
+import { diffSourcePluginHooks } from '.'
 
 export const DiffViewer: React.FC = () => {
   const [newText] = corePluginHooks.useEmitterValues('markdown')

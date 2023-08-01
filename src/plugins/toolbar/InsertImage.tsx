@@ -1,5 +1,5 @@
 import React from 'react'
-import { imagePluginHooks } from '../image/realmPlugin'
+import { imagePluginHooks } from '../image'
 import { DialogButton } from './primitives/DialogButton'
 import AddPhotoIcon from '../../icons/add_photo.svg'
 

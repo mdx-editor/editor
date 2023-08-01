@@ -1,8 +1,8 @@
 import { SandpackProvider } from '@codesandbox/sandpack-react'
 import React from 'react'
 import { realmPlugin, system } from '../../gurx'
-import { coreSystem } from '../core/realmPlugin'
-import { codeBlockSystem } from '../codeblock/realmPlugin'
+import { coreSystem } from '../core'
+import { codeBlockSystem } from '../codeblock'
 import { SandpackEditor } from './SandpackEditor'
 
 type SandpackProviderProps = React.ComponentProps<typeof SandpackProvider>

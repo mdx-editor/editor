@@ -4,7 +4,7 @@ import * as Mdast from 'mdast'
 import { LeafDirective } from 'mdast-util-directive'
 import React from 'react'
 import { CustomLeafDirectiveEditor, MDXEditor, NestedEditor, ToolbarComponents, useMdastNodeUpdater } from '../'
-import { DirectiveDescriptor } from '../plugins/directives/realmPlugin'
+import { DirectiveDescriptor } from '../plugins/directives'
 
 export default {
   title: 'Custom directive editors'

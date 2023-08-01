@@ -6,38 +6,38 @@
  */
 
 export type { MDXEditorMethods, MDXEditorCoreProps } from './MDXEditorCore'
-export type { JsxComponentDescriptor, JsxPropertyDescriptor } from './plugins/jsx/realmPlugin'
-export type { SandpackConfig, SandpackPreset } from './plugins/sandpack/realmPlugin'
-export type { CodeBlockEditorDescriptor } from './plugins/codeblock/realmPlugin'
-export type { DirectiveDescriptor } from './plugins/directives/realmPlugin'
+export type { JsxComponentDescriptor, JsxPropertyDescriptor } from './plugins/jsx'
+export type { SandpackConfig, SandpackPreset } from './plugins/sandpack'
+export type { CodeBlockEditorDescriptor } from './plugins/codeblock'
+export type { DirectiveDescriptor } from './plugins/directives'
 
 // Basics
 export { MDXEditorCore } from './MDXEditorCore'
-export { headingsPlugin } from './plugins/headings/realmPlugin'
-export { thematicBreakPlugin } from './plugins/thematic-break/realmPlugin'
-export { listsPlugin } from './plugins/lists/realmPlugin'
-export { tablePlugin } from './plugins/table/realmPlugin'
-export { linkPlugin } from './plugins/link/realmPlugin'
-export { imagePlugin } from './plugins/image/realmPlugin'
-export { frontmatterPlugin } from './plugins/frontmatter/realmPlugin'
-export { quotePlugin } from './plugins/quote/realmPlugin'
+export { headingsPlugin } from './plugins/headings'
+export { thematicBreakPlugin } from './plugins/thematic-break'
+export { listsPlugin } from './plugins/lists'
+export { tablePlugin } from './plugins/table'
+export { linkPlugin } from './plugins/link'
+export { imagePlugin } from './plugins/image'
+export { frontmatterPlugin } from './plugins/frontmatter'
+export { quotePlugin } from './plugins/quote'
 
 // JSX
-export { jsxPlugin } from './plugins/jsx/realmPlugin'
+export { jsxPlugin } from './plugins/jsx'
 export { GenericJsxEditor } from './jsx-editors/GenericJsxEditor'
 
 // code blocks
-export { sandpackPlugin } from './plugins/sandpack/realmPlugin'
-export { codeMirrorPlugin } from './plugins/codemirror/realmPlugin'
-export { codeBlockPlugin } from './plugins/codeblock/realmPlugin'
+export { sandpackPlugin } from './plugins/sandpack'
+export { codeMirrorPlugin } from './plugins/codemirror'
+export { codeBlockPlugin } from './plugins/codeblock'
 export { useCodeBlockEditorContext } from './plugins/codeblock/CodeBlockNode'
 
 // directives
-export { directivesPlugin } from './plugins/directives/realmPlugin'
+export { directivesPlugin } from './plugins/directives'
 export { AdmonitionDirectiveDescriptor } from './directive-editors/AdmonitionDirectiveDescriptor'
 export { GenericDirectiveEditor } from './directive-editors/GenericDirectiveEditor'
 
 // UI
-export { linkDialogPlugin } from './plugins/link-dialog/realmPlugin'
+export { linkDialogPlugin } from './plugins/link-dialog'
 
-export { toolbarPlugin } from './plugins/toolbar/realmPlugin'
+export { toolbarPlugin } from './plugins/toolbar'

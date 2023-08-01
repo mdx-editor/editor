@@ -1,7 +1,7 @@
 import React from 'react'
 import { ButtonOrDropdownButton } from './primitives/toolbar'
 import AdmonitionIcon from '../../icons/emergency_home.svg'
-import { directivesPluginHooks } from '../directives/realmPlugin'
+import { directivesPluginHooks } from '../directives'
 import { ADMONITION_TYPES } from '../../directive-editors/AdmonitionDirectiveDescriptor'
 
 export const InsertAdmonition = () => {

@@ -1,5 +1,5 @@
 import React from 'react'
-import { diffSourcePluginHooks } from './realmPlugin'
+import { diffSourcePluginHooks } from '.'
 import { DiffViewer } from './DiffViewer'
 import { SourceEditor } from './SourceEditor'
 

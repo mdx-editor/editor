@@ -3,7 +3,7 @@ import { MultipleChoiceToggleGroup } from './primitives/toolbar'
 import UndoIcon from '../../icons/undo.svg'
 import RedoIcon from '../../icons/redo.svg'
 import { IS_APPLE } from '../../utils/detectMac'
-import { corePluginHooks } from '../core/realmPlugin'
+import { corePluginHooks } from '../core'
 import { mergeRegister } from '@lexical/utils'
 import { CAN_UNDO_COMMAND, COMMAND_PRIORITY_CRITICAL, CAN_REDO_COMMAND, REDO_COMMAND, UNDO_COMMAND } from 'lexical'
 

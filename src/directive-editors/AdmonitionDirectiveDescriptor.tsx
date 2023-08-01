@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import React from 'react'
 import { NestedLexicalEditor, useNestedEditorContext } from '../plugins/core/NestedLexicalEditor'
-import { DirectiveDescriptor } from '../plugins/directives/realmPlugin'
+import { DirectiveDescriptor } from '../plugins/directives'
 import { ContainerDirective } from 'mdast-util-directive'
 
 export const ADMONITION_TYPES = ['note', 'tip', 'danger', 'info', 'caution'] as const

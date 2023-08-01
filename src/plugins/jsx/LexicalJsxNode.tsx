@@ -3,7 +3,8 @@ import type { EditorConfig, LexicalEditor, LexicalNode, NodeKey, SerializedLexic
 import { DecoratorNode } from 'lexical'
 import React from 'react'
 import { NestedEditorsContext } from '../core/NestedLexicalEditor'
-import { MdastJsx, jsxPluginHooks } from './realmPlugin'
+import { MdastJsx, jsxPluginHooks } from '.'
+import { VoidEmitter, voidEmitter } from '../../utils/voidEmitter'
 
 /**
  * A serialized representation of an {@link LexicalJsxNode}.
@@ -22,6 +23,7 @@ export type SerializedLexicalJsxNode = Spread<
  */
 export class LexicalJsxNode extends DecoratorNode<JSX.Element> {
   __mdastNode: MdastJsx
+  __focusEmitter = voidEmitter()
 
   static getType(): string {
     return 'jsx'
@@ -64,8 +66,20 @@ export class LexicalJsxNode extends DecoratorNode<JSX.Element> {
     this.getWritable().__mdastNode = mdastNode
   }
 
+  select = () => {
+    this.__focusEmitter.publish()
+  }
+
   decorate(parentEditor: LexicalEditor, config: EditorConfig): JSX.Element {
-    return <JsxEditorContainer lexicalJsxNode={this} config={config} mdastNode={this.getMdastNode()} parentEditor={parentEditor} />
+    return (
+      <JsxEditorContainer
+        lexicalJsxNode={this}
+        config={config}
+        mdastNode={this.getMdastNode()}
+        parentEditor={parentEditor}
+        focusEmitter={this.__focusEmitter}
+      />
+    )
   }
 
   isInline(): boolean {
@@ -85,6 +99,7 @@ export function JsxEditorContainer(props: {
   /** The MDAST node that is being edited */
   mdastNode: MdastJsx
   config: EditorConfig
+  focusEmitter: VoidEmitter
 }) {
   const { mdastNode } = props
   const [jsxComponentDescriptors] = jsxPluginHooks.useEmitterValues('jsxComponentDescriptors')
@@ -95,6 +110,7 @@ export function JsxEditorContainer(props: {
     <NestedEditorsContext.Provider
       value={{
         config: props.config,
+        focusEmitter: props.focusEmitter,
         mdastNode: mdastNode,
         parentEditor: props.parentEditor,
         lexicalNode: props.lexicalJsxNode

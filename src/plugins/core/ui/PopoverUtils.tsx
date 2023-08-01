@@ -1,6 +1,6 @@
 import React from 'react'
 import * as RadixPopover from '@radix-ui/react-popover'
-import { corePluginHooks } from '../realmPlugin'
+import { corePluginHooks } from '..'
 import styles from '../../../styles/ui.module.css'
 
 export const PopoverPortal = (props: RadixPopover.PopoverPortalProps) => {

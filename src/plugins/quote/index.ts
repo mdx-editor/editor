@@ -1,5 +1,5 @@
 import { realmPlugin, system } from '../../gurx'
-import { coreSystem } from '../core/realmPlugin'
+import { coreSystem } from '../core'
 import { QuoteNode } from '@lexical/rich-text'
 import { MdastBlockQuoteVisitor } from './MdastBlockQuoteVisitor'
 import { LexicalQuoteVisitor } from './LexicalQuoteVisitor'

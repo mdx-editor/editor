@@ -1,5 +1,5 @@
 import { realmPlugin, system } from '../../gurx'
-import { coreSystem } from '../core/realmPlugin'
+import { coreSystem } from '../core'
 import { MdastThematicBreakVisitor } from './MdastThematicBreakVisitor'
 import { LexicalThematicBreakVisitor } from './LexicalThematicBreakVisitor'
 import { HorizontalRuleNode, INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontalRuleNode'

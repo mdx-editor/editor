@@ -1,5 +1,5 @@
 import { realmPlugin, system } from '../../gurx'
-import { coreSystem } from '../core/realmPlugin'
+import { coreSystem } from '../core'
 import { gfmTableFromMarkdown, gfmTableToMarkdown } from 'mdast-util-gfm-table'
 import { gfmTable } from 'micromark-extension-gfm-table'
 import { MdastTableVisitor } from './MdastTableVisitor'
@@ -22,28 +22,18 @@ function seedTable(): Mdast.Table {
 }
 
 export const tableSystem = system(
-  (r, [{ rootEditor }]) => {
+  (r, [{ insertDecoratorNode }]) => {
     const insertTable = r.node<true>()
 
-    r.sub(r.pipe(insertTable, r.o.withLatestFrom(rootEditor)), ([, theEditor]) => {
-      theEditor?.getEditorState().read(() => {
-        const selection = $getSelection()
-
-        if ($isRangeSelection(selection)) {
-          const focusNode = selection.focus.getNode()
-
-          if (focusNode !== null) {
-            theEditor.update(() => {
-              const tableNode = $createTableNode(seedTable())
-              $insertNodeToNearestRoot(tableNode)
-              setTimeout(() => {
-                tableNode.select([0, 0])
-              }, 50)
-            })
-          }
-        }
-      })
-    })
+    r.link(
+      r.pipe(
+        insertTable,
+        r.o.mapTo(() => {
+          return $createTableNode(seedTable())
+        })
+      ),
+      insertDecoratorNode
+    )
 
     return {
       insertTable

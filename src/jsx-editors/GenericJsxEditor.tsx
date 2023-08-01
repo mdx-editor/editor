@@ -5,7 +5,7 @@ import React from 'react'
 import { NestedLexicalEditor, useMdastNodeUpdater } from '../plugins/core/NestedLexicalEditor'
 import { PropertyPopover } from '../plugins/core/PropertyPopover'
 import styles from '../styles/ui.module.css'
-import { JsxEditorProps } from '../plugins/jsx/realmPlugin'
+import { JsxEditorProps } from '../plugins/jsx'
 
 export const GenericJsxEditor: React.FC<JsxEditorProps> = ({ mdastNode, descriptor }) => {
   const updateMdastNode = useMdastNodeUpdater()

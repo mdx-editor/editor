@@ -1,5 +1,5 @@
 import React from 'react'
-import { CodeBlockEditorProps } from '../codeblock/realmPlugin'
+import { CodeBlockEditorProps } from '../codeblock'
 import { useCodeMirrorRef } from '../sandpack/useCodeMirrorRef'
 import { CodeEditor as TheEditorFromSandpack, SandpackProvider } from '@codesandbox/sandpack-react'
 import { useCodeBlockEditorContext } from '../codeblock/CodeBlockNode'
@@ -17,7 +17,12 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
   }, [focusEmitter, codeMirrorRef, nodeKey])
 
   return (
-    <div className={styles.sandpackWrapper}>
+    <div
+      className={styles.sandpackWrapper}
+      onKeyDown={(e) => {
+        e.stopPropagation()
+      }}
+    >
       <SandpackProvider>
         <TheEditorFromSandpack
           showLineNumbers

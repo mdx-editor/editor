@@ -16,8 +16,8 @@ import DropDownIcon from '../../icons/arrow_drop_down.svg'
 import classNames from 'classnames'
 import { useCombobox } from 'downshift'
 import styles from '../../styles/ui.module.css'
-import { corePluginHooks } from '../core/realmPlugin'
-import { linkDialogPluginHooks } from './realmPlugin'
+import { corePluginHooks } from '../core'
+import { linkDialogPluginHooks } from '.'
 
 export const OPEN_LINK_DIALOG: LexicalCommand<undefined> = createCommand()
 

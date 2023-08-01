@@ -1,5 +1,5 @@
 import React from 'react'
-import { thematicBreakPluginHooks } from '../thematic-break/realmPlugin'
+import { thematicBreakPluginHooks } from '../thematic-break'
 import { ButtonWithTooltip } from './primitives/toolbar'
 import HorizontalRuleIcon from '../../icons/horizontal_rule.svg'
 

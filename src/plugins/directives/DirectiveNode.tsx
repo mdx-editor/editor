@@ -3,7 +3,7 @@ import type { EditorConfig, LexicalEditor, LexicalNode, NodeKey, SerializedLexic
 import { DecoratorNode } from 'lexical'
 import { Directive } from 'mdast-util-directive'
 import { NestedEditorsContext } from '../core/NestedLexicalEditor'
-import { directivesPluginHooks } from './realmPlugin'
+import { directivesPluginHooks } from '.'
 import { VoidEmitter, voidEmitter } from '../../utils/voidEmitter'
 
 /**

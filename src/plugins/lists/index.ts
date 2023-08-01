@@ -1,5 +1,5 @@
 import { realmPlugin, system } from '../../gurx'
-import { coreSystem } from '../core/realmPlugin'
+import { coreSystem } from '../core'
 import { MdastListVisitor } from './MdastListVisitor'
 import { MdastListItemVisitor } from './MdastListItemVisitor'
 import { LexicalListVisitor } from './LexicalListVisitor'

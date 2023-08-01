@@ -1,7 +1,7 @@
 import React from 'react'
 import { IS_CODE } from '../../FormatConstants'
 import CodeIcon from '../../icons/code.svg'
-import { corePluginHooks } from '../core/realmPlugin'
+import { corePluginHooks } from '../core'
 import { MultipleChoiceToggleGroup } from './primitives/toolbar'
 
 export const CodeToggle: React.FC = () => {

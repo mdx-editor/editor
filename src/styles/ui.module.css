@@ -862,6 +862,10 @@
   border: 1px solid var(--baseBorder);
   border-radius: var(--radius-medium);
   .toolbarToggleItem {
-    padding: var(--spacing-1) var(--spacing-3);
+    padding: 0;
+    & > span {
+      display: inline-block;
+      padding: var(--spacing-1) var(--spacing-3);
+    }
   }
 }

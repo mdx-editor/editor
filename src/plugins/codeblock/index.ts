@@ -1,7 +1,7 @@
 import { CodeBlockVisitor } from './CodeBlockVisitor'
 import { realmPlugin, system } from '../../gurx'
 import { MdastCodeVisitor } from './MdastCodeVisitor'
-import { coreSystem } from '../core/realmPlugin'
+import { coreSystem } from '../core'
 import { $createCodeBlockNode, CodeBlockNode, CreateCodeBlockNodeOptions } from './CodeBlockNode'
 import { VoidEmitter } from '../../utils/voidEmitter'
 

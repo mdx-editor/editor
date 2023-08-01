@@ -1,7 +1,7 @@
 import { $createHeadingNode, $createQuoteNode, HeadingTagType } from '@lexical/rich-text'
 import { $createParagraphNode } from 'lexical'
 import React from 'react'
-import { BlockType, corePluginHooks } from '../core/realmPlugin'
+import { BlockType, corePluginHooks } from '../core'
 import { Select } from './primitives/select'
 
 export const BlockTypeSelect = () => {

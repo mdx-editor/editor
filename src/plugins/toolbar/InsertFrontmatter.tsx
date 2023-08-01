@@ -1,7 +1,7 @@
 import React from 'react'
 import { ButtonWithTooltip } from './primitives/toolbar'
 import FrontmatterIcon from '../../icons/frontmatter.svg'
-import { frontmatterPluginHooks } from '../frontmatter/realmPlugin'
+import { frontmatterPluginHooks } from '../frontmatter'
 
 export const InsertFrontmatter: React.FC = () => {
   const insertFrontmatter = frontmatterPluginHooks.usePublisher('insertFrontmatter')

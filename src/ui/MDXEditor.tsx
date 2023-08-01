@@ -27,8 +27,8 @@ import {
   ToolbarSeparator
 } from './ToolbarPlugin/toolbarComponents'
 import styles from './styles.module.css'
-import { SandpackConfig } from '../plugins/sandpack/realmPlugin'
-import { JsxComponentDescriptor } from '../plugins/jsx/realmPlugin'
+import { SandpackConfig } from '../plugins/sandpack'
+import { JsxComponentDescriptor } from '../plugins/jsx'
 
 /**
  * The properties of the {@link MDXEditor} react component

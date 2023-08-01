@@ -26,7 +26,7 @@ import { ImageButton } from './Image'
 import { InstantTooltip } from './InstantTooltip'
 import { SelectButtonTrigger, SelectContent, SelectItem } from './SelectPieces'
 import { DialogButton } from './DialogButton'
-import { SandpackConfig } from '../../plugins/sandpack/realmPlugin'
+import { SandpackConfig } from '../../plugins/sandpack'
 
 export { BlockTypeSelect } from './BlockTypeSelect'
 export { ImageButton } from './Image'

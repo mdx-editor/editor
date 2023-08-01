@@ -1,7 +1,7 @@
 import React from 'react'
 import { ButtonOrDropdownButton } from './primitives/toolbar'
 import LiveCodeIcon from '../../icons/deployed_code.svg'
-import { sandpackPluginHooks } from '../sandpack/realmPlugin'
+import { sandpackPluginHooks } from '../sandpack'
 
 export const InsertSandpack = () => {
   const [sandpackConfig] = sandpackPluginHooks.useEmitterValues('sandpackConfig')

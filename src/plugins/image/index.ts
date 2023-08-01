@@ -1,5 +1,5 @@
 import { defaultComparator, realmPlugin, system } from '../../gurx'
-import { coreSystem } from '../core/realmPlugin'
+import { coreSystem } from '../core'
 import { MdastImageVisitor } from './MdastImageVisitor'
 import { LexicalImageVisitor } from './LexicalImageVisitor'
 import { $createImageNode, $isImageNode, CreateImageNodeOptions, ImageNode } from './ImageNode'

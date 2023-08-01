@@ -1,5 +1,5 @@
 import React from 'react'
-import { corePluginHooks } from '../core/realmPlugin'
+import { corePluginHooks } from '../core'
 import { IS_BOLD, IS_ITALIC, IS_UNDERLINE } from '../../FormatConstants'
 import { MultipleChoiceToggleGroup } from './primitives/toolbar'
 import BoldIcon from '../../icons/format_bold.svg'

@@ -1,6 +1,6 @@
 import { realmPlugin, system } from '../../gurx'
-import { coreSystem } from '../core/realmPlugin'
-import { codeBlockSystem } from '../codeblock/realmPlugin'
+import { coreSystem } from '../core'
+import { codeBlockSystem } from '../codeblock'
 import { CodeMirrorEditor } from './CodeMirrorEditor'
 
 const defaultCodeBlockLanguages: Record<string, string> = {

@@ -5,16 +5,19 @@ import {
   $getRoot,
   BLUR_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
+  COMMAND_PRIORITY_EDITOR,
+  COMMAND_PRIORITY_HIGH,
   DecoratorNode,
   EditorConfig,
   KEY_BACKSPACE_COMMAND,
   LexicalEditor,
+  SELECTION_CHANGE_COMMAND,
   createEditor
 } from 'lexical'
 import * as Mdast from 'mdast'
 import { Node } from 'unist'
 import React from 'react'
-import { corePluginHooks } from './realmPlugin'
+import { NESTED_EDITOR_UPDATED_COMMAND, corePluginHooks } from '.'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary'
 import { LexicalNestedComposer } from '@lexical/react/LexicalNestedComposer'
@@ -26,6 +29,7 @@ import styles from '../../styles/ui.module.css'
 import { SharedHistoryPlugin } from './SharedHistoryPlugin'
 import { mergeRegister } from '@lexical/utils'
 import { VoidEmitter } from '../../utils/voidEmitter'
+import { isPartOftheEditorUI } from '../../utils/isPartOftheEditorUI'
 
 interface NestedEditorsContextValue<T extends Node> {
   parentEditor: LexicalEditor
@@ -129,10 +133,11 @@ export interface NestedEditorProps<T extends Mdast.Content> {
  */
 export const NestedLexicalEditor = function <T extends Mdast.Content>(props: NestedEditorProps<T>) {
   const { getContent, getUpdatedMdastNode, contentEditableProps, block = false } = props
-  const { mdastNode } = useNestedEditorContext<T>()
+  const { mdastNode, lexicalNode } = useNestedEditorContext<T>()
   const updateMdastNode = useMdastNodeUpdater<T>()
   const removeNode = useLexicalNodeRemove()
   const content = getContent(mdastNode)
+  const [rootEditor] = corePluginHooks.useEmitterValues('rootEditor')
 
   const [importVisitors, exportVisitors, usedLexicalNodes, jsxComponentDescriptors, jsxIsAvailable] = corePluginHooks.useEmitterValues(
     'importVisitors',
@@ -141,6 +146,8 @@ export const NestedLexicalEditor = function <T extends Mdast.Content>(props: Nes
     'jsxComponentDescriptors',
     'jsxIsAvailable'
   )
+
+  const setEditorInFocus = corePluginHooks.usePublisher('editorInFocus')
 
   const [editor] = React.useState(() => {
     const editor = createEditor({
@@ -181,23 +188,48 @@ export const NestedLexicalEditor = function <T extends Mdast.Content>(props: Nes
   }, [editor, block, importVisitors])
 
   React.useEffect(() => {
+    function updateParentNode() {
+      editor.getEditorState().read(() => {
+        const mdast = exportLexicalTreeToMdast({
+          root: $getRoot(),
+          visitors: exportVisitors,
+          jsxComponentDescriptors,
+          jsxIsAvailable
+        })
+        const content: Mdast.Content[] = block ? mdast.children : (mdast.children[0] as Mdast.Paragraph)!.children
+        updateMdastNode(getUpdatedMdastNode(structuredClone(mdastNode) as any, content as any))
+      })
+    }
     return mergeRegister(
       editor.registerCommand(
         BLUR_COMMAND,
-        () => {
-          editor.getEditorState().read(() => {
-            const mdast = exportLexicalTreeToMdast({
-              root: $getRoot(),
-              visitors: exportVisitors,
-              jsxComponentDescriptors,
-              jsxIsAvailable
-            })
-            const content: Mdast.Content[] = block ? mdast.children : (mdast.children[0] as Mdast.Paragraph)!.children
-            updateMdastNode(getUpdatedMdastNode(structuredClone(mdastNode) as any, content as any))
-          })
+        (payload) => {
+          const relatedTarget = payload.relatedTarget as HTMLElement | null
+          if (isPartOftheEditorUI(relatedTarget, rootEditor!.getRootElement()!)) {
+            return false
+          }
+          updateParentNode()
+          setEditorInFocus(null)
           return true
         },
-        COMMAND_PRIORITY_CRITICAL
+        COMMAND_PRIORITY_EDITOR
+      ),
+      // triggered by codemirror
+      editor.registerCommand(
+        NESTED_EDITOR_UPDATED_COMMAND,
+        () => {
+          updateParentNode()
+          return true
+        },
+        COMMAND_PRIORITY_EDITOR
+      ),
+      editor.registerCommand(
+        SELECTION_CHANGE_COMMAND,
+        () => {
+          setEditorInFocus({ editorType: 'lexical', rootNode: lexicalNode })
+          return false
+        },
+        COMMAND_PRIORITY_HIGH
       ),
       editor.registerCommand(
         KEY_BACKSPACE_COMMAND,
@@ -213,7 +245,20 @@ export const NestedLexicalEditor = function <T extends Mdast.Content>(props: Nes
         COMMAND_PRIORITY_CRITICAL
       )
     )
-  }, [block, editor, exportVisitors, getUpdatedMdastNode, jsxComponentDescriptors, jsxIsAvailable, mdastNode, removeNode, updateMdastNode])
+  }, [
+    block,
+    editor,
+    exportVisitors,
+    getUpdatedMdastNode,
+    jsxComponentDescriptors,
+    jsxIsAvailable,
+    lexicalNode,
+    mdastNode,
+    removeNode,
+    setEditorInFocus,
+    updateMdastNode,
+    rootEditor
+  ])
 
   return (
     <LexicalNestedComposer initialEditor={editor}>

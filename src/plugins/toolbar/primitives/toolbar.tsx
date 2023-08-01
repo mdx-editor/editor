@@ -5,6 +5,7 @@ import React from 'react'
 import styles from '../../../styles/ui.module.css'
 import { TooltipWrap } from './TooltipWrap'
 import { SelectButtonTrigger, SelectContent, SelectItem } from './select'
+import { EditorInFocus, corePluginHooks } from '../../core'
 
 function decorate<P extends { className?: string | undefined }>(Component: React.ComponentType<P>, decoratedProps: P) {
   return (props: P) => {
@@ -152,6 +153,21 @@ export const ButtonOrDropdownButton = <T extends string>(props: ButtonOrDropdown
         </RadixSelect.Root>
       )}
     </>
+  )
+}
+
+interface ConditionalContentsProps {
+  when: (rootNode: EditorInFocus | null) => boolean
+  contents: () => React.ReactNode
+  fallback: () => React.ReactNode
+}
+
+export const ConditionalContents: React.FC<ConditionalContentsProps> = ({ when, contents, fallback }) => {
+  const [editorInFocus] = corePluginHooks.useEmitterValues('editorInFocus')
+  return (
+    <div style={{ display: 'flex' }} key={React.useId()}>
+      {when(editorInFocus) ? contents() : fallback()}
+    </div>
   )
 }
 

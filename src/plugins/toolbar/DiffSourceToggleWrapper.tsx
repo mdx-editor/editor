@@ -1,5 +1,5 @@
 import React from 'react'
-import { diffSourcePluginHooks } from '../diff-source/realmPlugin'
+import { diffSourcePluginHooks } from '../diff-source'
 import { SingleChoiceToggleGroup } from './primitives/toolbar'
 import RichTextIcon from '../../icons/rich_text.svg'
 import DiffIcon from '../../icons/difference.svg'

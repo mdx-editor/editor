@@ -2,7 +2,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import classNames from 'classnames'
 import React, { ReactNode } from 'react'
 import styles from '../../../styles/ui.module.css'
-import { corePluginHooks } from '../../core/realmPlugin'
+import { corePluginHooks } from '../../core'
 
 export const TooltipWrap = React.forwardRef<HTMLButtonElement, { title: string; children: ReactNode }>(({ title, children }, ref) => {
   const [editorRootElementRef] = corePluginHooks.useEmitterValues('editorRootElementRef')

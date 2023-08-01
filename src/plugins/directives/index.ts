@@ -1,6 +1,6 @@
 import { Directive } from 'mdast-util-directive'
 import { realmPlugin, system } from '../../gurx'
-import { coreSystem } from '../core/realmPlugin'
+import { coreSystem } from '../core'
 import { directive } from 'micromark-extension-directive'
 import { directiveFromMarkdown, directiveToMarkdown } from 'mdast-util-directive'
 import { DirectiveNode, $createDirectiveNode } from './DirectiveNode'

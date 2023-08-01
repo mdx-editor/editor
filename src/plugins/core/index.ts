@@ -10,7 +10,6 @@ import {
   $isRootOrShadowRoot,
   BLUR_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
-  COMMAND_PRIORITY_LOW,
   DecoratorNode,
   ElementNode,
   FORMAT_TEXT_COMMAND,
@@ -21,14 +20,15 @@ import {
   RangeSelection,
   SELECTION_CHANGE_COMMAND,
   TextFormatType,
-  TextNode
+  TextNode,
+  createCommand
 } from 'lexical'
 import * as Mdast from 'mdast'
 import React from 'react'
 import { LexicalConvertOptions, exportMarkdownFromLexical } from '../../exportMarkdownFromLexical'
 import { RealmNode, realmPlugin, system } from '../../gurx'
 import { MarkdownParseOptions, MdastImportVisitor, importMarkdownToLexical } from '../../importMarkdownToLexical'
-import type { JsxComponentDescriptor } from '../jsx/realmPlugin'
+import type { JsxComponentDescriptor } from '../jsx'
 import { LexicalLinebreakVisitor } from './LexicalLinebreakVisitor'
 import { LexicalParagraphVisitor } from './LexicalParagraphVisitor'
 import { LexicalRootVisitor } from './LexicalRootVisitor'
@@ -44,6 +44,13 @@ export type EditorSubscription = (activeEditor: LexicalEditor) => () => void
 type Teardowns = (() => void)[]
 
 export type BlockType = 'paragraph' | 'quote' | HeadingTagType | ''
+
+export interface EditorInFocus {
+  editorType: string
+  rootNode: LexicalNode | null
+}
+
+export const NESTED_EDITOR_UPDATED_COMMAND = createCommand<void>('NESTED_EDITOR_UPDATED_COMMAND')
 
 export const coreSystem = system((r) => {
   function createAppendNodeFor<T>(node: RealmNode<T[]>) {
@@ -76,6 +83,7 @@ export const coreSystem = system((r) => {
 
   const activeEditorSubscriptions = r.node<EditorSubscription[]>([])
   const rootEditorSubscriptions = r.node<EditorSubscription[]>([])
+  const editorInFocus = r.node<EditorInFocus | null>(null)
 
   const rebind = () =>
     r.o.scan((teardowns, [subs, activeEditorValue]: [EditorSubscription[], LexicalEditor]) => {
@@ -115,6 +123,16 @@ export const coreSystem = system((r) => {
           [activeEditor.key]: theActiveEditor,
           [inFocus.key]: true
         })
+        // doing stuff root editor restores the focus state
+        if (theActiveEditor._parentEditor === null) {
+          theActiveEditor.getEditorState().read(() => {
+            console.log('root editor in focus')
+            r.pub(editorInFocus, {
+              rootNode: $getRoot(),
+              editorType: 'lexical'
+            })
+          })
+        }
         handleSelectionChange()
 
         return false
@@ -232,7 +250,7 @@ export const coreSystem = system((r) => {
         }
         return false
       },
-      COMMAND_PRIORITY_LOW
+      COMMAND_PRIORITY_CRITICAL
     )
   })
 
@@ -297,7 +315,8 @@ export const coreSystem = system((r) => {
 
   const insertDecoratorNode = r.node<() => DecoratorNode<unknown>>()
 
-  r.sub(r.pipe(insertDecoratorNode, r.o.withLatestFrom(rootEditor)), ([nodeFactory, theEditor]) => {
+  r.sub(r.pipe(insertDecoratorNode, r.o.withLatestFrom(activeEditor)), ([nodeFactory, theEditor]) => {
+    console.log('inserting DecoratorNode', theEditor)
     theEditor?.focus(
       () => {
         theEditor.getEditorState().read(() => {
@@ -377,6 +396,7 @@ export const coreSystem = system((r) => {
 
     // editor content state and commands
     currentFormat,
+    editorInFocus,
     applyFormat,
     currentBlockType,
     applyBlockType,

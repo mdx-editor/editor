@@ -8,7 +8,7 @@ import { useCombobox } from 'downshift'
 import DropDownIcon from '../../../icons/arrow_drop_down.svg'
 import CheckIcon from '../../../icons/check.svg'
 import CloseIcon from '../../../icons/close.svg'
-import { corePluginHooks } from '../../core/realmPlugin'
+import { corePluginHooks } from '../../core'
 import styles from '../../../styles/ui.module.css'
 import { TooltipWrap } from './TooltipWrap'
 

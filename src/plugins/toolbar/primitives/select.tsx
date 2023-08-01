@@ -4,7 +4,7 @@ import DropDownIcon from '../../../icons/arrow_drop_down.svg'
 import classNames from 'classnames'
 import styles from '../../../styles/ui.module.css'
 import { TooltipWrap } from './TooltipWrap'
-import { corePluginHooks } from '../../core/realmPlugin'
+import { corePluginHooks } from '../../core'
 
 export const SelectItem = React.forwardRef<HTMLDivElement | null, { className?: string; children: React.ReactNode; value: string }>(
   ({ children, className, ...props }, forwardedRef) => {
@@ -19,7 +19,7 @@ export const SelectItem = React.forwardRef<HTMLDivElement | null, { className?: 
 export const SelectTrigger: React.FC<{ title: string; placeholder: string; className?: string }> = ({ title, placeholder, className }) => {
   return (
     <TooltipWrap title={title}>
-      <RadixSelect.Trigger aria-label={placeholder} className={classNames(styles.selectTrigger, className)}>
+      <RadixSelect.Trigger aria-label={placeholder} className={classNames(styles.selectTrigger, className)} data-toolbar-item={true}>
         <RadixSelect.Value placeholder={placeholder} />
         <RadixSelect.Icon className={styles.selectDropdownArrow}>
           <DropDownIcon />
@@ -38,7 +38,7 @@ export const SelectContent: React.FC<{ children: React.ReactNode; className?: st
   return (
     <RadixSelect.Portal container={editorRootElementRef?.current}>
       <RadixSelect.Content className={className} onCloseAutoFocus={(e) => e.preventDefault()} position="popper">
-        <RadixSelect.Viewport>{children}</RadixSelect.Viewport>
+        <RadixSelect.Viewport data-editor-dropdown={true}>{children}</RadixSelect.Viewport>
       </RadixSelect.Content>
     </RadixSelect.Portal>
   )

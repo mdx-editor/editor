@@ -1,6 +1,6 @@
 import React from 'react'
 import CodeIcon from '../../icons/code.svg'
-import { listsPluginHooks } from '../lists/realmPlugin'
+import { listsPluginHooks } from '../lists'
 import { SingleChoiceToggleGroup } from './primitives/toolbar'
 import BulletedListIcon from '../../icons/format_list_bulleted.svg'
 import NumberedListIcon from '../../icons/format_list_numbered.svg'

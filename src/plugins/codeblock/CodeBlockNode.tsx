@@ -1,8 +1,9 @@
 import React from 'react'
 import { DecoratorNode, EditorConfig, LexicalEditor, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
 import { noop } from '../../utils/fp'
-import { CodeBlockEditorProps, codeBlockPluginHooks } from './realmPlugin'
+import { CodeBlockEditorProps, codeBlockPluginHooks } from '.'
 import { voidEmitter } from '../../utils/voidEmitter'
+import { NESTED_EDITOR_UPDATED_COMMAND } from '../core'
 /**
  * The options necessary to construct a {@link CodeBlockNode}.
  */
@@ -148,6 +149,9 @@ const CodeBlockEditorContextProvider = ({ parentEditor, lexicalNode, children }:
         setCode: (code: string) => {
           parentEditor.update(() => {
             lexicalNode.setCode(code)
+            setTimeout(() => {
+              parentEditor.dispatchCommand(NESTED_EDITOR_UPDATED_COMMAND, undefined)
+            }, 0)
           })
         },
         setLanguage: (language: string) => {

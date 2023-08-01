@@ -18,12 +18,14 @@ import {
   AdmonitionDirectiveDescriptor
 } from '..'
 import { virtuosoSampleSandpackConfig, YoutubeDirectiveDescriptor } from './_boilerplate'
-import { diffSourcePlugin } from '../plugins/diff-source/realmPlugin'
+import { diffSourcePlugin } from '../plugins/diff-source'
+import kitchenSinkMarkdown from './assets/kitchen-sink.md?raw'
+import { markdownShorcutPlugin } from '../plugins/markdown-shortcut'
 
 export const Basics = () => {
   return (
     <MDXEditorCore
-      markdown="Hello, world!"
+      markdown={kitchenSinkMarkdown}
       plugins={[
         toolbarPlugin(),
         listsPlugin(),
@@ -39,7 +41,8 @@ export const Basics = () => {
         sandpackPlugin({ sandpackConfig: virtuosoSampleSandpackConfig }),
         codeMirrorPlugin({ codeBlockLanguages: { js: 'JavaScript', css: 'CSS', txt: 'text' } }),
         directivesPlugin({ directiveDescriptors: [YoutubeDirectiveDescriptor, AdmonitionDirectiveDescriptor] }),
-        diffSourcePlugin({ viewMode: 'diff', diffMarkdown: 'boo' })
+        diffSourcePlugin({ viewMode: 'rich-text', diffMarkdown: 'boo' }),
+        markdownShorcutPlugin()
       ]}
     />
   )

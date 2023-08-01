@@ -1,5 +1,5 @@
 import React from 'react'
-import { Root, Separator } from './primitives/toolbar'
+import { ConditionalContents, Root, Separator } from './primitives/toolbar'
 import { BoldItalicUnderlineToggles } from './BoldItalicUnderlineToggles'
 import { CodeToggle } from './CodeToggle'
 import { ListsToggle } from './ListsToggle'
@@ -14,6 +14,20 @@ import { InsertSandpack } from './InsertSandpack'
 import { InsertAdmonition } from './InsertAdmonition'
 import { UndoRedo } from './UndoRedo'
 import { DiffSourceToggleWrapper } from './DiffSourceToggleWrapper'
+import { EditorInFocus } from '../core'
+import { DirectiveNode } from '../directives/DirectiveNode'
+import { ADMONITION_TYPES } from '../../directive-editors/AdmonitionDirectiveDescriptor'
+import { AdmonitionKind } from 'lexical'
+import { ChangeAdmonitionType } from './ChangeAdmonitionType'
+
+function whenInAdmonition(editorInFocus: EditorInFocus | null) {
+  const node = editorInFocus?.rootNode
+  if (!node || node.getType() !== 'directive') {
+    return false
+  }
+
+  return ADMONITION_TYPES.includes((node as DirectiveNode).getMdastNode().name as AdmonitionKind)
+}
 
 export const Toolbar: React.FC = () => {
   return (
@@ -26,7 +40,9 @@ export const Toolbar: React.FC = () => {
         <Separator />
         <ListsToggle />
         <Separator />
-        <BlockTypeSelect />
+
+        <ConditionalContents when={whenInAdmonition} contents={() => <ChangeAdmonitionType />} fallback={() => <BlockTypeSelect />} />
+
         <Separator />
         <Createlink />
         <Separator />
@@ -36,7 +52,15 @@ export const Toolbar: React.FC = () => {
         <InsertFrontmatter />
         <InsertCodeBlock />
         <InsertSandpack />
-        <InsertAdmonition />
+        <ConditionalContents
+          when={whenInAdmonition}
+          contents={() => null}
+          fallback={() => (
+            <>
+              <InsertAdmonition />
+            </>
+          )}
+        />
       </DiffSourceToggleWrapper>
     </Root>
   )

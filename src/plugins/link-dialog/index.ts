@@ -10,7 +10,7 @@ import {
 import { realmPlugin, system } from '../../gurx'
 import { IS_APPLE } from '../../utils/detectMac'
 import { getSelectedNode, getSelectionRectangle } from '../../utils/lexicalHelpers'
-import { coreSystem } from '../core/realmPlugin'
+import { coreSystem } from '../core'
 import { LinkDialog } from './LinkDialog'
 
 export interface InactiveLinkDialog {

@@ -36,9 +36,10 @@ import { TableNode } from './TableNode'
 import * as RadixToolbar from '@radix-ui/react-toolbar'
 import classNames from 'classnames'
 import styles from '../../styles/ui.module.css'
-import { corePluginHooks } from '../core/realmPlugin'
+import { corePluginHooks } from '../core'
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
 import { mergeRegister } from '@lexical/utils'
+import { isPartOftheEditorUI } from '../../utils/isPartOftheEditorUI'
 
 const AlignToTailwindClassMap = {
   center: styles.centeredCell,
@@ -276,13 +277,15 @@ const Cell: React.FC<Omit<CellProps, 'focus'>> = ({ align, ...props }) => {
 }
 
 const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, lexicalTable, contents, colIndex, rowIndex }) => {
-  const [importVisitors, exportVisitors, usedLexicalNodes, jsxComponentDescriptors, jsxIsAvailable] = corePluginHooks.useEmitterValues(
-    'importVisitors',
-    'exportVisitors',
-    'usedLexicalNodes',
-    'jsxComponentDescriptors',
-    'jsxIsAvailable'
-  )
+  const [importVisitors, exportVisitors, usedLexicalNodes, jsxComponentDescriptors, jsxIsAvailable, rootEditor] =
+    corePluginHooks.useEmitterValues(
+      'importVisitors',
+      'exportVisitors',
+      'usedLexicalNodes',
+      'jsxComponentDescriptors',
+      'jsxIsAvailable',
+      'rootEditor'
+    )
 
   const [editor] = React.useState(() => {
     const editor = createEditor({
@@ -357,7 +360,8 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
         BLUR_COMMAND,
         (payload) => {
           const relatedTarget = payload.relatedTarget as HTMLElement | null
-          if (relatedTarget?.dataset['editorDialog'] !== undefined || relatedTarget?.dataset['toolbarItem'] !== undefined) {
+
+          if (isPartOftheEditorUI(relatedTarget, rootEditor!.getRootElement()!)) {
             return false
           }
           saveAndFocus(null)

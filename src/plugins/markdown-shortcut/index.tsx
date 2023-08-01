@@ -3,7 +3,7 @@ import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPl
 import React from 'react'
 import { realmPlugin, system } from '../../gurx'
 import { $createCodeBlockNode, CodeBlockNode } from '../codeblock/CodeBlockNode'
-import { coreSystem } from '../core/realmPlugin'
+import { coreSystem } from '../core'
 
 // insert CM code block type rather than the default one
 function patchMarkdownTransformers(transformers: Transformer[]) {

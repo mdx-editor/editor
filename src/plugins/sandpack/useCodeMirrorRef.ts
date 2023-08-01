@@ -1,10 +1,10 @@
 import { CodeMirrorRef } from '@codesandbox/sandpack-react/dist/components/CodeEditor/CodeMirror'
 import { $createParagraphNode, $getNodeByKey } from 'lexical'
 import React from 'react'
-import { corePluginHooks } from '../core/realmPlugin'
+import { corePluginHooks } from '../core'
 
 export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'sandpack', language: string) {
-  const [theEditor] = corePluginHooks.useEmitterValues('rootEditor')
+  const [theEditor] = corePluginHooks.useEmitterValues('activeEditor')
   // const setActiveEditorType = usePublisher('activeEditorType')
   const codeMirrorRef = React.useRef<CodeMirrorRef>(null)
 

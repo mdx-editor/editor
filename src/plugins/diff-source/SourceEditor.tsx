@@ -2,8 +2,8 @@ import { markdown as markdownLanguageSupport } from '@codemirror/lang-markdown'
 import type { CodeMirrorRef } from '@codesandbox/sandpack-react/components/CodeEditor/CodeMirror'
 import { SandpackProvider, CodeEditor as TheEditorFromSandpack } from '@codesandbox/sandpack-react'
 import React from 'react'
-import { diffSourcePluginHooks } from './realmPlugin'
-import { corePluginHooks } from '../core/realmPlugin'
+import { diffSourcePluginHooks } from '.'
+import { corePluginHooks } from '../core'
 
 export const SourceEditor = () => {
   const [markdown] = corePluginHooks.useEmitterValues('markdown')

@@ -1,6 +1,6 @@
 import React from 'react'
 import { realmPlugin, system } from '../../gurx'
-import { coreSystem } from '../core/realmPlugin'
+import { coreSystem } from '../core'
 import { MdastLinkVisitor } from './MdastLinkVisitor'
 import { LexicalLinkVisitor } from './LexicalLinkVisitor'
 import { LinkNode } from '@lexical/link'

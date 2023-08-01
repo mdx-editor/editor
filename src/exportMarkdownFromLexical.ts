@@ -2,7 +2,7 @@ import { $isElementNode, ElementNode as LexicalElementNode, LexicalNode, RootNod
 import * as Mdast from 'mdast'
 import type { MdxjsEsm } from 'mdast-util-mdx'
 import { Options as ToMarkdownOptions, toMarkdown } from 'mdast-util-to-markdown'
-import type { JsxComponentDescriptor } from './plugins/jsx/realmPlugin'
+import type { JsxComponentDescriptor } from './plugins/jsx'
 
 export type { Options as ToMarkdownOptions } from 'mdast-util-to-markdown'
 

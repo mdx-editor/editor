@@ -161,8 +161,8 @@ export class TableNode extends DecoratorNode<JSX.Element> {
     return <TableEditor lexicalTable={this} mdastNode={this.__mdastNode} parentEditor={parentEditor} />
   }
 
-  select(coords: [colIndex: number, rowIndex: number]): void {
-    this.focusEmitter.publish(coords)
+  select(coords?: [colIndex: number, rowIndex: number]): void {
+    this.focusEmitter.publish(coords || [0, 0])
   }
 
   isInline(): false {

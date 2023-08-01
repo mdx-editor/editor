@@ -1,5 +1,5 @@
 import { realmPlugin, system } from '../../gurx'
-import { coreSystem } from '../core/realmPlugin'
+import { coreSystem } from '../core'
 import { MdastHeadingVisitor } from './MdastHeadingVisitor'
 import { HeadingNode } from '@lexical/rich-text'
 import { LexicalHeadingVisitor } from './LexicalHeadingVisitor'

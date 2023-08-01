@@ -1,6 +1,6 @@
 import React from 'react'
 import { RealmPluginInitializer } from './gurx'
-import { corePlugin, corePluginHooks } from './plugins/core/realmPlugin'
+import { corePlugin, corePluginHooks } from './plugins/core'
 import { lexicalTheme } from './styles/lexicalTheme'
 import { LexicalComposer } from '@lexical/react/LexicalComposer'
 import styles from './styles/ui.module.css'

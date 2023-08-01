@@ -1,7 +1,7 @@
 import React from 'react'
 import { ButtonWithTooltip } from './primitives/toolbar'
 import LinkIcon from '../../icons/link.svg'
-import { linkDialogPluginHooks } from '../link-dialog/realmPlugin'
+import { linkDialogPluginHooks } from '../link-dialog'
 
 export const Createlink = () => {
   const openLinkDialog = linkDialogPluginHooks.usePublisher('openLinkEditDialog')
