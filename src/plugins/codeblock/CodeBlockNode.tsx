@@ -79,15 +79,15 @@ export class CodeBlockNode extends DecoratorNode<JSX.Element> {
   }
 
   getCode(): string {
-    return this.getLatest().__code
+    return this.__code
   }
 
   getMeta(): string {
-    return this.getLatest().__meta
+    return this.__meta
   }
 
   getLanguage(): string {
-    return this.getLatest().__language
+    return this.__language
   }
 
   setCode = (code: string) => {

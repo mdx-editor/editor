@@ -19,6 +19,7 @@ import { DirectiveNode } from '../directives/DirectiveNode'
 import { ADMONITION_TYPES } from '../../directive-editors/AdmonitionDirectiveDescriptor'
 import { AdmonitionKind } from 'lexical'
 import { ChangeAdmonitionType } from './ChangeAdmonitionType'
+import { ChangeCodeMirrorLanguage } from './ChangeCodeMirrorLanguage'
 
 function whenInAdmonition(editorInFocus: EditorInFocus | null) {
   const node = editorInFocus?.rootNode
@@ -68,7 +69,7 @@ export const Toolbar: React.FC = () => {
         <ConditionalContents
           when={whenInCodeBlock}
           contents={() => {
-            return 'CODEBLOCK'
+            return <ChangeCodeMirrorLanguage />
           }}
           fallback={() => null}
         />
