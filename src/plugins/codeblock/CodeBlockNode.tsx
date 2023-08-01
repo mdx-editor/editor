@@ -140,12 +140,15 @@ type CodeBlockContextProviderProps = {
   children: React.ReactNode
 }
 
-const CodeBlockEditorContext = React.createContext<Pick<CodeBlockNode, 'setCode' | 'setLanguage' | 'setMeta'> | null>(null)
+const CodeBlockEditorContext = React.createContext<
+  (Pick<CodeBlockNode, 'setCode' | 'setLanguage' | 'setMeta'> & { lexicalNode: CodeBlockNode }) | null
+>(null)
 
 const CodeBlockEditorContextProvider = ({ parentEditor, lexicalNode, children }: CodeBlockContextProviderProps) => {
   return (
     <CodeBlockEditorContext.Provider
       value={{
+        lexicalNode,
         setCode: (code: string) => {
           parentEditor.update(() => {
             lexicalNode.setCode(code)

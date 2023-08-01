@@ -6,7 +6,7 @@ import { useCodeBlockEditorContext } from '../codeblock/CodeBlockNode'
 import styles from '../../styles/ui.module.css'
 
 export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: CodeBlockEditorProps) => {
-  const codeMirrorRef = useCodeMirrorRef(nodeKey, 'sandpack', 'jsx')
+  const codeMirrorRef = useCodeMirrorRef(nodeKey, 'codeblock', 'jsx')
   const { setCode } = useCodeBlockEditorContext()
 
   React.useEffect(() => {

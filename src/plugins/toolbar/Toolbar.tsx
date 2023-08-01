@@ -29,6 +29,10 @@ function whenInAdmonition(editorInFocus: EditorInFocus | null) {
   return ADMONITION_TYPES.includes((node as DirectiveNode).getMdastNode().name as AdmonitionKind)
 }
 
+function whenInCodeBlock(editorInFocus: EditorInFocus | null) {
+  return editorInFocus?.editorType === 'codeblock'
+}
+
 export const Toolbar: React.FC = () => {
   return (
     <Root>
@@ -60,6 +64,13 @@ export const Toolbar: React.FC = () => {
               <InsertAdmonition />
             </>
           )}
+        />
+        <ConditionalContents
+          when={whenInCodeBlock}
+          contents={() => {
+            return 'CODEBLOCK'
+          }}
+          fallback={() => null}
         />
       </DiffSourceToggleWrapper>
     </Root>

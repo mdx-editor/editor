@@ -1,12 +1,15 @@
 import { CodeMirrorRef } from '@codesandbox/sandpack-react/dist/components/CodeEditor/CodeMirror'
-import { $createParagraphNode, $getNodeByKey } from 'lexical'
+import { $createParagraphNode, $getNodeByKey, LexicalNode } from 'lexical'
 import React from 'react'
 import { corePluginHooks } from '../core'
+import { useCodeBlockEditorContext } from '../codeblock/CodeBlockNode'
 
 export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'sandpack', language: string) {
   const [theEditor] = corePluginHooks.useEmitterValues('activeEditor')
+  const setEditorInFocus = corePluginHooks.usePublisher('editorInFocus')
   // const setActiveEditorType = usePublisher('activeEditorType')
   const codeMirrorRef = React.useRef<CodeMirrorRef>(null)
+  const { lexicalNode } = useCodeBlockEditorContext()
 
   // these flags escape the editor with arrows.
   // they are set to true when the cursor is at the top or bottom of the editor, and then the user presses the arrow.
@@ -14,8 +17,12 @@ export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'san
   const atTop = React.useRef(false)
 
   const onFocusHandler = React.useCallback(() => {
-    // setActiveEditorType({ type: editorType, nodeKey })
-  }, [])
+    console.log(editorType, lexicalNode)
+    setEditorInFocus({
+      editorType,
+      rootNode: lexicalNode
+    })
+  }, [editorType, lexicalNode, setEditorInFocus])
 
   const onKeyDownHandler = React.useCallback(
     (e: KeyboardEvent) => {
