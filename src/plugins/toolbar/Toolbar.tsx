@@ -20,6 +20,7 @@ import { ADMONITION_TYPES } from '../../directive-editors/AdmonitionDirectiveDes
 import { AdmonitionKind } from 'lexical'
 import { ChangeAdmonitionType } from './ChangeAdmonitionType'
 import { ChangeCodeMirrorLanguage } from './ChangeCodeMirrorLanguage'
+import { ShowSandpackInfo } from './ShowSandpackInfo'
 
 function whenInAdmonition(editorInFocus: EditorInFocus | null) {
   const node = editorInFocus?.rootNode
@@ -30,10 +31,6 @@ function whenInAdmonition(editorInFocus: EditorInFocus | null) {
   return ADMONITION_TYPES.includes((node as DirectiveNode).getMdastNode().name as AdmonitionKind)
 }
 
-function whenInCodeBlock(editorInFocus: EditorInFocus | null) {
-  return editorInFocus?.editorType === 'codeblock'
-}
-
 export const Toolbar: React.FC = () => {
   return (
     <Root>
@@ -41,7 +38,7 @@ export const Toolbar: React.FC = () => {
         <ConditionalContents
           options={[
             { when: (editor) => editor?.editorType === 'codeblock', contents: () => <ChangeCodeMirrorLanguage /> },
-            { when: (editor) => editor?.editorType === 'sandpack', contents: () => 'Sandpack' },
+            { when: (editor) => editor?.editorType === 'sandpack', contents: () => <ShowSandpackInfo /> },
             {
               when: () => true,
               contents: () => (
