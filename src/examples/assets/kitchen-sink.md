@@ -12,9 +12,19 @@ horizontal rule
 
 Block of code:
 
+JS: 
+
 ```js
 export default function App() {
   return <h1>Hello world from a markdown</h1>
+}
+```
+
+CSS:
+
+```css
+html, body {
+  font-weight: 400;
 }
 ```
 
@@ -48,3 +58,11 @@ And note admonition
 Image:
 
 ![Shiprock](https://virtuoso.dev/img/logo.svg)
+
+React Sandpack:
+
+```tsx live react
+export default function App() {
+  return <h1>Hello world from a markdown</h1>
+}
+```

@@ -21,15 +21,8 @@ export interface SandpackEditorProps extends CodeBlockEditorProps {
 }
 
 export const SandpackEditor = ({ nodeKey, code, focusEmitter, preset }: SandpackEditorProps) => {
-  const codeMirrorRef = useCodeMirrorRef(nodeKey, 'sandpack', 'jsx')
+  const codeMirrorRef = useCodeMirrorRef(nodeKey, 'sandpack', 'jsx', focusEmitter)
   const { setCode } = useCodeBlockEditorContext()
-
-  React.useEffect(() => {
-    focusEmitter.subscribe(() => {
-      codeMirrorRef?.current?.getCodemirror()?.focus()
-      // setActiveEditorType({ type: 'sandpack', nodeKey })
-    })
-  }, [focusEmitter, codeMirrorRef, nodeKey])
 
   return (
     <SandpackProvider

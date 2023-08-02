@@ -3,8 +3,9 @@ import { $createParagraphNode, $getNodeByKey, LexicalNode } from 'lexical'
 import React from 'react'
 import { corePluginHooks } from '../core'
 import { useCodeBlockEditorContext } from '../codeblock/CodeBlockNode'
+import { VoidEmitter } from '../../utils/voidEmitter'
 
-export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'sandpack', language: string) {
+export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'sandpack', language: string, focusEmitter: VoidEmitter) {
   const [theEditor] = corePluginHooks.useEmitterValues('activeEditor')
   const setEditorInFocus = corePluginHooks.usePublisher('editorInFocus')
   // const setActiveEditorType = usePublisher('activeEditorType')
@@ -17,7 +18,6 @@ export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'san
   const atTop = React.useRef(false)
 
   const onFocusHandler = React.useCallback(() => {
-    console.log(editorType, lexicalNode)
     setEditorInFocus({
       editorType,
       rootNode: lexicalNode
@@ -99,6 +99,13 @@ export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'san
       codeMirror?.getCodemirror()?.contentDOM.removeEventListener('keydown', onKeyDownHandler)
     }
   }, [codeMirrorRef, onFocusHandler, onKeyDownHandler, language])
+
+  React.useEffect(() => {
+    focusEmitter.subscribe(() => {
+      codeMirrorRef?.current?.getCodemirror()?.focus()
+      onFocusHandler()
+    })
+  }, [focusEmitter, codeMirrorRef, nodeKey, onFocusHandler])
 
   return codeMirrorRef
 }

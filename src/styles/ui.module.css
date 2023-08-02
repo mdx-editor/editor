@@ -869,3 +869,15 @@
     }
   }
 }
+
+.selectWithLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  & > label {
+    font-size: var(--text-sm);
+  }
+  .selectTrigger {
+    border: 1px solid var(--baseBorder);
+  }
+}

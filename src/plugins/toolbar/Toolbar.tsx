@@ -38,40 +38,45 @@ export const Toolbar: React.FC = () => {
   return (
     <Root>
       <DiffSourceToggleWrapper>
-        <UndoRedo />
-        <Separator />
-        <BoldItalicUnderlineToggles />
-        <CodeToggle />
-        <Separator />
-        <ListsToggle />
-        <Separator />
-
-        <ConditionalContents when={whenInAdmonition} contents={() => <ChangeAdmonitionType />} fallback={() => <BlockTypeSelect />} />
-
-        <Separator />
-        <Createlink />
-        <Separator />
-        <InsertImage />
-        <InsertTable />
-        <InsertThematicBreak />
-        <InsertFrontmatter />
-        <InsertCodeBlock />
-        <InsertSandpack />
         <ConditionalContents
-          when={whenInAdmonition}
-          contents={() => null}
-          fallback={() => (
-            <>
-              <InsertAdmonition />
-            </>
-          )}
-        />
-        <ConditionalContents
-          when={whenInCodeBlock}
-          contents={() => {
-            return <ChangeCodeMirrorLanguage />
-          }}
-          fallback={() => null}
+          options={[
+            { when: (editor) => editor?.editorType === 'codeblock', contents: () => <ChangeCodeMirrorLanguage /> },
+            { when: (editor) => editor?.editorType === 'sandpack', contents: () => 'Sandpack' },
+            {
+              when: () => true,
+              contents: () => (
+                <>
+                  <UndoRedo />
+                  <Separator />
+                  <BoldItalicUnderlineToggles />
+                  <CodeToggle />
+                  <Separator />
+                  <ListsToggle />
+                  <Separator />
+
+                  <ConditionalContents
+                    options={[
+                      { when: whenInAdmonition, contents: () => <ChangeAdmonitionType /> },
+                      { when: () => true, contents: () => <BlockTypeSelect /> }
+                    ]}
+                  />
+
+                  <Separator />
+                  <Createlink />
+                  <Separator />
+                  <InsertImage />
+                  <InsertTable />
+                  <InsertThematicBreak />
+                  <InsertFrontmatter />
+                  <InsertCodeBlock />
+                  <InsertSandpack />
+                  <ConditionalContents
+                    options={[{ when: (editorInFocus) => !whenInAdmonition(editorInFocus), contents: () => <InsertAdmonition /> }]}
+                  />
+                </>
+              )
+            }
+          ]}
         />
       </DiffSourceToggleWrapper>
     </Root>

@@ -6,15 +6,8 @@ import { useCodeBlockEditorContext } from '../codeblock/CodeBlockNode'
 import styles from '../../styles/ui.module.css'
 
 export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: CodeBlockEditorProps) => {
-  const codeMirrorRef = useCodeMirrorRef(nodeKey, 'codeblock', 'jsx')
+  const codeMirrorRef = useCodeMirrorRef(nodeKey, 'codeblock', 'jsx', focusEmitter)
   const { setCode } = useCodeBlockEditorContext()
-
-  React.useEffect(() => {
-    focusEmitter.subscribe(() => {
-      codeMirrorRef?.current?.getCodemirror()?.focus()
-      // setActiveEditorType({ type: 'sandpack', nodeKey })
-    })
-  }, [focusEmitter, codeMirrorRef, nodeKey])
 
   return (
     <div

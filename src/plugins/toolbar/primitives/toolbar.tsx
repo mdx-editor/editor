@@ -157,18 +157,17 @@ export const ButtonOrDropdownButton = <T extends string>(props: ButtonOrDropdown
 }
 
 interface ConditionalContentsProps {
-  when: (rootNode: EditorInFocus | null) => boolean
-  contents: () => React.ReactNode
-  fallback: () => React.ReactNode
+  options: {
+    when: (rootNode: EditorInFocus | null) => boolean
+    contents: () => React.ReactNode
+  }[]
 }
 
-export const ConditionalContents: React.FC<ConditionalContentsProps> = ({ when, contents, fallback }) => {
+export const ConditionalContents: React.FC<ConditionalContentsProps> = ({ options }) => {
   const [editorInFocus] = corePluginHooks.useEmitterValues('editorInFocus')
-  return (
-    <div style={{ display: 'flex' }} key={React.useId()}>
-      {when(editorInFocus) ? contents() : fallback()}
-    </div>
-  )
+  const contents = React.useMemo(() => options.find(({ when }) => when(editorInFocus))?.contents() ?? null, [options, editorInFocus])
+
+  return <div style={{ display: 'flex' }}>{contents}</div>
 }
 
 export const Separator = RadixToolbar.Separator
