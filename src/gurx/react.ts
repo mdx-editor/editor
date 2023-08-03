@@ -14,6 +14,7 @@ import {
   realmFactory,
   LongTuple
 } from './realmFactory'
+import { uuidv4 } from '../utils/uuid4'
 
 /** @internal */
 interface Dict<T> {
@@ -120,6 +121,7 @@ export type MethodsFromPropMap<Sys extends System, Map extends SystemPropsMap<Sy
 export type RefHandle<T> = T extends React.ForwardRefExoticComponent<React.RefAttributes<infer Handle>> ? Handle : never
 
 const GurxContext = React.createContext(undefined)
+
 /**
  * Converts a system spec to React component by mapping the system streams to component properties, events and methods. Returns hooks for querying and modifying
  * the system streams from the component's child components.
@@ -290,7 +292,11 @@ export function sysHooks<Sys extends System>() {
 
 type SystemAndDependencies<Spec extends AnySystemSpec> = SystemOfSpecs<[Spec]> & SystemOfSpecs<Spec['dependencies']>
 
+const UsedPluginsContext = React.createContext<Set<string>>(new Set())
+
 export interface RealmPluginParams<Spec extends AnySystemSpec, Params extends object> {
+  id: string
+  dependencies?: string[]
   systemSpec: Spec
   applyParamsToSystem?: (realm: TypedRealm<SystemAndDependencies<Spec>>, props: Params) => void
   init?: (realm: TypedRealm<SystemAndDependencies<Spec>>, props: Params) => void
@@ -306,7 +312,9 @@ export function realmPlugin<Spec extends AnySystemSpec, Params extends object>(p
       systemSpec: params.systemSpec,
       pluginParams,
       applyParamsToSystem: params.applyParamsToSystem,
-      init: params.init
+      init: params.init,
+      id: params.id,
+      dependencies: params.dependencies
     }
   }
 
@@ -320,10 +328,26 @@ export const RealmPluginInitializer = function <P extends Array<ReturnType<Plugi
   plugins: P
   children?: React.ReactNode
 }) {
+  const validPlugins = React.useMemo(() => {
+    const availablePlugins = plugins.map((plugin) => plugin.id)
+    const validPlugins: P = plugins.filter((plugin) => {
+      if (plugin.dependencies) {
+        if (plugin.dependencies.some((dep) => !availablePlugins.includes(dep))) {
+          console.log('plugin', plugin.id, 'has missing dependencies', plugin.dependencies)
+          return false
+        }
+      }
+      return true
+    }) as P
+
+    return validPlugins
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const realm = React.useMemo(() => {
-    const specs = plugins.map((plugin) => plugin.systemSpec) as LongTuple<AnySystemSpec>
+    const specs = validPlugins.map((plugin) => plugin.systemSpec) as LongTuple<AnySystemSpec>
     const realm = realmFactory(...specs)
-    plugins.forEach((plugin) => {
+    validPlugins.forEach((plugin) => {
       plugin.init?.(realm, plugin.pluginParams)
       plugin.applyParamsToSystem?.(realm, plugin.pluginParams)
     })
@@ -332,11 +356,25 @@ export const RealmPluginInitializer = function <P extends Array<ReturnType<Plugi
   }, [])
 
   React.useEffect(() => {
-    plugins.forEach((plugin) => {
+    validPlugins.forEach((plugin) => {
       plugin.applyParamsToSystem?.(realm, plugin.pluginParams)
     })
-  }, [realm, plugins])
+  }, [realm, validPlugins])
 
   const Context = GurxContext as unknown as React.Context<TypedRealm<any>>
-  return React.createElement(Context.Provider, { value: realm }, children)
+
+  return React.createElement(
+    Context.Provider,
+    { value: realm },
+    React.createElement(UsedPluginsContext.Provider, { value: new Set(plugins.map((plugin) => plugin.id)) }, children)
+  )
+}
+
+export function useHasPlugin(id: string) {
+  const usedPlugins = React.useContext(UsedPluginsContext)
+  return usedPlugins.has(id)
+}
+
+export const RequirePlugin: React.FC<{ id: string; children: React.ReactNode }> = ({ id, children }) => {
+  return useHasPlugin(id) ? React.createElement(React.Fragment, {}, children) : null
 }

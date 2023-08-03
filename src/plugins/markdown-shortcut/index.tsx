@@ -26,11 +26,14 @@ function patchMarkdownTransformers(transformers: Transformer[]) {
   return transformersCopy
 }
 
-export const [markdownShorcutPlugin] = realmPlugin({
+export const [markdownShortcutPlugin] = realmPlugin({
+  id: 'markdown-shortcut',
+  dependencies: ['lists', 'headings', 'codeblock', 'quote'],
   systemSpec: system((_) => ({}), [coreSystem]),
 
   init: (realm) => {
     realm.pubKey('addComposerChild', () => <MarkdownShortcutPlugin transformers={patchMarkdownTransformers(TRANSFORMERS)} />)
+    realm.pubKey('addNestedEditorChild', () => <MarkdownShortcutPlugin transformers={patchMarkdownTransformers(TRANSFORMERS)} />)
   }
 })
 

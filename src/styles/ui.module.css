@@ -171,7 +171,9 @@
   width: inherit;
 
   & div[role=separator] {
-    margin: var(--spacing-1);
+    margin: var(--spacing-2) var(--spacing-2);
+    border-left: 1px solid var(--baseBorder);
+    border-right: 1px solid var(--baseBase);
   }
 }
 
@@ -196,6 +198,7 @@
 
 .toolbarGroupOfGroups {
   display: flex;
+  margin: 0 var(--spacing-1);
 }
 
 .toolbarToggleSingleGroup:first-of-type .toolbarToggleItem:only-child,
@@ -861,11 +864,13 @@
 .diffSourceToggle {
   border: 1px solid var(--baseBorder);
   border-radius: var(--radius-medium);
+  display: flex;
   .toolbarToggleItem {
     padding: 0;
+
     & > span {
-      display: inline-block;
-      padding: var(--spacing-1) var(--spacing-3);
+      display: block;
+      padding: var(--spacing-2) var(--spacing-3);
     }
   }
 }
@@ -874,10 +879,17 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-2);
+  margin-left: var(--spacing-2);
+
   & > label {
     font-size: var(--text-sm);
   }
   .selectTrigger {
     border: 1px solid var(--baseBorder);
   }
+}
+
+.toolbarTitleMode {
+  font-size: var(--text-sm);
+  margin-left: var(--spacing-2);
 }

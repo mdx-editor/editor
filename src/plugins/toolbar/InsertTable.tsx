@@ -1,9 +1,10 @@
-import { Button, ButtonWithTooltip } from './primitives/toolbar'
+import { ButtonWithTooltip } from './primitives/toolbar'
 import React from 'react'
 import { tablePluginHooks } from '../table'
 import TableIcon from '../../icons/table.svg'
+import { RequirePlugin } from '../../gurx'
 
-export const InsertTable: React.FC = () => {
+const InnerInsertTable: React.FC = () => {
   const insertTable = tablePluginHooks.usePublisher('insertTable')
 
   return (
@@ -15,5 +16,13 @@ export const InsertTable: React.FC = () => {
     >
       <TableIcon />
     </ButtonWithTooltip>
+  )
+}
+
+export const InsertTable = () => {
+  return (
+    <RequirePlugin id="table">
+      <InnerInsertTable />
+    </RequirePlugin>
   )
 }

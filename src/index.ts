@@ -41,3 +41,6 @@ export { GenericDirectiveEditor } from './directive-editors/GenericDirectiveEdit
 export { linkDialogPlugin } from './plugins/link-dialog'
 
 export { toolbarPlugin } from './plugins/toolbar'
+
+export { diffSourcePlugin } from './plugins/diff-source'
+export { markdownShortcutPlugin } from './plugins/markdown-shortcut'

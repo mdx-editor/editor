@@ -127,7 +127,6 @@ export function importMdastTreeToLexical({ root, mdastRoot, visitors }: MdastTre
       return visitor.testNode(mdastNode)
     })
     if (!visitor) {
-      debugger
       throw new Error(`no MdastImportVisitor found for ${mdastNode.type}`, {
         cause: mdastNode
       })

@@ -131,6 +131,7 @@ export const sandpackSystem = system(
 )
 
 export const [sandpackPlugin, sandpackPluginHooks] = realmPlugin({
+  id: 'sandpack',
   systemSpec: sandpackSystem,
   applyParamsToSystem(r, params: { sandpackConfig: SandpackConfig }) {
     r.pubKey('sandpackConfig', params.sandpackConfig)

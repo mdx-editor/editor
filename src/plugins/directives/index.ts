@@ -60,6 +60,7 @@ export interface DirectivesPluginParams {
 }
 
 export const [directivesPlugin, directivesPluginHooks] = realmPlugin({
+  id: 'directives',
   systemSpec: directivesSystem,
   applyParamsToSystem: (realm, params: DirectivesPluginParams) => {
     realm.pubKey('directiveDescriptors', params?.directiveDescriptors || [])

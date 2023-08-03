@@ -5,14 +5,21 @@ import RichTextIcon from '../../icons/rich_text.svg'
 import DiffIcon from '../../icons/difference.svg'
 import SourceIcon from '../../icons/markdown.svg'
 import styles from '../../styles/ui.module.css'
+import { useHasPlugin } from '../../gurx'
 
-export const DiffSourceToggleWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const InnerDiffSourceToggleWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [viewMode] = diffSourcePluginHooks.useEmitterValues('viewMode')
   const changeViewMode = diffSourcePluginHooks.usePublisher('viewMode')
 
   return (
     <>
-      {viewMode === 'rich-text' ? children : null}
+      {viewMode === 'rich-text' ? (
+        children
+      ) : viewMode === 'diff' ? (
+        <span className={styles.toolbarTitleMode}>Diff mode</span>
+      ) : (
+        <span className={styles.toolbarTitleMode}>Source mode</span>
+      )}
 
       <div style={{ marginLeft: 'auto' }}>
         <SingleChoiceToggleGroup
@@ -28,4 +35,8 @@ export const DiffSourceToggleWrapper: React.FC<{ children: React.ReactNode }> = 
       </div>
     </>
   )
+}
+
+export const DiffSourceToggleWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return useHasPlugin('diff-source') ? <InnerDiffSourceToggleWrapper>{children}</InnerDiffSourceToggleWrapper> : <>{children}</>
 }

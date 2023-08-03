@@ -18,6 +18,7 @@ export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'san
   const atTop = React.useRef(false)
 
   const onFocusHandler = React.useCallback(() => {
+    console.log('onFocusHandler', editorType)
     setEditorInFocus({
       editorType,
       rootNode: lexicalNode

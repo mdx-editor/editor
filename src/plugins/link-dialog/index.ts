@@ -267,6 +267,8 @@ export const linkDialogSystem = system(
 )
 
 export const [linkDialogPlugin, linkDialogPluginHooks] = realmPlugin({
+  id: 'link-dialog',
+  dependencies: ['link'],
   systemSpec: linkDialogSystem,
   applyParamsToSystem(r, params: { linkAutocompleteSuggestions?: string[] } = {}) {
     r.pubKey('linkAutocompleteSuggestions', params.linkAutocompleteSuggestions || [])

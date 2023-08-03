@@ -3,8 +3,9 @@ import { ButtonOrDropdownButton } from './primitives/toolbar'
 import AdmonitionIcon from '../../icons/emergency_home.svg'
 import { directivesPluginHooks } from '../directives'
 import { ADMONITION_TYPES } from '../../directive-editors/AdmonitionDirectiveDescriptor'
+import { RequirePlugin } from '../../gurx'
 
-export const InsertAdmonition = () => {
+const InnerInsertAdmonition = () => {
   const insertDirective = directivesPluginHooks.usePublisher('insertDirective')
   const items = React.useMemo(
     () => ADMONITION_TYPES.map((type) => ({ value: type, label: type.replace(/^./, (l) => l.toUpperCase()) })),
@@ -24,5 +25,13 @@ export const InsertAdmonition = () => {
     >
       <AdmonitionIcon />
     </ButtonOrDropdownButton>
+  )
+}
+
+export const InsertAdmonition = () => {
+  return (
+    <RequirePlugin id="directives">
+      <InnerInsertAdmonition />
+    </RequirePlugin>
   )
 }

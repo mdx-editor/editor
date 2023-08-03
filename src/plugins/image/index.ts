@@ -131,6 +131,7 @@ const defaultParams: ImagePluginParams = {
 }
 
 export const [imagePlugin, imagePluginHooks] = realmPlugin({
+  id: 'image',
   systemSpec: imageSystem,
 
   applyParamsToSystem: (realm, params: ImagePluginParams = defaultParams) => {

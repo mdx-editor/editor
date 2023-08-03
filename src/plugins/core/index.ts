@@ -126,7 +126,6 @@ export const coreSystem = system((r) => {
         // doing stuff root editor restores the focus state
         if (theActiveEditor._parentEditor === null) {
           theActiveEditor.getEditorState().read(() => {
-            console.log('root editor in focus')
             r.pub(editorInFocus, {
               rootNode: $getRoot(),
               editorType: 'lexical'
@@ -263,6 +262,9 @@ export const coreSystem = system((r) => {
   const editorWrappers = r.node<React.ComponentType<{ children: React.ReactNode }>[]>([])
   const addEditorWrapper = createAppendNodeFor(editorWrappers)
 
+  const nestedEditorChildren = r.node<React.ComponentType[]>([])
+  const addNestedEditorChild = createAppendNodeFor(nestedEditorChildren)
+
   const historyState = r.node(createEmptyHistoryState())
 
   r.sub(r.pipe(applyFormat, r.o.withLatestFrom(activeEditor)), ([format, theEditor]) => {
@@ -391,6 +393,9 @@ export const coreSystem = system((r) => {
     topAreaChildren,
     addTopAreaChild,
 
+    nestedEditorChildren,
+    addNestedEditorChild,
+
     editorWrappers,
     addEditorWrapper,
 
@@ -413,6 +418,7 @@ interface CorePluginParams {
 }
 
 export const [corePlugin, corePluginHooks] = realmPlugin({
+  id: 'core',
   systemSpec: coreSystem,
 
   applyParamsToSystem(realm, params: CorePluginParams) {

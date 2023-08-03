@@ -69,6 +69,7 @@ export interface CodeBlockPluginParams {
 }
 
 export const [codeBlockPlugin, codeBlockPluginHooks] = realmPlugin({
+  id: 'codeblock',
   systemSpec: codeBlockSystem,
 
   applyParamsToSystem(realm, params?: CodeBlockPluginParams) {

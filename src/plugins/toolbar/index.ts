@@ -5,6 +5,7 @@ import { Toolbar } from './Toolbar'
 export const toolbarSystem = system((_) => ({}), [coreSystem])
 
 export const [toolbarPlugin, toolbarPluginHooks] = realmPlugin({
+  id: 'toolbar',
   systemSpec: toolbarSystem,
 
   init: (realm) => {

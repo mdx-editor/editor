@@ -23,7 +23,7 @@ import {
   useCodeBlockEditorContext
 } from '../'
 import { virtuosoSampleSandpackConfig } from './_boilerplate'
-import { markdownShorcutPlugin } from '../plugins/markdown-shortcut'
+import { markdownShortcutPlugin } from '../plugins/markdown-shortcut'
 import { quotePlugin } from '../plugins/quote'
 
 const helloMarkdown = `Hello <u>world am **here**</u> more <u>under</u> line`
@@ -178,7 +178,7 @@ export function MarkdownShortcuts() {
         listsPlugin(),
         linkPlugin(),
         quotePlugin(),
-        markdownShorcutPlugin()
+        markdownShortcutPlugin()
       ]}
     />
   )

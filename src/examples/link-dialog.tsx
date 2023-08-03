@@ -1,6 +1,6 @@
 import React from 'react'
 import { MDXEditorCore, linkPlugin, linkDialogPlugin, AdmonitionDirectiveDescriptor, directivesPlugin } from '../'
-import admonitionMarkdown from './assets/admonition.md?raw'
+import admonitionMarkdown from './assets/live-demo-contents.md?raw'
 
 export function Basics() {
   return (

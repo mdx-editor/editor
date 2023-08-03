@@ -39,6 +39,7 @@ export const codeMirrorSystem = system(
 )
 
 export const [codeMirrorPlugin, codeMirrorHooks] = realmPlugin({
+  id: 'codemirror',
   systemSpec: codeMirrorSystem,
   applyParamsToSystem(r, params: { codeBlockLanguages: Record<string, string> }) {
     r.pubKey('codeBlockLanguages', params.codeBlockLanguages)

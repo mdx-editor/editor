@@ -4,8 +4,9 @@ import { Select } from './primitives/select'
 import { CodeBlockNode } from '../codeblock/CodeBlockNode'
 import { codeMirrorHooks } from '../codemirror'
 import styles from '../../styles/ui.module.css'
+import { RequirePlugin } from '../../gurx'
 
-export const ChangeCodeMirrorLanguage = () => {
+const InnerChangeCodeMirrorLanguage = () => {
   const [editorInFocus, theEditor] = corePluginHooks.useEmitterValues('editorInFocus', 'activeEditor')
   const codeBlockNode = editorInFocus!.rootNode as CodeBlockNode
   const [codeBlockLanguages] = codeMirrorHooks.useEmitterValues('codeBlockLanguages')
@@ -30,5 +31,13 @@ export const ChangeCodeMirrorLanguage = () => {
         items={Object.entries(codeBlockLanguages).map(([value, label]) => ({ value, label }))}
       />
     </div>
+  )
+}
+
+export const ChangeCodeMirrorLanguage = () => {
+  return (
+    <RequirePlugin id="codemirror">
+      <InnerChangeCodeMirrorLanguage />
+    </RequirePlugin>
   )
 }

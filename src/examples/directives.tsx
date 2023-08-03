@@ -8,6 +8,10 @@ import { YoutubeDirectiveDescriptor } from './_boilerplate'
 import admonitionMarkdown from './assets/admonition.md?raw'
 import { codeBlockPlugin } from '../plugins/codeblock'
 import { codeMirrorPlugin } from '../plugins/codemirror'
+import { markdownShortcutPlugin } from '../plugins/markdown-shortcut'
+import { listsPlugin } from '../plugins/lists'
+import { headingsPlugin } from '../plugins/headings'
+import { quotePlugin } from '../plugins/quote'
 
 const youtubeMarkdown = `
 This should be an youtube video:
@@ -52,7 +56,15 @@ export const Admonitions: React.FC = () => {
     <MDXEditorCore
       onChange={console.log}
       markdown={admonitionMarkdown}
-      plugins={[directivesPlugin({ directiveDescriptors: [AdmonitionDirectiveDescriptor] }), linkPlugin()]}
+      plugins={[
+        directivesPlugin({ directiveDescriptors: [AdmonitionDirectiveDescriptor] }),
+        linkPlugin(),
+        listsPlugin(),
+        headingsPlugin(),
+        codeBlockPlugin(),
+        quotePlugin(),
+        markdownShortcutPlugin()
+      ]}
     />
   )
 }

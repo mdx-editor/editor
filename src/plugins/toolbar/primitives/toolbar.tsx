@@ -156,16 +156,36 @@ export const ButtonOrDropdownButton = <T extends string>(props: ButtonOrDropdown
   )
 }
 
+type ConditionalContentsOption = {
+  when: (rootNode: EditorInFocus | null) => boolean
+  contents: () => React.ReactNode
+}
+
+type FallBackOption = { fallback: () => React.ReactNode }
+
+function isConditionalContentsOption(option: ConditionalContentsOption | FallBackOption): option is ConditionalContentsOption {
+  return Object.hasOwn(option, 'when')
+}
+
 interface ConditionalContentsProps {
-  options: {
-    when: (rootNode: EditorInFocus | null) => boolean
-    contents: () => React.ReactNode
-  }[]
+  options: (ConditionalContentsOption | FallBackOption)[]
 }
 
 export const ConditionalContents: React.FC<ConditionalContentsProps> = ({ options }) => {
   const [editorInFocus] = corePluginHooks.useEmitterValues('editorInFocus')
-  const contents = React.useMemo(() => options.find(({ when }) => when(editorInFocus))?.contents() ?? null, [options, editorInFocus])
+  console.log(editorInFocus)
+  const contents = React.useMemo(() => {
+    const option = options.find((option) => {
+      if (isConditionalContentsOption(option)) {
+        if (option.when(editorInFocus)) {
+          return true
+        }
+      } else {
+        return true
+      }
+    })
+    return option ? (isConditionalContentsOption(option) ? option.contents() : option.fallback()) : null
+  }, [options, editorInFocus])
 
   return <div style={{ display: 'flex' }}>{contents}</div>
 }

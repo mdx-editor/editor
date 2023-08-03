@@ -2,8 +2,9 @@ import React from 'react'
 import { ButtonWithTooltip } from './primitives/toolbar'
 import FrameSourceIcon from '../../icons/frame_source.svg'
 import { codeBlockPluginHooks } from '../codeblock'
+import { RequirePlugin } from '../../gurx'
 
-export const InsertCodeBlock: React.FC = () => {
+const InnerInsertCodeBlock: React.FC = () => {
   const insertCodeBlock = codeBlockPluginHooks.usePublisher('insertCodeBlock')
   return (
     <ButtonWithTooltip
@@ -14,5 +15,13 @@ export const InsertCodeBlock: React.FC = () => {
     >
       <FrameSourceIcon />
     </ButtonWithTooltip>
+  )
+}
+
+export const InsertCodeBlock: React.FC = () => {
+  return (
+    <RequirePlugin id="codeblock">
+      <InnerInsertCodeBlock />
+    </RequirePlugin>
   )
 }

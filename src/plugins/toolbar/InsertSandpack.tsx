@@ -2,8 +2,9 @@ import React from 'react'
 import { ButtonOrDropdownButton } from './primitives/toolbar'
 import LiveCodeIcon from '../../icons/deployed_code.svg'
 import { sandpackPluginHooks } from '../sandpack'
+import { RequirePlugin } from '../../gurx'
 
-export const InsertSandpack = () => {
+const InnerInsertSandpack = () => {
   const [sandpackConfig] = sandpackPluginHooks.useEmitterValues('sandpackConfig')
   const insertSandpack = sandpackPluginHooks.usePublisher('insertSandpack')
   const items = React.useMemo(() => sandpackConfig.presets.map((preset) => ({ value: preset.name, label: preset.name })), [sandpackConfig])
@@ -12,5 +13,13 @@ export const InsertSandpack = () => {
     <ButtonOrDropdownButton title="Insert Sandpack" onChoose={insertSandpack} items={items}>
       <LiveCodeIcon />
     </ButtonOrDropdownButton>
+  )
+}
+
+export const InsertSandpack = () => {
+  return (
+    <RequirePlugin id="sandpack">
+      <InnerInsertSandpack />
+    </RequirePlugin>
   )
 }

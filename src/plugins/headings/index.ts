@@ -7,6 +7,7 @@ import { LexicalHeadingVisitor } from './LexicalHeadingVisitor'
 export const headingsSystem = system((_) => ({}), [coreSystem])
 
 export const [headingsPlugin] = realmPlugin({
+  id: 'headings',
   systemSpec: headingsSystem,
 
   init: (realm) => {

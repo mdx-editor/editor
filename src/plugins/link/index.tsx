@@ -9,6 +9,7 @@ import { LinkPlugin as LexicalLinkPlugin } from '@lexical/react/LexicalLinkPlugi
 export const linkSystem = system((_) => ({}), [coreSystem])
 
 export const [linkPlugin] = realmPlugin({
+  id: 'link',
   systemSpec: linkSystem,
 
   init: (realm, params: { validateUrl: React.ComponentProps<typeof LexicalLinkPlugin>['validateUrl'] }) => {

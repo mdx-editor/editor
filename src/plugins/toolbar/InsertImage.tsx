@@ -2,8 +2,9 @@ import React from 'react'
 import { imagePluginHooks } from '../image'
 import { DialogButton } from './primitives/DialogButton'
 import AddPhotoIcon from '../../icons/add_photo.svg'
+import { RequirePlugin } from '../../gurx'
 
-export const InsertImage = React.forwardRef<HTMLButtonElement, Record<string, never>>((_, forwardedRef) => {
+const InnerInsertImage = React.forwardRef<HTMLButtonElement, Record<string, never>>((_, forwardedRef) => {
   const [imageAutocompleteSuggestions] = imagePluginHooks.useEmitterValues('imageAutocompleteSuggestions')
   const insertImage = imagePluginHooks.usePublisher('insertImage')
 
@@ -19,3 +20,11 @@ export const InsertImage = React.forwardRef<HTMLButtonElement, Record<string, ne
     />
   )
 })
+
+export const InsertImage = () => {
+  return (
+    <RequirePlugin id="image">
+      <InnerInsertImage />
+    </RequirePlugin>
+  )
+}

@@ -139,13 +139,15 @@ export const NestedLexicalEditor = function <T extends Mdast.Content>(props: Nes
   const content = getContent(mdastNode)
   const [rootEditor] = corePluginHooks.useEmitterValues('rootEditor')
 
-  const [importVisitors, exportVisitors, usedLexicalNodes, jsxComponentDescriptors, jsxIsAvailable] = corePluginHooks.useEmitterValues(
-    'importVisitors',
-    'exportVisitors',
-    'usedLexicalNodes',
-    'jsxComponentDescriptors',
-    'jsxIsAvailable'
-  )
+  const [importVisitors, exportVisitors, usedLexicalNodes, jsxComponentDescriptors, jsxIsAvailable, nestedEditorChildren] =
+    corePluginHooks.useEmitterValues(
+      'importVisitors',
+      'exportVisitors',
+      'usedLexicalNodes',
+      'jsxComponentDescriptors',
+      'jsxIsAvailable',
+      'nestedEditorChildren'
+    )
 
   const setEditorInFocus = corePluginHooks.usePublisher('editorInFocus')
 
@@ -268,6 +270,9 @@ export const NestedLexicalEditor = function <T extends Mdast.Content>(props: Nes
         ErrorBoundary={LexicalErrorBoundary}
       />
       <SharedHistoryPlugin />
+      {nestedEditorChildren.map((Child, index) => (
+        <Child key={index} />
+      ))}
     </LexicalNestedComposer>
   )
 }

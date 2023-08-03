@@ -9,6 +9,7 @@ export const quoteSystem = system(() => {
 }, [coreSystem])
 
 export const [quotePlugin, quotePluginHooks] = realmPlugin({
+  id: 'quote',
   systemSpec: quoteSystem,
 
   init: (realm) => {

@@ -4,8 +4,9 @@ import { listsPluginHooks } from '../lists'
 import { SingleChoiceToggleGroup } from './primitives/toolbar'
 import BulletedListIcon from '../../icons/format_list_bulleted.svg'
 import NumberedListIcon from '../../icons/format_list_numbered.svg'
+import { RequirePlugin } from '../../gurx'
 
-export const ListsToggle: React.FC = () => {
+const InnerListsToggle: React.FC = () => {
   const [currentListType] = listsPluginHooks.useEmitterValues('currentListType')
   const applyListType = listsPluginHooks.usePublisher('applyListType')
   return (
@@ -17,5 +18,12 @@ export const ListsToggle: React.FC = () => {
       ]}
       onChange={applyListType}
     />
+  )
+}
+export const ListsToggle: React.FC = () => {
+  return (
+    <RequirePlugin id="lists">
+      <InnerListsToggle />
+    </RequirePlugin>
   )
 }

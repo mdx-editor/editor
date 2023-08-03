@@ -37,6 +37,7 @@ export const diffSourceSystem = system(
 )
 
 export const [diffSourcePlugin, diffSourcePluginHooks] = realmPlugin({
+  id: 'diff-source',
   systemSpec: diffSourceSystem,
 
   applyParamsToSystem(r, params?: { viewMode?: ViewMode; diffMarkdown?: string }) {

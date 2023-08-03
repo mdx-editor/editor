@@ -32,6 +32,7 @@ export const frontmatterSystem = system(
 )
 
 export const [frontmatterPlugin, frontmatterPluginHooks] = realmPlugin({
+  id: 'frontmatter',
   systemSpec: frontmatterSystem,
 
   init: (realm) => {

@@ -21,6 +21,7 @@ import { AdmonitionKind } from 'lexical'
 import { ChangeAdmonitionType } from './ChangeAdmonitionType'
 import { ChangeCodeMirrorLanguage } from './ChangeCodeMirrorLanguage'
 import { ShowSandpackInfo } from './ShowSandpackInfo'
+import { RequirePlugin } from '../../gurx'
 
 function whenInAdmonition(editorInFocus: EditorInFocus | null) {
   const node = editorInFocus?.rootNode
@@ -40,8 +41,7 @@ export const Toolbar: React.FC = () => {
             { when: (editor) => editor?.editorType === 'codeblock', contents: () => <ChangeCodeMirrorLanguage /> },
             { when: (editor) => editor?.editorType === 'sandpack', contents: () => <ShowSandpackInfo /> },
             {
-              when: () => true,
-              contents: () => (
+              fallback: () => (
                 <>
                   <UndoRedo />
                   <Separator />
@@ -54,22 +54,40 @@ export const Toolbar: React.FC = () => {
                   <ConditionalContents
                     options={[
                       { when: whenInAdmonition, contents: () => <ChangeAdmonitionType /> },
-                      { when: () => true, contents: () => <BlockTypeSelect /> }
+                      { fallback: () => <BlockTypeSelect /> }
                     ]}
                   />
 
                   <Separator />
+
                   <Createlink />
-                  <Separator />
                   <InsertImage />
+
+                  <Separator />
+
                   <InsertTable />
                   <InsertThematicBreak />
-                  <InsertFrontmatter />
+
+                  <Separator />
                   <InsertCodeBlock />
                   <InsertSandpack />
+
                   <ConditionalContents
-                    options={[{ when: (editorInFocus) => !whenInAdmonition(editorInFocus), contents: () => <InsertAdmonition /> }]}
+                    options={[
+                      {
+                        when: (editorInFocus) => !whenInAdmonition(editorInFocus),
+                        contents: () => (
+                          <>
+                            <Separator />
+                            <InsertAdmonition />
+                          </>
+                        )
+                      }
+                    ]}
                   />
+
+                  <Separator />
+                  <InsertFrontmatter />
                 </>
               )
             }

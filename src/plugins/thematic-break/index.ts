@@ -21,6 +21,7 @@ export const thematicBreakSystem = system(
 )
 
 export const [thematicBreakPlugin, thematicBreakPluginHooks] = realmPlugin({
+  id: 'thematic-break',
   systemSpec: thematicBreakSystem,
 
   init: (realm) => {

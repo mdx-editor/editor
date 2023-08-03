@@ -80,6 +80,7 @@ export interface JsxPluginParams {
 }
 
 export const [jsxPlugin, jsxPluginHooks] = realmPlugin({
+  id: 'jsx',
   systemSpec: jsxSystem,
   applyParamsToSystem: (realm, params: JsxPluginParams) => {
     realm.pubKey('jsxComponentDescriptors', params?.jsxComponentDescriptors || [])

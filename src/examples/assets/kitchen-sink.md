@@ -61,6 +61,13 @@ Image:
 
 React Sandpack:
 
+
+```tsx
+export default function App() {
+  return <h1>Hello world from a markdown</h1>
+}
+```
+
 ```tsx live react
 export default function App() {
   return <h1>Hello world from a markdown</h1>

@@ -72,6 +72,7 @@ export const listsSystem = system(
 )
 
 export const [listsPlugin, listsPluginHooks] = realmPlugin({
+  id: 'lists',
   systemSpec: listsSystem,
 
   init: (realm) => {

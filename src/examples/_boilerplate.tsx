@@ -1,7 +1,27 @@
 import React from 'react'
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { LeafDirective } from 'mdast-util-directive'
-import { DirectiveDescriptor, SandpackConfig } from '../'
+import {
+  diffSourcePlugin,
+  markdownShortcutPlugin,
+  AdmonitionDirectiveDescriptor,
+  DirectiveDescriptor,
+  SandpackConfig,
+  codeBlockPlugin,
+  codeMirrorPlugin,
+  directivesPlugin,
+  frontmatterPlugin,
+  headingsPlugin,
+  imagePlugin,
+  linkDialogPlugin,
+  linkPlugin,
+  listsPlugin,
+  quotePlugin,
+  sandpackPlugin,
+  tablePlugin,
+  thematicBreakPlugin,
+  toolbarPlugin
+} from '../'
 import dataCode from './assets/dataCode.ts?raw'
 
 const defaultSnippetContent = `
@@ -22,6 +42,16 @@ export const virtuosoSampleSandpackConfig: SandpackConfig = {
       label: 'React',
       name: 'react',
       meta: 'live react',
+      sandpackTemplate: 'react',
+      sandpackTheme: 'light',
+      snippetFileName: '/App.js',
+      snippetLanguage: 'jsx',
+      initialSnippetContent: defaultSnippetContent
+    },
+    {
+      label: 'React',
+      name: 'react',
+      meta: 'live',
       sandpackTemplate: 'react',
       sandpackTheme: 'light',
       snippetFileName: '/App.js',
@@ -93,3 +123,22 @@ export const YoutubeDirectiveDescriptor: DirectiveDescriptor<YoutubeDirectiveNod
     )
   }
 }
+
+export const ALL_PLUGINS = [
+  toolbarPlugin(),
+  listsPlugin(),
+  quotePlugin(),
+  headingsPlugin(),
+  linkPlugin(),
+  linkDialogPlugin(),
+  imagePlugin(),
+  tablePlugin(),
+  thematicBreakPlugin(),
+  frontmatterPlugin(),
+  codeBlockPlugin({ defaultCodeBlockLanguage: 'txt' }),
+  sandpackPlugin({ sandpackConfig: virtuosoSampleSandpackConfig }),
+  codeMirrorPlugin({ codeBlockLanguages: { js: 'JavaScript', css: 'CSS', txt: 'text', tsx: 'TypeScript' } }),
+  directivesPlugin({ directiveDescriptors: [YoutubeDirectiveDescriptor, AdmonitionDirectiveDescriptor] }),
+  diffSourcePlugin({ viewMode: 'rich-text', diffMarkdown: 'boo' }),
+  markdownShortcutPlugin()
+]
