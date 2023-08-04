@@ -7,9 +7,10 @@ const newExports = {
     "./package.json": "./package.json",
     "./style.css": "./dist/style.css",
     ".": {
-      "import": "./dist/index.js",
-      // "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
+      import: {
+        types: "./dist/index.d.ts",
+        default: "./dist/index.js",
+      } 
     },
 }
 
@@ -22,9 +23,10 @@ const additionalExports = [
 
 additionalExports.forEach(exp => { 
   newExports[`./${exp}`] = {
-    import: `./dist/${exp}.js`,
-    // require: `./dist/${exp}.cjs`,
-    types: `./dist/${exp}/index.d.ts`,
+    import: {
+      types: `./dist/${exp}/index.d.ts`,
+      default: `./dist/${exp}.js`,
+    }
   }
 })
 
@@ -32,9 +34,10 @@ function addFileExports(dirName) {
   fs.readdirSync(`./src/${dirName}`).forEach(exp => {
     const name = path.parse(exp).name
     newExports[`./${dirName}/${name}`] = {
-      import: `./dist/${dirName}/${name}.js`,
-      // require: `./dist/${dirName}/${exp}.cjs`,
-      types: `./dist/${dirName}/${name}.d.ts`,
+      import: {
+        types: `./dist/${dirName}/${name}.d.ts`,
+        default: `./dist/${dirName}/${name}.js`,
+      }
     }
   })
 }
@@ -42,9 +45,11 @@ function addFileExports(dirName) {
 
 fs.readdirSync('./src/plugins').forEach(dirName => {
   newExports[`./plugins/${dirName}`] = {
-    import: `./dist/plugins/${dirName}/index.js`,
+    import: {
+      types: `./dist/plugins/${dirName}/index.d.ts`,
+      default: `./dist/plugins/${dirName}/index.js`
+    }
     // require: `./dist/plugins/${dirName}/index.cjs`,
-    types: `./dist/plugins/${dirName}/index.d.ts`,
   }
 })
 
