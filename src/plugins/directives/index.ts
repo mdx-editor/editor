@@ -7,7 +7,6 @@ import { DirectiveNode, $createDirectiveNode } from './DirectiveNode'
 import { DirectiveVisitor } from './DirectiveVisitor'
 import { MdastDirectiveVisitor } from './MdastDirectiveVisitor'
 import { LexicalEditor } from 'lexical'
-import { VoidEmitter } from '../../utils/voidEmitter'
 
 export interface DirectiveDescriptor<T extends Directive = Directive> {
   testNode: (node: Directive) => boolean

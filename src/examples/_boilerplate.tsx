@@ -6,9 +6,6 @@ import {
   markdownShortcutPlugin,
   AdmonitionDirectiveDescriptor,
   DirectiveDescriptor,
-  SandpackConfig,
-  codeBlockPlugin,
-  codeMirrorPlugin,
   directivesPlugin,
   frontmatterPlugin,
   headingsPlugin,
@@ -17,10 +14,14 @@ import {
   linkPlugin,
   listsPlugin,
   quotePlugin,
-  sandpackPlugin,
   tablePlugin,
   thematicBreakPlugin,
-  toolbarPlugin
+  toolbarPlugin,
+  SandpackConfig,
+  codeBlockPlugin,
+  codeMirrorPlugin,
+  sandpackPlugin,
+  KitchenSinkToolbar
 } from '../'
 import dataCode from './assets/dataCode.ts?raw'
 
@@ -125,7 +126,7 @@ export const YoutubeDirectiveDescriptor: DirectiveDescriptor<YoutubeDirectiveNod
 }
 
 export const ALL_PLUGINS = [
-  toolbarPlugin(),
+  toolbarPlugin({ toolbarContents: () => <KitchenSinkToolbar /> }),
   listsPlugin(),
   quotePlugin(),
   headingsPlugin(),

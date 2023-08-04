@@ -1,13 +1,11 @@
-import { realmPlugin, system } from '../../gurx'
-import { coreSystem } from '../core'
+import * as Mdast from 'mdast'
 import { gfmTableFromMarkdown, gfmTableToMarkdown } from 'mdast-util-gfm-table'
 import { gfmTable } from 'micromark-extension-gfm-table'
+import { realmPlugin, system } from '../../gurx'
+import { coreSystem } from '../core'
+import { LexicalTableVisitor } from './LexicalTableVisitor'
 import { MdastTableVisitor } from './MdastTableVisitor'
 import { $createTableNode, TableNode } from './TableNode'
-import { LexicalTableVisitor } from './LexicalTableVisitor'
-import { $insertNodeToNearestRoot } from '@lexical/utils'
-import { $getSelection, $isRangeSelection } from 'lexical'
-import * as Mdast from 'mdast'
 
 function seedTable(): Mdast.Table {
   return {

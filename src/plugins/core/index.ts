@@ -318,7 +318,6 @@ export const coreSystem = system((r) => {
   const insertDecoratorNode = r.node<() => DecoratorNode<unknown>>()
 
   r.sub(r.pipe(insertDecoratorNode, r.o.withLatestFrom(activeEditor)), ([nodeFactory, theEditor]) => {
-    console.log('inserting DecoratorNode', theEditor)
     theEditor?.focus(
       () => {
         theEditor.getEditorState().read(() => {

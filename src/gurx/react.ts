@@ -14,7 +14,6 @@ import {
   realmFactory,
   LongTuple
 } from './realmFactory'
-import { uuidv4 } from '../utils/uuid4'
 
 /** @internal */
 interface Dict<T> {
@@ -333,7 +332,7 @@ export const RealmPluginInitializer = function <P extends Array<ReturnType<Plugi
     const validPlugins: P = plugins.filter((plugin) => {
       if (plugin.dependencies) {
         if (plugin.dependencies.some((dep) => !availablePlugins.includes(dep))) {
-          console.log('plugin', plugin.id, 'has missing dependencies', plugin.dependencies)
+          console.warn('MDXEditor plugin', plugin.id, 'has some missing dependencies', plugin.dependencies, ', skipping')
           return false
         }
       }

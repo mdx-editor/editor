@@ -173,7 +173,6 @@ interface ConditionalContentsProps {
 
 export const ConditionalContents: React.FC<ConditionalContentsProps> = ({ options }) => {
   const [editorInFocus] = corePluginHooks.useEmitterValues('editorInFocus')
-  console.log(editorInFocus)
   const contents = React.useMemo(() => {
     const option = options.find((option) => {
       if (isConditionalContentsOption(option)) {

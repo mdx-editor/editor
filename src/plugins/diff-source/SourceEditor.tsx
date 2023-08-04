@@ -9,7 +9,6 @@ export const SourceEditor = () => {
   const [markdown] = corePluginHooks.useEmitterValues('markdown')
   const updateMarkdown = diffSourcePluginHooks.usePublisher('markdownSourceEditorValue')
   const codeMirrorRef = React.useRef<CodeMirrorRef>(null)
-  console.log({ markdown })
 
   return (
     <div>

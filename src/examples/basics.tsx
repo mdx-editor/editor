@@ -1,14 +1,10 @@
 import React from 'react'
-import { MDXEditorCore, MDXEditorMethods } from '../MDXEditorCore'
-import codeBlocksMarkdown from './assets/code-blocks.md?raw'
-import imageMarkdown from './assets/image.md?raw'
-import jsxMarkdown from './assets/jsx.md?raw'
-import tableMarkdown from './assets/table.md?raw'
-
 import {
   CodeBlockEditorDescriptor,
   GenericJsxEditor,
   JsxComponentDescriptor,
+  MDXEditor,
+  MDXEditorMethods,
   codeBlockPlugin,
   codeMirrorPlugin,
   frontmatterPlugin,
@@ -17,14 +13,19 @@ import {
   jsxPlugin,
   linkPlugin,
   listsPlugin,
+  markdownShortcutPlugin,
+  quotePlugin,
   sandpackPlugin,
   tablePlugin,
   thematicBreakPlugin,
   useCodeBlockEditorContext
 } from '../'
+import codeBlocksMarkdown from './assets/code-blocks.md?raw'
+import imageMarkdown from './assets/image.md?raw'
+import jsxMarkdown from './assets/jsx.md?raw'
+import tableMarkdown from './assets/table.md?raw'
+
 import { virtuosoSampleSandpackConfig } from './_boilerplate'
-import { markdownShortcutPlugin } from '../plugins/markdown-shortcut'
-import { quotePlugin } from '../plugins/quote'
 
 const helloMarkdown = `Hello <u>world am **here**</u> more <u>under</u> line`
 export function Bare() {
@@ -33,7 +34,7 @@ export function Bare() {
     <>
       <button onClick={() => ref.current?.setMarkdown('new markdown')}>Set new markdown</button>
       <button onClick={() => console.log(ref.current?.getMarkdown())}>Get markdown</button>
-      <MDXEditorCore ref={ref} markdown={helloMarkdown} onChange={console.log} />
+      <MDXEditor ref={ref} markdown={helloMarkdown} onChange={console.log} />
     </>
   )
 }
@@ -75,13 +76,13 @@ export function Jsx() {
       <button onClick={() => ref.current?.setMarkdown('new markdown')}>Set new markdown</button>
       <button onClick={() => console.log(ref.current?.getMarkdown())}>Get markdown</button>
 
-      <MDXEditorCore ref={ref} markdown={jsxMarkdown} onChange={console.log} plugins={[jsxPlugin({ jsxComponentDescriptors })]} />
+      <MDXEditor ref={ref} markdown={jsxMarkdown} onChange={console.log} plugins={[jsxPlugin({ jsxComponentDescriptors })]} />
     </>
   )
 }
 
 export function Headings() {
-  return <MDXEditorCore markdown="# hello world" plugins={[headingsPlugin()]} />
+  return <MDXEditor markdown="# hello world" plugins={[headingsPlugin()]} />
 }
 
 const breakMarkdown = `hello 
@@ -91,7 +92,7 @@ const breakMarkdown = `hello
 world`
 
 export function ThematicBreaks() {
-  return <MDXEditorCore markdown={breakMarkdown} plugins={[thematicBreakPlugin()]} />
+  return <MDXEditor markdown={breakMarkdown} plugins={[thematicBreakPlugin()]} />
 }
 
 const listsMarkdown = `
@@ -106,21 +107,21 @@ const listsMarkdown = `
 `
 
 export function Lists() {
-  return <MDXEditorCore markdown={listsMarkdown} plugins={[listsPlugin()]} />
+  return <MDXEditor markdown={listsMarkdown} plugins={[listsPlugin()]} />
 }
 
 export function Table() {
-  return <MDXEditorCore markdown={tableMarkdown} plugins={[tablePlugin()]} />
+  return <MDXEditor markdown={tableMarkdown} plugins={[tablePlugin()]} />
 }
 
 export function Link() {
-  return <MDXEditorCore markdown={'some [hello](https://google.com) link'} plugins={[linkPlugin()]} />
+  return <MDXEditor markdown={'some [hello](https://google.com) link'} plugins={[linkPlugin()]} />
 }
 
 export function Images() {
   // eslint-disable-next-line @typescript-eslint/require-await
   return (
-    <MDXEditorCore
+    <MDXEditor
       markdown={imageMarkdown}
       plugins={[imagePlugin({ imageUploadHandler: async () => Promise.resolve('https://picsum.photos/200/300') })]}
     />
@@ -136,7 +137,7 @@ this is a cool markdown
 `
 
 export function Frontmatter() {
-  return <MDXEditorCore markdown={frontmatterMarkdown} plugins={[frontmatterPlugin()]} />
+  return <MDXEditor markdown={frontmatterMarkdown} plugins={[frontmatterPlugin()]} />
 }
 
 const PlainTextCodeEditorDescriptor: CodeBlockEditorDescriptor = {
@@ -155,7 +156,7 @@ const PlainTextCodeEditorDescriptor: CodeBlockEditorDescriptor = {
 
 export function CodeBlock() {
   return (
-    <MDXEditorCore
+    <MDXEditor
       onChange={console.log}
       markdown={codeBlocksMarkdown}
       plugins={[
@@ -169,7 +170,7 @@ export function CodeBlock() {
 
 export function MarkdownShortcuts() {
   return (
-    <MDXEditorCore
+    <MDXEditor
       onChange={console.log}
       markdown={helloMarkdown}
       plugins={[

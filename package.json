@@ -9,15 +9,6 @@
   "private": false,
   "sideEffects": false,
   "type": "module",
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
-    },
-    "./package.json": "./package.json",
-    "./style.css": "./dist/style.css"
-  },
   "main": "dist/index.cjs",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -26,6 +17,7 @@
   "scripts": {
     "build": "vite build",
     "build:docs:api": "./scripts/build_docs_api.sh",
+    "build:update-exports": "node ./scripts/generate-exports.js",
     "start": "LADLE=true ladle dev",
     "dev": "LADLE=true ladle dev",
     "typecheck": "tsc --noEmit",
@@ -180,5 +172,189 @@
         "prerelease": true
       }
     ]
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    "./style.css": "./dist/style.css",
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./MDXEditor": {
+      "import": "./dist/MDXEditor.js",
+      "types": "./dist/MDXEditor/index.d.ts"
+    },
+    "./directive-editors/AdmonitionDirectiveDescriptor": {
+      "import": "./dist/directive-editors/AdmonitionDirectiveDescriptor.js",
+      "types": "./dist/directive-editors/AdmonitionDirectiveDescriptor/index.d.ts"
+    },
+    "./directive-editors/GenericDirectiveEditor": {
+      "import": "./dist/directive-editors/GenericDirectiveEditor.js",
+      "types": "./dist/directive-editors/GenericDirectiveEditor/index.d.ts"
+    },
+    "./jsx-editors/GenericJsxEditor": {
+      "import": "./dist/jsx-editors/GenericJsxEditor.js",
+      "types": "./dist/jsx-editors/GenericJsxEditor/index.d.ts"
+    },
+    "./plugins/codeblock": {
+      "import": "./dist/plugins/codeblock/index.js",
+      "types": "./dist/plugins/codeblock/index.d.ts"
+    },
+    "./plugins/codemirror": {
+      "import": "./dist/plugins/codemirror/index.js",
+      "types": "./dist/plugins/codemirror/index.d.ts"
+    },
+    "./plugins/core": {
+      "import": "./dist/plugins/core/index.js",
+      "types": "./dist/plugins/core/index.d.ts"
+    },
+    "./plugins/diff-source": {
+      "import": "./dist/plugins/diff-source/index.js",
+      "types": "./dist/plugins/diff-source/index.d.ts"
+    },
+    "./plugins/directives": {
+      "import": "./dist/plugins/directives/index.js",
+      "types": "./dist/plugins/directives/index.d.ts"
+    },
+    "./plugins/frontmatter": {
+      "import": "./dist/plugins/frontmatter/index.js",
+      "types": "./dist/plugins/frontmatter/index.d.ts"
+    },
+    "./plugins/headings": {
+      "import": "./dist/plugins/headings/index.js",
+      "types": "./dist/plugins/headings/index.d.ts"
+    },
+    "./plugins/image": {
+      "import": "./dist/plugins/image/index.js",
+      "types": "./dist/plugins/image/index.d.ts"
+    },
+    "./plugins/jsx": {
+      "import": "./dist/plugins/jsx/index.js",
+      "types": "./dist/plugins/jsx/index.d.ts"
+    },
+    "./plugins/link": {
+      "import": "./dist/plugins/link/index.js",
+      "types": "./dist/plugins/link/index.d.ts"
+    },
+    "./plugins/link-dialog": {
+      "import": "./dist/plugins/link-dialog/index.js",
+      "types": "./dist/plugins/link-dialog/index.d.ts"
+    },
+    "./plugins/lists": {
+      "import": "./dist/plugins/lists/index.js",
+      "types": "./dist/plugins/lists/index.d.ts"
+    },
+    "./plugins/markdown-shortcut": {
+      "import": "./dist/plugins/markdown-shortcut/index.js",
+      "types": "./dist/plugins/markdown-shortcut/index.d.ts"
+    },
+    "./plugins/quote": {
+      "import": "./dist/plugins/quote/index.js",
+      "types": "./dist/plugins/quote/index.d.ts"
+    },
+    "./plugins/sandpack": {
+      "import": "./dist/plugins/sandpack/index.js",
+      "types": "./dist/plugins/sandpack/index.d.ts"
+    },
+    "./plugins/table": {
+      "import": "./dist/plugins/table/index.js",
+      "types": "./dist/plugins/table/index.d.ts"
+    },
+    "./plugins/thematic-break": {
+      "import": "./dist/plugins/thematic-break/index.js",
+      "types": "./dist/plugins/thematic-break/index.d.ts"
+    },
+    "./plugins/toolbar": {
+      "import": "./dist/plugins/toolbar/index.js",
+      "types": "./dist/plugins/toolbar/index.d.ts"
+    },
+    "./plugins/toolbar/components/BlockTypeSelect": {
+      "import": "./dist/plugins/toolbar/components/BlockTypeSelect.js",
+      "types": "./dist/plugins/toolbar/components/BlockTypeSelect.d.ts"
+    },
+    "./plugins/toolbar/components/BoldItalicUnderlineToggles": {
+      "import": "./dist/plugins/toolbar/components/BoldItalicUnderlineToggles.js",
+      "types": "./dist/plugins/toolbar/components/BoldItalicUnderlineToggles.d.ts"
+    },
+    "./plugins/toolbar/components/ChangeAdmonitionType": {
+      "import": "./dist/plugins/toolbar/components/ChangeAdmonitionType.js",
+      "types": "./dist/plugins/toolbar/components/ChangeAdmonitionType.d.ts"
+    },
+    "./plugins/toolbar/components/ChangeCodeMirrorLanguage": {
+      "import": "./dist/plugins/toolbar/components/ChangeCodeMirrorLanguage.js",
+      "types": "./dist/plugins/toolbar/components/ChangeCodeMirrorLanguage.d.ts"
+    },
+    "./plugins/toolbar/components/CodeToggle": {
+      "import": "./dist/plugins/toolbar/components/CodeToggle.js",
+      "types": "./dist/plugins/toolbar/components/CodeToggle.d.ts"
+    },
+    "./plugins/toolbar/components/CreateLink": {
+      "import": "./dist/plugins/toolbar/components/CreateLink.js",
+      "types": "./dist/plugins/toolbar/components/CreateLink.d.ts"
+    },
+    "./plugins/toolbar/components/DiffSourceToggleWrapper": {
+      "import": "./dist/plugins/toolbar/components/DiffSourceToggleWrapper.js",
+      "types": "./dist/plugins/toolbar/components/DiffSourceToggleWrapper.d.ts"
+    },
+    "./plugins/toolbar/components/InsertAdmonition": {
+      "import": "./dist/plugins/toolbar/components/InsertAdmonition.js",
+      "types": "./dist/plugins/toolbar/components/InsertAdmonition.d.ts"
+    },
+    "./plugins/toolbar/components/InsertCodeBlock": {
+      "import": "./dist/plugins/toolbar/components/InsertCodeBlock.js",
+      "types": "./dist/plugins/toolbar/components/InsertCodeBlock.d.ts"
+    },
+    "./plugins/toolbar/components/InsertFrontmatter": {
+      "import": "./dist/plugins/toolbar/components/InsertFrontmatter.js",
+      "types": "./dist/plugins/toolbar/components/InsertFrontmatter.d.ts"
+    },
+    "./plugins/toolbar/components/InsertImage": {
+      "import": "./dist/plugins/toolbar/components/InsertImage.js",
+      "types": "./dist/plugins/toolbar/components/InsertImage.d.ts"
+    },
+    "./plugins/toolbar/components/InsertSandpack": {
+      "import": "./dist/plugins/toolbar/components/InsertSandpack.js",
+      "types": "./dist/plugins/toolbar/components/InsertSandpack.d.ts"
+    },
+    "./plugins/toolbar/components/InsertTable": {
+      "import": "./dist/plugins/toolbar/components/InsertTable.js",
+      "types": "./dist/plugins/toolbar/components/InsertTable.d.ts"
+    },
+    "./plugins/toolbar/components/InsertThematicBreak": {
+      "import": "./dist/plugins/toolbar/components/InsertThematicBreak.js",
+      "types": "./dist/plugins/toolbar/components/InsertThematicBreak.d.ts"
+    },
+    "./plugins/toolbar/components/KitchenSinkToolbar": {
+      "import": "./dist/plugins/toolbar/components/KitchenSinkToolbar.js",
+      "types": "./dist/plugins/toolbar/components/KitchenSinkToolbar.d.ts"
+    },
+    "./plugins/toolbar/components/ListsToggle": {
+      "import": "./dist/plugins/toolbar/components/ListsToggle.js",
+      "types": "./dist/plugins/toolbar/components/ListsToggle.d.ts"
+    },
+    "./plugins/toolbar/components/ShowSandpackInfo": {
+      "import": "./dist/plugins/toolbar/components/ShowSandpackInfo.js",
+      "types": "./dist/plugins/toolbar/components/ShowSandpackInfo.d.ts"
+    },
+    "./plugins/toolbar/components/UndoRedo": {
+      "import": "./dist/plugins/toolbar/components/UndoRedo.js",
+      "types": "./dist/plugins/toolbar/components/UndoRedo.d.ts"
+    },
+    "./plugins/toolbar/primitives/DialogButton": {
+      "import": "./dist/plugins/toolbar/primitives/DialogButton.js",
+      "types": "./dist/plugins/toolbar/primitives/DialogButton.d.ts"
+    },
+    "./plugins/toolbar/primitives/TooltipWrap": {
+      "import": "./dist/plugins/toolbar/primitives/TooltipWrap.js",
+      "types": "./dist/plugins/toolbar/primitives/TooltipWrap.d.ts"
+    },
+    "./plugins/toolbar/primitives/select": {
+      "import": "./dist/plugins/toolbar/primitives/select.js",
+      "types": "./dist/plugins/toolbar/primitives/select.d.ts"
+    },
+    "./plugins/toolbar/primitives/toolbar": {
+      "import": "./dist/plugins/toolbar/primitives/toolbar.js",
+      "types": "./dist/plugins/toolbar/primitives/toolbar.d.ts"
+    }
   }
 }

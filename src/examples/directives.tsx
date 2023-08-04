@@ -1,17 +1,21 @@
 import React from 'react'
-import { MDXEditorCore } from '../MDXEditorCore'
-import { AdmonitionDirectiveDescriptor } from '../directive-editors/AdmonitionDirectiveDescriptor'
-import { GenericDirectiveEditor } from '../directive-editors/GenericDirectiveEditor'
-import { DirectiveDescriptor, directivesPlugin } from '../plugins/directives'
-import { linkPlugin } from '../plugins/link'
+import {
+  AdmonitionDirectiveDescriptor,
+  DirectiveDescriptor,
+  GenericDirectiveEditor,
+  MDXEditor,
+  codeBlockPlugin,
+  codeMirrorPlugin,
+  directivesPlugin,
+  headingsPlugin,
+  linkPlugin,
+  listsPlugin,
+  markdownShortcutPlugin,
+  quotePlugin
+} from '../'
 import { YoutubeDirectiveDescriptor } from './_boilerplate'
+
 import admonitionMarkdown from './assets/admonition.md?raw'
-import { codeBlockPlugin } from '../plugins/codeblock'
-import { codeMirrorPlugin } from '../plugins/codemirror'
-import { markdownShortcutPlugin } from '../plugins/markdown-shortcut'
-import { listsPlugin } from '../plugins/lists'
-import { headingsPlugin } from '../plugins/headings'
-import { quotePlugin } from '../plugins/quote'
 
 const youtubeMarkdown = `
 This should be an youtube video:
@@ -30,7 +34,7 @@ const GenericDirectiveDescriptor: DirectiveDescriptor = {
 }
 
 export const Youtube: React.FC = () => {
-  return <MDXEditorCore markdown={youtubeMarkdown} plugins={[directivesPlugin({ directiveDescriptors: [YoutubeDirectiveDescriptor] })]} />
+  return <MDXEditor markdown={youtubeMarkdown} plugins={[directivesPlugin({ directiveDescriptors: [YoutubeDirectiveDescriptor] })]} />
 }
 
 const genericMarkdown = `
@@ -48,12 +52,12 @@ Some **markdown**
 `
 
 export const CatchAll: React.FC = () => {
-  return <MDXEditorCore markdown={genericMarkdown} plugins={[directivesPlugin({ directiveDescriptors: [GenericDirectiveDescriptor] })]} />
+  return <MDXEditor markdown={genericMarkdown} plugins={[directivesPlugin({ directiveDescriptors: [GenericDirectiveDescriptor] })]} />
 }
 
 export const Admonitions: React.FC = () => {
   return (
-    <MDXEditorCore
+    <MDXEditor
       onChange={console.log}
       markdown={admonitionMarkdown}
       plugins={[
@@ -91,7 +95,7 @@ more markdown
 
 export const AdmonitionsWithCodeBlocks: React.FC = () => {
   return (
-    <MDXEditorCore
+    <MDXEditor
       onChange={console.log}
       markdown={codeBlockInAdmonition}
       plugins={[

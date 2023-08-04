@@ -4,6 +4,7 @@ import { MdastCodeVisitor } from './MdastCodeVisitor'
 import { coreSystem } from '../core'
 import { $createCodeBlockNode, CodeBlockNode, CreateCodeBlockNodeOptions } from './CodeBlockNode'
 import { VoidEmitter } from '../../utils/voidEmitter'
+export { useCodeBlockEditorContext } from './CodeBlockNode'
 
 export interface CodeBlockEditorProps {
   code: string

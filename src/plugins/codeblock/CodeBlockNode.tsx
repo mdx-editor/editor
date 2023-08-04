@@ -1,6 +1,5 @@
 import React from 'react'
 import { DecoratorNode, EditorConfig, LexicalEditor, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
-import { noop } from '../../utils/fp'
 import { CodeBlockEditorProps, codeBlockPluginHooks } from '.'
 import { voidEmitter } from '../../utils/voidEmitter'
 import { NESTED_EDITOR_UPDATED_COMMAND } from '../core'

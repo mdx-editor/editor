@@ -4,43 +4,64 @@
  *
  * @packageDocumentation
  */
+import './styles/globals.css'
 
-export type { MDXEditorMethods, MDXEditorCoreProps } from './MDXEditorCore'
-export type { JsxComponentDescriptor, JsxPropertyDescriptor } from './plugins/jsx'
-export type { SandpackConfig, SandpackPreset } from './plugins/sandpack'
-export type { CodeBlockEditorDescriptor } from './plugins/codeblock'
-export type { DirectiveDescriptor } from './plugins/directives'
+// editor copmonent
+export * from './MDXEditor'
 
-// Basics
-export { MDXEditorCore } from './MDXEditorCore'
-export { headingsPlugin } from './plugins/headings'
-export { thematicBreakPlugin } from './plugins/thematic-break'
-export { listsPlugin } from './plugins/lists'
-export { tablePlugin } from './plugins/table'
-export { linkPlugin } from './plugins/link'
-export { imagePlugin } from './plugins/image'
-export { frontmatterPlugin } from './plugins/frontmatter'
-export { quotePlugin } from './plugins/quote'
+// basics
+export * from './plugins/headings'
+export * from './plugins/thematic-break'
+export * from './plugins/lists'
+export * from './plugins/table'
+export * from './plugins/link'
+export * from './plugins/image'
+export * from './plugins/frontmatter'
+export * from './plugins/quote'
 
 // JSX
-export { jsxPlugin } from './plugins/jsx'
-export { GenericJsxEditor } from './jsx-editors/GenericJsxEditor'
+export * from './plugins/jsx'
+export * from './jsx-editors/GenericJsxEditor'
 
 // code blocks
-export { sandpackPlugin } from './plugins/sandpack'
-export { codeMirrorPlugin } from './plugins/codemirror'
-export { codeBlockPlugin } from './plugins/codeblock'
-export { useCodeBlockEditorContext } from './plugins/codeblock/CodeBlockNode'
+export * from './plugins/sandpack'
+export * from './plugins/codemirror'
+export * from './plugins/codeblock'
 
 // directives
-export { directivesPlugin } from './plugins/directives'
-export { AdmonitionDirectiveDescriptor } from './directive-editors/AdmonitionDirectiveDescriptor'
-export { GenericDirectiveEditor } from './directive-editors/GenericDirectiveEditor'
+export * from './plugins/directives'
+export * from './directive-editors/AdmonitionDirectiveDescriptor'
+export * from './directive-editors/GenericDirectiveEditor'
 
 // UI
-export { linkDialogPlugin } from './plugins/link-dialog'
+export * from './plugins/link-dialog'
 
-export { toolbarPlugin } from './plugins/toolbar'
+export * from './plugins/toolbar'
 
-export { diffSourcePlugin } from './plugins/diff-source'
-export { markdownShortcutPlugin } from './plugins/markdown-shortcut'
+export * from './plugins/diff-source'
+export * from './plugins/markdown-shortcut'
+
+// Toolbar components
+export * from './plugins/toolbar/components/BlockTypeSelect'
+export * from './plugins/toolbar/components/BoldItalicUnderlineToggles'
+export * from './plugins/toolbar/components/ChangeAdmonitionType'
+export * from './plugins/toolbar/components/ChangeCodeMirrorLanguage'
+export * from './plugins/toolbar/components/CodeToggle'
+export * from './plugins/toolbar/components/CreateLink'
+export * from './plugins/toolbar/components/DiffSourceToggleWrapper'
+export * from './plugins/toolbar/components/InsertAdmonition'
+export * from './plugins/toolbar/components/InsertCodeBlock'
+export * from './plugins/toolbar/components/InsertFrontmatter'
+export * from './plugins/toolbar/components/InsertImage'
+export * from './plugins/toolbar/components/InsertSandpack'
+export * from './plugins/toolbar/components/InsertTable'
+export * from './plugins/toolbar/components/InsertThematicBreak'
+export * from './plugins/toolbar/components/ListsToggle'
+export * from './plugins/toolbar/components/ShowSandpackInfo'
+export * from './plugins/toolbar/components/UndoRedo'
+export * from './plugins/toolbar/components/KitchenSinkToolbar'
+
+export * from './plugins/toolbar/primitives/toolbar'
+export * from './plugins/toolbar/primitives/DialogButton'
+export * from './plugins/toolbar/primitives/TooltipWrap'
+export * from './plugins/toolbar/primitives/select'

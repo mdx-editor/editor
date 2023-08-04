@@ -1,8 +1,3 @@
-import { defaultComparator, realmPlugin, system } from '../../gurx'
-import { coreSystem } from '../core'
-import { MdastImageVisitor } from './MdastImageVisitor'
-import { LexicalImageVisitor } from './LexicalImageVisitor'
-import { $createImageNode, $isImageNode, CreateImageNodeOptions, ImageNode } from './ImageNode'
 import { $wrapNodeInElement } from '@lexical/utils'
 import {
   $createParagraphNode,
@@ -16,14 +11,19 @@ import {
   COMMAND_PRIORITY_EDITOR,
   COMMAND_PRIORITY_HIGH,
   COMMAND_PRIORITY_LOW,
-  createCommand,
   DRAGOVER_COMMAND,
   DRAGSTART_COMMAND,
   DROP_COMMAND,
   LexicalCommand,
   LexicalEditor,
-  PASTE_COMMAND
+  PASTE_COMMAND,
+  createCommand
 } from 'lexical'
+import { realmPlugin, system } from '../../gurx'
+import { coreSystem } from '../core'
+import { $createImageNode, $isImageNode, CreateImageNodeOptions, ImageNode } from './ImageNode'
+import { LexicalImageVisitor } from './LexicalImageVisitor'
+import { MdastImageVisitor } from './MdastImageVisitor'
 
 import { CAN_USE_DOM } from '../../utils/detectMac'
 

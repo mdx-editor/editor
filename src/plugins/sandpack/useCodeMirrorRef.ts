@@ -1,9 +1,9 @@
 import { CodeMirrorRef } from '@codesandbox/sandpack-react/dist/components/CodeEditor/CodeMirror'
-import { $createParagraphNode, $getNodeByKey, LexicalNode } from 'lexical'
+import { $createParagraphNode, $getNodeByKey } from 'lexical'
 import React from 'react'
-import { corePluginHooks } from '../core'
-import { useCodeBlockEditorContext } from '../codeblock/CodeBlockNode'
 import { VoidEmitter } from '../../utils/voidEmitter'
+import { useCodeBlockEditorContext } from '../codeblock/CodeBlockNode'
+import { corePluginHooks } from '../core'
 
 export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'sandpack', language: string, focusEmitter: VoidEmitter) {
   const [theEditor] = corePluginHooks.useEmitterValues('activeEditor')
@@ -18,7 +18,6 @@ export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'san
   const atTop = React.useRef(false)
 
   const onFocusHandler = React.useCallback(() => {
-    console.log('onFocusHandler', editorType)
     setEditorInFocus({
       editorType,
       rootNode: lexicalNode
