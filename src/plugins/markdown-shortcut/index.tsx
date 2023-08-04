@@ -26,6 +26,7 @@ function patchMarkdownTransformers(transformers: Transformer[]) {
   return transformersCopy
 }
 
+/** @internal */
 export const [markdownShortcutPlugin] = realmPlugin({
   id: 'markdown-shortcut',
   dependencies: ['lists', 'headings', 'codeblock', 'quote'],

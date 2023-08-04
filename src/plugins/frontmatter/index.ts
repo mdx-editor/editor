@@ -7,6 +7,7 @@ import { LexicalFrontmatterVisitor } from './LexicalFrontmatterVisitor'
 import { $getRoot } from 'lexical'
 import { $isFrontmatterNode, $createFrontmatterNode, FrontmatterNode } from './FrontmatterNode'
 
+/** @internal */
 export const frontmatterSystem = system(
   (r, [{ rootEditor }]) => {
     const insertFrontmatter = r.node<true>()
@@ -31,7 +32,12 @@ export const frontmatterSystem = system(
   [coreSystem]
 )
 
-export const [frontmatterPlugin, frontmatterPluginHooks] = realmPlugin({
+export const [
+  /** @internal */
+  frontmatterPlugin,
+  /** @internal */
+  frontmatterPluginHooks
+] = realmPlugin({
   id: 'frontmatter',
   systemSpec: frontmatterSystem,
 

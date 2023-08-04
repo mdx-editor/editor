@@ -19,6 +19,7 @@ function seedTable(): Mdast.Table {
   }
 }
 
+/** @internal */
 export const tableSystem = system(
   (r, [{ insertDecoratorNode }]) => {
     const insertTable = r.node<true>()
@@ -40,7 +41,12 @@ export const tableSystem = system(
   [coreSystem]
 )
 
-export const [tablePlugin, tablePluginHooks] = realmPlugin({
+export const [
+  /** @internal */
+  tablePlugin,
+  /** @internal */
+  tablePluginHooks
+] = realmPlugin({
   id: 'table',
   systemSpec: tableSystem,
 

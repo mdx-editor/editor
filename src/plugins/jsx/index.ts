@@ -73,13 +73,19 @@ export interface JsxEditorProps {
   descriptor: JsxComponentDescriptor
 }
 
+/** @internal */
 export const jsxSystem = system((_) => ({}), [coreSystem])
 
 export interface JsxPluginParams {
   jsxComponentDescriptors: JsxComponentDescriptor[]
 }
 
-export const [jsxPlugin, jsxPluginHooks] = realmPlugin({
+export const [
+  /** @internal */
+  jsxPlugin,
+  /** @internal */
+  jsxPluginHooks
+] = realmPlugin({
   id: 'jsx',
   systemSpec: jsxSystem,
   applyParamsToSystem: (realm, params: JsxPluginParams) => {

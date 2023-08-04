@@ -3,8 +3,9 @@ import { DecoratorNode, EditorConfig, LexicalEditor, LexicalNode, NodeKey, Seria
 import { CodeBlockEditorProps, codeBlockPluginHooks } from '.'
 import { voidEmitter } from '../../utils/voidEmitter'
 import { NESTED_EDITOR_UPDATED_COMMAND } from '../core'
+
 /**
- * The options necessary to construct a {@link CodeBlockNode}.
+ * The options necessary to construct a new code block node.
  */
 export interface CreateCodeBlockNodeOptions {
   /**
@@ -139,9 +140,30 @@ type CodeBlockContextProviderProps = {
   children: React.ReactNode
 }
 
-const CodeBlockEditorContext = React.createContext<
-  (Pick<CodeBlockNode, 'setCode' | 'setLanguage' | 'setMeta'> & { lexicalNode: CodeBlockNode }) | null
->(null)
+/**
+ * A set of functions that modify the underlying code block node. Get this with the {@link useCodeBlockEditorContext} hook.
+ */
+export interface CodeBlockEditorContextValue {
+  /**
+   * Updates the code contents of the code block.
+   */
+  setCode(code: string): void
+  /**
+   * Updates the language of the code block. See {@link https://www.markdownguide.org/extended-syntax/#syntax-highlighting} for language examples.
+   *
+   */
+  setLanguage(language: string): void
+  /**
+   * Updates the meta of the code block. The meta is the additional string that comes after the code block language.
+   */
+  setMeta(meta: string): void
+  /**
+   * The Lexical node that's being edited.
+   */
+  lexicalNode: CodeBlockNode
+}
+
+const CodeBlockEditorContext = React.createContext<CodeBlockEditorContextValue | null>(null)
 
 const CodeBlockEditorContextProvider = ({ parentEditor, lexicalNode, children }: CodeBlockContextProviderProps) => {
   return (
@@ -173,6 +195,9 @@ const CodeBlockEditorContextProvider = ({ parentEditor, lexicalNode, children }:
   )
 }
 
+/**
+ * Use this hook in your custom code block editors to modify the underlying node code, language, and meta.
+ */
 export function useCodeBlockEditorContext() {
   const context = React.useContext(CodeBlockEditorContext)
   if (!context) {

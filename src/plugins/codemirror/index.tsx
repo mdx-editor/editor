@@ -11,6 +11,7 @@ const defaultCodeBlockLanguages: Record<string, string> = {
   css: 'CSS'
 }
 
+/** @internal */
 export const codeMirrorSystem = system(
   (r, [, { insertCodeBlock }]) => {
     const codeBlockLanguages = r.node(defaultCodeBlockLanguages)
@@ -38,7 +39,12 @@ export const codeMirrorSystem = system(
   [coreSystem, codeBlockSystem]
 )
 
-export const [codeMirrorPlugin, codeMirrorHooks] = realmPlugin({
+export const [
+  /** @internal */
+  codeMirrorPlugin,
+  /** @internal */
+  codeMirrorHooks
+] = realmPlugin({
   id: 'codemirror',
   systemSpec: codeMirrorSystem,
   applyParamsToSystem(r, params: { codeBlockLanguages: Record<string, string> }) {

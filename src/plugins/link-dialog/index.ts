@@ -13,22 +13,22 @@ import { getSelectedNode, getSelectionRectangle } from '../../utils/lexicalHelpe
 import { coreSystem } from '../core'
 import { LinkDialog } from './LinkDialog'
 
-export interface InactiveLinkDialog {
+type RectData = Pick<DOMRect, 'height' | 'width' | 'top' | 'left'>
+
+type InactiveLinkDialog = {
   type: 'inactive'
   rectangle?: undefined
   linkNodeKey?: undefined
 }
 
-type RectData = Pick<DOMRect, 'height' | 'width' | 'top' | 'left'>
-
-export interface PreviewLinkDialog {
+type PreviewLinkDialog = {
   type: 'preview'
   url: string
   linkNodeKey: string
   rectangle: RectData
 }
 
-export interface EditLinkDialog {
+type EditLinkDialog = {
   type: 'edit'
   initialUrl: string
   url: string
@@ -50,7 +50,7 @@ function getLinkNodeInSelection(selection: RangeSelection | null) {
   return null
 }
 
-export const linkDialogSystem = system(
+const linkDialogSystem = system(
   (r, [{ activeEditor, currentSelection, createActiveEditorSubscription }]) => {
     const dialogState = r.node(false)
     // node that publishes signals when the window gets resized or scrolled
@@ -266,7 +266,12 @@ export const linkDialogSystem = system(
   [coreSystem]
 )
 
-export const [linkDialogPlugin, linkDialogPluginHooks] = realmPlugin({
+export const [
+  /** @internal */
+  linkDialogPlugin,
+  /** @internal */
+  linkDialogPluginHooks
+] = realmPlugin({
   id: 'link-dialog',
   dependencies: ['link'],
   systemSpec: linkDialogSystem,

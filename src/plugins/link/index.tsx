@@ -6,8 +6,14 @@ import { LexicalLinkVisitor } from './LexicalLinkVisitor'
 import { LinkNode } from '@lexical/link'
 import { LinkPlugin as LexicalLinkPlugin } from '@lexical/react/LexicalLinkPlugin'
 
+/**
+ * @internal
+ */
 export const linkSystem = system((_) => ({}), [coreSystem])
 
+/**
+ * @internal
+ */
 export const [linkPlugin] = realmPlugin({
   id: 'link',
   systemSpec: linkSystem,

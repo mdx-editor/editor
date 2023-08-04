@@ -4,8 +4,14 @@ import { MdastHeadingVisitor } from './MdastHeadingVisitor'
 import { HeadingNode } from '@lexical/rich-text'
 import { LexicalHeadingVisitor } from './LexicalHeadingVisitor'
 
+/**
+ * @internal
+ */
 export const headingsSystem = system((_) => ({}), [coreSystem])
 
+/**
+ * @internal
+ */
 export const [headingsPlugin] = realmPlugin({
   id: 'headings',
   systemSpec: headingsSystem,

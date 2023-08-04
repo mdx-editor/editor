@@ -95,6 +95,9 @@ const defaultSandpackConfig: SandpackConfig = {
   ]
 }
 
+/**
+ * @internal
+ */
 export const sandpackSystem = system(
   (r, [, { insertCodeBlock }]) => {
     const sandpackConfig = r.node<SandpackConfig>(defaultSandpackConfig)
@@ -130,7 +133,12 @@ export const sandpackSystem = system(
   [coreSystem, codeBlockSystem]
 )
 
-export const [sandpackPlugin, sandpackPluginHooks] = realmPlugin({
+export const [
+  /** @internal */
+  sandpackPlugin,
+  /** @internal */
+  sandpackPluginHooks
+] = realmPlugin({
   id: 'sandpack',
   systemSpec: sandpackSystem,
   applyParamsToSystem(r, params: { sandpackConfig: SandpackConfig }) {

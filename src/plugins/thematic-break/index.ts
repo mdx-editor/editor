@@ -5,6 +5,7 @@ import { LexicalThematicBreakVisitor } from './LexicalThematicBreakVisitor'
 import { HorizontalRuleNode, INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontalRuleNode'
 import { HorizontalRulePlugin } from '@lexical/react/LexicalHorizontalRulePlugin'
 
+/** @internal */
 export const thematicBreakSystem = system(
   (r, [{ activeEditor }]) => {
     const insertThematicBreak = r.node<true>()
@@ -20,7 +21,12 @@ export const thematicBreakSystem = system(
   [coreSystem]
 )
 
-export const [thematicBreakPlugin, thematicBreakPluginHooks] = realmPlugin({
+export const [
+  /** @internal */
+  thematicBreakPlugin,
+  /** @internal */
+  thematicBreakPluginHooks
+] = realmPlugin({
   id: 'thematic-break',
   systemSpec: thematicBreakSystem,
 

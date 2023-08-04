@@ -3,6 +3,8 @@ import { coreSystem } from '../core'
 import { DiffSourceWrapper } from './DiffSourceWrapper'
 
 export type ViewMode = 'rich-text' | 'source' | 'diff'
+
+/** @internal */
 export const diffSourceSystem = system(
   (r, [{ markdown, setMarkdown }]) => {
     const diffMarkdown = r.node('')
@@ -36,7 +38,12 @@ export const diffSourceSystem = system(
   [coreSystem]
 )
 
-export const [diffSourcePlugin, diffSourcePluginHooks] = realmPlugin({
+export const [
+  /** @internal */
+  diffSourcePlugin,
+  /** @internal */
+  diffSourcePluginHooks
+] = realmPlugin({
   id: 'diff-source',
   systemSpec: diffSourceSystem,
 

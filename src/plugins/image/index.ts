@@ -27,6 +27,7 @@ import { MdastImageVisitor } from './MdastImageVisitor'
 
 import { CAN_USE_DOM } from '../../utils/detectMac'
 
+/** @internal */
 export const imageSystem = system(
   (r, [{ rootEditor }]) => {
     const insertImage = r.node<string>()
@@ -130,7 +131,12 @@ const defaultParams: ImagePluginParams = {
   }
 }
 
-export const [imagePlugin, imagePluginHooks] = realmPlugin({
+export const [
+  /** @internal */
+  imagePlugin,
+  /** @internal */
+  imagePluginHooks
+] = realmPlugin({
   id: 'image',
   systemSpec: imageSystem,
 

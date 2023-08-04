@@ -25,6 +25,7 @@ const ListTypeCommandMap = new Map<ListType | '', LexicalCommand<void>>([
   ['', REMOVE_LIST_COMMAND]
 ])
 
+/** @internal */
 export const listsSystem = system(
   (r, [{ activeEditor, currentSelection }]) => {
     const currentListType = r.node<ListType | ''>('')
@@ -71,7 +72,12 @@ export const listsSystem = system(
   [coreSystem]
 )
 
-export const [listsPlugin, listsPluginHooks] = realmPlugin({
+export const [
+  /** @internal */
+  listsPlugin,
+  /** @internal */
+  listsPluginHooks
+] = realmPlugin({
   id: 'lists',
   systemSpec: listsSystem,
 

@@ -301,9 +301,9 @@ export interface RealmPluginParams<Spec extends AnySystemSpec, Params extends ob
   init?: (realm: TypedRealm<SystemAndDependencies<Spec>>, props: Params) => void
 }
 
-type PluginConstructor<Spec extends AnySystemSpec, Params extends object> = (
-  params?: Params
-) => { pluginParams?: Params } & RealmPluginParams<Spec, Params>
+export interface PluginConstructor<Spec extends AnySystemSpec, Params extends object> {
+  (params?: Params): { pluginParams?: Params } & RealmPluginParams<Spec, Params>
+}
 
 export function realmPlugin<Spec extends AnySystemSpec, Params extends object>(params: RealmPluginParams<Spec, Params>) {
   const plugin: PluginConstructor<Spec, Params> = (pluginParams?: Params) => {

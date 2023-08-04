@@ -3,6 +3,7 @@ import { realmPlugin, system } from '../../gurx'
 import { coreSystem } from '../core'
 import { Root } from './primitives/toolbar'
 
+/** @internal */
 export const toolbarSystem = system(
   (r) => {
     const toolbarContents = r.node<() => React.ReactNode>(() => null)
@@ -17,7 +18,12 @@ const DEFAULT_TOOLBAR_CONTENTS = () => {
   return 'This is an empty toolbar. Pass `{toolbarContents: () => { return <>toolbar components</> }}` to the toolbarPlugin to customize it.'
 }
 
-export const [toolbarPlugin, toolbarPluginHooks] = realmPlugin({
+export const [
+  /** @internal */
+  toolbarPlugin,
+  /** @internal */
+  toolbarPluginHooks
+] = realmPlugin({
   id: 'toolbar',
   systemSpec: toolbarSystem,
 

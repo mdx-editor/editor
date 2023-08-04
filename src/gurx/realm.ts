@@ -662,4 +662,5 @@ export function realm() {
   }
 }
 
-export type Realm = ReturnType<typeof realm>
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface Realm extends ReturnType<typeof realm> {}

@@ -6,18 +6,27 @@ import { uuidv4 } from '../utils/uuid4'
 import { Realm, realm, RealmNode, Subscription, UnsubscribeHandle } from './realm'
 
 // eslint-disable-next-line
-export type System = Record<string, RealmNode<any>>
+export interface System {
+  [key: string]: RealmNode<any>
+}
 
 /**
  * a SystemSpec is the result from a [[system]] call. To obtain the [[system]], pass the spec to [[init]].
+ * @typeParam Dependencies - The dependencies of the system.
+ * @typeParam Constructor - The system constructor.
  */
-export interface SystemSpec<Dependencies extends AnySystemSpec[], Constructor extends SystemConstructor<Dependencies>> {
+export interface SystemSpec<Dependencies extends AnySystemSpecs, /** @internal */ Constructor extends SystemConstructor<Dependencies>> {
   id: string
   constructor: Constructor
   dependencies: Dependencies
 }
 
-export type AnySystemSpec = SystemSpec<AnySystemSpec[], any>
+export interface AnySystemSpec extends SystemSpec<AnySystemSpecs, any> {
+  id: string
+}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface AnySystemSpecs extends Array<AnySystemSpec> {}
 
 export type SystemOfSpec<Spec extends AnySystemSpec> = ReturnType<Spec['constructor']>
 
@@ -25,7 +34,7 @@ export type SystemOfSpec<Spec extends AnySystemSpec> = ReturnType<Spec['construc
 export type SSR<Spec extends AnySystemSpec> = SystemOfSpec<Spec>
 
 /** @internal **/
-export type SystemsFromSpecs<ST extends AnySystemSpec[]> = ST extends unknown[] ? SystemsFromSpecsRec<ST, []> : never
+export type SystemsFromSpecs<ST extends AnySystemSpecs> = ST extends unknown[] ? SystemsFromSpecsRec<ST, []> : never
 type SystemsFromSpecsRec<ST extends unknown[], Acc extends unknown[]> = ST extends [infer Head, ...infer Tail]
   ? SystemsFromSpecsRec<Tail, [...Acc, Head extends AnySystemSpec ? SystemOfSpec<Head> : never]>
   : Acc
@@ -34,7 +43,9 @@ type SystemsFromSpecsRec<ST extends unknown[], Acc extends unknown[]> = ST exten
  * The system constructor is a function which initializes and connects nodes and returns them as a [[system]].
  * If the [[system]] call specifies system dependencies, the constructor receives the dependencies as an array argument.
  */
-export type SystemConstructor<D extends AnySystemSpec[]> = (r: Realm, dependencies: SystemsFromSpecs<D>) => System
+export interface SystemConstructor<D extends AnySystemSpecs> {
+  (r: Realm, dependencies: SystemsFromSpecs<D>): System
+}
 
 export function system<Dependencies extends LongTuple<AnySystemSpec>, Constructor extends SystemConstructor<Dependencies>>(
   constructor: Constructor,

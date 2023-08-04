@@ -52,6 +52,11 @@ export interface EditorInFocus {
 
 export const NESTED_EDITOR_UPDATED_COMMAND = createCommand<void>('NESTED_EDITOR_UPDATED_COMMAND')
 
+const fooSystem = system((r) => {
+  const foo = r.node('foo')
+  return { foo }
+})
+
 export const coreSystem = system((r) => {
   function createAppendNodeFor<T>(node: RealmNode<T[]>) {
     const appendNode = r.node<T>()
@@ -416,7 +421,12 @@ interface CorePluginParams {
   toMarkdownOptions: NonNullable<LexicalConvertOptions['toMarkdownOptions']>
 }
 
-export const [corePlugin, corePluginHooks] = realmPlugin({
+export const [
+  /** @internal */
+  corePlugin,
+  /** @internal */
+  corePluginHooks
+] = realmPlugin({
   id: 'core',
   systemSpec: coreSystem,
 

@@ -125,18 +125,49 @@ export const SingleChoiceToggleGroup = <T extends string>({ value, onChange, cla
     </div>
   )
 }
+
+/**
+ * The properties of the {@link ButtonOrDropdownButton} React component.
+ */
 export interface ButtonOrDropdownButtonProps<T extends string> {
+  /**
+   * The contents of the button - usually an icon.
+   */
   children: React.ReactNode
+  /**
+   * The title used for the tooltip.
+   */
   title: string
-  onChoose: (T: string) => void
-  items: { value: T; label: string }[]
+  /**
+   * The function to execute when the button is clicked or an item is chosen from the dropdown.
+   * If there is only one item in the dropdown, the value will be an empty string.
+   */
+  onChoose: (value: T) => void
+  /**
+   * The items to show in the dropdown.
+   */
+  items: {
+    /**
+     * The value to pass to the `onChoose` function when this item is chosen.
+     */
+    value: T
+    /**
+     * The label to show in the dropdown.
+     */
+    label: string
+  }[]
 }
 
+/**
+ * Use this primitive to create a toolbar button that can be either a button or a dropdown, depending on the number of items passed.
+ *
+ * @see {@link ButtonOrDropdownButtonProps} for the properties of the React component.
+ */
 export const ButtonOrDropdownButton = <T extends string>(props: ButtonOrDropdownButtonProps<T>) => {
   return (
     <>
       {props.items.length === 1 ? (
-        <ButtonWithTooltip title={props.title} onClick={() => props.onChoose('')}>
+        <ButtonWithTooltip title={props.title} onClick={() => props.onChoose('' as T)}>
           {props.children}
         </ButtonWithTooltip>
       ) : (
