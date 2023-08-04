@@ -18,7 +18,7 @@ const additionalExports = [
 additionalExports.forEach(exp => { 
   newExports[`./${exp}`] = {
     import:  `./dist/${exp}.js`,
-    types: `./dist/${exp}/index.d.ts`,
+    types: `./dist/${exp}.d.ts`,
   }
 })
 

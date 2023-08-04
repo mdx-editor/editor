@@ -175,19 +175,19 @@
     "./style.css": "./dist/style.css",
     "./MDXEditor": {
       "import": "./dist/MDXEditor.js",
-      "types": "./dist/MDXEditor/index.d.ts"
+      "types": "./dist/MDXEditor.d.ts"
     },
     "./directive-editors/AdmonitionDirectiveDescriptor": {
       "import": "./dist/directive-editors/AdmonitionDirectiveDescriptor.js",
-      "types": "./dist/directive-editors/AdmonitionDirectiveDescriptor/index.d.ts"
+      "types": "./dist/directive-editors/AdmonitionDirectiveDescriptor.d.ts"
     },
     "./directive-editors/GenericDirectiveEditor": {
       "import": "./dist/directive-editors/GenericDirectiveEditor.js",
-      "types": "./dist/directive-editors/GenericDirectiveEditor/index.d.ts"
+      "types": "./dist/directive-editors/GenericDirectiveEditor.d.ts"
     },
     "./jsx-editors/GenericJsxEditor": {
       "import": "./dist/jsx-editors/GenericJsxEditor.js",
-      "types": "./dist/jsx-editors/GenericJsxEditor/index.d.ts"
+      "types": "./dist/jsx-editors/GenericJsxEditor.d.ts"
     },
     "./plugins/codeblock": {
       "types": "./dist/plugins/codeblock/index.d.ts",
