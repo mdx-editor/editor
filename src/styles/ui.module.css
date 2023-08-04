@@ -162,6 +162,7 @@
     margin: var(--spacing-2) var(--spacing-2);
     border-left: 1px solid var(--baseBorder);
     border-right: 1px solid var(--baseBase);
+    height: var(--spacing-4);
   }
 }
 

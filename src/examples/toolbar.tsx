@@ -3,6 +3,7 @@ import {
   AdmonitionDirectiveDescriptor,
   KitchenSinkToolbar,
   MDXEditor,
+  UndoRedo,
   codeBlockPlugin,
   codeMirrorPlugin,
   diffSourcePlugin,
@@ -18,7 +19,8 @@ import {
   sandpackPlugin,
   tablePlugin,
   thematicBreakPlugin,
-  toolbarPlugin
+  toolbarPlugin,
+  Separator
 } from '..'
 import { ALL_PLUGINS, YoutubeDirectiveDescriptor, virtuosoSampleSandpackConfig } from './_boilerplate'
 import kitchenSinkMarkdown from './assets/kitchen-sink.md?raw'
@@ -33,6 +35,39 @@ export const ConditionalToolbar = () => {
       markdown={'hello world'}
       plugins={[
         toolbarPlugin({ toolbarContents: () => <KitchenSinkToolbar /> }),
+        listsPlugin(),
+        quotePlugin(),
+        headingsPlugin(),
+        linkPlugin(),
+        linkDialogPlugin(),
+        imagePlugin(),
+        tablePlugin(),
+        thematicBreakPlugin(),
+        frontmatterPlugin(),
+        codeBlockPlugin({ defaultCodeBlockLanguage: 'txt' }),
+        sandpackPlugin({ sandpackConfig: virtuosoSampleSandpackConfig }),
+        codeMirrorPlugin({ codeBlockLanguages: { js: 'JavaScript', css: 'CSS', txt: 'text' } }),
+        directivesPlugin({ directiveDescriptors: [YoutubeDirectiveDescriptor, AdmonitionDirectiveDescriptor] }),
+        diffSourcePlugin({ viewMode: 'rich-text', diffMarkdown: 'boo' }),
+        markdownShortcutPlugin()
+      ]}
+    />
+  )
+}
+
+export const SimpleToolbar = () => {
+  return (
+    <MDXEditor
+      markdown={'hello world'}
+      plugins={[
+        toolbarPlugin({
+          toolbarContents: () => (
+            <>
+              <UndoRedo />
+              <Separator />
+            </>
+          )
+        }),
         listsPlugin(),
         quotePlugin(),
         headingsPlugin(),
