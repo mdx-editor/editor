@@ -4,6 +4,7 @@ import { SandpackProvider, CodeEditor as TheEditorFromSandpack } from '@codesand
 import React from 'react'
 import { diffSourcePluginHooks } from '.'
 import { corePluginHooks } from '../core'
+import { EditorView } from '@codemirror/view'
 
 export const SourceEditor = () => {
   const [markdown] = corePluginHooks.useEmitterValues('markdown')
@@ -15,6 +16,7 @@ export const SourceEditor = () => {
       <React.Suspense fallback={null}>
         <SandpackProvider>
           <TheEditorFromSandpack
+            extensions={[EditorView.lineWrapping]}
             showLineNumbers
             additionalLanguages={[{ name: 'markdown', extensions: ['md'], language: markdownLanguageSupport() }]}
             initMode="lazy"
