@@ -22,11 +22,14 @@ import {
 import styles from '../../styles/ui.module.css'
 import classNames from 'classnames'
 import { $isImageNode } from './ImageNode'
+import ImageResizer from './ImageResizer'
 
 export interface ImageEditorProps {
   nodeKey: string
   src: string
   title?: string
+  width: number | 'inherit'
+  height: number | 'inherit'
 }
 
 const imageCache = new Set()
@@ -48,24 +51,29 @@ function LazyImage({
   title,
   className,
   imageRef,
-  src
+  src,
+  width,
+  height
 }: {
   title: string
   className: string | null
   imageRef: { current: null | HTMLImageElement }
   src: string
+  width: number | 'inherit'
+  height: number | 'inherit'
 }): JSX.Element {
   useSuspenseImage(src)
-  return <img className={className || undefined} src={src} title={title} ref={imageRef} draggable="false" />
+  return <img className={className || undefined} src={src} title={title} ref={imageRef} draggable="false" width={width} height={height} />
 }
 
-export function ImageEditor({ src, title, nodeKey }: ImageEditorProps): JSX.Element {
+export function ImageEditor({ src, title, nodeKey, width, height }: ImageEditorProps): JSX.Element {
   const imageRef = React.useRef<null | HTMLImageElement>(null)
   const buttonRef = React.useRef<HTMLButtonElement | null>(null)
   const [isSelected, setSelected, clearSelection] = useLexicalNodeSelection(nodeKey)
   const [editor] = useLexicalComposerContext()
   const [selection, setSelection] = React.useState<RangeSelection | NodeSelection | GridSelection | null>(null)
   const activeEditorRef = React.useRef<LexicalEditor | null>(null)
+  const [isResizing, setIsResizing] = React.useState<boolean>(false)
 
   const onDelete = React.useCallback(
     (payload: KeyboardEvent) => {
@@ -136,6 +144,10 @@ export function ImageEditor({ src, title, nodeKey }: ImageEditorProps): JSX.Elem
         CLICK_COMMAND,
         (payload) => {
           const event = payload
+
+          if (isResizing) {
+            return true
+          }
           if (event.target === imageRef.current) {
             if (event.shiftKey) {
               setSelected(!isSelected)
@@ -172,15 +184,35 @@ export function ImageEditor({ src, title, nodeKey }: ImageEditorProps): JSX.Elem
       isMounted = false
       unregister()
     }
-  }, [clearSelection, editor, isSelected, nodeKey, onDelete, onEnter, onEscape, setSelected])
+  }, [clearSelection, editor, isResizing, isSelected, nodeKey, onDelete, onEnter, onEscape, setSelected])
+
+  const onResizeEnd = (nextWidth: 'inherit' | number, nextHeight: 'inherit' | number) => {
+    // Delay hiding the resize bars for click case
+    setTimeout(() => {
+      setIsResizing(false)
+    }, 200)
+
+    editor.update(() => {
+      const node = $getNodeByKey(nodeKey)
+      if ($isImageNode(node)) {
+        node.setWidthAndHeight(nextWidth, nextHeight)
+      }
+    })
+  }
+
+  const onResizeStart = () => {
+    setIsResizing(true)
+  }
 
   const draggable = $isNodeSelection(selection)
   const isFocused = isSelected
   return (
     <React.Suspense fallback={null}>
-      <>
-        <div draggable={draggable} className={styles.imageWrapper} data-editor-block-type="image">
+      <div className={styles.imageWrapper} data-editor-block-type="image">
+        <div draggable={draggable}>
           <LazyImage
+            width={width}
+            height={height}
             className={classNames({
               [styles.focusedImage]: isFocused
             })}
@@ -189,7 +221,10 @@ export function ImageEditor({ src, title, nodeKey }: ImageEditorProps): JSX.Elem
             imageRef={imageRef}
           />
         </div>
-      </>
+        {draggable && isFocused && (
+          <ImageResizer editor={editor} imageRef={imageRef} onResizeStart={onResizeStart} onResizeEnd={onResizeEnd} />
+        )}
+      </div>
     </React.Suspense>
   )
 }

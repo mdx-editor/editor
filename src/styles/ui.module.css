@@ -524,7 +524,7 @@
 }
 
 .linkDialogAnchor {
-  position: absolute;
+  position: fixed;
   background-color: highlight;
   z-index: -1;
 
@@ -799,7 +799,8 @@
 }
 
 .imageWrapper {
-  display: inline;
+  display: inline-block;
+  position: relative;
 }
 
 .imageWrapper[draggable=true] {
@@ -881,4 +882,66 @@
 .toolbarTitleMode {
   font-size: var(--text-sm);
   margin-left: var(--spacing-2);
+}
+
+
+.imageControlWrapperResizing {
+  touch-action: none;
+}
+
+.imageResizer {
+  display: block;
+  width: 7px;
+  height: 7px;
+  position: absolute;
+  background-color: var(--accentText);
+  border: 1px solid var(--baseBg);
+}
+
+.imageResizer.imageResizerN {
+  top: -6px;
+  left: 48%;
+  cursor: n-resize;
+}
+
+.imageResizer.imageResizerNe {
+  top: -6px;
+  right: -6px;
+  cursor: ne-resize;
+}
+
+.imageResizer.imageResizerE {
+  bottom: 48%;
+  right: -6px;
+  cursor: e-resize;
+}
+
+.imageResizer.imageResizerSe {
+  bottom: -2px;
+  right: -6px;
+  cursor: nwse-resize;
+}
+
+.imageResizer.imageResizerS {
+  bottom: -2px;
+  left: 48%;
+  cursor: s-resize;
+}
+
+.imageResizer.imageResizerSw {
+  bottom: -2px;
+  left: -6px;
+  cursor: sw-resize;
+}
+
+.imageResizer.imageResizerW {
+  bottom: 48%;
+  left: -6px;
+  cursor: w-resize;
+}
+
+.imageResizer.imageResizerNw {
+  top: -6px;
+  left: -6px;
+  cursor: nw-resize;
 }
