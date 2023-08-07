@@ -113,7 +113,7 @@ const EditorRootElement: React.FC<{ children: React.ReactNode; className?: strin
     setEditorRootElementRef(editorRootElementRef)
   }, [editorRootElementRef, setEditorRootElementRef])
   return (
-    <div className={classNames(styles.editorRoot, styles.editorWrapper, className)} ref={editorRootElementRef}>
+    <div className={classNames(styles.editorRoot, styles.editorWrapper, className, 'mdxeditor')} ref={editorRootElementRef}>
       {children}
     </div>
   )

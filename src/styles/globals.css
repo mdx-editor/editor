@@ -6,3 +6,8 @@
 @import url('@radix-ui/colors/cyan.css');
 @import url('@radix-ui/colors/amber.css');
 @import url('@radix-ui/colors/red.css');
+
+.mdxeditor .diff {
+  --diff-font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
