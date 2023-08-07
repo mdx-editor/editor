@@ -18,7 +18,9 @@ export const MdastImageVisitor: MdastImportVisitor<Mdast.Image> = {
 }
 
 export const MdastHtmlImageVisitor: MdastImportVisitor<Mdast.HTML> = {
-  testNode: (node) => node.type === 'html' && node.value.startsWith('<img'),
+  testNode: (node) => {
+    return node.type === 'html' && node.value.trim().startsWith('<img')
+  },
   visitNode({ mdastNode, lexicalParent }) {
     const wrapper = document.createElement('div')
     wrapper.innerHTML = mdastNode.value

@@ -20,7 +20,13 @@ import {
   tablePlugin,
   thematicBreakPlugin,
   toolbarPlugin,
-  Separator
+  Separator,
+  BlockTypeSelect,
+  BoldItalicUnderlineToggles,
+  CreateLink,
+  DiffSourceToggleWrapper,
+  InsertImage,
+  ListsToggle
 } from '..'
 import { ALL_PLUGINS, YoutubeDirectiveDescriptor, virtuosoSampleSandpackConfig } from './_boilerplate'
 import kitchenSinkMarkdown from './assets/kitchen-sink.md?raw'
@@ -34,7 +40,22 @@ export const ConditionalToolbar = () => {
     <MDXEditor
       markdown={'hello world'}
       plugins={[
-        toolbarPlugin({ toolbarContents: () => <KitchenSinkToolbar /> }),
+        toolbarPlugin({
+          toolbarContents: () => (
+            <>
+              <DiffSourceToggleWrapper>
+                <UndoRedo />
+                <BoldItalicUnderlineToggles />
+                <ListsToggle />
+                <Separator />
+                <BlockTypeSelect />
+                <CreateLink />
+                <InsertImage />
+                <Separator />
+              </DiffSourceToggleWrapper>
+            </>
+          )
+        }),
         listsPlugin(),
         quotePlugin(),
         headingsPlugin(),
@@ -44,9 +65,9 @@ export const ConditionalToolbar = () => {
         tablePlugin(),
         thematicBreakPlugin(),
         frontmatterPlugin(),
-        codeBlockPlugin({ defaultCodeBlockLanguage: 'txt' }),
-        sandpackPlugin({ sandpackConfig: virtuosoSampleSandpackConfig }),
-        codeMirrorPlugin({ codeBlockLanguages: { js: 'JavaScript', css: 'CSS', txt: 'text' } }),
+        // codeBlockPlugin({ defaultCodeBlockLanguage: 'txt' }),
+        // sandpackPlugin({ sandpackConfig: virtuosoSampleSandpackConfig }),
+        // codeMirrorPlugin({ codeBlockLanguages: { js: 'JavaScript', css: 'CSS', txt: 'text' } }),
         directivesPlugin({ directiveDescriptors: [YoutubeDirectiveDescriptor, AdmonitionDirectiveDescriptor] }),
         diffSourcePlugin({ viewMode: 'rich-text', diffMarkdown: 'boo' }),
         markdownShortcutPlugin()
