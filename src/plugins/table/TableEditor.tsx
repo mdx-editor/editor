@@ -109,20 +109,28 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
     lexicalTable.focusEmitter.subscribe(setActiveCellWithBoundaries)
   }, [lexicalTable, setActiveCellWithBoundaries])
 
-  const addRowToBottom = React.useCallback(() => {
-    parentEditor.update(() => {
-      lexicalTable.addRowToBottom()
-      setActiveCell([0, lexicalTable.getRowCount()])
-    })
-  }, [parentEditor, lexicalTable])
+  const addRowToBottom = React.useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault()
+      parentEditor.update(() => {
+        lexicalTable.addRowToBottom()
+        setActiveCell([0, lexicalTable.getRowCount()])
+      })
+    },
+    [parentEditor, lexicalTable]
+  )
 
   // adds column to the right and focuses the top cell of it
-  const addColumnToRight = React.useCallback(() => {
-    parentEditor.update(() => {
-      lexicalTable.addColumnToRight()
-      setActiveCell([lexicalTable.getColCount(), 0])
-    })
-  }, [parentEditor, lexicalTable])
+  const addColumnToRight = React.useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault()
+      parentEditor.update(() => {
+        lexicalTable.addColumnToRight()
+        setActiveCell([lexicalTable.getColCount(), 0])
+      })
+    },
+    [parentEditor, lexicalTable]
+  )
 
   const [highlightedCoordinates, setHighlightedCoordinates] = React.useState<[number, number]>([-1, -1])
 
@@ -165,8 +173,10 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
           <th className={styles.tableToolsColumn} data-tool-cell={true}>
             <button
               className={styles.iconButton}
+              type="button"
               title="Delete table"
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault()
                 parentEditor.update(() => {
                   lexicalTable.selectNext()
                   lexicalTable.remove()
@@ -222,7 +232,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
               })}
               {rowIndex === 0 && (
                 <th rowSpan={lexicalTable.getRowCount()} data-tool-cell={true}>
-                  <button className={styles.addColumnButton} onClick={addColumnToRight}>
+                  <button type="button" className={styles.addColumnButton} onClick={addColumnToRight}>
                     <AddColumnIcon />
                   </button>
                 </th>
@@ -235,7 +245,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
         <tr>
           <th></th>
           <th colSpan={lexicalTable.getColCount()}>
-            <button className={styles.addRowButton} onClick={addRowToBottom}>
+            <button type="button" className={styles.addRowButton} onClick={addRowToBottom}>
               <AddRowIcon />
             </button>
           </th>

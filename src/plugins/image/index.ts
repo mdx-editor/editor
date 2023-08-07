@@ -23,7 +23,7 @@ import { realmPlugin, system } from '../../gurx'
 import { coreSystem } from '../core'
 import { $createImageNode, $isImageNode, CreateImageNodeOptions, ImageNode } from './ImageNode'
 import { LexicalImageVisitor } from './LexicalImageVisitor'
-import { MdastImageVisitor } from './MdastImageVisitor'
+import { MdastHtmlImageVisitor, MdastImageVisitor, MdastJsxImageVisitor } from './MdastImageVisitor'
 
 import { CAN_USE_DOM } from '../../utils/detectMac'
 
@@ -147,6 +147,8 @@ export const [
 
   init: (realm) => {
     realm.pubKey('addImportVisitor', MdastImageVisitor)
+    realm.pubKey('addImportVisitor', MdastHtmlImageVisitor)
+    realm.pubKey('addImportVisitor', MdastJsxImageVisitor)
     realm.pubKey('addLexicalNode', ImageNode)
     realm.pubKey('addExportVisitor', LexicalImageVisitor)
   }
