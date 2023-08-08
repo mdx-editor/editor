@@ -290,7 +290,6 @@ declare global {
   }
 }
 
-// TODO: prevent from dropping in code blocks or live code blocks.
 function canDropImage(event: DragEvent): boolean {
   const target = event.target
   return !!(target && target instanceof HTMLElement && target.parentElement)

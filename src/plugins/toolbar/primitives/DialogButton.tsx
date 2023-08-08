@@ -46,7 +46,6 @@ export interface DialogButtonProps {
   submitButtonTitle: string
 }
 
-// TODO: make this configurable
 const MAX_SUGGESTIONS = 20
 
 /**

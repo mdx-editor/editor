@@ -7,7 +7,6 @@ export const LexicalListVisitor: LexicalExportVisitor<ListNode, Mdast.List> = {
   visitLexicalNode: ({ lexicalNode, actions }) => {
     actions.addAndStepInto('list', {
       ordered: lexicalNode.getListType() === 'number',
-      //TODO: figure out when spread can be true
       spread: false
     })
   }

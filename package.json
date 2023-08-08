@@ -171,6 +171,8 @@
       }
     ]
   },
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "exports": {
     "./package.json": "./package.json",
     "./style.css": "./dist/style.css",

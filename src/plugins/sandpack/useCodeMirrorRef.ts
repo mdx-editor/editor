@@ -86,9 +86,6 @@ export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'san
 
   React.useEffect(() => {
     const codeMirror = codeMirrorRef.current
-
-    // TODO: This is a hack to get around the fact that the CodeMirror instance
-    // is not available immediately after the component is mounted.
     setTimeout(() => {
       codeMirror?.getCodemirror()?.contentDOM?.addEventListener('focus', onFocusHandler)
       codeMirror?.getCodemirror()?.contentDOM?.addEventListener('keydown', onKeyDownHandler)

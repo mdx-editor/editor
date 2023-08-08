@@ -143,7 +143,6 @@ export const LinkDialog: React.FC = () => {
     }
 
     window.addEventListener('resize', update)
-    // TODO: get the right scroller
     window.addEventListener('scroll', update)
 
     return () => {
