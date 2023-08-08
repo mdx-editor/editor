@@ -2,6 +2,7 @@ import { realmPlugin, system } from '../../gurx'
 import { coreSystem } from '../core'
 import { DiffSourceWrapper } from './DiffSourceWrapper'
 
+/** @internal */
 export type ViewMode = 'rich-text' | 'source' | 'diff'
 
 /** @internal */

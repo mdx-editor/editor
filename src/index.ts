@@ -61,7 +61,12 @@ export * from './plugins/toolbar/components/ShowSandpackInfo'
 export * from './plugins/toolbar/components/UndoRedo'
 export * from './plugins/toolbar/components/KitchenSinkToolbar'
 
+// Build your own toolbar items
 export * from './plugins/toolbar/primitives/toolbar'
 export * from './plugins/toolbar/primitives/DialogButton'
 export * from './plugins/toolbar/primitives/TooltipWrap'
 export * from './plugins/toolbar/primitives/select'
+
+// Build your own editor
+export * from './plugins/core/NestedLexicalEditor'
+export * from './plugins/core/PropertyPopover'

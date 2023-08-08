@@ -4,6 +4,10 @@ import CodeIcon from '../../../icons/code.svg'
 import { corePluginHooks } from '../../core'
 import { MultipleChoiceToggleGroup } from '.././primitives/toolbar'
 
+/**
+ * A toolbar component that lets the user toggle code formatting.
+ * Use for inline `code` elements (like variables, methods, etc).
+ */
 export const CodeToggle: React.FC = () => {
   const [currentFormat] = corePluginHooks.useEmitterValues('currentFormat')
   const applyFormat = corePluginHooks.usePublisher('applyFormat')

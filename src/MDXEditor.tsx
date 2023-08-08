@@ -56,12 +56,38 @@ const RichTextEditor: React.FC = () => {
   )
 }
 
+/**
+ * The properties of the {@link MDXEditor} React component.
+ */
 export interface MDXEditorProps {
+  /**
+   * the CSS class to apply to the content editable element of the editor.
+   * Use this to style the various content elements like lists and blockquotes.
+   */
   contentEditableClassName?: string
+  /**
+   * The markdown to edit. Notice that this is read only when the component is mounted.
+   * To change the component content dynamically, use the `MDXEditorMethods.setMarkdown` method.
+   */
   markdown: string
+  /**
+   * Triggered when the editor value changes. The callback is not throttled, you can use any throttling mechanism
+   * if you intend to do auto-saving.
+   */
   onChange?: (markdown: string) => void
+  /**
+   * The markdown options used to generate the resulting markdown.
+   * See {@link https://github.com/syntax-tree/mdast-util-to-markdown#options | the mdast-util-to-markdown docs} for the full list of options.
+   */
   toMarkdownOptions?: ToMarkdownOptions
+  /**
+   * The plugins to use in the editor.
+   */
   plugins?: React.ComponentProps<typeof RealmPluginInitializer>['plugins']
+  /**
+   * The class name to apply to the root component element. Use this if you want to change the editor dimensions, maximum height, etc.
+   * For a content-specific styling, Use `contentEditableClassName` property.
+   */
   className?: string
 }
 
@@ -139,6 +165,9 @@ const Methods: React.FC<{ mdxRef: React.ForwardedRef<MDXEditorMethods> }> = ({ m
   return null
 }
 
+/**
+ * The MDXEditor React component. See {@link MDXEditorProps} for the list of properties supported and the {@link MDXEditorMethods} for the methods accessible through the ref.
+ */
 export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>((props, ref) => {
   return (
     <RealmPluginInitializer

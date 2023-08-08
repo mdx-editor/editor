@@ -6,6 +6,11 @@ import DiffIcon from '../../../icons/difference.svg'
 import SourceIcon from '../../../icons/markdown.svg'
 import styles from '../../../styles/ui.module.css'
 
+/**
+ * A wrapper element for the toolbar contents that lets the user toggle between rich text, diff and source mode.
+ * Put the rich text toolbar contents as children of this component.
+ * For this component to work, you must include the `diffSourcePlugin`.
+ */
 export const DiffSourceToggleWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [viewMode] = diffSourcePluginHooks.useEmitterValues('viewMode')
   const changeViewMode = diffSourcePluginHooks.usePublisher('viewMode')

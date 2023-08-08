@@ -34,22 +34,40 @@ function addTooltipToChildren<C extends React.ComponentType<{ children: React.Re
   }
 }
 
+/**
+ * @internal
+ */
 export const Root = decorate(RadixToolbar.Root, { className: styles.toolbarRoot })
 
+/**
+ * A toolbar button primitive.
+ */
 export const Button = decorateWithRef(RadixToolbar.Button, { className: styles.toolbarButton, 'data-toolbar-item': true })
 
+/**
+ * A toolbar button with a custom toolbar primitive.
+ */
 export const ButtonWithTooltip = addTooltipToChildren(Button)
 
+/**
+ * @internal
+ */
 export const ToolbarToggleItem = decorateWithRef(RadixToolbar.ToggleItem, {
   className: styles.toolbarToggleItem,
   'data-toolbar-item': true
 })
 
+/**
+ * @internal
+ */
 export const SingleToggleGroup = decorateWithRef(RadixToolbar.ToggleGroup, {
   type: 'single',
   className: styles.toolbarToggleSingleGroup
 })
 
+/**
+ * @internal
+ */
 export const ToggleSingleGroupWithItem = React.forwardRef<
   HTMLDivElement,
   Omit<RadixToolbar.ToolbarToggleGroupSingleProps, 'type'> & { on: boolean; title: string; disabled?: boolean }
@@ -69,6 +87,9 @@ export const ToggleSingleGroupWithItem = React.forwardRef<
   )
 })
 
+/**
+ * A toolbar primitive that allows you to build an UI with multiple non-exclusive toggle groups, like the bold/italic/underline toggle.
+ */
 export const MultipleChoiceToggleGroup: React.FC<{
   items: {
     title: string
@@ -95,7 +116,10 @@ export const MultipleChoiceToggleGroup: React.FC<{
   )
 }
 
-interface SingleChoiceToggleGroupProps<T extends string> {
+/**
+ * The properties of the {@link SingleChoiceToggleGroup} React component.
+ */
+export interface SingleChoiceToggleGroupProps<T extends string> {
   items: {
     title: string
     value: T
@@ -106,6 +130,9 @@ interface SingleChoiceToggleGroupProps<T extends string> {
   className?: string
 }
 
+/**
+ * A toolbar primitive that allows you to build an UI with multiple exclusive toggle groups, like the list type toggle.
+ */
 export const SingleChoiceToggleGroup = <T extends string>({ value, onChange, className, items }: SingleChoiceToggleGroupProps<T>) => {
   return (
     <div className={styles.toolbarGroupOfGroups}>
@@ -187,21 +214,68 @@ export const ButtonOrDropdownButton = <T extends string>(props: ButtonOrDropdown
   )
 }
 
-type ConditionalContentsOption = {
+/**
+ * An object that describes a possible option to be displayed in the {@link ConditionalContents} component.
+ */
+export type ConditionalContentsOption = {
+  /**
+   * A function that returns `true` if the option should be displayed for the current editor in focus.
+   */
   when: (rootNode: EditorInFocus | null) => boolean
+  /**
+   * The contents to display if the `when` function returns `true`.
+   */
   contents: () => React.ReactNode
 }
 
-type FallBackOption = { fallback: () => React.ReactNode }
+/**
+ * A default option to be displayed in the {@link ConditionalContents} component if none of the other options match.
+ */
+export type FallBackOption = {
+  /**
+   * The contents to display
+   */
+  fallback: () => React.ReactNode
+}
 
 function isConditionalContentsOption(option: ConditionalContentsOption | FallBackOption): option is ConditionalContentsOption {
   return Object.hasOwn(option, 'when')
 }
 
-interface ConditionalContentsProps {
+/**
+ * The properties of the {@link ConditionalContents} React component.
+ */
+export interface ConditionalContentsProps {
+  /**
+   * A set of options that define the contents to show based on the editor that is in focus.
+   * Can be either a {@link ConditionalContentsOption} or a {@link FallBackOption}.
+   * See the {@link ConditionalContents} documentation for an example.
+   */
   options: (ConditionalContentsOption | FallBackOption)[]
 }
 
+/**
+ * A toolbar primitive that allows you to show different contents based on the editor that is in focus.
+ * Useful for code editors that have different features and don't support rich text formatting.
+ * @example
+ * ```tsx
+ *    <ConditionalContents
+ *      options={[
+ *        { when: (editor) => editor?.editorType === 'codeblock', contents: () => <ChangeCodeMirrorLanguage /> },
+ *        { when: (editor) => editor?.editorType === 'sandpack', contents: () => <ShowSandpackInfo /> },
+ *        {
+ *          fallback: () => (
+ *            <>
+ *              <UndoRedo />
+ *              <BoldItalicUnderlineToggles />
+ *              <InsertCodeBlock />
+ *            </>
+ *          )
+ *        }
+ *      ]}
+ *    />
+ * ```
+ */
 export const ConditionalContents: React.FC<ConditionalContentsProps> = ({ options }) => {
   const [editorInFocus] = corePluginHooks.useEmitterValues('editorInFocus')
   const contents = React.useMemo(() => {
@@ -220,4 +294,8 @@ export const ConditionalContents: React.FC<ConditionalContentsProps> = ({ option
   return <div style={{ display: 'flex' }}>{contents}</div>
 }
 
+/**
+ * A toolbar primitive that allows you to show a separator between toolbar items.
+ * By default, the separator is styled as vertical line.
+ */
 export const Separator = RadixToolbar.Separator

@@ -5,6 +5,10 @@ import { useHasPlugin } from '../../../gurx'
 import { BlockType, corePluginHooks } from '../../core'
 import { Select } from '.././primitives/select'
 
+/**
+ * A toolbar component that allows the user to change the block type of the current selection.
+ * Supports paragraphs, headings and block quotes.
+ */
 export const BlockTypeSelect = () => {
   const convertSelectionToNode = corePluginHooks.usePublisher('convertSelectionToNode')
   const [currentBlockType] = corePluginHooks.useEmitterValues('currentBlockType')

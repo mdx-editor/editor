@@ -4,6 +4,9 @@ import React, { ReactNode } from 'react'
 import styles from '../../../styles/ui.module.css'
 import { corePluginHooks } from '../../core'
 
+/**
+ * A small styled wrapper around the radix-ui tooltip, that lets you display an instan tooltip on hover.
+ */
 export const TooltipWrap = React.forwardRef<HTMLButtonElement, { title: string; children: ReactNode }>(({ title, children }, ref) => {
   const [editorRootElementRef] = corePluginHooks.useEmitterValues('editorRootElementRef')
 

@@ -3,6 +3,10 @@ import { ButtonOrDropdownButton } from '.././primitives/toolbar'
 import LiveCodeIcon from '../../../icons/deployed_code.svg'
 import { sandpackPluginHooks } from '../../sandpack'
 
+/**
+ * A dropdown button that allows the user to insert a live code block into the editor. The dropdown offers a list of presets that are defined in the sandpack plugin config.
+ * For this to work, you need to have the `sandpackPlugin` installed.
+ */
 export const InsertSandpack = () => {
   const [sandpackConfig] = sandpackPluginHooks.useEmitterValues('sandpackConfig')
   const insertSandpack = sandpackPluginHooks.usePublisher('insertSandpack')

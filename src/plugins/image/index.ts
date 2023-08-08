@@ -154,10 +154,14 @@ export const [
   }
 })
 
+/** @internal */
 export type InsertImagePayload = Readonly<CreateImageNodeOptions>
 
 const getDOMSelection = (targetWindow: Window | null): Selection | null => (CAN_USE_DOM ? (targetWindow || window).getSelection() : null)
 
+/**
+ * @internal
+ */
 export const INSERT_IMAGE_COMMAND: LexicalCommand<InsertImagePayload> = createCommand('INSERT_IMAGE_COMMAND')
 
 const TRANSPARENT_IMAGE = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'

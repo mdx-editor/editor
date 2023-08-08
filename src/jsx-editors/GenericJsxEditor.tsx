@@ -7,6 +7,11 @@ import { PropertyPopover } from '../plugins/core/PropertyPopover'
 import styles from '../styles/ui.module.css'
 import { JsxEditorProps } from '../plugins/jsx'
 
+/**
+ * A generic editor that can be used as an universal UI for any JSX element.
+ * Allows editing of the element content and properties.
+ * Use this editor for the {@link JsxComponentDescriptor} Editor option.
+ */
 export const GenericJsxEditor: React.FC<JsxEditorProps> = ({ mdastNode, descriptor }) => {
   const updateMdastNode = useMdastNodeUpdater()
 

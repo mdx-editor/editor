@@ -7,6 +7,9 @@ import { IS_APPLE } from '../../../utils/detectMac'
 import { corePluginHooks } from '../../core'
 import { MultipleChoiceToggleGroup } from '.././primitives/toolbar'
 
+/**
+ * A toolbar component that lets the user undo and redo changes in the editor.
+ */
 export const UndoRedo: React.FC = () => {
   const [activeEditor] = corePluginHooks.useEmitterValues('activeEditor')
   const [canUndo, setCanUndo] = React.useState(false)

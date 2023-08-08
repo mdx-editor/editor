@@ -9,6 +9,9 @@ import { LexicalJsxVisitor } from './LexicalJsxVisitor'
 import { MdastMdxJsEsmVisitor } from './MdastMdxJsEsmVisitor'
 import { MdastMdxJsxElementVisitor } from './MdastMdxJsxElementVisitor'
 
+/**
+ * @internal
+ */
 export type MdastJsx = MdxJsxTextElement | MdxJsxFlowElement
 
 /**
@@ -76,7 +79,13 @@ export interface JsxEditorProps {
 /** @internal */
 export const jsxSystem = system((_) => ({}), [coreSystem])
 
+/**
+ * The parameters of the `jsxPlugin`.
+ */
 export interface JsxPluginParams {
+  /**
+   * A set of descriptors that document the JSX elements used in the document.
+   */
   jsxComponentDescriptors: JsxComponentDescriptor[]
 }
 

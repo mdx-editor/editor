@@ -192,6 +192,14 @@
       "import": "./dist/jsx-editors/GenericJsxEditor.js",
       "types": "./dist/jsx-editors/GenericJsxEditor.d.ts"
     },
+    "./plugins/core/PropertyPopover": {
+      "import": "./dist/plugins/core/PropertyPopover.js",
+      "types": "./dist/plugins/core/PropertyPopover.d.ts"
+    },
+    "./plugins/core/NestedLexicalEditor": {
+      "import": "./dist/plugins/core/NestedLexicalEditor.js",
+      "types": "./dist/plugins/core/NestedLexicalEditor.d.ts"
+    },
     "./plugins/codeblock": {
       "types": "./dist/plugins/codeblock/index.d.ts",
       "import": "./dist/plugins/codeblock/index.js"

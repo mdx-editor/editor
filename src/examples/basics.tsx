@@ -39,6 +39,17 @@ export function Bare() {
   )
 }
 
+const singleEnterMarkdown = `
+more 
+
+·foo· 
+bar
+more`
+
+export function BreakExample() {
+  return <MDXEditor markdown={singleEnterMarkdown} onChange={console.log} />
+}
+
 const jsxComponentDescriptors: JsxComponentDescriptor[] = [
   {
     name: 'MyLeaf',

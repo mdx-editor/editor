@@ -41,8 +41,15 @@ interface NestedEditorsContextValue<T extends Node> {
   focusEmitter: VoidEmitter
 }
 
+/**
+ * Use this context to provide the necessary values to the {@link NestedLexicalEditor} React component.
+ * Place it as a wrapper in your custom lexical node decorators.
+ */
 export const NestedEditorsContext = React.createContext<NestedEditorsContextValue<Node> | undefined>(undefined)
 
+/**
+ * A hook to get the current {@link NestedEditorsContext} value. Use this in your custom editor components.
+ */
 export const useNestedEditorContext = <T extends Mdast.Content>() => {
   const context = React.useContext(NestedEditorsContext) as NestedEditorsContextValue<T> | undefined
   if (!context) {
@@ -85,7 +92,7 @@ export function useLexicalNodeRemove() {
 }
 
 /**
- * The properties of the {@link NestedEditor} React Component.
+ * The properties of the {@link NestedLexicalEditor} React component.
  * @typeParam T - The type of the mdast node of the editor.
  */
 export interface NestedEditorProps<T extends Mdast.Content> {
@@ -128,7 +135,7 @@ export interface NestedEditorProps<T extends Mdast.Content> {
  *   children: Mdast.PhrasingContent[]
  * }
  *
- * return <NestedEditor<CalloutDirectiveNode> getContent={node => node.children} getUpdatedMdastNode={(node, children) => ({ ...node, children })} />
+ * return <NestedLexicalEditor<CalloutDirectiveNode> getContent={node => node.children} getUpdatedMdastNode={(node, children) => ({ ...node, children })} />
  * ```
  */
 export const NestedLexicalEditor = function <T extends Mdast.Content>(props: NestedEditorProps<T>) {

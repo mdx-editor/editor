@@ -6,6 +6,9 @@ import styles from '../../../styles/ui.module.css'
 import { TooltipWrap } from './TooltipWrap'
 import { corePluginHooks } from '../../core'
 
+/**
+ * @internal
+ */
 export const SelectItem = React.forwardRef<HTMLDivElement | null, { className?: string; children: React.ReactNode; value: string }>(
   ({ children, className, ...props }, forwardedRef) => {
     return (
@@ -16,6 +19,9 @@ export const SelectItem = React.forwardRef<HTMLDivElement | null, { className?: 
   }
 )
 
+/**
+ * @internal
+ */
 export const SelectTrigger: React.FC<{ title: string; placeholder: string; className?: string }> = ({ title, placeholder, className }) => {
   return (
     <TooltipWrap title={title}>
@@ -29,6 +35,9 @@ export const SelectTrigger: React.FC<{ title: string; placeholder: string; class
   )
 }
 
+/**
+ * @internal
+ */
 export const SelectContent: React.FC<{ children: React.ReactNode; className?: string }> = ({
   children,
   className = styles.selectContainer
@@ -44,6 +53,9 @@ export const SelectContent: React.FC<{ children: React.ReactNode; className?: st
   )
 }
 
+/**
+ * @internal
+ */
 export const SelectButtonTrigger: React.FC<{ children: React.ReactNode; title: string; className?: string }> = ({
   children,
   title,
@@ -61,6 +73,9 @@ export const SelectButtonTrigger: React.FC<{ children: React.ReactNode; title: s
   )
 }
 
+/**
+ * The properties of the {@link Select} React component.
+ */
 export interface SelectProps<T extends string> {
   value: T
   onChange: (value: T) => void
@@ -69,6 +84,10 @@ export interface SelectProps<T extends string> {
   items: ({ label: string; value: T } | 'separator')[]
 }
 
+/**
+ * A toolbar primitive you can use to build dropdowns, such as the block type select.
+ * See {@link SelectProps} for more details.
+ */
 export const Select = <T extends string>(props: SelectProps<T>) => {
   return (
     <RadixSelect.Root value={props.value} onValueChange={props.onChange}>

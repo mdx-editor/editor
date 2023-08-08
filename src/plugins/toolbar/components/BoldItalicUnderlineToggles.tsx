@@ -6,6 +6,9 @@ import BoldIcon from '../../../icons/format_bold.svg'
 import ItalicIcon from '../../../icons/format_italic.svg'
 import UnderlinedIcon from '../../../icons/format_underlined.svg'
 
+/**
+ * A toolbar component that lets the user toggle bold, italic and underline formatting.
+ */
 export const BoldItalicUnderlineToggles: React.FC = () => {
   const [currentFormat] = corePluginHooks.useEmitterValues('currentFormat')
   const applyFormat = corePluginHooks.usePublisher('applyFormat')

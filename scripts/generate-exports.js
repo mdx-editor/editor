@@ -13,6 +13,8 @@ const additionalExports = [
   'directive-editors/AdmonitionDirectiveDescriptor',
   'directive-editors/GenericDirectiveEditor',
   'jsx-editors/GenericJsxEditor',
+  'plugins/core/PropertyPopover',
+  'plugins/core/NestedLexicalEditor',
 ]
 
 additionalExports.forEach(exp => { 
