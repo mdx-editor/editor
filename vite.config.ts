@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs'
 import react from '@vitejs/plugin-react'
 import dts from 'vite-plugin-dts'
 import svgr from 'vite-plugin-svgr'
+import fs from 'fs'
 
 const ext = {
   cjs: 'cjs',
@@ -21,9 +22,6 @@ const externalPackages = [
   ...Object.keys(packageJson.dependencies),
   ...Object.keys(packageJson.peerDependencies),
   /@lexical\/react\/.*/,
-  // '@lexical/react/LexicalHorizontalRuleNode',
-  // '@lexical/react/LexicalHorizontalRulePlugin',
-  // '@lexical/react/LexicalComposerContext',
 ]
 
 // https://vitejs.dev/config/
@@ -31,7 +29,8 @@ export default defineConfig({
   plugins: [
     react(IN_LADLE ? {} : { jsxRuntime: 'classic' } as const),
     dts({
-      rollupTypes: true,
+      rollupTypes: false,
+      staticImport: true,
       compilerOptions: {
         skipLibCheck: true,
       },
@@ -53,11 +52,18 @@ export default defineConfig({
     minify: 'terser',
     cssMinify: false,
     lib: {
-      entry: ['src/index.ts'],
-      formats: ['es', 'cjs'],
-      fileName: (format) => `index.${ext[format as 'cjs' | 'es']}`,
+      entry: 'src/index.ts',
+      formats: ['es'],
+      fileName: (format, entryName) => {
+        return `${entryName}.${ext[format as 'cjs' | 'es']}` 
+      },
     },
     rollupOptions: {
+      output: {
+        exports: 'named',
+        preserveModules: true,
+        preserveModulesRoot: 'src'
+      },
       external: externalPackages,
     },
   },

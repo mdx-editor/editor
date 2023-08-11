@@ -1,52 +1,19 @@
-/**
- * `@virtuoso.dev/react-urx` exports the [[systemToComponent]] function.
- * It wraps urx systems in to UI **logic provider components**,
- * mapping the system input and output streams to the component input / output points.
- *
- * ### Simple system wrapped as React Component
- *
- * ```tsx
- * const sys = system(() => {
- *   const foo = statefulStream(42)
- *   return { foo }
- * })
- *
- * const { Component: MyComponent, useEmitterValue } = systemToComponent(sys, {
- *   required: { fooProp: 'foo' },
- * })
- *
- * const Child = () => {
- *   const foo = useEmitterValue('foo')
- *   return <div>{foo}</div>
- * }
- *
- * const App = () => {
- *   return <Comp fooProp={42}><Child /><Comp>
- * }
- * ```
- *
- * @packageDocumentation
- */
-import * as React from 'react'
-// import { flushSync } from 'react-dom'
-import {
-  ComponentType,
-  createContext,
-  createElement,
-  forwardRef,
-  ForwardRefExoticComponent,
-  ReactNode,
-  RefAttributes,
-  useContext,
-  useImperativeHandle,
-  useState,
-  useCallback,
-  useMemo
-} from 'react'
+import React from 'react'
 import { always, tap } from '../utils/fp'
 import { RealmNode } from './realm'
 
-import { TypedRealm, System, RealmFactory, ValueForKey, SystemKeys, SystemDict } from './realmFactory'
+import {
+  TypedRealm,
+  System,
+  RealmFactory,
+  ValueForKey,
+  SystemKeys,
+  SystemDict,
+  AnySystemSpec,
+  SystemOfSpecs,
+  realmFactory,
+  LongTuple
+} from './realmFactory'
 
 /** @internal */
 interface Dict<T> {
@@ -150,9 +117,10 @@ export type MethodsFromPropMap<Sys extends System, Map extends SystemPropsMap<Sy
  *
  * @typeParam T the type of the component
  */
-export type RefHandle<T> = T extends ForwardRefExoticComponent<RefAttributes<infer Handle>> ? Handle : never
+export type RefHandle<T> = T extends React.ForwardRefExoticComponent<React.RefAttributes<infer Handle>> ? Handle : never
 
-const GurxContext = createContext(undefined)
+const GurxContext = React.createContext(undefined)
+
 /**
  * Converts a system spec to React component by mapping the system streams to component properties, events and methods. Returns hooks for querying and modifying
  * the system streams from the component's child components.
@@ -174,19 +142,18 @@ export function realmFactoryToComponent<
   Realm extends TypedRealm<Sys> = TypedRealm<Sys>,
   M extends SystemPropsMap<Sys> = SystemPropsMap<Sys>
 >(realmFactory: RF, map: M, Root?: RootComp) {
-  type RootCompProps = RootComp extends ComponentType<infer RP> ? RP : { children?: ReactNode }
+  type RootCompProps = RootComp extends React.ComponentType<infer RP> ? RP : { children?: React.ReactNode }
   type CompProps = PropsFromPropMap<Sys, M> & RootCompProps
   type CompMethods = MethodsFromPropMap<Sys, M>
-  type ReactContextRealm = Realm & { suppressFlushSync?: boolean }
 
-  const requiredPropNames = Object.keys(map.required || {}) as Array<StringKeys<M['required']>>
-  const optionalPropNames = Object.keys(map.optional || {}) as Array<StringKeys<M['optional']>>
-  const methodNames = Object.keys(map.methods || {}) as Array<keyof CompMethods>
-  const eventNames = Object.keys(map.events || {}) as Array<StringKeys<M['events']>>
+  const requiredPropNames = Object.keys(map.required || {}) as StringKeys<M['required']>[]
+  const optionalPropNames = Object.keys(map.optional || {}) as StringKeys<M['optional']>[]
+  const methodNames = Object.keys(map.methods || {}) as (keyof CompMethods)[]
+  const eventNames = Object.keys(map.events || {}) as StringKeys<M['events']>[]
   // this enables HMR in vite. Unless context is persistent, HMR breaks.
-  const Context = GurxContext as unknown as React.Context<ReactContextRealm | undefined>
+  const Context = GurxContext as unknown as React.Context<Realm | undefined>
 
-  function applyPropsToRealm(realm: ReactContextRealm, props: CompProps) {
+  function applyPropsToRealm(realm: Realm, props: CompProps) {
     const toBePublished: SystemDict<Sys> = {}
 
     for (const requiredPropName of requiredPropNames) {
@@ -202,16 +169,13 @@ export function realmFactoryToComponent<
       }
     }
 
-    // this prevents flushSync warnings
-    realm.suppressFlushSync = true
     realm.pubKeys(toBePublished)
-    realm.suppressFlushSync = false
   }
 
   function buildMethods(realm: Realm) {
     return methodNames.reduce((acc, methodName) => {
       const nodeName = map.methods![methodName]
-      // @ts-expect-error why!!?
+      // @ts-expect-error why?
       acc[methodName] = (value: ValueForKey<Sys, typeof nodeName>) => {
         realm.pubKey(nodeName, value)
       }
@@ -219,9 +183,9 @@ export function realmFactoryToComponent<
     }, {} as CompMethods)
   }
 
-  const Component = forwardRef<CompMethods, CompProps>((props, ref) => {
-    const realm = useMemo(() => {
-      return tap<ReactContextRealm>(realmFactory() as ReactContextRealm, (realm) => applyPropsToRealm(realm, props))
+  const Component = React.forwardRef<CompMethods, CompProps>((props, ref) => {
+    const realm = React.useMemo(() => {
+      return tap<Realm>(realmFactory() as Realm, (realm) => applyPropsToRealm(realm, props))
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
@@ -238,16 +202,16 @@ export function realmFactoryToComponent<
       }
     }, [props])
 
-    useImperativeHandle(ref, always(buildMethods(realm)))
+    React.useImperativeHandle(ref, always(buildMethods(realm)))
 
-    const children = (props as unknown as { children?: ReactNode }).children
+    const children = (props as unknown as { children?: React.ReactNode }).children
 
-    return createElement(
+    return React.createElement(
       Context.Provider,
       { value: realm },
       Root
-        ? createElement(
-            Root as unknown as ComponentType,
+        ? React.createElement(
+            Root as unknown as React.ComponentType,
             omit([...requiredPropNames, ...optionalPropNames, ...eventNames], props),
             children
           )
@@ -257,9 +221,19 @@ export function realmFactoryToComponent<
 
   Component.displayName = 'Gurx Component'
 
+  return {
+    Component,
+    ...sysHooks<Sys>()
+  }
+}
+
+export function sysHooks<Sys extends System>() {
+  // this enables HMR in vite. Unless context is persistent, HMR breaks.
+  const Context = GurxContext as unknown as React.Context<TypedRealm<Sys> | undefined>
+
   const usePublisher = <K extends keyof Sys>(key: K) => {
     const realm = React.useContext(Context)!
-    return useCallback(
+    return React.useCallback(
       (value: ValueForKey<Sys, K>) => {
         realm.pubKey(key, value)
       },
@@ -269,11 +243,11 @@ export function realmFactoryToComponent<
   }
 
   /**
-   * Returns the values emitted from the streams.
+   * Returns the values emitted from the nodes.
    */
   const useEmitterValues = <K extends SystemKeys<Sys>>(...keys: K) => {
-    const realm = useContext(Context)!
-    const [values, setValues] = useState(() => realm.getKeyValues(keys))
+    const realm = React.useContext(Context)!
+    const [values, setValues] = React.useState(() => realm.getKeyValues(keys))
 
     useIsomorphicLayoutEffect(
       () =>
@@ -285,14 +259,7 @@ export function realmFactoryToComponent<
             setValues(keys.length === 1 ? [newValues] : newValues)
           }
 
-          if (realm.suppressFlushSync) {
-            // console.log('avoiding flush sync, we are in a useIsomorphicLayoutEffect cycle')
-            setter()
-          } else {
-            // console.log('flushing sync like a boss')
-            setter()
-            // flushSync(setter)
-          }
+          setter()
         }),
       [keys]
     )
@@ -301,19 +268,112 @@ export function realmFactoryToComponent<
   }
 
   const usePubKeys = () => {
-    return useContext(Context)!.pubKeys
+    return React.useContext(Context)!.pubKeys
   }
 
   const useEmitter = <K extends StringKeys<Sys>>(key: K, callback: (value: ValueForKey<Sys, K>) => void) => {
-    const realm = useContext(Context)!
+    const realm = React.useContext(Context)!
     useIsomorphicLayoutEffect(() => realm.subKey(key, callback), [callback])
   }
 
+  const useRealmContext = () => {
+    return React.useContext(Context)!
+  }
+
   return {
-    Component,
+    useRealmContext,
     useEmitter,
     useEmitterValues,
     usePubKeys,
     usePublisher
   }
+}
+
+type SystemAndDependencies<Spec extends AnySystemSpec> = SystemOfSpecs<[Spec]> & SystemOfSpecs<Spec['dependencies']>
+
+const UsedPluginsContext = React.createContext<Set<string>>(new Set())
+
+export interface RealmPluginParams<Spec extends AnySystemSpec, Params extends object> {
+  id: string
+  dependencies?: string[]
+  systemSpec: Spec
+  applyParamsToSystem?: (realm: TypedRealm<SystemAndDependencies<Spec>>, props: Params) => void
+  init?: (realm: TypedRealm<SystemAndDependencies<Spec>>, props: Params) => void
+}
+
+export interface PluginConstructor<Spec extends AnySystemSpec, Params extends object> {
+  (params?: Params): { pluginParams?: Params } & RealmPluginParams<Spec, Params>
+}
+
+export function realmPlugin<Spec extends AnySystemSpec, Params extends object>(params: RealmPluginParams<Spec, Params>) {
+  const plugin: PluginConstructor<Spec, Params> = (pluginParams?: Params) => {
+    return {
+      systemSpec: params.systemSpec,
+      pluginParams,
+      applyParamsToSystem: params.applyParamsToSystem,
+      init: params.init,
+      id: params.id,
+      dependencies: params.dependencies
+    }
+  }
+
+  return [plugin, sysHooks<SystemAndDependencies<Spec>>()] as const
+}
+
+export const RealmPluginInitializer = function <P extends Array<ReturnType<PluginConstructor<AnySystemSpec, any>>>>({
+  plugins,
+  children
+}: {
+  plugins: P
+  children?: React.ReactNode
+}) {
+  const validPlugins = React.useMemo(() => {
+    const availablePlugins = plugins.map((plugin) => plugin.id)
+    const validPlugins: P = plugins.filter((plugin) => {
+      if (plugin.dependencies) {
+        if (plugin.dependencies.some((dep) => !availablePlugins.includes(dep))) {
+          console.warn('MDXEditor plugin', plugin.id, 'has some missing dependencies', plugin.dependencies, ', skipping')
+          return false
+        }
+      }
+      return true
+    }) as P
+
+    return validPlugins
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const realm = React.useMemo(() => {
+    const specs = validPlugins.map((plugin) => plugin.systemSpec) as LongTuple<AnySystemSpec>
+    const realm = realmFactory(...specs)
+    validPlugins.forEach((plugin) => {
+      plugin.init?.(realm, plugin.pluginParams)
+      plugin.applyParamsToSystem?.(realm, plugin.pluginParams)
+    })
+    return realm
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  React.useEffect(() => {
+    validPlugins.forEach((plugin) => {
+      plugin.applyParamsToSystem?.(realm, plugin.pluginParams)
+    })
+  }, [realm, validPlugins])
+
+  const Context = GurxContext as unknown as React.Context<TypedRealm<any>>
+
+  return React.createElement(
+    Context.Provider,
+    { value: realm },
+    React.createElement(UsedPluginsContext.Provider, { value: new Set(plugins.map((plugin) => plugin.id)) }, children)
+  )
+}
+
+export function useHasPlugin(id: string) {
+  const usedPlugins = React.useContext(UsedPluginsContext)
+  return usedPlugins.has(id)
+}
+
+export const RequirePlugin: React.FC<{ id: string; children: React.ReactNode }> = ({ id, children }) => {
+  return useHasPlugin(id) ? React.createElement(React.Fragment, {}, children) : null
 }

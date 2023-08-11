@@ -1,0 +1,23 @@
+@import url('@radix-ui/colors/blue.css');
+@import url('@radix-ui/colors/blueDark.css');
+@import url('@radix-ui/colors/slate.css');
+@import url('@radix-ui/colors/slateDark.css');
+@import url('@radix-ui/colors/grass.css');
+@import url('@radix-ui/colors/cyan.css');
+@import url('@radix-ui/colors/amber.css');
+@import url('@radix-ui/colors/red.css');
+
+.mdxeditor {
+  & .diff {
+    --diff-font-family: var(--font-mono);
+    font-size: var(--text-xs);
+  }
+  & .sp-cm {
+    & pre {
+      white-space: break-spaces;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+      flex-shrink: 1;
+    }
+  }
+}

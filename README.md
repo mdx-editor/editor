@@ -5,13 +5,14 @@
 
 > Because markdown editing can be even more delightful.
 
-MDXEditor is an open-source React component that allows users to author markdown documents naturally. Just like in Google docs or Notion. [See the live demo](https://mdxeditor.dev/editor/demo) that has the default features turned on. It supports the core markdown syntax and certain extensions, including tables, images, code blocks, etc. It also allows users to edit JSX components with a dedicated property editor.
+MDXEditor is an open-source React component that allows users to author markdown documents naturally. Just like in Google docs or Notion. [See the live demo](https://mdxeditor.dev/editor/demo) that has all features turned on. 
+The component supports the core markdown syntax and certain extensions, including tables, images, code blocks, etc. It also allows users to edit JSX components with a built-in JSX editor or a custom one.
 
 ```jsx
-import {MDXEditor} from '@mdxeditor/editor';
+import {MDXEditor, headingsPlugin()} from '@mdxeditor/editor';
 
 export default function App() {
-  return <MDXEditor markdown={'# Hello World'} />;
+  return <MDXEditor markdown={'# Hello World'} plugins={[headingsPlugin()]} />;
 }
 ```
 ## Get Started

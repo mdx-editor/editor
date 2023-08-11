@@ -1,3 +1,3 @@
 export default {
-  stories: 'src/stories/*.stories.tsx',
+  stories: ['src/examples/*.tsx', '!src/examples/_boilerplate.tsx'],
 }

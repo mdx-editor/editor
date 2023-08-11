@@ -168,8 +168,8 @@ export function realm() {
   function sub<T1, T2>(...args: [RN<T1>, RN<T2>, Subscription<[T1, T2]>]): UnsubscribeHandle
   function sub<T1, T2, T3>(...args: [RN<T1>, RN<T2>, RN<T3>, Subscription<[T1, T2, T3]>]): UnsubscribeHandle
   function sub(...args: unknown[]): UnsubscribeHandle {
-    const [subscription] = args.slice(-1) as Array<Subscription>
-    const nodes = args.slice(0, -1) as Array<RN>
+    const [subscription] = args.slice(-1) as Subscription[]
+    const nodes = args.slice(0, -1) as RN[]
     if (nodes.length === 1) {
       return subSingle(nodes[0], subscription)
     } else {
@@ -182,7 +182,7 @@ export function realm() {
   // }
 
   function calculateExecutionMap(keys: NodeKey[]) {
-    const participatingNodeKeys: Array<NodeKey> = []
+    const participatingNodeKeys: NodeKey[] = []
     const visitedNodes = new Set()
     const pendingPulls = new SetMap<NodeKey>()
     const refCount = new RefCount()
@@ -590,7 +590,15 @@ export function realm() {
 
   function pubKeys(values: Record<string, unknown>) {
     const valuesWithInternalKeys = Object.entries(values).reduce(
-      (acc, [key, value]) => tap(acc, (acc) => (acc[labels[key].key] = value)),
+      (acc, [key, value]) =>
+        tap(acc, (acc) => {
+          const label = labels[key]
+          if (!label) {
+            throw new Error(`No label for key ${key}. Do you miss a plugin?`)
+          }
+          acc[label.key] = value
+          return value
+        }),
       {} as Record<string, unknown>
     )
     pubIn(valuesWithInternalKeys)
@@ -605,7 +613,13 @@ export function realm() {
   }
 
   function getKeyValues(keys: string[]) {
-    return keys.map((key) => state.get(labels[key].key))
+    return keys.map((key) => {
+      const label = labels[key]
+      if (!label) {
+        throw new Error(`No label for key ${key}. Do you miss a plugin?`)
+      }
+      return state.get(label.key)
+    })
   }
 
   return {
@@ -648,4 +662,5 @@ export function realm() {
   }
 }
 
-export type Realm = ReturnType<typeof realm>
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface Realm extends ReturnType<typeof realm> {}

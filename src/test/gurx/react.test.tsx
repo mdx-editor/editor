@@ -9,7 +9,7 @@ import { useState } from 'react'
 import { realmFactoryToComponent, system, getRealmFactory } from '../../gurx'
 
 const simpleRealm = () => {
-  const [sys] = system((r) => {
+  const sys = system((r) => {
     const prop = r.node<number>()
     const depot = r.node(10)
     r.connect({ map: (done) => (value) => done(value), sink: depot, sources: [prop] })
@@ -42,7 +42,7 @@ describe('generated component', () => {
   })
 
   it('supports updates of multiple nodes', () => {
-    const [sys] = system((r) => {
+    const sys = system((r) => {
       const prop1 = r.node<number>(1)
       const prop2 = r.node<number>(2)
 

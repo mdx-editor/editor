@@ -1,7 +1,7 @@
 import { $getRoot, $getSelection, ElementNode, LexicalEditor, RangeSelection, TextNode } from 'lexical'
 import { $isAtNodeEnd } from '@lexical/selection'
 import { tap } from './fp'
-import { ExportMarkdownFromLexicalOptions, exportMarkdownFromLexical } from '../export'
+import { ExportMarkdownFromLexicalOptions, exportMarkdownFromLexical } from '../exportMarkdownFromLexical'
 
 export function fromWithinEditorRead<T>(editor: LexicalEditor, fn: () => T): T {
   let result: T | null = null
@@ -53,8 +53,8 @@ export function getSelectionRectangle(editor: LexicalEditor) {
     }
 
     return {
-      top: rect.top + window.scrollY,
-      left: rect.left + window.scrollX,
+      top: rect.top,
+      left: rect.left,
       width: rect.width,
       height: rect.height
     }
