@@ -47,7 +47,7 @@ const useIsomorphicLayoutEffect = typeof document !== 'undefined' ? React.useLay
 /**
  * Describes the mapping between the system streams and the component properties.
  * Each property uses the keys as the names of the properties and the values as the corresponding stream names.
- * @typeParam SS the type of the system.
+ * @typeParam SS - the type of the system.
  */
 export interface SystemPropsMap<Sys extends System, K = keyof Sys, D = { [name: string]: K }> {
   /**
@@ -115,7 +115,7 @@ export type MethodsFromPropMap<Sys extends System, Map extends SystemPropsMap<Sy
  * }
  * ```
  *
- * @typeParam T the type of the component
+ * @typeParam T - the type of the component
  */
 export type RefHandle<T> = T extends React.ForwardRefExoticComponent<React.RefAttributes<infer Handle>> ? Handle : never
 
@@ -124,9 +124,9 @@ const GurxContext = React.createContext(undefined)
 /**
  * Converts a system spec to React component by mapping the system streams to component properties, events and methods. Returns hooks for querying and modifying
  * the system streams from the component's child components.
- * @param realmFactory The return value from a [[system]] call.
- * @param map The streams to props / events / methods mapping Check [[SystemPropsMap]] for more details.
- * @param Root The optional React component to render. By default, the resulting component renders nothing, acting as a logical wrapper for its children.
+ * @param realmFactory - The return value from a [[system]] call.
+ * @param map - The streams to props / events / methods mapping Check [[SystemPropsMap]] for more details.
+ * @param Root - The optional React component to render. By default, the resulting component renders nothing, acting as a logical wrapper for its children.
  * @returns an object containing the following:
  *  - `Component`: the React component.
  *  - `useEmitterValue`: a hook that lets child components use values emitted from the specified output stream.
