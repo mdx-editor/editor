@@ -82,8 +82,15 @@ export interface LexicalExportVisitor<LN extends LexicalNode, UN extends Mdast.C
   join?<T extends Mdast.Content>(prevNode: T, currentNode: T): T
 }
 
+/**
+ * The "any" type for LexicalExportVisitor.
+ * @internal
+ */
 export type LexicalVisitor = LexicalExportVisitor<LexicalNode, Mdast.Content>
 
+/**
+ * @internal
+ */
 export interface ExportLexicalTreeOptions {
   root: LexicalRootNode
   visitors: LexicalVisitor[]
@@ -95,6 +102,9 @@ function isParent(node: unknown): node is Mdast.Parent {
   return (node as { children?: any[] }).children instanceof Array
 }
 
+/**
+ * @internal
+ */
 export function exportLexicalTreeToMdast({
   root,
   visitors,
@@ -290,8 +300,14 @@ function fixWrappingWhitespace(node: Mdast.Parent | Mdast.Content, parentChain: 
   }
 }
 
+/**
+ * @internal
+ */
 export type ToMarkdownExtension = NonNullable<ToMarkdownOptions['extensions']>[number]
 
+/**
+ * @internal
+ */
 export interface ExportMarkdownFromLexicalOptions extends ExportLexicalTreeOptions {
   visitors: LexicalVisitor[]
 
@@ -324,6 +340,9 @@ export interface LexicalConvertOptions {
   toMarkdownOptions?: ToMarkdownOptions
 }
 
+/**
+ * @internal
+ */
 export function exportMarkdownFromLexical({
   root,
   toMarkdownOptions,

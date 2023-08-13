@@ -42,18 +42,28 @@ import { MdastRootVisitor } from './MdastRootVisitor'
 import { MdastTextVisitor } from './MdastTextVisitor'
 import { SharedHistoryPlugin } from './SharedHistoryPlugin'
 
+/** @internal */
 export type EditorSubscription = (activeEditor: LexicalEditor) => () => void
 type Teardowns = (() => void)[]
 
+/** @internal */
 export type BlockType = 'paragraph' | 'quote' | HeadingTagType | ''
 
+/**
+ * The type of the editor being edited currently. Custom editors can override this, so that the toolbar can change contents.
+ */
 export interface EditorInFocus {
   editorType: string
   rootNode: LexicalNode | null
 }
 
+/** @internal */
 export const NESTED_EDITOR_UPDATED_COMMAND = createCommand<void>('NESTED_EDITOR_UPDATED_COMMAND')
 
+/**
+ * Add the the core system when creating systemf for your own plugins.
+ * This gives you access to the component core state and logic, like the visitors, the lexical nodes, and the publishers used to insert nodes in the editor.
+ */
 export const coreSystem = system((r) => {
   function createAppendNodeFor<T>(node: RealmNode<T[]>) {
     const appendNode = r.node<T>()

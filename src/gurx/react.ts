@@ -103,8 +103,10 @@ export type MethodsFromPropMap<Sys extends System, Map extends SystemPropsMap<Sy
 }
 
 /**
- * Used to correctly specify type refs for system components
+ * @internal
+ * Used to correctly specify type refs for system components.
  *
+ * @example
  * ```tsx
  * const s = system(() => { return { a: statefulStream(0) } })
  * const { Component } = systemToComponent(s)
@@ -227,6 +229,7 @@ export function realmFactoryToComponent<
   }
 }
 
+/** @internal */
 export function sysHooks<Sys extends System>() {
   // this enables HMR in vite. Unless context is persistent, HMR breaks.
   const Context = GurxContext as unknown as React.Context<TypedRealm<Sys> | undefined>
@@ -293,18 +296,40 @@ type SystemAndDependencies<Spec extends AnySystemSpec> = SystemOfSpecs<[Spec]> &
 
 const UsedPluginsContext = React.createContext<Set<string>>(new Set())
 
+/**
+ * The parameters of a plugin declaration. THe best way to understand what each one does is to examine the source code of the existing plugins.
+ */
 export interface RealmPluginParams<Spec extends AnySystemSpec, Params extends object> {
+  /**
+   * The id of the plugin. Used to declare conditional features that are activated only if the plugin is present.
+   */
   id: string
+  /**
+   * The ids of the plugins that this plugin depends on. The plugin will not be activated if any of the dependencies is not present.
+   */
   dependencies?: string[]
+  /**
+   * The system spec of the plugin. Construct one using {@link system}.
+   */
   systemSpec: Spec
+  /**
+   * The callback is executed every time the react component is re-rendered.
+   */
   applyParamsToSystem?: (realm: TypedRealm<SystemAndDependencies<Spec>>, props: Params) => void
+  /**
+   * Executed when the component mounts. Use this to register import/export visitors, add lexical nodes to the editor, etc.
+   */
   init?: (realm: TypedRealm<SystemAndDependencies<Spec>>, props: Params) => void
 }
 
+/** @internal */
 export interface PluginConstructor<Spec extends AnySystemSpec, Params extends object> {
   (params?: Params): { pluginParams?: Params } & RealmPluginParams<Spec, Params>
 }
 
+/**
+ * Declares a new MDXEditor plugin.
+ */
 export function realmPlugin<Spec extends AnySystemSpec, Params extends object>(params: RealmPluginParams<Spec, Params>) {
   const plugin: PluginConstructor<Spec, Params> = (pluginParams?: Params) => {
     return {
@@ -320,6 +345,7 @@ export function realmPlugin<Spec extends AnySystemSpec, Params extends object>(p
   return [plugin, sysHooks<SystemAndDependencies<Spec>>()] as const
 }
 
+/** @internal */
 export const RealmPluginInitializer = function <P extends Array<ReturnType<PluginConstructor<AnySystemSpec, any>>>>({
   plugins,
   children
@@ -369,11 +395,13 @@ export const RealmPluginInitializer = function <P extends Array<ReturnType<Plugi
   )
 }
 
+/** @internal */
 export function useHasPlugin(id: string) {
   const usedPlugins = React.useContext(UsedPluginsContext)
   return usedPlugins.has(id)
 }
 
+/** @internal */
 export const RequirePlugin: React.FC<{ id: string; children: React.ReactNode }> = ({ id, children }) => {
   return useHasPlugin(id) ? React.createElement(React.Fragment, {}, children) : null
 }

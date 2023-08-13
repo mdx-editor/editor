@@ -2,10 +2,11 @@ import { tap } from '../utils/fp'
 import { uuidv4 } from '../utils/uuid4'
 import { LongTuple } from './realmFactory'
 
+/** @internal */
 export type NodeKey = string
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export interface RealmNode<T = unknown> {
+/** @internal */
+export interface RealmNode<_T = unknown> {
   key: NodeKey
   toString(): string
 }
@@ -13,12 +14,15 @@ export interface RealmNode<T = unknown> {
 /** @internal */
 type RN<T = unknown> = RealmNode<T>
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+/** @internal **/
 export type Subscription<T = any> = (value: T) => unknown
+
+/** @internal */
 export type UnsubscribeHandle = () => void
 
 type ProjectionFunc<T extends unknown[] = unknown[]> = (done: (...values: unknown[]) => void) => (...args: T) => void
 
+/** @internal */
 export interface RealmProjection<T extends unknown[] = unknown[]> {
   sources: Set<NodeKey>
   pulls: Set<NodeKey>
@@ -26,6 +30,7 @@ export interface RealmProjection<T extends unknown[] = unknown[]> {
   map: ProjectionFunc<T>
 }
 
+/** @internal */
 export interface RealmProjectionSpec<T extends unknown[] = unknown[]> {
   sources: RealmNode[]
   pulls?: RealmNode[]
@@ -35,7 +40,7 @@ export interface RealmProjectionSpec<T extends unknown[] = unknown[]> {
 
 /**
  * A function which determines if two values are equal.
- * Implement custom comparators when [[distinctUntilChanged]] needs to work on non-primitive objects.
+ * Implement custom comparators when the distinctUntilChanged operator needs to work on non-primitive objects.
  * @returns true if values should be considered equal.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -47,8 +52,12 @@ type NodesFromValuesRec<T extends unknown[], Acc extends unknown[]> = T extends 
   ? NodesFromValuesRec<Tail, [...Acc, Head extends unknown ? RealmNode<Head> : never]>
   : Acc
 
+/** @internal */
 export type NodesFromValues<T extends unknown[]> = T extends unknown[] ? NodesFromValuesRec<T, []> : never
 
+/**
+ * A comparator function to determine if two values are equal. Used by distinctUntilChanged  operator.
+ */
 export function defaultComparator<T>(current: T, next: T) {
   return current === next
 }
@@ -81,6 +90,9 @@ class SetMap<T> {
   }
 }
 
+/**
+ * @internal
+ */
 export class RefCount {
   map: Map<NodeKey, number>
 
@@ -109,9 +121,11 @@ export class RefCount {
   }
 }
 
+/** @internal */
 export type RealmGraph = SetMap<RealmProjection>
 const NO_VALUE = Symbol('NO_VALUE')
 
+/** @internal */
 export function realm() {
   const subscriptions = new SetMap<Subscription>()
   const singletonSubscriptions = new Map<NodeKey, Subscription>()
@@ -662,5 +676,6 @@ export function realm() {
   }
 }
 
+/** @internal */
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface Realm extends ReturnType<typeof realm> {}
