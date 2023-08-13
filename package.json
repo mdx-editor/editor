@@ -181,10 +181,25 @@
     },
     "./package.json": "./package.json",
     "./style.css": "./dist/style.css",
+    "./gurx": {
+      "types": "./dist/gurx/index.d.ts",
+      "import": "./dist/gurx/index.js",
+      "default": "./dist/gurx/index.js"
+    },
     "./MDXEditor": {
       "types": "./dist/MDXEditor.d.ts",
       "import": "./dist/MDXEditor.js",
       "default": "./dist/MDXEditor.js"
+    },
+    "./importMarkdownToLexical": {
+      "types": "./dist/importMarkdownToLexical.d.ts",
+      "import": "./dist/importMarkdownToLexical.js",
+      "default": "./dist/importMarkdownToLexical.js"
+    },
+    "./exportMarkdownFromLexical": {
+      "types": "./dist/exportMarkdownFromLexical.d.ts",
+      "import": "./dist/exportMarkdownFromLexical.js",
+      "default": "./dist/exportMarkdownFromLexical.js"
     },
     "./directive-editors/AdmonitionDirectiveDescriptor": {
       "types": "./dist/directive-editors/AdmonitionDirectiveDescriptor.d.ts",

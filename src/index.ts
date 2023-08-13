@@ -4,8 +4,15 @@
  */
 import './styles/globals.css'
 
-// editor copmonent
+// editor component
 export * from './MDXEditor'
+
+// import/export
+export * from './importMarkdownToLexical'
+export * from './exportMarkdownFromLexical'
+
+// core so that you can build your own plugins
+export * from './plugins/core'
 
 // basics
 export * from './plugins/headings'
@@ -68,3 +75,5 @@ export * from './plugins/toolbar/primitives/select'
 // Build your own editor
 export * from './plugins/core/NestedLexicalEditor'
 export * from './plugins/core/PropertyPopover'
+
+export * from './gurx'

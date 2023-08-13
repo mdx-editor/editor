@@ -4,17 +4,24 @@ import path from 'node:path'
 const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf-8'))
 
 const newExports = {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "default": "./dist/index.js"
-    },
-    "./package.json": "./package.json",
-    "./style.css": "./dist/style.css",
+  ".": {
+    "types": "./dist/index.d.ts",
+    "import": "./dist/index.js",
+    "default": "./dist/index.js"
+  },
+  "./package.json": "./package.json",
+  "./style.css": "./dist/style.css",
+  "./gurx": {
+    types: `./dist/gurx/index.d.ts`,
+    import: `./dist/gurx/index.js`,
+    default: `./dist/gurx/index.js`
+  }
 }
 
 const additionalExports = [
   'MDXEditor',
+  'importMarkdownToLexical',
+  'exportMarkdownFromLexical',
   'directive-editors/AdmonitionDirectiveDescriptor',
   'directive-editors/GenericDirectiveEditor',
   'jsx-editors/GenericJsxEditor',

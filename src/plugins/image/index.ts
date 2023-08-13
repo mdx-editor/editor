@@ -24,8 +24,9 @@ import { coreSystem } from '../core'
 import { $createImageNode, $isImageNode, CreateImageNodeOptions, ImageNode } from './ImageNode'
 import { LexicalImageVisitor } from './LexicalImageVisitor'
 import { MdastHtmlImageVisitor, MdastImageVisitor, MdastJsxImageVisitor } from './MdastImageVisitor'
-
 import { CAN_USE_DOM } from '../../utils/detectMac'
+
+export * from './ImageNode'
 
 /** @internal */
 export const imageSystem = system(

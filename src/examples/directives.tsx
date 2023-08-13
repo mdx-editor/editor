@@ -15,12 +15,26 @@ import {
   listsPlugin,
   markdownShortcutPlugin,
   quotePlugin,
-  toolbarPlugin
+  toolbarPlugin,
+  realmPlugin,
+  system,
+  coreSystem,
+  CreateImageNodeOptions,
+  $createImageNode,
+  imagePlugin,
+  MdastImportVisitor,
+  ImageNode,
+  LexicalExportVisitor,
+  $isImageNode
 } from '../'
-import { YoutubeDirectiveDescriptor } from './_boilerplate'
+
+import * as Mdast from 'mdast'
 
 import admonitionMarkdown from './assets/admonition.md?raw'
-import { ContainerDirective, LeafDirective } from 'mdast-util-directive'
+import { ContainerDirective, Directive, LeafDirective, directiveFromMarkdown, directiveToMarkdown } from 'mdast-util-directive'
+import { directive } from 'micromark-extension-directive'
+import { $createParagraphNode, $createTextNode, ElementNode, RootNode } from 'lexical'
+import { TextDirective } from 'mdast-util-directive/lib'
 
 const youtubeMarkdown = `
 This should be an youtube video:
@@ -70,7 +84,7 @@ export const Youtube: React.FC = () => {
     <MDXEditor
       markdown={youtubeMarkdown}
       plugins={[
-        directivesPlugin({ directiveDescriptors: [YoutubeDirectiveDescriptor] }),
+        directivesPlugin({ directiveDescriptors: [] }),
         toolbarPlugin({
           toolbarContents: () => {
             return <YouTubeButton />
@@ -199,4 +213,59 @@ Copyright (c) 2023 Author. All Rights Reserved.
       plugins={[directivesPlugin({ directiveDescriptors: [CalloutDirectiveDescriptor] })]}
     />
   )
+}
+
+const MdastImageDirectiveVisitor: MdastImportVisitor<TextDirective> = {
+  testNode: (mdastNode) => {
+    return mdastNode.type === 'textDirective' && mdastNode.name === 'img'
+  },
+
+  visitNode({ mdastNode, lexicalParent }) {
+    const payload: CreateImageNodeOptions = {
+      src: mdastNode.attributes?.src ?? '',
+      altText: (mdastNode.children[0] as Mdast.Text).value
+    }
+    ;(lexicalParent as ElementNode).append($createImageNode(payload))
+  }
+}
+
+const LexicalImageNodeVisitor: LexicalExportVisitor<ImageNode, Directive> = {
+  testLexicalNode: $isImageNode,
+  visitLexicalNode({ lexicalNode, mdastParent, actions }) {
+    const mdastNode: TextDirective = {
+      type: 'textDirective',
+      name: 'img',
+      attributes: {
+        src: lexicalNode.getSrc()
+      },
+      children: [{ type: 'text', value: lexicalNode.getAltText() }]
+    }
+    actions.appendToParent(mdastParent, mdastNode)
+  }
+}
+
+const [imageAsDirectivePlugin] = realmPlugin({
+  id: 'imageAsDirective',
+  systemSpec: system(() => ({}), [coreSystem]),
+  init: (realm) => {
+    realm.pubKey('addMdastExtension', directiveFromMarkdown)
+    realm.pubKey('addSyntaxExtension', directive())
+    realm.pubKey('addImportVisitor', MdastImageDirectiveVisitor)
+    realm.pubKey('addExportVisitor', LexicalImageNodeVisitor)
+    realm.pubKey('addToMarkdownExtension', directiveToMarkdown)
+  }
+})
+
+const imageDirectiveMarkdown = `
+Content
+
+inline images =  :img[alt text]{src="https://via.placeholder.com/150"} :img[alt text]{src="https://via.placeholder.com/150"} :img[alt text]{src="https://via.placeholder.com/150"}
+
+:img[alt text]{src="https://via.placeholder.com/150"}
+
+more
+`
+
+export const ImageAsDirective: React.FC = () => {
+  return <MDXEditor onChange={console.log} markdown={imageDirectiveMarkdown} plugins={[imageAsDirectivePlugin(), imagePlugin()]} />
 }
