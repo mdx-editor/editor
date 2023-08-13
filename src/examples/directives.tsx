@@ -31,10 +31,16 @@ import {
 import * as Mdast from 'mdast'
 
 import admonitionMarkdown from './assets/admonition.md?raw'
-import { ContainerDirective, Directive, LeafDirective, directiveFromMarkdown, directiveToMarkdown } from 'mdast-util-directive'
+import {
+  TextDirective,
+  ContainerDirective,
+  Directive,
+  LeafDirective,
+  directiveFromMarkdown,
+  directiveToMarkdown
+} from 'mdast-util-directive'
 import { directive } from 'micromark-extension-directive'
 import { $createParagraphNode, $createTextNode, ElementNode, RootNode } from 'lexical'
-import { TextDirective } from 'mdast-util-directive/lib'
 
 const youtubeMarkdown = `
 This should be an youtube video:
