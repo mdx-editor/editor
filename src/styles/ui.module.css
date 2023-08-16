@@ -274,6 +274,9 @@
     background-color: var(--baseBgHover);
   }
 }
+.selectTrigger[data-placeholder] > span:first-child {
+  color: var(--baseBorderHover);
+}
 
 /** used in the sandpack */
 .toolbarButtonSelectTrigger {

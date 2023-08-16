@@ -90,7 +90,7 @@ export interface SelectProps<T extends string> {
  */
 export const Select = <T extends string>(props: SelectProps<T>) => {
   return (
-    <RadixSelect.Root value={props.value} onValueChange={props.onChange}>
+    <RadixSelect.Root value={props.value || undefined} onValueChange={props.onChange}>
       <SelectTrigger title={props.triggerTitle} placeholder={props.placeholder} />
       <SelectContent>
         {props.items.map((item, index) => {
