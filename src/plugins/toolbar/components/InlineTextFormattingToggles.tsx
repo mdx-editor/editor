@@ -13,7 +13,7 @@ import HighlightIcon from '../../../icons/format_highlight.svg'
 /**
  * A toolbar component that lets the user toggle basic text formatting options - bold, italics, underline, strikethrough, subscript, superscript and highlight.
  */
-export const BoldItalicUnderlineToggles: React.FC = () => {
+export const InlineTextFormattingToggles: React.FC = () => {
   const [currentFormat] = corePluginHooks.useEmitterValues('currentFormat')
   const applyFormat = corePluginHooks.usePublisher('applyFormat')
 

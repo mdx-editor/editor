@@ -22,7 +22,7 @@ import {
   toolbarPlugin,
   Separator,
   BlockTypeSelect,
-  BoldItalicUnderlineToggles,
+  InlineTextFormattingToggles,
   CreateLink,
   DiffSourceToggleWrapper,
   InsertImage,
@@ -50,7 +50,7 @@ export const ConditionalToolbar = () => {
             <>
               <DiffSourceToggleWrapper>
                 <UndoRedo />
-                <BoldItalicUnderlineToggles />
+                <InlineTextFormattingToggles />
                 <ListsToggle />
                 <Separator />
                 <BlockTypeSelect />
