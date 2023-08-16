@@ -1,6 +1,15 @@
 import { $isTextNode, TextNode } from 'lexical'
 import * as Mdast from 'mdast'
-import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from '../../FormatConstants'
+import {
+  IS_BOLD,
+  IS_CODE,
+  IS_HIGHLIGHT,
+  IS_ITALIC,
+  IS_STRIKETHROUGH,
+  IS_SUBSCRIPT,
+  IS_SUPERSCRIPT,
+  IS_UNDERLINE
+} from '../../FormatConstants'
 import { LexicalExportVisitor } from '../../exportMarkdownFromLexical'
 
 export function isMdastText(mdastNode: Mdast.Content): mdastNode is Mdast.Text {
@@ -55,14 +64,6 @@ export const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text> = {
         children: []
       }) as Mdast.Parent
     }
-    if (prevFormat & format & IS_UNDERLINE) {
-      localParentNode = actions.appendToParent(localParentNode, {
-        type: 'mdxJsxTextElement',
-        name: 'u',
-        children: [],
-        attributes: []
-      }) as Mdast.Parent
-    }
 
     if (format & IS_ITALIC && !(prevFormat & IS_ITALIC)) {
       localParentNode = actions.appendToParent(localParentNode, {
@@ -78,13 +79,24 @@ export const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text> = {
       }) as Mdast.Parent
     }
 
-    if (format & IS_UNDERLINE && !(prevFormat & IS_UNDERLINE)) {
-      localParentNode = actions.appendToParent(localParentNode, {
-        type: 'mdxJsxTextElement',
-        name: 'u',
-        children: [],
-        attributes: []
-      }) as Mdast.Parent
+    const INLINE_TEXT_FORMATTING_JSX_OPTIONS = [
+      { format: IS_UNDERLINE, jsxName: 'u' },
+      { format: IS_STRIKETHROUGH, jsxName: 's' },
+      { format: IS_SUBSCRIPT, jsxName: 'sub' },
+      { format: IS_SUPERSCRIPT, jsxName: 'sup' },
+      { format: IS_HIGHLIGHT, jsxName: 'mark' }
+    ]
+    for (const OPTION of INLINE_TEXT_FORMATTING_JSX_OPTIONS) {
+      // TODO - Simplify `isFormatMatch` logic statement:
+      const isFormatMatch = prevFormat & format & OPTION.format || (!(prevFormat & OPTION.format) && format & OPTION.format)
+      if (isFormatMatch) {
+        localParentNode = actions.appendToParent(localParentNode, {
+          type: 'mdxJsxTextElement',
+          name: OPTION.jsxName,
+          children: [],
+          attributes: []
+        }) as Mdast.Parent
+      }
     }
 
     actions.appendToParent(localParentNode, {

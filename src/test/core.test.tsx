@@ -49,4 +49,20 @@ describe('markdown import export', () => {
   it('works with code', () => {
     testIdenticalMarkdown('`Hello` World')
   })
+
+  it('works with strikethrough', () => {
+    testIdenticalMarkdown(`<s>Hello</s> World`)
+  })
+
+  it('works with subscript', () => {
+    testIdenticalMarkdown(`<sub>Hello</sub> World`)
+  })
+
+  it('works with superscript', () => {
+    testIdenticalMarkdown(`<sup>Hello</sup> World`)
+  })
+
+  it('works with highlight', () => {
+    testIdenticalMarkdown(`<mark>Hello</mark> World`)
+  })
 })

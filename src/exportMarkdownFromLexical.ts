@@ -236,22 +236,25 @@ export function exportLexicalTreeToMdast({
   fixWrappingWhitespace(typedRoot, [])
 
   if (!jsxIsAvailable) {
-    convertUnderlineJsxToHtml(typedRoot)
+    convertInlineTextFormattingJsxToHtml(typedRoot)
   }
 
   return typedRoot
 }
 
-function convertUnderlineJsxToHtml(node: Mdast.Parent | Mdast.Content) {
+const INLINE_TEXT_FORMATTING_JSX_NAME = ['u', 's', 'sub', 'sup', 'mark']
+function convertInlineTextFormattingJsxToHtml(node: Mdast.Parent | Mdast.Content) {
   if (Object.hasOwn(node, 'children')) {
     const nodeAsParent = node as Mdast.Parent
     const newChildren = [] as Mdast.Content[]
     nodeAsParent.children.forEach((child) => {
-      if (child.type === 'mdxJsxTextElement' && child.name === 'u') {
-        newChildren.push(...[{ type: 'html', value: '<u>' } as const, ...child.children, { type: 'html', value: '</u>' } as const])
+      if (child.type === 'mdxJsxTextElement' && INLINE_TEXT_FORMATTING_JSX_NAME.includes(child.name || '')) {
+        newChildren.push(
+          ...[{ type: 'html', value: `<${child.name}>` } as const, ...child.children, { type: 'html', value: `</${child.name}>` } as const]
+        )
       } else {
         newChildren.push(child)
-        convertUnderlineJsxToHtml(child)
+        convertInlineTextFormattingJsxToHtml(child)
       }
     })
     nodeAsParent.children = newChildren

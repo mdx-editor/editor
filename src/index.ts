@@ -48,7 +48,7 @@ export * from './plugins/markdown-shortcut'
 
 // Toolbar components
 export * from './plugins/toolbar/components/BlockTypeSelect'
-export * from './plugins/toolbar/components/BoldItalicUnderlineToggles'
+export * from './plugins/toolbar/components/InlineTextFormattingToggles'
 export * from './plugins/toolbar/components/ChangeAdmonitionType'
 export * from './plugins/toolbar/components/ChangeCodeMirrorLanguage'
 export * from './plugins/toolbar/components/CodeToggle'
