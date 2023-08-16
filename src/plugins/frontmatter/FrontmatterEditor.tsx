@@ -120,7 +120,6 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
 const TableInput = React.forwardRef<
   HTMLInputElement,
   React.HTMLAttributes<HTMLInputElement> & { autofocusIfEmpty?: boolean; autoFocus?: boolean; value?: string }
->(({ className, autofocusIfEmpty, ...props }, ref) => {
-  props.autoFocus = Boolean(!props.value && autofocusIfEmpty)
+>(({ className, autofocusIfEmpty: _, ...props }, ref) => {
   return <input className={classNames(styles.propertyEditorInput, className)} {...props} ref={ref} />
 })
