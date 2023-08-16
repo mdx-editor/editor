@@ -39,7 +39,7 @@ export function Bare() {
     <>
       <button onClick={() => ref.current?.setMarkdown('new markdown')}>Set new markdown</button>
       <button onClick={() => console.log(ref.current?.getMarkdown())}>Get markdown</button>
-      <MDXEditor ref={ref} markdown={helloMarkdown} onChange={console.log} />
+      <MDXEditor autoFocus={true} ref={ref} markdown={helloMarkdown} onChange={console.log} />
     </>
   )
 }

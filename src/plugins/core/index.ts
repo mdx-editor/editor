@@ -41,6 +41,7 @@ import { MdastParagraphVisitor } from './MdastParagraphVisitor'
 import { MdastRootVisitor } from './MdastRootVisitor'
 import { MdastTextVisitor } from './MdastTextVisitor'
 import { SharedHistoryPlugin } from './SharedHistoryPlugin'
+import { noop } from '../../utils/fp'
 
 /** @internal */
 export type EditorSubscription = (activeEditor: LexicalEditor) => () => void
@@ -87,6 +88,7 @@ export const coreSystem = system((r) => {
   const rootEditor = r.node<LexicalEditor | null>(null)
   const activeEditor = r.node<LexicalEditor | null>(null, true)
   const contentEditableClassName = r.node<string>('')
+  const autoFocus = r.node<boolean>(false)
   const inFocus = r.node(false, true)
   const currentFormat = r.node(0, true)
 
@@ -238,6 +240,10 @@ export const coreSystem = system((r) => {
       markdown: r.getValue(initialMarkdown),
       syntaxExtensions: r.getValue(syntaxExtensions)
     })
+
+    if (r.getValue(autoFocus)) {
+      setTimeout(() => theRootEditor.focus(noop, { defaultSelection: 'rootStart' }))
+    }
   })
 
   r.pub(createActiveEditorSubscription, (editor) => {
@@ -403,6 +409,7 @@ export const coreSystem = system((r) => {
     // DOM
     editorRootElementRef,
     contentEditableClassName,
+    autoFocus,
 
     // child controls
     composerChildren,
@@ -431,6 +438,7 @@ export const coreSystem = system((r) => {
 interface CorePluginParams {
   initialMarkdown: string
   contentEditableClassName: string
+  autoFocus: boolean
   onChange: (markdown: string) => void
   toMarkdownOptions: NonNullable<LexicalConvertOptions['toMarkdownOptions']>
 }
@@ -447,6 +455,7 @@ export const [
   applyParamsToSystem(realm, params: CorePluginParams) {
     realm.pubKey('contentEditableClassName', params.contentEditableClassName)
     realm.pubKey('toMarkdownOptions', params.toMarkdownOptions)
+    realm.pubKey('autoFocus', params.autoFocus)
     realm.singletonSubKey('markdown', params.onChange)
   },
 

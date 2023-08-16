@@ -35,7 +35,8 @@ const RichTextEditor: React.FC = () => {
     'contentEditableClassName',
     'composerChildren',
     'topAreaChildren',
-    'editorWrappers'
+    'editorWrappers',
+    'autoFocus'
   )
   return (
     <>
@@ -89,6 +90,10 @@ export interface MDXEditorProps {
    * For a content-specific styling, Use `contentEditableClassName` property.
    */
   className?: string
+  /**
+   * pass if you would like to have the editor automatically focused when mounted.
+   */
+  autoFocus?: boolean
 }
 
 const DEFAULT_MARKDOWN_OPTIONS: ToMarkdownOptions = {
@@ -176,7 +181,8 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>((pro
           contentEditableClassName: props.contentEditableClassName ?? '',
           initialMarkdown: props.markdown,
           onChange: props.onChange ?? noop,
-          toMarkdownOptions: props.toMarkdownOptions ?? DEFAULT_MARKDOWN_OPTIONS
+          toMarkdownOptions: props.toMarkdownOptions ?? DEFAULT_MARKDOWN_OPTIONS,
+          autoFocus: props.autoFocus ?? false
         }),
         ...(props.plugins || [])
       ]}
