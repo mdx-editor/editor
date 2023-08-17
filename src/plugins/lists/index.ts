@@ -15,8 +15,8 @@ import {
 import { $isRootOrShadowRoot, LexicalCommand, RangeSelection } from 'lexical'
 import { $getListDepth, $isListItemNode, $isListNode } from '@lexical/list'
 import { $getSelection, $isElementNode, $isRangeSelection, COMMAND_PRIORITY_CRITICAL, ElementNode, INDENT_CONTENT_COMMAND } from 'lexical'
-import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin'
-import { ListPlugin } from '@lexical/react/LexicalListPlugin'
+import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin.js'
+import { ListPlugin } from '@lexical/react/LexicalListPlugin.js'
 import { $findMatchingParent, $getNearestNodeOfType } from '@lexical/utils'
 
 const ListTypeCommandMap = new Map<ListType | '', LexicalCommand<void>>([

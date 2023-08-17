@@ -1,4 +1,4 @@
-import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
+import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin.js'
 import React from 'react'
 import { corePluginHooks } from '.'
 

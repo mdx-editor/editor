@@ -1,5 +1,5 @@
 import { CODE, ElementTransformer, Transformer, TRANSFORMERS } from '@lexical/markdown'
-import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin'
+import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin.js'
 import React from 'react'
 import { realmPlugin, system } from '../../gurx'
 import { $createCodeBlockNode, CodeBlockNode } from '../codeblock/CodeBlockNode'

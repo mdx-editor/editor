@@ -4,7 +4,7 @@ import { coreSystem } from '../core'
 import { MdastLinkVisitor } from './MdastLinkVisitor'
 import { LexicalLinkVisitor } from './LexicalLinkVisitor'
 import { AutoLinkNode, LinkNode } from '@lexical/link'
-import { LinkPlugin as LexicalLinkPlugin } from '@lexical/react/LexicalLinkPlugin'
+import { LinkPlugin as LexicalLinkPlugin } from '@lexical/react/LexicalLinkPlugin.js'
 import { LexicalAutoLinkPlugin } from './AutoLinkPlugin'
 
 const linkSystem = system(

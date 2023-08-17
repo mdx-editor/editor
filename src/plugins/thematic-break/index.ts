@@ -2,8 +2,8 @@ import { realmPlugin, system } from '../../gurx'
 import { coreSystem } from '../core'
 import { MdastThematicBreakVisitor } from './MdastThematicBreakVisitor'
 import { LexicalThematicBreakVisitor } from './LexicalThematicBreakVisitor'
-import { HorizontalRuleNode, INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontalRuleNode'
-import { HorizontalRulePlugin } from '@lexical/react/LexicalHorizontalRulePlugin'
+import { HorizontalRuleNode, INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontalRuleNode.js'
+import { HorizontalRulePlugin } from '@lexical/react/LexicalHorizontalRulePlugin.js'
 
 /** @internal */
 export const thematicBreakSystem = system(

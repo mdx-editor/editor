@@ -1,5 +1,5 @@
-import { InitialEditorStateType } from '@lexical/react/LexicalComposer'
-import { createEmptyHistoryState } from '@lexical/react/LexicalHistoryPlugin'
+import { InitialEditorStateType } from '@lexical/react/LexicalComposer.js'
+import { createEmptyHistoryState } from '@lexical/react/LexicalHistoryPlugin.js'
 import { $isHeadingNode, HeadingTagType } from '@lexical/rich-text'
 import { $setBlocksType } from '@lexical/selection'
 import { $findMatchingParent, $insertNodeToNearestRoot, $wrapNodeInElement } from '@lexical/utils'
