@@ -33,6 +33,7 @@ import tableMarkdown from './assets/table.md?raw'
 import { virtuosoSampleSandpackConfig } from './_boilerplate'
 
 const helloMarkdown = `Hello <u>world am **here**</u> more <u>under</u> line`
+
 export function Bare() {
   const ref = React.useRef<MDXEditorMethods>(null)
   return (
@@ -40,6 +41,14 @@ export function Bare() {
       <button onClick={() => ref.current?.setMarkdown('new markdown')}>Set new markdown</button>
       <button onClick={() => console.log(ref.current?.getMarkdown())}>Get markdown</button>
       <MDXEditor autoFocus={true} ref={ref} markdown={helloMarkdown} onChange={console.log} />
+    </>
+  )
+}
+
+export function Placeholder() {
+  return (
+    <>
+      <MDXEditor placeholder="Type some content here" markdown="" onChange={console.log} />
     </>
   )
 }

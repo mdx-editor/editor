@@ -31,12 +31,12 @@ const LexicalProvider: React.FC<{ children: JSX.Element | string | (JSX.Element 
 }
 
 const RichTextEditor: React.FC = () => {
-  const [contentEditableClassName, composerChildren, topAreaChildren, editorWrappers] = corePluginHooks.useEmitterValues(
+  const [contentEditableClassName, composerChildren, topAreaChildren, editorWrappers, placeholder] = corePluginHooks.useEmitterValues(
     'contentEditableClassName',
     'composerChildren',
     'topAreaChildren',
     'editorWrappers',
-    'autoFocus'
+    'placeholder'
   )
   return (
     <>
@@ -44,11 +44,17 @@ const RichTextEditor: React.FC = () => {
         <Child key={index} />
       ))}
       <RenderRecurisveWrappers wrappers={editorWrappers}>
-        <RichTextPlugin
-          contentEditable={<ContentEditable className={classNames(styles.contentEditable, contentEditableClassName)} />}
-          placeholder={<div></div>}
-          ErrorBoundary={LexicalErrorBoundary}
-        ></RichTextPlugin>
+        <div className={classNames(styles.rootContentEditableWrapper)}>
+          <RichTextPlugin
+            contentEditable={<ContentEditable className={classNames(styles.contentEditable, contentEditableClassName)} />}
+            placeholder={
+              <div className={classNames(styles.contentEditable, styles.placeholder)}>
+                <p>{placeholder}</p>
+              </div>
+            }
+            ErrorBoundary={LexicalErrorBoundary}
+          ></RichTextPlugin>
+        </div>
       </RenderRecurisveWrappers>
       {composerChildren.map((Child, index) => (
         <Child key={index} />
@@ -94,6 +100,10 @@ export interface MDXEditorProps {
    * pass if you would like to have the editor automatically focused when mounted.
    */
   autoFocus?: boolean
+  /**
+   * The placeholder contents, displayed when the editor is empty.
+   */
+  placeholder?: React.ReactNode
 }
 
 const DEFAULT_MARKDOWN_OPTIONS: ToMarkdownOptions = {
@@ -182,7 +192,8 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>((pro
           initialMarkdown: props.markdown,
           onChange: props.onChange ?? noop,
           toMarkdownOptions: props.toMarkdownOptions ?? DEFAULT_MARKDOWN_OPTIONS,
-          autoFocus: props.autoFocus ?? false
+          autoFocus: props.autoFocus ?? false,
+          placeholder: props.placeholder ?? ''
         }),
         ...(props.plugins || [])
       ]}

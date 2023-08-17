@@ -88,6 +88,7 @@ export const coreSystem = system((r) => {
   const rootEditor = r.node<LexicalEditor | null>(null)
   const activeEditor = r.node<LexicalEditor | null>(null, true)
   const contentEditableClassName = r.node<string>('')
+  const placeholder = r.node<React.ReactNode>('')
   const autoFocus = r.node<boolean>(false)
   const inFocus = r.node(false, true)
   const currentFormat = r.node(0, true)
@@ -409,6 +410,7 @@ export const coreSystem = system((r) => {
     // DOM
     editorRootElementRef,
     contentEditableClassName,
+    placeholder,
     autoFocus,
 
     // child controls
@@ -438,6 +440,7 @@ export const coreSystem = system((r) => {
 interface CorePluginParams {
   initialMarkdown: string
   contentEditableClassName: string
+  placeholder?: React.ReactNode
   autoFocus: boolean
   onChange: (markdown: string) => void
   toMarkdownOptions: NonNullable<LexicalConvertOptions['toMarkdownOptions']>
@@ -456,6 +459,7 @@ export const [
     realm.pubKey('contentEditableClassName', params.contentEditableClassName)
     realm.pubKey('toMarkdownOptions', params.toMarkdownOptions)
     realm.pubKey('autoFocus', params.autoFocus)
+    realm.pubKey('placeholder', params.placeholder)
     realm.singletonSubKey('markdown', params.onChange)
   },
 

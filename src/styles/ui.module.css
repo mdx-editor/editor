@@ -942,3 +942,20 @@
   left: -6px;
   cursor: nw-resize;
 }
+
+.placeholder {
+    color: var(--baseSolid);
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    padding: var(--spacing-3);
+    text-overflow: ellipsis;
+    user-select: none;
+    white-space: nowrap;
+    display: inline-block;
+    pointer-events: none;
+}
+  
+.rootContentEditableWrapper {
+  position: relative;
+}
