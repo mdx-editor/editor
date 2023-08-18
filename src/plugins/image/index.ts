@@ -28,15 +28,15 @@ import { CAN_USE_DOM } from '../../utils/detectMac'
 
 export * from './ImageNode'
 
+export type ImageUploadHandler = ((image: File) => Promise<string>) | null
+
 /** @internal */
 export const imageSystem = system(
   (r, [{ rootEditor }]) => {
     const insertImage = r.node<string>()
     const imageAutocompleteSuggestions = r.node<string[]>([])
-
-    const imageUploadHandler = r.node<(image: File) => Promise<string>>((_) => {
-      throw new Error('Image upload handling is not implemented')
-    })
+    const disableImageResize = r.node<boolean>(false)
+    const imageUploadHandler = r.node<ImageUploadHandler>(null)
 
     r.sub(r.pipe(insertImage, r.o.withLatestFrom(rootEditor)), ([src, theEditor]) => {
       theEditor?.update(() => {
@@ -62,6 +62,9 @@ export const imageSystem = system(
         },
         COMMAND_PRIORITY_EDITOR
       )
+
+      const theUploadHandler = r.getValue(imageUploadHandler)
+
       editor?.registerCommand<DragEvent>(
         DRAGSTART_COMMAND,
         (event) => {
@@ -85,6 +88,10 @@ export const imageSystem = system(
         COMMAND_PRIORITY_HIGH
       )
 
+      if (theUploadHandler === null) {
+        return
+      }
+
       editor?.registerCommand(
         PASTE_COMMAND,
         (event: ClipboardEvent) => {
@@ -95,7 +102,7 @@ export const imageSystem = system(
             return false
           } // If no image was present in the collection, bail.
 
-          const imageUploadHandlerValue = r.getValue(imageUploadHandler)
+          const imageUploadHandlerValue = r.getValue(imageUploadHandler)!
 
           Promise.all(cbPayload.map((file) => imageUploadHandlerValue(file.getAsFile()!)))
             .then((urls) => {
@@ -115,6 +122,7 @@ export const imageSystem = system(
     return {
       imageUploadHandler,
       imageAutocompleteSuggestions,
+      disableImageResize,
       insertImage
     }
   },
@@ -122,14 +130,9 @@ export const imageSystem = system(
 )
 
 interface ImagePluginParams {
-  imageUploadHandler: (image: File) => Promise<string>
+  imageUploadHandler?: ImageUploadHandler
   imageAutocompleteSuggestions?: string[]
-}
-
-const defaultParams: ImagePluginParams = {
-  imageUploadHandler: () => {
-    throw new Error('Image upload handling is not implemented')
-  }
+  disableImageResize?: boolean
 }
 
 export const [
@@ -141,9 +144,10 @@ export const [
   id: 'image',
   systemSpec: imageSystem,
 
-  applyParamsToSystem: (realm, params: ImagePluginParams = defaultParams) => {
-    realm.pubKey('imageUploadHandler', params.imageUploadHandler)
-    realm.pubKey('imageAutocompleteSuggestions', params.imageAutocompleteSuggestions || [])
+  applyParamsToSystem: (realm, params: ImagePluginParams) => {
+    realm.pubKey('imageUploadHandler', params?.imageUploadHandler || null)
+    realm.pubKey('imageAutocompleteSuggestions', params?.imageAutocompleteSuggestions || [])
+    realm.pubKey('disableImageResize', Boolean(params?.disableImageResize))
   },
 
   init: (realm) => {
@@ -218,26 +222,28 @@ function onDragover(event: DragEvent): boolean {
   return true
 }
 
-function onDrop(event: DragEvent, editor: LexicalEditor, imageUploadHandler: (file: File) => Promise<string>): boolean {
+function onDrop(event: DragEvent, editor: LexicalEditor, imageUploadHandler: ImageUploadHandler): boolean {
   let cbPayload = Array.from(event.dataTransfer?.items || [])
   cbPayload = cbPayload.filter((i) => /image/.test(i.type)) // Strip out the non-image bits
 
   if (cbPayload.length > 0) {
-    event.preventDefault()
-    Promise.all(cbPayload.map((image) => imageUploadHandler(image.getAsFile()!)))
-      .then((urls) => {
-        urls.forEach((url) => {
-          editor.dispatchCommand(INSERT_IMAGE_COMMAND, {
-            src: url,
-            altText: ''
+    if (imageUploadHandler !== null) {
+      event.preventDefault()
+      Promise.all(cbPayload.map((image) => imageUploadHandler(image.getAsFile()!)))
+        .then((urls) => {
+          urls.forEach((url) => {
+            editor.dispatchCommand(INSERT_IMAGE_COMMAND, {
+              src: url,
+              altText: ''
+            })
           })
         })
-      })
-      .catch((e) => {
-        throw e
-      })
+        .catch((e) => {
+          throw e
+        })
 
-    return true
+      return true
+    }
   }
 
   const node = getImageNodeInSelection()

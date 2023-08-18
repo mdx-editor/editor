@@ -23,7 +23,7 @@ export function HtmlImage() {
       <MDXEditor
         markdown={markdownWithHtmlImages}
         plugins={[
-          imagePlugin(),
+          imagePlugin({ imageUploadHandler: async () => Promise.resolve('https://picsum.photos/200/300') }),
           diffSourcePlugin(),
           toolbarPlugin({ toolbarContents: () => <DiffSourceToggleWrapper>:)</DiffSourceToggleWrapper> })
         ]}
@@ -39,7 +39,7 @@ export function JsxImage() {
       <MDXEditor
         markdown={markdownWithHtmlImages}
         plugins={[
-          imagePlugin(),
+          imagePlugin({ disableImageResize: true }),
           diffSourcePlugin(),
           jsxPlugin(),
           toolbarPlugin({ toolbarContents: () => <DiffSourceToggleWrapper>:)</DiffSourceToggleWrapper> })

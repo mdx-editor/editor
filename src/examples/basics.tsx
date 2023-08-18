@@ -235,14 +235,7 @@ export function MarkdownShortcuts() {
     <MDXEditor
       onChange={console.log}
       markdown={helloMarkdown}
-      plugins={[
-        codeBlockPlugin({ codeBlockEditorDescriptors: [PlainTextCodeEditorDescriptor] }),
-        headingsPlugin(),
-        listsPlugin(),
-        linkPlugin(),
-        quotePlugin(),
-        markdownShortcutPlugin()
-      ]}
+      plugins={[headingsPlugin(), listsPlugin(), linkPlugin(), quotePlugin(), markdownShortcutPlugin()]}
     />
   )
 }

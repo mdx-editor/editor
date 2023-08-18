@@ -23,6 +23,7 @@ import styles from '../../styles/ui.module.css'
 import classNames from 'classnames'
 import { $isImageNode } from './ImageNode'
 import ImageResizer from './ImageResizer'
+import { imagePluginHooks } from '.'
 
 export interface ImageEditorProps {
   nodeKey: string
@@ -74,6 +75,7 @@ export function ImageEditor({ src, title, nodeKey, width, height }: ImageEditorP
   const [selection, setSelection] = React.useState<RangeSelection | NodeSelection | GridSelection | null>(null)
   const activeEditorRef = React.useRef<LexicalEditor | null>(null)
   const [isResizing, setIsResizing] = React.useState<boolean>(false)
+  const [disableImageResize] = imagePluginHooks.useEmitterValues('disableImageResize')
 
   const onDelete = React.useCallback(
     (payload: KeyboardEvent) => {
@@ -221,7 +223,7 @@ export function ImageEditor({ src, title, nodeKey, width, height }: ImageEditorP
             imageRef={imageRef}
           />
         </div>
-        {draggable && isFocused && (
+        {draggable && isFocused && !disableImageResize && (
           <ImageResizer editor={editor} imageRef={imageRef} onResizeStart={onResizeStart} onResizeEnd={onResizeEnd} />
         )}
       </div>
