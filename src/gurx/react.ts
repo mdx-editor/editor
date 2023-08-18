@@ -318,8 +318,11 @@ export interface RealmPluginParams<Spec extends AnySystemSpec, Params extends ob
   applyParamsToSystem?: (realm: TypedRealm<SystemAndDependencies<Spec>>, props: Params) => void
   /**
    * Executed when the component mounts. Use this to register import/export visitors, add lexical nodes to the editor, etc.
+   * @param realm - the realm instance
+   * @param params - the parameters passed to the plugin in the component declaration
+   * @param pluginIds - the ids of all the plugins that are present in the component declaration
    */
-  init?: (realm: TypedRealm<SystemAndDependencies<Spec>>, props: Params) => void
+  init?: (realm: TypedRealm<SystemAndDependencies<Spec>>, params: Params, pluginIds: string[]) => void
 }
 
 /** @internal */
@@ -371,9 +374,10 @@ export const RealmPluginInitializer = function <P extends Array<ReturnType<Plugi
 
   const realm = React.useMemo(() => {
     const specs = validPlugins.map((plugin) => plugin.systemSpec) as LongTuple<AnySystemSpec>
+    const pluginIds = validPlugins.map((plugin) => plugin.id)
     const realm = realmFactory(...specs)
     validPlugins.forEach((plugin) => {
-      plugin.init?.(realm, plugin.pluginParams)
+      plugin.init?.(realm, plugin.pluginParams, pluginIds)
       plugin.applyParamsToSystem?.(realm, plugin.pluginParams)
     })
     return realm
