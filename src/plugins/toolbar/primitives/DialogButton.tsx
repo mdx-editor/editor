@@ -120,11 +120,6 @@ const DialogForm: React.FC<{
     }
   })
 
-  const onSubmitEH = (e: React.FormEvent) => {
-    e.preventDefault()
-    onSubmitCallback(selectedItem || '')
-  }
-
   const onKeyDownEH = React.useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === 'Escape') {
@@ -148,6 +143,11 @@ const DialogForm: React.FC<{
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       downshiftInputProps.onKeyDown(e)
     }
+  }
+
+  const onSubmitEH = (e: React.FormEvent) => {
+    e.preventDefault()
+    onSubmitCallback((inputProps as { value: string }).value)
   }
 
   const dropdownIsVisible = isOpen && items.length > 0
