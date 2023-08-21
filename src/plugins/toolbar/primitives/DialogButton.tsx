@@ -57,10 +57,15 @@ export const DialogButton = React.forwardRef<HTMLButtonElement, DialogButtonProp
   ({ autocompleteSuggestions = [], submitButtonTitle, dialogInputPlaceholder, onSubmit, tooltipTitle, buttonContent }, forwardedRef) => {
     const [editorRootElementRef] = corePluginHooks.useEmitterValues('editorRootElementRef')
     const [open, setOpen] = React.useState(false)
+    const [inputValue, setInputValue] = React.useState('')
 
     const onSubmitCallback = React.useCallback(
       (value: string) => {
-        onSubmit(value)
+        if (value.length > 0) {
+          onSubmit(value)
+        } else if (inputValue.length > 0) {
+          onSubmit(inputValue)
+        }
         setOpen(false)
       },
       [onSubmit]
@@ -79,6 +84,7 @@ export const DialogButton = React.forwardRef<HTMLButtonElement, DialogButtonProp
             <DialogForm
               submitButtonTitle={submitButtonTitle}
               autocompleteSuggestions={autocompleteSuggestions}
+              onChangeCallback={setInputValue}
               onSubmitCallback={onSubmitCallback}
               dialogInputPlaceholder={dialogInputPlaceholder}
             />
@@ -93,8 +99,9 @@ const DialogForm: React.FC<{
   submitButtonTitle: string
   autocompleteSuggestions: string[]
   dialogInputPlaceholder: string
+  onChangeCallback: (value: string) => void
   onSubmitCallback: (value: string) => void
-}> = ({ autocompleteSuggestions, onSubmitCallback, dialogInputPlaceholder, submitButtonTitle }) => {
+}> = ({ autocompleteSuggestions, onChangeCallback, onSubmitCallback, dialogInputPlaceholder, submitButtonTitle }) => {
   const [items, setItems] = React.useState(autocompleteSuggestions.slice(0, MAX_SUGGESTIONS))
 
   const enableAutoComplete = autocompleteSuggestions.length > 0
@@ -103,6 +110,7 @@ const DialogForm: React.FC<{
     initialInputValue: '',
     onInputValueChange({ inputValue }) {
       inputValue = inputValue?.toLowerCase() || ''
+      onChangeCallback(inputValue)
       const matchingItems = []
       for (const suggestion of autocompleteSuggestions) {
         if (suggestion.toLowerCase().includes(inputValue)) {
@@ -128,7 +136,7 @@ const DialogForm: React.FC<{
   const onKeyDownEH = React.useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === 'Escape') {
-        ;(e.target as HTMLInputElement).form?.reset()
+        ; (e.target as HTMLInputElement).form?.reset()
       } else if (e.key === 'Enter' && (!isOpen || items.length === 0)) {
         e.preventDefault()
         onSubmitCallback((e.target as HTMLInputElement).value)
@@ -188,6 +196,7 @@ const DialogForm: React.FC<{
 
       <button
         type="submit"
+        name="submit"
         title={submitButtonTitle}
         aria-label={submitButtonTitle}
         className={classNames(styles.actionButton, styles.primaryActionButton)}
