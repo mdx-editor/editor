@@ -48,7 +48,7 @@ const RichTextEditor: React.FC = () => {
           <RichTextPlugin
             contentEditable={<ContentEditable className={classNames(styles.contentEditable, contentEditableClassName)} />}
             placeholder={
-              <div className={classNames(styles.contentEditable, styles.placeholder)}>
+              <div className={classNames(styles.contentEditable, styles.placeholder, contentEditableClassName)}>
                 <p>{placeholder}</p>
               </div>
             }
