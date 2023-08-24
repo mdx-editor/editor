@@ -147,17 +147,20 @@ const RenderRecurisveWrappers: React.FC<{ wrappers: React.ComponentType<{ childr
 }
 
 const EditorRootElement: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className }) => {
-  const editorRootElementRef = React.useRef<HTMLDivElement>(null)
+  const editorRootElementRef = React.useRef<HTMLDivElement | null>(null)
   const setEditorRootElementRef = corePluginHooks.usePublisher('editorRootElementRef')
 
   React.useEffect(() => {
+    const popupContainer = document.createElement('div')
+    popupContainer.classList.add(styles.editorRoot)
+    document.body.appendChild(popupContainer)
+    editorRootElementRef.current = popupContainer
     setEditorRootElementRef(editorRootElementRef)
+    return () => {
+      document.body.removeChild(popupContainer)
+    }
   }, [editorRootElementRef, setEditorRootElementRef])
-  return (
-    <div className={classNames(styles.editorRoot, styles.editorWrapper, className, 'mdxeditor')} ref={editorRootElementRef}>
-      {children}
-    </div>
-  )
+  return <div className={classNames(styles.editorRoot, styles.editorWrapper, className, 'mdxeditor')}>{children}</div>
 }
 
 const Methods: React.FC<{ mdxRef: React.ForwardedRef<MDXEditorMethods> }> = ({ mdxRef }) => {
