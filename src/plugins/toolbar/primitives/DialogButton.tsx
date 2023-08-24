@@ -147,6 +147,7 @@ const DialogForm: React.FC<{
 
   const onSubmitEH = (e: React.FormEvent) => {
     e.preventDefault()
+    e.stopPropagation()
     onSubmitCallback((inputProps as { value: string }).value)
   }
 
