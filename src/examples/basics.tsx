@@ -32,7 +32,7 @@ import tableMarkdown from './assets/table.md?raw'
 
 import { virtuosoSampleSandpackConfig } from './_boilerplate'
 
-const helloMarkdown = `Hello <u>world am **here**</u> more <u>under</u> line`
+const helloMarkdown = `Hello <u>world am **here**</u> more <u>under</u> line. Some \`code with backticks\` and <code>code tag</code> `
 
 export function Bare() {
   const ref = React.useRef<MDXEditorMethods>(null)

@@ -3,7 +3,7 @@ import { ElementNode, LexicalNode, RootNode as LexicalRootNode } from 'lexical'
 import * as Mdast from 'mdast'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { ParseOptions } from 'micromark-util-types'
-import { IS_BOLD, IS_ITALIC, IS_UNDERLINE } from './FormatConstants'
+import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from './FormatConstants'
 
 /** @internal */
 export type MdastExtensions = NonNullable<Parameters<typeof fromMarkdown>[1]>['mdastExtensions']
@@ -25,13 +25,13 @@ export interface MdastVisitActions {
    * Adds formatting as a context for the current node and its children.
    * This is necessary due to mdast treating formatting as a node, while lexical considering it an attribute of a node.
    */
-  addFormatting(format: typeof IS_BOLD | typeof IS_ITALIC | typeof IS_UNDERLINE, node?: Mdast.Content): void
+  addFormatting(format: typeof IS_BOLD | typeof IS_ITALIC | typeof IS_UNDERLINE | typeof IS_CODE, node?: Mdast.Content): void
 
   /**
    * Adds formatting as a context for the current node and its children.
    * This is necessary due to mdast treating formatting as a node, while lexical considering it an attribute of a node.
    */
-  removeFormatting(format: typeof IS_BOLD | typeof IS_ITALIC | typeof IS_UNDERLINE, node?: Mdast.Content): void
+  removeFormatting(format: typeof IS_BOLD | typeof IS_ITALIC | typeof IS_UNDERLINE | typeof IS_CODE, node?: Mdast.Content): void
   /**
    * Access the current formatting context.
    */
