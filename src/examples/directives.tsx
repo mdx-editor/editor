@@ -25,7 +25,10 @@ import {
   MdastImportVisitor,
   ImageNode,
   LexicalExportVisitor,
-  $isImageNode
+  $isImageNode,
+  KitchenSinkToolbar,
+  diffSourcePlugin,
+  DiffSourceToggleWrapper
 } from '../'
 
 import * as Mdast from 'mdast'
@@ -40,7 +43,7 @@ import {
   directiveToMarkdown
 } from 'mdast-util-directive'
 import { directive } from 'micromark-extension-directive'
-import { $createParagraphNode, $createTextNode, ElementNode, RootNode } from 'lexical'
+import { ElementNode } from 'lexical'
 
 const youtubeMarkdown = `
 This should be an youtube video:
@@ -131,7 +134,9 @@ export const Admonitions: React.FC = () => {
         headingsPlugin(),
         codeBlockPlugin(),
         quotePlugin(),
-        markdownShortcutPlugin()
+        markdownShortcutPlugin(),
+        diffSourcePlugin(),
+        toolbarPlugin({ toolbarContents: () => <DiffSourceToggleWrapper>-</DiffSourceToggleWrapper> })
       ]}
     />
   )

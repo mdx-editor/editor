@@ -36,6 +36,7 @@ export const AdmonitionDirectiveDescriptor: DirectiveDescriptor = {
     return (
       <div className={theme.admonition[mdastNode.name]}>
         <NestedLexicalEditor<ContainerDirective>
+          block
           focusEmitter={focusEmitter}
           getContent={(node) => node.children}
           getUpdatedMdastNode={(mdastNode, children: any) => ({ ...mdastNode, children })}
