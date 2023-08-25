@@ -1,5 +1,6 @@
 import { $isLinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link'
 import {
+  $getSelection,
   $isRangeSelection,
   COMMAND_PRIORITY_HIGH,
   COMMAND_PRIORITY_LOW,
@@ -121,9 +122,14 @@ const linkDialogSystem = system(
         KEY_MODIFIER_COMMAND,
         (event) => {
           if (event.key === 'k' && (IS_APPLE ? event.metaKey : event.ctrlKey)) {
-            r.pub(openLinkEditDialog, true)
-            event.stopPropagation()
-            return true
+            const selection = $getSelection()
+            if ($isRangeSelection(selection) && !selection.isCollapsed()) {
+              r.pub(openLinkEditDialog, true)
+              event.stopPropagation()
+              return true
+            } else {
+              return false
+            }
           }
           return false
         },
