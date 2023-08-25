@@ -1,7 +1,6 @@
 import React from 'react'
 import {
   AdmonitionDirectiveDescriptor,
-  KitchenSinkToolbar,
   MDXEditor,
   UndoRedo,
   codeBlockPlugin,
