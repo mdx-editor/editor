@@ -8,13 +8,16 @@ import {
   $getRoot,
   $getSelection,
   $insertNodes,
+  $isElementNode,
   $isRangeSelection,
   $isRootOrShadowRoot,
   BLUR_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
+  COMMAND_PRIORITY_LOW,
   DecoratorNode,
   ElementNode,
   FORMAT_TEXT_COMMAND,
+  KEY_DOWN_COMMAND,
   Klass,
   LexicalEditor,
   LexicalNode,
@@ -42,6 +45,7 @@ import { MdastRootVisitor } from './MdastRootVisitor'
 import { MdastTextVisitor } from './MdastTextVisitor'
 import { SharedHistoryPlugin } from './SharedHistoryPlugin'
 import { noop } from '../../utils/fp'
+import { IS_APPLE } from '../../utils/detectMac'
 
 /** @internal */
 export type EditorSubscription = (activeEditor: LexicalEditor) => () => void
@@ -269,6 +273,48 @@ export const coreSystem = system((r) => {
         return false
       },
       COMMAND_PRIORITY_CRITICAL
+    )
+  })
+
+  // Fixes select all when frontmatter is present
+  r.pub(createRootEditorSubscription, (theRootEditor) => {
+    function controlOrMeta(metaKey: boolean, ctrlKey: boolean): boolean {
+      if (IS_APPLE) {
+        return metaKey
+      }
+      return ctrlKey
+    }
+
+    function isSelectAll(keyCode: number, metaKey: boolean, ctrlKey: boolean): boolean {
+      return keyCode === 65 && controlOrMeta(metaKey, ctrlKey)
+    }
+
+    function $selectAll(editor: LexicalEditor) {
+      const root = $getRoot()
+      const skipFirstChild = root.getFirstChild()?.getType() === 'frontmatter'
+      root.select(skipFirstChild ? 1 : 0, root.getChildrenSize())
+
+      const rootElement = editor.getRootElement() as HTMLDivElement
+      rootElement.focus({
+        preventScroll: true
+      })
+    }
+
+    theRootEditor.registerCommand<KeyboardEvent>(
+      KEY_DOWN_COMMAND,
+      (event) => {
+        const { keyCode, ctrlKey, metaKey } = event
+        if (isSelectAll(keyCode, metaKey, ctrlKey)) {
+          event.preventDefault()
+          theRootEditor.update(() => {
+            $selectAll(theRootEditor)
+          })
+          return true
+        }
+
+        return false
+      },
+      COMMAND_PRIORITY_LOW
     )
   })
 
