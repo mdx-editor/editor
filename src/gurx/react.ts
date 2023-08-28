@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { always, tap } from '../utils/fp'
 import { RealmNode } from './realm'
 
@@ -252,19 +252,28 @@ export function sysHooks<Sys extends System>() {
     const realm = React.useContext(Context)!
     const [values, setValues] = React.useState(() => realm.getKeyValues(keys))
 
-    useIsomorphicLayoutEffect(
+    useEffect(
       () =>
         realm?.subKeys(keys, (newValues) => {
           const setter = () => {
+            if (keys.length === 1) {
+              // @ts-expect-error the duality should be fixed with correct subscription mode
+              newValues = [newValues]
+            }
+
+            for (let i = 0; i < keys.length; i++) {
+              if (newValues[i] !== values[i]) {
+                setValues(newValues)
+              }
+            }
             // this fixes the dual behavior in sub where subSingle and subMultiple fight
             // console.log('setting values', keys.length === 1 ? [newValues] : newValues)
-            // @ts-expect-error the duality should be fixed with correct subscription mode
-            setValues(keys.length === 1 ? [newValues] : newValues)
+            // setTimeout(() => {})
           }
 
           setter()
         }),
-      [keys]
+      [keys, realm, values]
     )
 
     return values
