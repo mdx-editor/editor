@@ -1,6 +1,6 @@
 import React from 'react'
 import { realmPlugin, system } from '../../gurx'
-import { coreSystem } from '../core'
+import { corePluginHooks, coreSystem } from '../core'
 import { Root } from './primitives/toolbar'
 
 /** @internal */
@@ -35,5 +35,6 @@ export const [
 
 const ToolbarWrapper = () => {
   const [toolbarContents] = toolbarPluginHooks.useEmitterValues('toolbarContents')
-  return <Root>{toolbarContents()}</Root>
+  const [readOnly] = corePluginHooks.useEmitterValues('readOnly')
+  return <Root readOnly={readOnly}>{toolbarContents()}</Root>
 }

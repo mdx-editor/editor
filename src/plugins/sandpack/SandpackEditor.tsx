@@ -4,6 +4,7 @@ import { CodeBlockEditorProps } from '../codeblock'
 import { useCodeMirrorRef } from './useCodeMirrorRef'
 import { SandpackCodeEditor, SandpackLayout, SandpackPreview, SandpackProvider, useSandpack } from '@codesandbox/sandpack-react'
 import { useCodeBlockEditorContext } from '../codeblock/CodeBlockNode'
+import { corePluginHooks } from '../core'
 
 interface CodeUpdateEmitterProps {
   snippetFileName: string
@@ -22,6 +23,7 @@ export interface SandpackEditorProps extends CodeBlockEditorProps {
 
 export const SandpackEditor = ({ nodeKey, code, focusEmitter, preset }: SandpackEditorProps) => {
   const codeMirrorRef = useCodeMirrorRef(nodeKey, 'sandpack', 'jsx', focusEmitter)
+  const [readOnly] = corePluginHooks.useEmitterValues('readOnly')
   const { setCode } = useCodeBlockEditorContext()
 
   return (
@@ -40,7 +42,7 @@ export const SandpackEditor = ({ nodeKey, code, focusEmitter, preset }: Sandpack
       }}
     >
       <SandpackLayout>
-        <SandpackCodeEditor showLineNumbers showInlineErrors ref={codeMirrorRef} />
+        <SandpackCodeEditor readOnly={readOnly} showLineNumbers showInlineErrors ref={codeMirrorRef} />
         <SandpackPreview />
       </SandpackLayout>
       <CodeUpdateEmitter onChange={setCode} snippetFileName={preset.snippetFileName} />

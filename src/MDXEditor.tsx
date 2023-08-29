@@ -12,10 +12,15 @@ import { ToMarkdownOptions } from './exportMarkdownFromLexical'
 import { noop } from './utils/fp'
 
 const LexicalProvider: React.FC<{ children: JSX.Element | string | (JSX.Element | string)[] }> = ({ children }) => {
-  const [initialRootEditorState, nodes] = corePluginHooks.useEmitterValues('initialRootEditorState', 'usedLexicalNodes')
+  const [initialRootEditorState, nodes, readOnly] = corePluginHooks.useEmitterValues(
+    'initialRootEditorState',
+    'usedLexicalNodes',
+    'readOnly'
+  )
   return (
     <LexicalComposer
       initialConfig={{
+        editable: !readOnly,
         editorState: initialRootEditorState,
         namespace: 'MDXEditor',
         theme: lexicalTheme,
@@ -104,6 +109,11 @@ export interface MDXEditorProps {
    * The placeholder contents, displayed when the editor is empty.
    */
   placeholder?: React.ReactNode
+  /**
+   * pass if you would like to have the editor in read-only mode.
+   * Note: Don't use this mode to render content for consumption - reander the markdown using a library of your choice instead.
+   */
+  readOnly?: boolean
 }
 
 const DEFAULT_MARKDOWN_OPTIONS: ToMarkdownOptions = {
@@ -196,7 +206,8 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>((pro
           onChange: props.onChange ?? noop,
           toMarkdownOptions: props.toMarkdownOptions ?? DEFAULT_MARKDOWN_OPTIONS,
           autoFocus: props.autoFocus ?? false,
-          placeholder: props.placeholder ?? ''
+          placeholder: props.placeholder ?? '',
+          readOnly: Boolean(props.readOnly)
         }),
         ...(props.plugins || [])
       ]}

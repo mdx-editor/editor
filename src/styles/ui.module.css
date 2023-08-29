@@ -119,11 +119,13 @@
   --radius-extra-large: var(--spacing-3);
   --radius-full: 9999px;
 
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-body: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+
   --text-sm: 0.875rem;
   --text-xs: 0.75rem;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
+  font-family: var(--font-body);
   color: var(--baseText);
 }
 
@@ -158,7 +160,16 @@
   }
 }
 
+.readOnlyToolbarRoot {
+  pointer-events: none;
+  background: var(--baseBase);
+  & > div {
+    opacity: 0.5;
+  }
+}
+
 .toolbarModeSwitch {
+  opacity: 1 !important;
   margin-left: auto;
   align-self: stretch;
   align-items: stretch;
@@ -415,6 +426,12 @@
 .iconButton {
   @mixin clear-form-element;
   color:var(--baseText);
+  &:hover {
+    color: var(--accentText);
+  }
+  &:disabled, &:disabled:hover {
+    color:var(--baseLine);
+  }
 }
 
 .primaryButton, .secondaryButton {
@@ -425,6 +442,10 @@
   color:var(--baseBase);
   font-size: var(--text-sm);
   border-radius: var(--radius-medium);
+  &:disabled {
+    background: var(--accentLine);
+    border-color: var(--accentBg);
+  }
 }
 
 .secondaryButton {

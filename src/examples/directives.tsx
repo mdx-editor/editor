@@ -5,7 +5,6 @@ import {
   DirectiveDescriptor,
   GenericDirectiveEditor,
   MDXEditor,
-  NestedLexicalEditor,
   codeBlockPlugin,
   codeMirrorPlugin,
   directivesPlugin,
@@ -26,7 +25,6 @@ import {
   ImageNode,
   LexicalExportVisitor,
   $isImageNode,
-  KitchenSinkToolbar,
   diffSourcePlugin,
   DiffSourceToggleWrapper
 } from '../'
@@ -34,14 +32,7 @@ import {
 import * as Mdast from 'mdast'
 
 import admonitionMarkdown from './assets/admonition.md?raw'
-import {
-  TextDirective,
-  ContainerDirective,
-  Directive,
-  LeafDirective,
-  directiveFromMarkdown,
-  directiveToMarkdown
-} from 'mdast-util-directive'
+import { TextDirective, Directive, LeafDirective, directiveFromMarkdown, directiveToMarkdown } from 'mdast-util-directive'
 import { directive } from 'micromark-extension-directive'
 import { ElementNode } from 'lexical'
 
@@ -177,28 +168,28 @@ export const AdmonitionsWithCodeBlocks: React.FC = () => {
   )
 }
 
-const CalloutCustomDirectiveDescriptor: DirectiveDescriptor = {
-  name: 'callout',
-  testNode(node) {
-    return node.name === 'callout'
-  },
-  attributes: [],
-  hasChildren: true,
-  Editor: (props) => {
-    return (
-      <div style={{ border: '1px solid red', padding: 8, margin: 8 }}>
-        <NestedLexicalEditor<ContainerDirective>
-          block
-          getContent={(node) => node.children}
-          getUpdatedMdastNode={(mdastNode, children: any) => {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            return { ...mdastNode, children }
-          }}
-        />
-      </div>
-    )
-  }
-}
+// const CalloutCustomDirectiveDescriptor: DirectiveDescriptor = {
+//   name: 'callout',
+//   testNode(node) {
+//     return node.name === 'callout'
+//   },
+//   attributes: [],
+//   hasChildren: true,
+//   Editor: (props) => {
+//     return (
+//       <div style={{ border: '1px solid red', padding: 8, margin: 8 }}>
+//         <NestedLexicalEditor<ContainerDirective>
+//           block
+//           getContent={(node) => node.children}
+//           getUpdatedMdastNode={(mdastNode, children: any) => {
+//             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+//             return { ...mdastNode, children }
+//           }}
+//         />
+//       </div>
+//     )
+//   }
+// }
 
 const CalloutDirectiveDescriptor: DirectiveDescriptor = {
   name: 'callout',

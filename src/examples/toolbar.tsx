@@ -30,9 +30,23 @@ import {
 import { ALL_PLUGINS, YoutubeDirectiveDescriptor, virtuosoSampleSandpackConfig } from './_boilerplate'
 import kitchenSinkMarkdown from './assets/kitchen-sink.md?raw'
 import './dark-editor.css'
+import type { Story } from '@ladle/react'
 
 export const Basics = () => {
   return <MDXEditor markdown={kitchenSinkMarkdown} plugins={ALL_PLUGINS} />
+}
+
+export const ReadOnly: Story<{ readOnly: boolean }> = ({ readOnly }) => {
+  return <MDXEditor markdown={kitchenSinkMarkdown} readOnly={readOnly} plugins={ALL_PLUGINS} />
+}
+
+ReadOnly.args = { readOnly: true }
+ReadOnly.argTypes = {
+  readOnly: {
+    name: 'Read only',
+    defaultValue: true,
+    control: { type: 'boolean' }
+  }
 }
 
 export const CustomTheming = () => {

@@ -12,6 +12,29 @@
     --diff-font-family: var(--font-mono);
     font-size: var(--text-xs);
   }
+
+
+  /** Code mirror */
+  & .cm-editor {
+    --sp-font-mono: var(--font-mono);
+    --sp-font-body: var(--font-body);
+    padding: var(--sp-space-4) 0;
+  }
+
+  & .cm-scroller {
+    padding: 0 !important;
+  }
+
+  & .sp-wrapper {
+    border: 1px solid var(--baseLine);
+    border-radius: var(--radius-medium);
+    overflow: hidden;
+  }
+
+  & .sp-layout {
+    border: none;
+  }
+
   & .sp-cm {
     & pre {
       white-space: break-spaces;

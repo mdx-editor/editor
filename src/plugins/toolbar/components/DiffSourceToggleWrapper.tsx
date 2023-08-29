@@ -34,7 +34,7 @@ export const DiffSourceToggleWrapper: React.FC<{ children: React.ReactNode }> = 
         <span className={styles.toolbarTitleMode}>Source mode</span>
       )}
 
-      <div style={{ marginLeft: 'auto' }}>
+      <div style={{ marginLeft: 'auto', pointerEvents: 'auto', opacity: 1 }}>
         <SingleChoiceToggleGroup
           className={styles.diffSourceToggle}
           value={viewMode}

@@ -7,12 +7,14 @@ import { TooltipWrap } from './TooltipWrap'
 import { SelectButtonTrigger, SelectContent, SelectItem } from './select'
 import { EditorInFocus, corePluginHooks } from '../../core'
 
-function decorate<P extends { className?: string | undefined }>(Component: React.ComponentType<P>, decoratedProps: P) {
-  return (props: P) => {
-    const className = classNames(decoratedProps.className, props.className)
-    return <Component {...decoratedProps} {...props} className={className} />
-  }
-}
+//
+// function decorate<P extends { className?: string | undefined }>(Component: React.ComponentType<P>, decoratedProps: P) {
+//   return (props: P) => {
+//     const className = classNames(decoratedProps.className, props.className)
+//     return <Component {...decoratedProps} {...props} className={className} />
+//   }
+// }
+//
 
 function decorateWithRef<P extends { className?: string | undefined }>(
   Component: React.ForwardRefExoticComponent<P>,
@@ -37,7 +39,16 @@ function addTooltipToChildren<C extends React.ComponentType<{ children: React.Re
 /**
  * @internal
  */
-export const Root = decorate(RadixToolbar.Root, { className: styles.toolbarRoot })
+export const Root: React.FC<{ readOnly: boolean; children: React.ReactNode }> = ({ readOnly, children }) => {
+  return (
+    <RadixToolbar.Root
+      className={classNames(styles.toolbarRoot, { [styles.readOnlyToolbarRoot]: readOnly })}
+      {...(readOnly ? { tabIndex: -1 } : {})}
+    >
+      {children}
+    </RadixToolbar.Root>
+  )
+}
 
 /**
  * A toolbar button primitive.
@@ -191,10 +202,11 @@ export interface ButtonOrDropdownButtonProps<T extends string> {
  * @see {@link ButtonOrDropdownButtonProps} for the properties of the React component.
  */
 export const ButtonOrDropdownButton = <T extends string>(props: ButtonOrDropdownButtonProps<T>) => {
+  const [readOnly] = corePluginHooks.useEmitterValues('readOnly')
   return (
     <>
       {props.items.length === 1 ? (
-        <ButtonWithTooltip title={props.title} onClick={() => props.onChoose('' as T)}>
+        <ButtonWithTooltip title={props.title} onClick={() => props.onChoose('' as T)} disabled={readOnly}>
           {props.children}
         </ButtonWithTooltip>
       ) : (

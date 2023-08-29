@@ -379,7 +379,7 @@ export const RealmPluginInitializer = function <P extends Array<ReturnType<Plugi
 
     return validPlugins
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [plugins])
 
   const realm = React.useMemo(() => {
     const specs = validPlugins.map((plugin) => plugin.systemSpec) as LongTuple<AnySystemSpec>

@@ -23,9 +23,15 @@ export const SelectItem = React.forwardRef<HTMLDivElement | null, { className?: 
  * @internal
  */
 export const SelectTrigger: React.FC<{ title: string; placeholder: string; className?: string }> = ({ title, placeholder, className }) => {
+  const [readOnly] = corePluginHooks.useEmitterValues('readOnly')
   return (
     <TooltipWrap title={title}>
-      <RadixSelect.Trigger aria-label={placeholder} className={classNames(styles.selectTrigger, className)} data-toolbar-item={true}>
+      <RadixSelect.Trigger
+        aria-label={placeholder}
+        className={classNames(styles.selectTrigger, className)}
+        data-toolbar-item={true}
+        disabled={readOnly}
+      >
         <RadixSelect.Value placeholder={placeholder} />
         <RadixSelect.Icon className={styles.selectDropdownArrow}>
           <DropDownIcon />
@@ -61,9 +67,10 @@ export const SelectButtonTrigger: React.FC<{ children: React.ReactNode; title: s
   title,
   className
 }) => {
+  const [readOnly] = corePluginHooks.useEmitterValues('readOnly')
   return (
     <TooltipWrap title={title}>
-      <RadixSelect.Trigger className={classNames(styles.toolbarButtonSelectTrigger, className)}>
+      <RadixSelect.Trigger className={classNames(styles.toolbarButtonSelectTrigger, className)} disabled={readOnly}>
         {children}
         <RadixSelect.Icon className={styles.selectDropdownArrow}>
           <DropDownIcon />

@@ -91,6 +91,7 @@ export const coreSystem = system((r) => {
   const rootEditor = r.node<LexicalEditor | null>(null)
   const activeEditor = r.node<LexicalEditor | null>(null, true)
   const contentEditableClassName = r.node<string>('')
+  const readOnly = r.node<boolean>(false)
   const placeholder = r.node<React.ReactNode>('')
   const autoFocus = r.node<boolean>(false)
   const inFocus = r.node(false, true)
@@ -398,6 +399,10 @@ export const coreSystem = system((r) => {
     )
   })
 
+  r.sub(r.pipe(readOnly, r.o.withLatestFrom(rootEditor)), ([readOnly, theRootEditor]) => {
+    theRootEditor?.setEditable(!readOnly)
+  })
+
   return {
     // state
     activeEditor,
@@ -442,6 +447,7 @@ export const coreSystem = system((r) => {
     contentEditableClassName,
     placeholder,
     autoFocus,
+    readOnly,
 
     // child controls
     composerChildren,
@@ -474,6 +480,7 @@ interface CorePluginParams {
   autoFocus: boolean
   onChange: (markdown: string) => void
   toMarkdownOptions: NonNullable<LexicalConvertOptions['toMarkdownOptions']>
+  readOnly: boolean
 }
 
 export const [
@@ -486,10 +493,13 @@ export const [
   systemSpec: coreSystem,
 
   applyParamsToSystem(realm, params: CorePluginParams) {
-    realm.pubKey('contentEditableClassName', params.contentEditableClassName)
-    realm.pubKey('toMarkdownOptions', params.toMarkdownOptions)
-    realm.pubKey('autoFocus', params.autoFocus)
-    realm.pubKey('placeholder', params.placeholder)
+    realm.pubKeys({
+      contentEditableClassName: params.contentEditableClassName,
+      toMarkdownOptions: params.toMarkdownOptions,
+      autoFocus: params.autoFocus,
+      placeholder: params.placeholder,
+      readOnly: params.readOnly
+    })
     realm.singletonSubKey('markdown', params.onChange)
   },
 

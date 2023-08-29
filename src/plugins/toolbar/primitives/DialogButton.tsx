@@ -55,7 +55,7 @@ const MAX_SUGGESTIONS = 20
  */
 export const DialogButton = React.forwardRef<HTMLButtonElement, DialogButtonProps>(
   ({ autocompleteSuggestions = [], submitButtonTitle, dialogInputPlaceholder, onSubmit, tooltipTitle, buttonContent }, forwardedRef) => {
-    const [editorRootElementRef] = corePluginHooks.useEmitterValues('editorRootElementRef')
+    const [editorRootElementRef, readOnly] = corePluginHooks.useEmitterValues('editorRootElementRef', 'readOnly')
     const [open, setOpen] = React.useState(false)
 
     const onSubmitCallback = React.useCallback(
@@ -69,7 +69,7 @@ export const DialogButton = React.forwardRef<HTMLButtonElement, DialogButtonProp
     return (
       <Dialog.Root open={open} onOpenChange={setOpen}>
         <Dialog.Trigger asChild>
-          <RadixToolbar.Button className={styles.toolbarButton} ref={forwardedRef}>
+          <RadixToolbar.Button className={styles.toolbarButton} ref={forwardedRef} disabled={readOnly}>
             <TooltipWrap title={tooltipTitle}>{buttonContent}</TooltipWrap>
           </RadixToolbar.Button>
         </Dialog.Trigger>

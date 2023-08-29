@@ -1,12 +1,14 @@
+import { SandpackProvider, CodeEditor as TheEditorFromSandpack } from '@codesandbox/sandpack-react'
 import React from 'react'
-import { CodeBlockEditorProps } from '../codeblock'
-import { useCodeMirrorRef } from '../sandpack/useCodeMirrorRef'
-import { CodeEditor as TheEditorFromSandpack, SandpackProvider } from '@codesandbox/sandpack-react'
-import { useCodeBlockEditorContext } from '../codeblock/CodeBlockNode'
 import styles from '../../styles/ui.module.css'
+import { CodeBlockEditorProps } from '../codeblock'
+import { useCodeBlockEditorContext } from '../codeblock/CodeBlockNode'
+import { corePluginHooks } from '../core'
+import { useCodeMirrorRef } from '../sandpack/useCodeMirrorRef'
 
 export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: CodeBlockEditorProps) => {
   const codeMirrorRef = useCodeMirrorRef(nodeKey, 'codeblock', 'jsx', focusEmitter)
+  const [readOnly] = corePluginHooks.useEmitterValues('readOnly')
   const { setCode } = useCodeBlockEditorContext()
 
   return (
@@ -18,6 +20,7 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
     >
       <SandpackProvider>
         <TheEditorFromSandpack
+          readOnly={readOnly}
           showLineNumbers
           initMode="immediate"
           key={language}

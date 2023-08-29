@@ -7,7 +7,7 @@ import { corePluginHooks } from '../core'
 import { EditorView } from '@codemirror/view'
 
 export const SourceEditor = () => {
-  const [markdown] = corePluginHooks.useEmitterValues('markdown')
+  const [markdown, readOnly] = corePluginHooks.useEmitterValues('markdown', 'readOnly')
   const updateMarkdown = diffSourcePluginHooks.usePublisher('markdownSourceEditorValue')
   const codeMirrorRef = React.useRef<CodeMirrorRef>(null)
 
@@ -16,6 +16,7 @@ export const SourceEditor = () => {
       <React.Suspense fallback={null}>
         <SandpackProvider>
           <TheEditorFromSandpack
+            readOnly={readOnly}
             extensions={[EditorView.lineWrapping]}
             showLineNumbers
             additionalLanguages={[{ name: 'markdown', extensions: ['md'], language: markdownLanguageSupport() }]}

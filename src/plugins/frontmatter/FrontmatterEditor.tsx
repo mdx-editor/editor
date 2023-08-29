@@ -6,6 +6,7 @@ import ArrowDown from '../../icons/arrow_drop_down.svg'
 import ArrowRight from '../../icons/arrow_right.svg'
 import DeleteIcon from '../../icons/delete.svg'
 import styles from '../../styles/ui.module.css'
+import { corePluginHooks } from '../core'
 
 type YamlConfig = { key: string; value: string }[]
 
@@ -16,6 +17,7 @@ export interface FrontmatterEditorProps {
 
 export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) => {
   const [expanded, setExpanded] = React.useState(true)
+  const [readOnly] = corePluginHooks.useEmitterValues('readOnly')
   const yamlConfig = React.useMemo<YamlConfig>(() => {
     if (!yaml) {
       return []
@@ -81,13 +83,13 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
                 return (
                   <tr key={item.id}>
                     <td>
-                      <TableInput {...register(`yamlConfig.${index}.key`, { required: true })} autofocusIfEmpty />
+                      <TableInput {...register(`yamlConfig.${index}.key`, { required: true })} autofocusIfEmpty readOnly={readOnly} />
                     </td>
                     <td>
-                      <TableInput {...register(`yamlConfig.${index}.value`, { required: true })} />
+                      <TableInput {...register(`yamlConfig.${index}.value`, { required: true })} readOnly={readOnly} />
                     </td>
                     <td>
-                      <button type="button" onClick={() => remove(index)} className={styles.iconButton}>
+                      <button type="button" onClick={() => remove(index)} className={styles.iconButton} disabled={readOnly}>
                         <DeleteIcon />
                       </button>
                     </td>
@@ -99,6 +101,7 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
               <tr>
                 <td>
                   <button
+                    disabled={readOnly}
                     className={styles.primaryButton}
                     type="button"
                     onClick={() => {
@@ -119,7 +122,7 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
 
 const TableInput = React.forwardRef<
   HTMLInputElement,
-  React.HTMLAttributes<HTMLInputElement> & { autofocusIfEmpty?: boolean; autoFocus?: boolean; value?: string }
+  React.InputHTMLAttributes<HTMLInputElement> & { autofocusIfEmpty?: boolean; autoFocus?: boolean; value?: string }
 >(({ className, autofocusIfEmpty: _, ...props }, ref) => {
   return <input className={classNames(styles.propertyEditorInput, className)} {...props} ref={ref} />
 })
