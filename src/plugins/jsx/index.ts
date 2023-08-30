@@ -46,8 +46,9 @@ export interface JsxComponentDescriptor {
   kind: 'flow' | 'text'
   /**
    * The module path from which the component can be imported
+   * Omit to skip injecting an import statement
    */
-  source: string
+  source?: string
   /**
    * Wether the component is the default export of the module
    */

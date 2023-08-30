@@ -194,6 +194,9 @@ export function exportLexicalTreeToMdast({
     if (!descriptor) {
       throw new Error(`Component ${componentName} is used but not imported`)
     }
+    if (!descriptor.source) {
+      continue
+    }
     if (descriptor.defaultExport) {
       defaultImportsMap.set(componentName, descriptor.source)
     } else {
