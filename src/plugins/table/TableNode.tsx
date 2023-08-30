@@ -137,7 +137,12 @@ export class TableNode extends DecoratorNode<JSX.Element> {
   }
 
   deleteRowAt(rowIndex: number): void {
-    this.getWritable().__mdastNode.children.splice(rowIndex, 1)
+    if (this.getRowCount() === 1) {
+      this.selectNext()
+      this.remove()
+    } else {
+      this.getWritable().__mdastNode.children.splice(rowIndex, 1)
+    }
   }
 
   addRowToBottom(): void {
