@@ -4,6 +4,7 @@ import React from 'react'
 import { useHasPlugin } from '../../../gurx'
 import { BlockType, corePluginHooks } from '../../core'
 import { Select } from '.././primitives/select'
+import { headingsPluginHooks } from '../../headings'
 
 /**
  * A toolbar component that allows the user to change the block type of the current selection.
@@ -25,7 +26,8 @@ export const BlockTypeSelect = () => {
   }
 
   if (hasHeadings) {
-    items.push(...([1, 2, 3, 4, 5, 6] as const).map((n) => ({ label: `Heading ${n}`, value: `h${n}` } as const)))
+    const [allowedHeadingLevels] = headingsPluginHooks.useEmitterValues('allowedHeadingLevels')
+    items.push(...allowedHeadingLevels.map((n) => ({ label: `Heading ${n}`, value: `h${n}` } as const)))
   }
 
   return (

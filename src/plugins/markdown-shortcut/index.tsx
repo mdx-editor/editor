@@ -5,7 +5,6 @@ import {
   BOLD_UNDERSCORE,
   CODE,
   ElementTransformer,
-  HEADING,
   INLINE_CODE,
   ITALIC_STAR,
   ITALIC_UNDERSCORE,
@@ -21,6 +20,9 @@ import { realmPlugin, system } from '../../gurx'
 import { $createCodeBlockNode, CodeBlockNode } from '../codeblock/CodeBlockNode'
 import { coreSystem } from '../core'
 import { TextMatchTransformer } from '@lexical/markdown'
+import { HeadingNode, $isHeadingNode, HeadingTagType, $createHeadingNode } from '@lexical/rich-text'
+import { ElementNode } from 'lexical'
+import { HEADING_LEVEL } from '../headings'
 
 /** @internal */
 export const [markdownShortcutPlugin] = realmPlugin({
@@ -29,13 +31,26 @@ export const [markdownShortcutPlugin] = realmPlugin({
   systemSpec: system((_) => ({}), [coreSystem]),
 
   init: (realm, _, pluginIds) => {
-    const transformers = pickTransformersForActivePlugins(pluginIds)
+    const allowedHeadingLevels: ReadonlyArray<HEADING_LEVEL> = pluginIds.includes('headings')
+      ? // @ts-expect-error we query the realm for the allowed heading levels
+        (realm.getKeyValue('allowedHeadingLevels') as ReadonlyArray<HEADING_LEVEL>)
+      : []
+    const transformers = pickTransformersForActivePlugins(pluginIds, allowedHeadingLevels)
     realm.pubKey('addComposerChild', () => <MarkdownShortcutPlugin transformers={transformers} />)
     realm.pubKey('addNestedEditorChild', () => <MarkdownShortcutPlugin transformers={transformers} />)
   }
 })
 
-function pickTransformersForActivePlugins(pluginIds: string[]) {
+const createBlockNode = (createNode: (match: Array<string>) => ElementNode): ElementTransformer['replace'] => {
+  return (parentNode, children, match) => {
+    const node = createNode(match)
+    node.append(...children)
+    parentNode.replace(node)
+    node.select(0, 0)
+  }
+}
+
+function pickTransformersForActivePlugins(pluginIds: string[], allowedHeadingLevels: ReadonlyArray<HEADING_LEVEL>) {
   const transformers: (ElementTransformer | TextFormatTransformer | TextMatchTransformer)[] = [
     BOLD_ITALIC_STAR,
     BOLD_ITALIC_UNDERSCORE,
@@ -49,6 +64,28 @@ function pickTransformersForActivePlugins(pluginIds: string[]) {
   ]
 
   if (pluginIds.includes('headings')) {
+    // Using a range is technically a bug, because the developer might have allowed h2 and h4, but not h3.
+    // However, it's a very unlikely edge case.
+    const minHeadingLevel = Math.min(...allowedHeadingLevels)
+    const maxHeadingLevel = Math.max(...allowedHeadingLevels)
+    const headingRegExp = new RegExp(`^(#{${minHeadingLevel},${maxHeadingLevel}})\\s`)
+
+    const HEADING: ElementTransformer = {
+      dependencies: [HeadingNode],
+      export: (node, exportChildren) => {
+        if (!$isHeadingNode(node)) {
+          return null
+        }
+        const level = Number(node.getTag().slice(1))
+        return '#'.repeat(level) + ' ' + exportChildren(node)
+      },
+      regExp: headingRegExp,
+      replace: createBlockNode((match) => {
+        const tag = `h${match[1].length}` as HeadingTagType
+        return $createHeadingNode(tag)
+      }),
+      type: 'element'
+    }
     transformers.push(HEADING)
   }
 
