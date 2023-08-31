@@ -479,6 +479,7 @@ interface CorePluginParams {
   placeholder?: React.ReactNode
   autoFocus: boolean
   onChange: (markdown: string) => void
+  onBlur: () => void
   toMarkdownOptions: NonNullable<LexicalConvertOptions['toMarkdownOptions']>
   readOnly: boolean
 }
@@ -501,6 +502,7 @@ export const [
       readOnly: params.readOnly
     })
     realm.singletonSubKey('markdown', params.onChange)
+    realm.singletonSubKey('inFocus', (focus) => !focus && params.onBlur?.())
   },
 
   init(realm, params: CorePluginParams) {
