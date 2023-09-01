@@ -7,7 +7,6 @@ import React from 'react'
 
 import { createCommand, LexicalCommand } from 'lexical'
 import CheckIcon from '../../icons/check.svg'
-import CloseIcon from '../../icons/close.svg'
 import CopyIcon from '../../icons/content_copy.svg'
 import EditIcon from '../../icons/edit.svg'
 import LinkOffIcon from '../../icons/link_off.svg'
@@ -23,40 +22,43 @@ export const OPEN_LINK_DIALOG: LexicalCommand<undefined> = createCommand()
 
 interface LinkEditFormProps {
   initialUrl: string
-  onSubmit: (url: string) => void
+  initialTitle: string
+  onSubmit: (link: [string, string]) => void
   onCancel: () => void
   linkAutocompleteSuggestions: string[]
 }
 
 const MAX_SUGGESTIONS = 20
 
-export function LinkEditForm({ initialUrl, onSubmit, onCancel, linkAutocompleteSuggestions }: LinkEditFormProps) {
+export function LinkEditForm({ initialUrl, initialTitle, onSubmit, onCancel, linkAutocompleteSuggestions }: LinkEditFormProps) {
   const [items, setItems] = React.useState(linkAutocompleteSuggestions.slice(0, MAX_SUGGESTIONS))
+  const [title, setTitle] = React.useState(initialTitle)
 
-  const { isOpen, getToggleButtonProps, getMenuProps, getInputProps, highlightedIndex, getItemProps, selectedItem } = useCombobox({
-    initialInputValue: initialUrl,
-    onInputValueChange({ inputValue }) {
-      inputValue = inputValue?.toLowerCase() || ''
-      const matchingItems = []
-      for (const url of linkAutocompleteSuggestions) {
-        if (url.toLowerCase().includes(inputValue)) {
-          matchingItems.push(url)
-          if (matchingItems.length >= MAX_SUGGESTIONS) {
-            break
+  const { isOpen, getToggleButtonProps, getMenuProps, getInputProps, highlightedIndex, getItemProps, selectedItem, inputValue } =
+    useCombobox({
+      initialInputValue: initialUrl,
+      onInputValueChange({ inputValue }) {
+        inputValue = inputValue?.toLowerCase() || ''
+        const matchingItems = []
+        for (const url of linkAutocompleteSuggestions) {
+          if (url.toLowerCase().includes(inputValue)) {
+            matchingItems.push(url)
+            if (matchingItems.length >= MAX_SUGGESTIONS) {
+              break
+            }
           }
         }
+        setItems(matchingItems)
+      },
+      items,
+      itemToString(item) {
+        return item ?? ''
       }
-      setItems(matchingItems)
-    },
-    items,
-    itemToString(item) {
-      return item ?? ''
-    }
-  })
+    })
 
   const onSubmitEH = (e: React.FormEvent) => {
     e.preventDefault()
-    onSubmit(selectedItem || '')
+    onSubmit([inputValue, title])
   }
 
   const onKeyDownEH = React.useCallback(
@@ -65,10 +67,10 @@ export function LinkEditForm({ initialUrl, onSubmit, onCancel, linkAutocompleteS
         ;(e.target as HTMLInputElement).form?.reset()
       } else if (e.key === 'Enter' && (!isOpen || items.length === 0)) {
         e.preventDefault()
-        onSubmit((e.target as HTMLInputElement).value)
+        onSubmit([(e.target as HTMLInputElement).value, title])
       }
     },
-    [isOpen, items, onSubmit]
+    [isOpen, items, onSubmit, title]
   )
 
   const downshiftInputProps = getInputProps()
@@ -85,9 +87,12 @@ export function LinkEditForm({ initialUrl, onSubmit, onCancel, linkAutocompleteS
 
   return (
     <form onSubmit={onSubmitEH} onReset={onCancel} className={classNames(styles.linkDialogEditForm)}>
+      <div>
+        <label htmlFor="link-url">URL</label>
+      </div>
       <div className={styles.linkDialogInputContainer}>
         <div data-visible-dropdown={dropdownIsVisible} className={styles.linkDialogInputWrapper}>
-          <input className={styles.linkDialogInput} {...inputProps} autoFocus size={30} data-editor-dialog={true} />
+          <input id="link-url" className={styles.linkDialogInput} {...inputProps} autoFocus size={40} data-editor-dialog={true} />
           <button aria-label="toggle menu" type="button" {...getToggleButtonProps()}>
             <DropDownIcon />
           </button>
@@ -108,14 +113,23 @@ export function LinkEditForm({ initialUrl, onSubmit, onCancel, linkAutocompleteS
           </ul>
         </div>
       </div>
+      <div>
+        <label htmlFor="link-title">Title</label>
+      </div>
+      <div>
+        <div className={styles.linkDialogInputWrapper}>
+          <input id="link-title" className={styles.linkDialogInput} size={40} value={title} onChange={(e) => setTitle(e.target.value)} />
+        </div>
+      </div>
 
-      <ActionButton type="submit" title="Set URL" aria-label="Set URL">
-        <CheckIcon />
-      </ActionButton>
-
-      <ActionButton type="reset" title="Cancel change" aria-label="Cancel change">
-        <CloseIcon />
-      </ActionButton>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--spacing-2)' }}>
+        <button type="reset" title="Cancel change" aria-label="Cancel change" className={classNames(styles.secondaryButton)}>
+          Cancel
+        </button>
+        <button type="submit" title="Set URL" aria-label="Set URL" className={classNames(styles.primaryButton)}>
+          Save
+        </button>
+      </div>
     </form>
   )
 }
@@ -156,8 +170,8 @@ export const LinkDialog: React.FC = () => {
   const theRect = linkDialogState?.rectangle
 
   const onSubmitEH = React.useCallback(
-    (url: string) => {
-      updateLinkUrl(url)
+    (payload: [string, string]) => {
+      updateLinkUrl(payload)
       applyLinkChanges(true)
     },
     [applyLinkChanges, updateLinkUrl]
@@ -188,6 +202,7 @@ export const LinkDialog: React.FC = () => {
           {linkDialogState.type === 'edit' && (
             <LinkEditForm
               initialUrl={linkDialogState.url}
+              initialTitle={linkDialogState.title}
               onSubmit={onSubmitEH}
               onCancel={cancelLinkEdit.bind(null, true)}
               linkAutocompleteSuggestions={linkAutocompleteSuggestions}

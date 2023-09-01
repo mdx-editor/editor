@@ -32,7 +32,9 @@ type PreviewLinkDialog = {
 type EditLinkDialog = {
   type: 'edit'
   initialUrl: string
+  initialTitle?: string
   url: string
+  title: string
   linkNodeKey: string
   rectangle: RectData
 }
@@ -59,7 +61,7 @@ const linkDialogSystem = system(
     const linkDialogState = r.node<InactiveLinkDialog | PreviewLinkDialog | EditLinkDialog>({ type: 'inactive' }, true)
 
     // actions
-    const updateLinkUrl = r.node<string>()
+    const updateLinkUrl = r.node<[string, string]>()
     const cancelLinkEdit = r.node<true>()
     const applyLinkChanges = r.node<true>()
     const switchFromPreviewToLinkEdit = r.node<true>()
@@ -81,7 +83,9 @@ const linkDialogSystem = system(
             r.pub(linkDialogState, {
               type: 'edit',
               initialUrl: node.getURL(),
+              initialTitle: node.getTitle() || '',
               url: node.getURL(),
+              title: node.getTitle() || '',
               linkNodeKey: node.getKey(),
               rectangle
             })
@@ -89,6 +93,8 @@ const linkDialogSystem = system(
             r.pub(linkDialogState, {
               type: 'edit',
               initialUrl: '',
+              initialTitle: '',
+              title: '',
               url: '',
               linkNodeKey: '',
               rectangle
@@ -123,7 +129,9 @@ const linkDialogSystem = system(
         (event) => {
           if (event.key === 'k' && (IS_APPLE ? event.metaKey : event.ctrlKey)) {
             const selection = $getSelection()
-            if ($isRangeSelection(selection) && !selection.isCollapsed()) {
+            // we open the dialog if there's an actual selection
+            // or if the cursor is inside a link
+            if ($isRangeSelection(selection) && (getLinkNodeInSelection(selection) || !selection.isCollapsed())) {
               r.pub(openLinkEditDialog, true)
               event.stopPropagation()
               return true
@@ -161,8 +169,18 @@ const linkDialogSystem = system(
     r.sub(r.pipe(applyLinkChanges, r.o.withLatestFrom(linkDialogState, activeEditor)), ([, state, editor]) => {
       if (state.type === 'edit') {
         const url = state.url.trim()
+        const title = state.title.trim()
+
         if (url.trim() !== '') {
-          editor?.dispatchCommand(TOGGLE_LINK_COMMAND, url)
+          editor?.dispatchCommand(TOGGLE_LINK_COMMAND, { url, title })
+          // the dispatch command implementation fails to set the link for a fresh link creation.
+          // Work around with the code below.
+          setTimeout(() => {
+            editor?.update(() => {
+              const node = getLinkNodeInSelection($getSelection() as RangeSelection)
+              node?.setTitle(title)
+            })
+          })
           r.pub(linkDialogState, {
             type: 'preview',
             linkNodeKey: state.linkNodeKey,
@@ -186,11 +204,12 @@ const linkDialogSystem = system(
       r.pipe(
         updateLinkUrl,
         r.o.withLatestFrom(linkDialogState),
-        r.o.map(([url, state]) => {
+        r.o.map(([[url, title], state]) => {
           if (state.type === 'edit') {
             return {
               ...state,
-              url
+              url,
+              title
             }
           } else {
             throw new Error('Cannot update link url when not in edit mode')
