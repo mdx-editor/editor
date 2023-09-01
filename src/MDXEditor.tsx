@@ -147,7 +147,7 @@ export interface MDXEditorMethods {
   /**
    * Sets focus on input
    */
-  focus: () => void
+  focus: (defaultSelection?: 'rootStart' | 'rootEnd') => void
 }
 
 const RenderRecurisveWrappers: React.FC<{ wrappers: React.ComponentType<{ children: React.ReactNode }>[]; children: React.ReactNode }> = ({
@@ -195,8 +195,8 @@ const Methods: React.FC<{ mdxRef: React.ForwardedRef<MDXEditorMethods> }> = ({ m
         setMarkdown: (markdown) => {
           realm.pubKey('setMarkdown', markdown)
         },
-        focus: () => {
-          realm.getKeyValue('rootEditor')?.focus()
+        focus: (defaultSelection?: 'rootStart' | 'rootEnd') => {
+          realm.getKeyValue('rootEditor')?.focus(undefined, { defaultSelection })
         }
       }
     },
