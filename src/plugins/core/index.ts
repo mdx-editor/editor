@@ -104,6 +104,8 @@ export const coreSystem = system((r) => {
   const rootEditorSubscriptions = r.node<EditorSubscription[]>([])
   const editorInFocus = r.node<EditorInFocus | null>(null)
 
+  const onBlur = r.node<FocusEvent>()
+
   const rebind = () =>
     r.o.scan((teardowns, [subs, activeEditorValue]: [EditorSubscription[], LexicalEditor]) => {
       teardowns.forEach((teardown) => {
@@ -267,7 +269,10 @@ export const coreSystem = system((r) => {
         if (theRootEditor) {
           const movingOutside = !theRootEditor.getRootElement()?.contains(payload.relatedTarget as Node)
           if (movingOutside) {
-            r.pub(inFocus, false)
+            r.pubIn({
+              [inFocus.key]: false,
+              [onBlur.key]: payload
+            })
           }
         }
         return false
@@ -469,7 +474,10 @@ export const coreSystem = system((r) => {
     currentBlockType,
     applyBlockType,
     convertSelectionToNode,
-    insertDecoratorNode
+    insertDecoratorNode,
+
+    // Events
+    onBlur
   }
 }, [])
 
@@ -479,6 +487,7 @@ interface CorePluginParams {
   placeholder?: React.ReactNode
   autoFocus: boolean
   onChange: (markdown: string) => void
+  onBlur?: (e: FocusEvent) => void
   toMarkdownOptions: NonNullable<LexicalConvertOptions['toMarkdownOptions']>
   readOnly: boolean
 }
@@ -501,6 +510,7 @@ export const [
       readOnly: params.readOnly
     })
     realm.singletonSubKey('markdown', params.onChange)
+    realm.singletonSubKey('onBlur', params.onBlur)
   },
 
   init(realm, params: CorePluginParams) {
