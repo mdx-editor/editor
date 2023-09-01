@@ -196,7 +196,7 @@ export function realmFactoryToComponent<
       realm.resetSingletonSubs()
       for (const eventName of eventNames) {
         if (eventName in props) {
-          realm.singletonSubKey(map.events![eventName]! as string, props[eventName]!)
+          realm.singletonSubKey(map.events![eventName]! as string, props[eventName])
         }
       }
       return () => {
