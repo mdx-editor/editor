@@ -151,12 +151,16 @@ export function realm() {
     return () => nodeSubscriptions.delete(subscription)
   }
 
-  function singletonSub<T>({ key }: RealmNode<T>, subscription: Subscription<T>): UnsubscribeHandle {
-    singletonSubscriptions.set(key, subscription)
+  function singletonSub<T>({ key }: RealmNode<T>, subscription: Subscription<T> | undefined): UnsubscribeHandle {
+    if (!subscription) {
+      singletonSubscriptions.delete(key)
+    } else {
+      singletonSubscriptions.set(key, subscription)
+    }
     return () => singletonSubscriptions.delete(key)
   }
 
-  function singletonSubKey<T>(key: string, subscription: Subscription<T>): UnsubscribeHandle {
+  function singletonSubKey<T>(key: string, subscription: Subscription<T> | undefined): UnsubscribeHandle {
     return singletonSub(labels[key], subscription)
   }
 

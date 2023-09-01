@@ -106,9 +106,9 @@ export interface MDXEditorProps {
    */
   autoFocus?: boolean
   /**
-   * Triggered when focus leaves input
+   * Triggered when focus leaves the editor
    */
-  onBlur?: () => void
+  onBlur?: (e: FocusEvent) => void
   /**
    * The placeholder contents, displayed when the editor is empty.
    */
