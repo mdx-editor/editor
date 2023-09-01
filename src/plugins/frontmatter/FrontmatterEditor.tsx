@@ -1,9 +1,10 @@
+import * as Dialog from '@radix-ui/react-dialog'
 import classNames from 'classnames'
 import YamlParser from 'js-yaml'
 import React from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
-import ArrowDown from '../../icons/arrow_drop_down.svg'
-import ArrowRight from '../../icons/arrow_right.svg'
+import { frontmatterPluginHooks } from '.'
+import CloseIcon from '../../icons/close.svg'
 import DeleteIcon from '../../icons/delete.svg'
 import styles from '../../styles/ui.module.css'
 import { corePluginHooks } from '../core'
@@ -16,8 +17,10 @@ export interface FrontmatterEditorProps {
 }
 
 export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) => {
-  const [expanded, setExpanded] = React.useState(true)
-  const [readOnly] = corePluginHooks.useEmitterValues('readOnly')
+  const [readOnly, editorRootElementRef] = corePluginHooks.useEmitterValues('readOnly', 'editorRootElementRef')
+  const [frontmatterDialogOpen] = frontmatterPluginHooks.useEmitterValues('frontmatterDialogOpen')
+  const setFrontmatterDialogOpen = frontmatterPluginHooks.usePublisher('frontmatterDialogOpen')
+  const removeFrontmatter = frontmatterPluginHooks.usePublisher('removeFrontmatter')
   const yamlConfig = React.useMemo<YamlConfig>(() => {
     if (!yaml) {
       return []
@@ -25,7 +28,7 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
     return Object.entries(YamlParser.load(yaml) as Record<string, string>).map(([key, value]) => ({ key, value }))
   }, [yaml])
 
-  const { register, control, watch } = useForm({
+  const { register, control, handleSubmit } = useForm({
     defaultValues: {
       yamlConfig
     }
@@ -36,87 +39,100 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
     name: 'yamlConfig'
   })
 
-  React.useEffect(() => {
-    const subscription = watch(({ yamlConfig }) => {
-      const yaml = (yamlConfig as YamlConfig).reduce((acc, { key, value }) => {
+  const onSubmit = React.useCallback(
+    ({ yamlConfig }: { yamlConfig: YamlConfig }) => {
+      if (yamlConfig.length === 0) {
+        removeFrontmatter(true)
+        setFrontmatterDialogOpen(false)
+        return
+      }
+      const yaml = yamlConfig.reduce((acc, { key, value }) => {
         if (key && value) {
           acc[key] = value
         }
         return acc
       }, {} as Record<string, string>)
       onChange(YamlParser.dump(yaml).trim())
-    })
-
-    return () => subscription.unsubscribe()
-  }, [watch, onChange])
+      setFrontmatterDialogOpen(false)
+    },
+    [onChange, setFrontmatterDialogOpen, removeFrontmatter]
+  )
 
   return (
-    <div className={styles.frontmatterWrapper} data-expanded={expanded} data-editor-type="frontmatter">
-      <button
-        className={styles.frontmatterToggleButton}
-        onClick={(e) => {
-          e.preventDefault()
-          setExpanded((v) => !v)
-        }}
-      >
-        {expanded ? <ArrowDown /> : <ArrowRight />}
-        Document frontmatter
-      </button>
-
-      {expanded && (
-        <form>
-          <table className={styles.propertyEditorTable}>
-            <colgroup>
-              <col />
-              <col />
-              <col />
-            </colgroup>
-            <thead>
-              <tr>
-                <th>Key</th>
-                <th>Value</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {fields.map((item, index) => {
-                return (
-                  <tr key={item.id}>
+    <>
+      <Dialog.Root open={frontmatterDialogOpen} onOpenChange={(open) => setFrontmatterDialogOpen(open)}>
+        <Dialog.Portal container={editorRootElementRef?.current}>
+          <Dialog.Overlay className={styles.dialogOverlay} />
+          <Dialog.Content className={styles.largeDialogContent} data-editor-type="frontmatter">
+            <Dialog.Title className={styles.dialogTitle}>Edit document frontmatter</Dialog.Title>
+            <form onSubmit={handleSubmit(onSubmit)} onReset={() => setFrontmatterDialogOpen(false)}>
+              <table className={styles.propertyEditorTable}>
+                <colgroup>
+                  <col />
+                  <col />
+                  <col />
+                </colgroup>
+                <thead>
+                  <tr>
+                    <th>Key</th>
+                    <th>Value</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {fields.map((item, index) => {
+                    return (
+                      <tr key={item.id}>
+                        <td>
+                          <TableInput {...register(`yamlConfig.${index}.key`, { required: true })} autofocusIfEmpty readOnly={readOnly} />
+                        </td>
+                        <td>
+                          <TableInput {...register(`yamlConfig.${index}.value`, { required: true })} readOnly={readOnly} />
+                        </td>
+                        <td>
+                          <button type="button" onClick={() => remove(index)} className={styles.iconButton} disabled={readOnly}>
+                            <DeleteIcon />
+                          </button>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+                <tfoot>
+                  <tr>
                     <td>
-                      <TableInput {...register(`yamlConfig.${index}.key`, { required: true })} autofocusIfEmpty readOnly={readOnly} />
-                    </td>
-                    <td>
-                      <TableInput {...register(`yamlConfig.${index}.value`, { required: true })} readOnly={readOnly} />
-                    </td>
-                    <td>
-                      <button type="button" onClick={() => remove(index)} className={styles.iconButton} disabled={readOnly}>
-                        <DeleteIcon />
+                      <button
+                        disabled={readOnly}
+                        className={classNames(styles.primaryButton, styles.smallButton)}
+                        type="button"
+                        onClick={() => {
+                          append({ key: '', value: '' })
+                        }}
+                      >
+                        Add entry
                       </button>
                     </td>
                   </tr>
-                )
-              })}
-            </tbody>
-            <tfoot>
-              <tr>
-                <td>
-                  <button
-                    disabled={readOnly}
-                    className={styles.primaryButton}
-                    type="button"
-                    onClick={() => {
-                      append({ key: '', value: '' })
-                    }}
-                  >
-                    Add new key
-                  </button>
-                </td>
-              </tr>
-            </tfoot>
-          </table>
-        </form>
-      )}
-    </div>
+                </tfoot>
+              </table>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--spacing-2)' }}>
+                <button type="reset" className={styles.secondaryButton}>
+                  Cancel
+                </button>
+                <button type="submit" className={styles.primaryButton}>
+                  Save
+                </button>
+              </div>
+            </form>
+            <Dialog.Close asChild>
+              <button className={styles.dialogCloseButton} aria-label="Close">
+                <CloseIcon />
+              </button>
+            </Dialog.Close>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+    </>
   )
 }
 

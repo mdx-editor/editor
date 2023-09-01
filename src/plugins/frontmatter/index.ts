@@ -9,8 +9,11 @@ import { $isFrontmatterNode, $createFrontmatterNode, FrontmatterNode } from './F
 
 /** @internal */
 export const frontmatterSystem = system(
-  (r, [{ rootEditor }]) => {
+  (r, [{ rootEditor, createRootEditorSubscription }]) => {
     const insertFrontmatter = r.node<true>()
+    const removeFrontmatter = r.node<true>()
+    const frontmatterDialogOpen = r.node<boolean>(false)
+    const hasFrontmatter = r.node<boolean>(false)
 
     r.sub(r.pipe(insertFrontmatter, r.o.withLatestFrom(rootEditor)), ([, theEditor]) => {
       theEditor?.update(() => {
@@ -24,9 +27,32 @@ export const frontmatterSystem = system(
           }
         }
       })
+      r.pub(frontmatterDialogOpen, true)
     })
+
+    r.sub(r.pipe(removeFrontmatter, r.o.withLatestFrom(rootEditor)), ([, theEditor]) => {
+      theEditor?.update(() => {
+        const firstItem = $getRoot().getFirstChild()
+        if ($isFrontmatterNode(firstItem)) {
+          firstItem.remove()
+        }
+      })
+      r.pub(frontmatterDialogOpen, false)
+    })
+
+    r.pub(createRootEditorSubscription, (rootEditor) => {
+      return rootEditor.registerUpdateListener(({ editorState }) => {
+        editorState.read(() => {
+          r.pub(hasFrontmatter, $isFrontmatterNode($getRoot().getFirstChild()))
+        })
+      })
+    })
+
     return {
-      insertFrontmatter
+      insertFrontmatter,
+      removeFrontmatter,
+      hasFrontmatter,
+      frontmatterDialogOpen
     }
   },
   [coreSystem]
