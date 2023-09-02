@@ -104,7 +104,7 @@ export interface MDXEditorProps {
   /**
    * pass if you would like to have the editor automatically focused when mounted.
    */
-  autoFocus?: boolean
+  autoFocus?: boolean | 'rootStart' | 'rootEnd'
   /**
    * Triggered when focus leaves the editor
    */
