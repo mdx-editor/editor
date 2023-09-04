@@ -49,3 +49,23 @@ export function JsxImage() {
     </>
   )
 }
+
+export function ImageWithPreviewHook() {
+  return (
+    <>
+      <MDXEditor
+        markdown={markdownWithHtmlImages}
+        plugins={[
+          imagePlugin({
+            disableImageResize: true,
+            imagePreviewHandler: async (imageSource) => Promise.resolve(`${imageSource}?grayscale`)
+          }),
+          diffSourcePlugin(),
+          jsxPlugin(),
+          toolbarPlugin({ toolbarContents: () => <DiffSourceToggleWrapper>:)</DiffSourceToggleWrapper> })
+        ]}
+        onChange={console.log}
+      />
+    </>
+  )
+}

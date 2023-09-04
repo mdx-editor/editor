@@ -76,6 +76,8 @@ export function ImageEditor({ src, title, nodeKey, width, height }: ImageEditorP
   const activeEditorRef = React.useRef<LexicalEditor | null>(null)
   const [isResizing, setIsResizing] = React.useState<boolean>(false)
   const [disableImageResize] = imagePluginHooks.useEmitterValues('disableImageResize')
+  const [imagePreviewHandler] = imagePluginHooks.useEmitterValues('imagePreviewHandler')
+  const [imageSource, setImageSource] = React.useState<string>(src)
 
   const onDelete = React.useCallback(
     (payload: KeyboardEvent) => {
@@ -125,6 +127,17 @@ export function ImageEditor({ src, title, nodeKey, width, height }: ImageEditorP
     },
     [editor, setSelected]
   )
+
+  React.useEffect(() => {
+    if (imagePreviewHandler) {
+      const callPreviewHandler = async () => {
+        const updatedSrc = await imagePreviewHandler(src)
+        setImageSource(updatedSrc)
+      }
+
+      callPreviewHandler().catch(console.error)
+    }
+  }, [src, imagePreviewHandler])
 
   React.useEffect(() => {
     let isMounted = true
@@ -218,7 +231,7 @@ export function ImageEditor({ src, title, nodeKey, width, height }: ImageEditorP
             className={classNames({
               [styles.focusedImage]: isFocused
             })}
-            src={src}
+            src={imageSource}
             title={title || ''}
             imageRef={imageRef}
           />
