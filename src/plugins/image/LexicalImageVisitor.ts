@@ -14,7 +14,7 @@ export const LexicalImageVisitor: LexicalExportVisitor<ImageNode, Mdast.Image> =
       if (lexicalNode.getWidth() !== 'inherit') {
         img.width = lexicalNode.getWidth() as number
       }
-      img.src = lexicalNode.getSrc()
+
       if (lexicalNode.getAltText()) {
         img.alt = lexicalNode.getAltText()
       }
@@ -25,7 +25,7 @@ export const LexicalImageVisitor: LexicalExportVisitor<ImageNode, Mdast.Image> =
 
       actions.appendToParent(mdastParent, {
         type: 'html',
-        value: img.outerHTML.replace(/>$/, '/>')
+        value: img.outerHTML.replace(/>$/, ` src="${lexicalNode.getSrc()}" />`)
       })
     } else {
       actions.appendToParent(mdastParent, {
