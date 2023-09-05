@@ -288,14 +288,18 @@ export const coreSystem = system((r) => {
       KEY_DOWN_COMMAND,
       (event) => {
         const { keyCode, ctrlKey, metaKey } = event
-        if (keyCode === 65 && controlOrMeta(metaKey, ctrlKey)) {
-          event.preventDefault()
-          theRootEditor.update(() => {
-            const root = $getRoot()
-            const skipFirstChild = root.getFirstChild()?.getType() === 'frontmatter'
-            root.select(skipFirstChild ? 1 : 0, root.getChildrenSize())
+        let shouldOverride = false
 
+        theRootEditor.getEditorState().read(() => {
+          shouldOverride = $getRoot().getFirstChild()?.getType() === 'frontmatter'
+        })
+
+        if (keyCode === 65 && controlOrMeta(metaKey, ctrlKey) && shouldOverride) {
+          event.preventDefault()
+          event.stopImmediatePropagation()
+          theRootEditor.update(() => {
             const rootElement = theRootEditor.getRootElement() as HTMLDivElement
+            window.getSelection()?.selectAllChildren(rootElement)
             rootElement.focus({
               preventScroll: true
             })
@@ -305,7 +309,7 @@ export const coreSystem = system((r) => {
 
         return false
       },
-      COMMAND_PRIORITY_LOW
+      COMMAND_PRIORITY_CRITICAL
     )
   })
 
