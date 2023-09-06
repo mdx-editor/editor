@@ -29,6 +29,7 @@ import { CAN_USE_DOM } from '../../utils/detectMac'
 export * from './ImageNode'
 
 export type ImageUploadHandler = ((image: File) => Promise<string>) | null
+export type ImagePreviewHandler = ((imageSource: string) => Promise<string>) | null
 
 /** @internal */
 export const imageSystem = system(
@@ -37,6 +38,7 @@ export const imageSystem = system(
     const imageAutocompleteSuggestions = r.node<string[]>([])
     const disableImageResize = r.node<boolean>(false)
     const imageUploadHandler = r.node<ImageUploadHandler>(null)
+    const imagePreviewHandler = r.node<ImagePreviewHandler>(null)
 
     r.sub(r.pipe(insertImage, r.o.withLatestFrom(rootEditor)), ([src, theEditor]) => {
       theEditor?.update(() => {
@@ -123,7 +125,8 @@ export const imageSystem = system(
       imageUploadHandler,
       imageAutocompleteSuggestions,
       disableImageResize,
-      insertImage
+      insertImage,
+      imagePreviewHandler
     }
   },
   [coreSystem]
@@ -133,6 +136,7 @@ interface ImagePluginParams {
   imageUploadHandler?: ImageUploadHandler
   imageAutocompleteSuggestions?: string[]
   disableImageResize?: boolean
+  imagePreviewHandler?: ImagePreviewHandler
 }
 
 export const [
@@ -148,6 +152,7 @@ export const [
     realm.pubKey('imageUploadHandler', params?.imageUploadHandler || null)
     realm.pubKey('imageAutocompleteSuggestions', params?.imageAutocompleteSuggestions || [])
     realm.pubKey('disableImageResize', Boolean(params?.disableImageResize))
+    realm.pubKey('imagePreviewHandler', params?.imagePreviewHandler || null)
   },
 
   init: (realm) => {

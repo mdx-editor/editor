@@ -67,7 +67,7 @@ function LazyImage({
   return <img className={className || undefined} src={src} title={title} ref={imageRef} draggable="false" width={width} height={height} />
 }
 
-export function ImageEditor({ src, title, nodeKey, width, height }: ImageEditorProps): JSX.Element {
+export function ImageEditor({ src, title, nodeKey, width, height }: ImageEditorProps): JSX.Element | null {
   const imageRef = React.useRef<null | HTMLImageElement>(null)
   const buttonRef = React.useRef<HTMLButtonElement | null>(null)
   const [isSelected, setSelected, clearSelection] = useLexicalNodeSelection(nodeKey)
@@ -76,6 +76,8 @@ export function ImageEditor({ src, title, nodeKey, width, height }: ImageEditorP
   const activeEditorRef = React.useRef<LexicalEditor | null>(null)
   const [isResizing, setIsResizing] = React.useState<boolean>(false)
   const [disableImageResize] = imagePluginHooks.useEmitterValues('disableImageResize')
+  const [imagePreviewHandler] = imagePluginHooks.useEmitterValues('imagePreviewHandler')
+  const [imageSource, setImageSource] = React.useState<string | null>(null)
 
   const onDelete = React.useCallback(
     (payload: KeyboardEvent) => {
@@ -125,6 +127,18 @@ export function ImageEditor({ src, title, nodeKey, width, height }: ImageEditorP
     },
     [editor, setSelected]
   )
+
+  React.useEffect(() => {
+    if (imagePreviewHandler) {
+      const callPreviewHandler = async () => {
+        const updatedSrc = await imagePreviewHandler(src)
+        setImageSource(updatedSrc)
+      }
+      callPreviewHandler().catch(console.error)
+    } else {
+      setImageSource(src)
+    }
+  }, [src, imagePreviewHandler])
 
   React.useEffect(() => {
     let isMounted = true
@@ -208,7 +222,8 @@ export function ImageEditor({ src, title, nodeKey, width, height }: ImageEditorP
 
   const draggable = $isNodeSelection(selection)
   const isFocused = isSelected
-  return (
+
+  return imageSource !== null ? (
     <React.Suspense fallback={null}>
       <div className={styles.imageWrapper} data-editor-block-type="image">
         <div draggable={draggable}>
@@ -218,7 +233,7 @@ export function ImageEditor({ src, title, nodeKey, width, height }: ImageEditorP
             className={classNames({
               [styles.focusedImage]: isFocused
             })}
-            src={src}
+            src={imageSource}
             title={title || ''}
             imageRef={imageRef}
           />
@@ -228,5 +243,5 @@ export function ImageEditor({ src, title, nodeKey, width, height }: ImageEditorP
         )}
       </div>
     </React.Suspense>
-  )
+  ) : null
 }
