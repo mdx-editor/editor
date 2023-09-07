@@ -53,15 +53,10 @@ export function Placeholder() {
   )
 }
 
-const singleEnterMarkdown = `
-more 
-
-·foo· 
-bar
-more`
+const breakProducingMarkdown = `Hello  \nWorld`
 
 export function BreakExample() {
-  return <MDXEditor markdown={singleEnterMarkdown} onChange={console.log} />
+  return <MDXEditor markdown={breakProducingMarkdown} onChange={console.log} />
 }
 
 const jsxComponentDescriptors: JsxComponentDescriptor[] = [

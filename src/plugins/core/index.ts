@@ -45,6 +45,7 @@ import { MdastTextVisitor } from './MdastTextVisitor'
 import { SharedHistoryPlugin } from './SharedHistoryPlugin'
 import { noop } from '../../utils/fp'
 import { controlOrMeta } from '../../utils/detectMac'
+import { MdastBreakVisitor } from './MdastBreakVisitor'
 
 /** @internal */
 export type EditorSubscription = (activeEditor: LexicalEditor) => () => void
@@ -527,6 +528,7 @@ export const [
     realm.pubKey('addImportVisitor', MdastTextVisitor)
     realm.pubKey('addImportVisitor', MdastFormattingVisitor)
     realm.pubKey('addImportVisitor', MdastInlineCodeVisitor)
+    realm.pubKey('addImportVisitor', MdastBreakVisitor)
 
     // basic lexical nodes
     realm.pubKey('addLexicalNode', ParagraphNode)
