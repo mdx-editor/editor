@@ -12,7 +12,6 @@ import {
   $isRootOrShadowRoot,
   BLUR_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
-  COMMAND_PRIORITY_LOW,
   DecoratorNode,
   ElementNode,
   FORMAT_TEXT_COMMAND,
