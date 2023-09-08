@@ -610,6 +610,7 @@
   background-color: var(--baseBgSubtle);
   padding:var(--spacing-2) var(--spacing-2);
   font-size: var(--text-sm);
+  z-index: 1;
 }
 
 .popoverArrow {
