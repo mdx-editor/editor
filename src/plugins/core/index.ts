@@ -8,6 +8,7 @@ import {
   $getRoot,
   $getSelection,
   $insertNodes,
+  $isDecoratorNode,
   $isRangeSelection,
   $isRootOrShadowRoot,
   BLUR_COMMAND,
@@ -288,23 +289,25 @@ export const coreSystem = system((r) => {
       KEY_DOWN_COMMAND,
       (event) => {
         const { keyCode, ctrlKey, metaKey } = event
-        let shouldOverride = false
+        if (keyCode === 65 && controlOrMeta(metaKey, ctrlKey)) {
+          let shouldOverride = false
 
-        theRootEditor.getEditorState().read(() => {
-          shouldOverride = $getRoot().getFirstChild()?.getType() === 'frontmatter'
-        })
-
-        if (keyCode === 65 && controlOrMeta(metaKey, ctrlKey) && shouldOverride) {
-          event.preventDefault()
-          event.stopImmediatePropagation()
-          theRootEditor.update(() => {
-            const rootElement = theRootEditor.getRootElement() as HTMLDivElement
-            window.getSelection()?.selectAllChildren(rootElement)
-            rootElement.focus({
-              preventScroll: true
-            })
+          theRootEditor.getEditorState().read(() => {
+            shouldOverride = $isDecoratorNode($getRoot().getFirstChild()) || $isDecoratorNode($getRoot().getLastChild())
           })
-          return true
+
+          if (shouldOverride) {
+            event.preventDefault()
+            event.stopImmediatePropagation()
+            theRootEditor.update(() => {
+              const rootElement = theRootEditor.getRootElement() as HTMLDivElement
+              window.getSelection()?.selectAllChildren(rootElement)
+              rootElement.focus({
+                preventScroll: true
+              })
+            })
+            return true
+          }
         }
 
         return false
