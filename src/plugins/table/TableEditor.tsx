@@ -40,6 +40,7 @@ import { corePluginHooks } from '../core'
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin.js'
 import { mergeRegister } from '@lexical/utils'
 import { isPartOftheEditorUI } from '../../utils/isPartOftheEditorUI'
+import { uuidv4 } from '../../utils/uuid4'
 
 const AlignToTailwindClassMap = {
   center: styles.centeredCell,
@@ -55,6 +56,15 @@ export interface TableEditorProps {
 
 export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEditor, lexicalTable }) => {
   const [activeCell, setActiveCell] = React.useState<[number, number] | null>(null)
+  const getCellKey = React.useMemo(() => {
+    const cellKeyMap = new WeakMap<Mdast.TableCell, string>()
+    return (cell: Mdast.TableCell) => {
+      if (!cellKeyMap.has(cell)) {
+        cellKeyMap.set(cell, uuidv4())
+      }
+      return cellKeyMap.get(cell)!
+    }
+  }, [])
 
   const setActiveCellWithBoundaries = React.useCallback(
     (cell: [number, number] | null) => {
@@ -217,7 +227,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
                 return (
                   <Cell
                     align={mdastNode.align?.[colIndex]}
-                    key={colIndex}
+                    key={getCellKey(mdastCell)}
                     contents={mdastCell.children}
                     setActiveCell={setActiveCellWithBoundaries}
                     {...{
