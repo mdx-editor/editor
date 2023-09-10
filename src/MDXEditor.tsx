@@ -1,5 +1,5 @@
 import React from 'react'
-import { RealmPluginInitializer } from './gurx'
+import { RealmPluginInitializer, useHasPlugin } from './gurx'
 import { corePlugin, corePluginHooks } from './plugins/core'
 import { lexicalTheme } from './styles/lexicalTheme'
 import { LexicalComposer } from '@lexical/react/LexicalComposer.js'
@@ -184,12 +184,20 @@ const EditorRootElement: React.FC<{ children: React.ReactNode; className?: strin
 
 const Methods: React.FC<{ mdxRef: React.ForwardedRef<MDXEditorMethods> }> = ({ mdxRef }) => {
   const realm = corePluginHooks.useRealmContext()
+  const hasDiffSourcePlugin = useHasPlugin('diff-source')
 
   React.useImperativeHandle(
     mdxRef,
     () => {
       return {
         getMarkdown: () => {
+          if (hasDiffSourcePlugin) {
+            //@ts-expect-error we're accessing values from the diff-source plugin, but TS does not know about this. Typecast can be done, but we should import from the plugin.
+            if (realm.getKeyValue('viewMode') === 'source') {
+              // @ts-expect-error see above
+              return realm.getKeyValue('markdownSourceEditorValue') as string
+            }
+          }
           return realm.getKeyValue('markdown')
         },
         setMarkdown: (markdown) => {
@@ -200,7 +208,7 @@ const Methods: React.FC<{ mdxRef: React.ForwardedRef<MDXEditorMethods> }> = ({ m
         }
       }
     },
-    [realm]
+    [realm, hasDiffSourcePlugin]
   )
   return null
 }
