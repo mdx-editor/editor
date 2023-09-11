@@ -115,7 +115,7 @@ export interface MDXEditorProps {
   placeholder?: React.ReactNode
   /**
    * pass if you would like to have the editor in read-only mode.
-   * Note: Don't use this mode to render content for consumption - reander the markdown using a library of your choice instead.
+   * Note: Don't use this mode to render content for consumption - render the markdown using a library of your choice instead.
    */
   readOnly?: boolean
 }
