@@ -73,6 +73,10 @@ export function LinkEditForm({ initialUrl, initialTitle, onSubmit, onCancel, lin
     [isOpen, items, onSubmit, title]
   )
 
+  const handleSaveClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    event.stopPropagation()
+  }
+
   const downshiftInputProps = getInputProps()
 
   const inputProps = {
@@ -126,7 +130,7 @@ export function LinkEditForm({ initialUrl, initialTitle, onSubmit, onCancel, lin
         <button type="reset" title="Cancel change" aria-label="Cancel change" className={classNames(styles.secondaryButton)}>
           Cancel
         </button>
-        <button type="submit" title="Set URL" aria-label="Set URL" className={classNames(styles.primaryButton)}>
+        <button type="submit" title="Set URL" aria-label="Set URL" className={classNames(styles.primaryButton)} onClick={handleSaveClick}>
           Save
         </button>
       </div>
