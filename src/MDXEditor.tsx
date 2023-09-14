@@ -173,8 +173,8 @@ const EditorRootElement: React.FC<{ children: React.ReactNode; className?: strin
     const popupContainer = document.createElement('div')
     popupContainer.classList.add(styles.editorRoot)
     if (className) {
-      className.split(' ').forEach((_className) => {
-        popupContainer.classList.add(_className);
+      className.split(' ').forEach((c) => {
+        popupContainer.classList.add(c);
       });
     }
     document.body.appendChild(popupContainer)
