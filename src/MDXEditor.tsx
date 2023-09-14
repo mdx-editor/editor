@@ -172,13 +172,18 @@ const EditorRootElement: React.FC<{ children: React.ReactNode; className?: strin
   React.useEffect(() => {
     const popupContainer = document.createElement('div')
     popupContainer.classList.add(styles.editorRoot)
+    if (className) {
+      className.split(' ').forEach((_className) => {
+        popupContainer.classList.add(_className);
+      });
+    }
     document.body.appendChild(popupContainer)
     editorRootElementRef.current = popupContainer
     setEditorRootElementRef(editorRootElementRef)
     return () => {
       document.body.removeChild(popupContainer)
     }
-  }, [editorRootElementRef, setEditorRootElementRef])
+  }, [className, editorRootElementRef, setEditorRootElementRef])
   return <div className={classNames(styles.editorRoot, styles.editorWrapper, className, 'mdxeditor')}>{children}</div>
 }
 
