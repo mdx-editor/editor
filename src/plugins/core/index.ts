@@ -94,7 +94,7 @@ export const coreSystem = system((r) => {
   const contentEditableClassName = r.node<string>('')
   const readOnly = r.node<boolean>(false)
   const placeholder = r.node<React.ReactNode>('')
-  const autoFocus = r.node<boolean | 'rootStart' | 'rootEnd'>(false)
+  const autoFocus = r.node<boolean | { defaultSelection?: 'rootStart' | 'rootEnd'; preventScroll: boolean }>(false)
   const inFocus = r.node(false, true)
   const currentFormat = r.node(0, true)
 
@@ -251,7 +251,17 @@ export const coreSystem = system((r) => {
 
     const autoFocusValue = r.getValue(autoFocus)
     if (autoFocusValue) {
-      setTimeout(() => theRootEditor.focus(noop, { defaultSelection: autoFocusValue === true ? 'rootStart' : autoFocusValue }))
+      if (autoFocusValue === true) {
+        // Default 'on' state
+        setTimeout(() => theRootEditor.focus(noop, { defaultSelection: 'rootStart' }))
+        return
+      }
+      setTimeout(() =>
+        theRootEditor.focus(noop, {
+          defaultSelection: autoFocusValue.defaultSelection ?? 'rootStart',
+          preventScroll: autoFocusValue.preventScroll ?? false
+        })
+      )
     }
   })
 
@@ -493,7 +503,7 @@ interface CorePluginParams {
   initialMarkdown: string
   contentEditableClassName: string
   placeholder?: React.ReactNode
-  autoFocus: boolean | 'rootStart' | 'rootEnd'
+  autoFocus: boolean | { defaultSelection?: 'rootStart' | 'rootEnd'; preventScroll?: boolean }
   onChange: (markdown: string) => void
   onBlur?: (e: FocusEvent) => void
   toMarkdownOptions: NonNullable<LexicalConvertOptions['toMarkdownOptions']>
