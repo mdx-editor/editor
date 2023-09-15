@@ -9,6 +9,7 @@ import AddPhotoIcon from '../../../icons/add_photo.svg'
  */
 export const InsertImage = React.forwardRef<HTMLButtonElement, Record<string, never>>((_, forwardedRef) => {
   const [imageAutocompleteSuggestions] = imagePluginHooks.useEmitterValues('imageAutocompleteSuggestions')
+  const [imageUploadHandler] = imagePluginHooks.useEmitterValues('imageUploadHandler')
   const insertImage = imagePluginHooks.usePublisher('insertImage')
 
   return (
@@ -17,7 +18,19 @@ export const InsertImage = React.forwardRef<HTMLButtonElement, Record<string, ne
       submitButtonTitle="Insert Image"
       dialogInputPlaceholder="Paste or select image URL"
       tooltipTitle="Insert image"
-      onSubmit={insertImage}
+      onSubmit={(val) => {
+        if (val instanceof File) {
+          imageUploadHandler?.(val)
+            .then((url) => {
+              return insertImage?.(url)
+            })
+            .catch(() => {
+              return
+            })
+        } else {
+          insertImage?.(val)
+        }
+      }}
       buttonContent={<AddPhotoIcon />}
       autocompleteSuggestions={imageAutocompleteSuggestions}
     />

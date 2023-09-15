@@ -23,7 +23,7 @@ export interface DialogButtonProps {
   /**
    * The callback to call when the dialog is submitted. The callback receives the value of the text input as a parameter.
    */
-  onSubmit: (value: string) => void
+  onSubmit: (value: string | File) => void
   /**
    * The title to show in the tooltip of the toolbar button.
    */
@@ -59,7 +59,7 @@ export const DialogButton = React.forwardRef<HTMLButtonElement, DialogButtonProp
     const [open, setOpen] = React.useState(false)
 
     const onSubmitCallback = React.useCallback(
-      (value: string) => {
+      (value: string | File) => {
         onSubmit(value)
         setOpen(false)
       },
@@ -93,7 +93,7 @@ const DialogForm: React.FC<{
   submitButtonTitle: string
   autocompleteSuggestions: string[]
   dialogInputPlaceholder: string
-  onSubmitCallback: (value: string) => void
+  onSubmitCallback: (value: string | File) => void
 }> = ({ autocompleteSuggestions, onSubmitCallback, dialogInputPlaceholder, submitButtonTitle }) => {
   const [items, setItems] = React.useState(autocompleteSuggestions.slice(0, MAX_SUGGESTIONS))
 
@@ -144,6 +144,15 @@ const DialogForm: React.FC<{
       downshiftInputProps.onKeyDown(e)
     }
   }
+  const fileInputProps = {
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+      const files = e.target.files || []
+      if ((files.length || 0) > 0) {
+        onSubmitCallback(files[0])
+        e.target.form?.reset()
+      }
+    }
+  }
 
   const onSubmitEH = (e: React.FormEvent) => {
     e.preventDefault()
@@ -155,6 +164,15 @@ const DialogForm: React.FC<{
   return (
     <form onSubmit={onSubmitEH} className={classNames(styles.linkDialogEditForm)}>
       <div className={styles.linkDialogInputContainer}>
+        <span>Upload file</span>
+        <div
+          style={{
+            marginBottom: '5px'
+          }}
+        >
+          <input className={styles.linkDialogInput} {...fileInputProps} type="file" autoFocus size={30} data-editor-dialog={true} />
+        </div>
+        <span>Or enter your URL</span>
         <div data-visible-dropdown={dropdownIsVisible} className={styles.linkDialogInputWrapper}>
           <input
             placeholder={dialogInputPlaceholder}
