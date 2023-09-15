@@ -170,7 +170,15 @@ const DialogForm: React.FC<{
             marginBottom: '5px'
           }}
         >
-          <input className={styles.linkDialogInput} {...fileInputProps} type="file" autoFocus size={30} data-editor-dialog={true} />
+          <input
+            className={styles.linkDialogInput}
+            {...fileInputProps}
+            type="file"
+            accept="image/*"
+            autoFocus
+            size={30}
+            data-editor-dialog={true}
+          />
         </div>
         <span>Or enter your URL</span>
         <div data-visible-dropdown={dropdownIsVisible} className={styles.linkDialogInputWrapper}>
