@@ -104,7 +104,7 @@ export interface MDXEditorProps {
   /**
    * pass if you would like to have the editor automatically focused when mounted.
    */
-  autoFocus?: boolean | 'rootStart' | 'rootEnd'
+  autoFocus?: boolean | { defaultSelection?: 'rootStart' | 'rootEnd'; preventScroll?: boolean }
   /**
    * Triggered when focus leaves the editor
    */
@@ -147,7 +147,7 @@ export interface MDXEditorMethods {
   /**
    * Sets focus on input
    */
-  focus: (callbackFn?: (() => void) | undefined, defaultSelection?: 'rootStart' | 'rootEnd') => void
+  focus: (callbackFn?: (() => void) | undefined, opts?: { defaultSelection?: 'rootStart' | 'rootEnd'; preventScroll?: boolean }) => void
 }
 
 const RenderRecurisveWrappers: React.FC<{ wrappers: React.ComponentType<{ children: React.ReactNode }>[]; children: React.ReactNode }> = ({
@@ -208,8 +208,8 @@ const Methods: React.FC<{ mdxRef: React.ForwardedRef<MDXEditorMethods> }> = ({ m
         setMarkdown: (markdown) => {
           realm.pubKey('setMarkdown', markdown)
         },
-        focus: (callbackFn?: (() => void) | undefined, defaultSelection?: 'rootStart' | 'rootEnd') => {
-          realm.getKeyValue('rootEditor')?.focus(callbackFn, { defaultSelection })
+        focus: (callbackFn?: (() => void) | undefined, opts?: { defaultSelection?: 'rootStart' | 'rootEnd'; preventScroll?: boolean }) => {
+          realm.getKeyValue('rootEditor')?.focus(callbackFn, opts)
         }
       }
     },
