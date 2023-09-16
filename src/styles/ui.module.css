@@ -464,6 +464,12 @@
   color:var(--baseBase);
 }
 
+.dialogForm {
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-2);
+}
+
 .linkDialogEditForm {
   display: flex;
   flex-direction: column;

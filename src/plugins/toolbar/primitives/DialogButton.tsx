@@ -153,7 +153,7 @@ const DialogForm: React.FC<{
 
   const dropdownIsVisible = isOpen && items.length > 0
   return (
-    <form onSubmit={onSubmitEH} className={classNames(styles.linkDialogEditForm)}>
+    <form onSubmit={onSubmitEH} className={classNames(styles.dialogForm)}>
       <div className={styles.linkDialogInputContainer}>
         <div data-visible-dropdown={dropdownIsVisible} className={styles.linkDialogInputWrapper}>
           <input

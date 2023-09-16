@@ -132,7 +132,7 @@ export const ALL_PLUGINS = [
   headingsPlugin({ allowedHeadingLevels: [1, 2, 3] }),
   linkPlugin(),
   linkDialogPlugin(),
-  imagePlugin(),
+  imagePlugin({ imageAutocompleteSuggestions: ['https://via.placeholder.com/150', 'https://via.placeholder.com/150'] }),
   tablePlugin(),
   thematicBreakPlugin(),
   frontmatterPlugin(),
