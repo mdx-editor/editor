@@ -97,9 +97,7 @@ export function LinkEditForm({ initialUrl, initialTitle, onSubmit, onCancel, lin
       <div className={styles.linkDialogInputContainer}>
         <div data-visible-dropdown={dropdownIsVisible} className={styles.linkDialogInputWrapper}>
           <input id="link-url" className={styles.linkDialogInput} {...inputProps} autoFocus size={40} data-editor-dialog={true} />
-          <button aria-label="toggle menu" type="button" {...getToggleButtonProps()}>
-            <DropDownIcon />
-          </button>
+          {items.length > 0 && <DropDownIcon className={styles.linkDialogDropDownIcon} {...getToggleButtonProps()} />}
         </div>
 
         <div className={styles.linkDialogAutocompleteContainer}>
