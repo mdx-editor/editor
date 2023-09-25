@@ -11,6 +11,7 @@ import {
   $isDecoratorNode,
   $isRangeSelection,
   $isRootOrShadowRoot,
+  $setSelection,
   BLUR_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
   DecoratorNode,
@@ -94,7 +95,7 @@ export const coreSystem = system((r) => {
   const contentEditableClassName = r.node<string>('')
   const readOnly = r.node<boolean>(false)
   const placeholder = r.node<React.ReactNode>('')
-  const autoFocus = r.node<boolean | { defaultSelection?: 'rootStart' | 'rootEnd'; preventScroll: boolean }>(false)
+  const autoFocus = r.node<boolean | { defaultSelection?: 'rootStart' | 'rootEnd'; preventScroll?: boolean }>(false)
   const inFocus = r.node(false, true)
   const currentFormat = r.node(0, true)
 
@@ -218,8 +219,8 @@ export const coreSystem = system((r) => {
   const setMarkdown = r.node<string>()
 
   r.sub(
-    r.pipe(setMarkdown, r.o.withLatestFrom(rootEditor, importVisitors, mdastExtensions, syntaxExtensions)),
-    ([theNewMarkdownValue, editor, importVisitors, mdastExtensions, syntaxExtensions]) => {
+    r.pipe(setMarkdown, r.o.withLatestFrom(rootEditor, importVisitors, mdastExtensions, syntaxExtensions, inFocus)),
+    ([theNewMarkdownValue, editor, importVisitors, mdastExtensions, syntaxExtensions, inFocus]) => {
       editor?.update(() => {
         $getRoot().clear()
         importMarkdownToLexical({
@@ -229,6 +230,10 @@ export const coreSystem = system((r) => {
           markdown: theNewMarkdownValue,
           syntaxExtensions
         })
+
+        if (!inFocus) {
+          $setSelection(null)
+        }
       })
     }
   )
@@ -503,7 +508,7 @@ interface CorePluginParams {
   initialMarkdown: string
   contentEditableClassName: string
   placeholder?: React.ReactNode
-  autoFocus: boolean | { defaultSelection?: 'rootStart' | 'rootEnd'; preventScroll?: boolean }
+  autoFocus: boolean | { defaultSelection?: 'rootStart' | 'rootEnd'; preventScroll?: boolean | undefined }
   onChange: (markdown: string) => void
   onBlur?: (e: FocusEvent) => void
   toMarkdownOptions: NonNullable<LexicalConvertOptions['toMarkdownOptions']>
