@@ -263,8 +263,7 @@ export const coreSystem = system((r) => {
       }
       setTimeout(() =>
         theRootEditor.focus(noop, {
-          defaultSelection: autoFocusValue.defaultSelection ?? 'rootStart',
-          preventScroll: autoFocusValue.preventScroll ?? false
+          defaultSelection: autoFocusValue.defaultSelection ?? 'rootStart'
         })
       )
     }
