@@ -415,7 +415,7 @@ export const coreSystem = system((r) => {
                 }
                 if (Object.hasOwn(node, 'select') && typeof node.select === 'function') {
                   // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-                  setTimeout(() => node.select(), 80)
+                  setTimeout(() => node.select())
                 }
               })
             }

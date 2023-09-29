@@ -136,11 +136,6 @@ export interface NestedEditorProps<T extends Mdast.Content> {
    * Whether or not the editor edits blocks (multiple paragraphs)
    */
   block?: boolean
-
-  /**
-   * An emitter (usually constructed in the lexical node) that will activate the editor when the node is focused.
-   */
-  focusEmitter?: VoidEmitter
 }
 
 /**
@@ -161,7 +156,7 @@ export interface NestedEditorProps<T extends Mdast.Content> {
  */
 export const NestedLexicalEditor = function <T extends Mdast.Content>(props: NestedEditorProps<T>) {
   const { getContent, getUpdatedMdastNode, contentEditableProps, block = false } = props
-  const { mdastNode, lexicalNode } = useNestedEditorContext<T>()
+  const { mdastNode, lexicalNode, focusEmitter } = useNestedEditorContext<T>()
   const updateMdastNode = useMdastNodeUpdater<T>()
   const removeNode = useLexicalNodeRemove()
   const content = getContent(mdastNode)
@@ -188,10 +183,10 @@ export const NestedLexicalEditor = function <T extends Mdast.Content>(props: Nes
   })
 
   React.useEffect(() => {
-    props.focusEmitter?.subscribe(() => {
+    focusEmitter?.subscribe(() => {
       editor.focus()
     })
-  }, [editor, props.focusEmitter])
+  }, [editor, focusEmitter])
 
   React.useEffect(() => {
     editor.update(() => {
