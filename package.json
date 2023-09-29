@@ -36,7 +36,9 @@
   "license": "MIT",
   "dependencies": {
     "@codemirror/lang-markdown": "^6.1.1",
+    "@codemirror/merge": "^6.1.2",
     "@codemirror/state": "^6.2.1",
+    "@codemirror/theme-one-dark": "^6.1.2",
     "@codemirror/view": "6.15.3",
     "@codesandbox/sandpack-react": "^2.6.7",
     "@lexical/clipboard": "^0.12.2",
@@ -58,6 +60,8 @@
     "@radix-ui/react-toolbar": "^1.0.4",
     "@radix-ui/react-tooltip": "^1.0.6",
     "classnames": "^2.3.2",
+    "cm6-theme-basic-light": "^0.2.0",
+    "codemirror": "^6.0.1",
     "downshift": "^7.6.0",
     "hast-util-raw": "^8.0.0",
     "hast-util-sanitize": "^4.1.0",
@@ -76,7 +80,6 @@
     "micromark-extension-frontmatter": "1.1.0",
     "micromark-extension-gfm-table": "^1.0.6",
     "micromark-extension-mdxjs": "1.0.1",
-    "react-diff-view": "^3.0.3",
     "react-hook-form": "^7.44.2",
     "unidiff": "^1.0.2"
   },

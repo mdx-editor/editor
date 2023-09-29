@@ -125,6 +125,7 @@
   --text-base: 1rem;
   --text-sm: 0.875rem;
   --text-xs: 0.75rem;
+  --text-xxs: 0.6rem;
 
   font-family: var(--font-body);
   color: var(--baseText);

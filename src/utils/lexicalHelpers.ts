@@ -10,19 +10,24 @@ export function fromWithinEditorRead<T>(editor: LexicalEditor, fn: () => T): T {
   })
   return result as T
 }
-export function getSelectedNode(selection: RangeSelection): TextNode | ElementNode {
-  const anchor = selection.anchor
-  const focus = selection.focus
-  const anchorNode = selection.anchor.getNode()
-  const focusNode = selection.focus.getNode()
-  if (anchorNode === focusNode) {
-    return anchorNode
-  }
-  const isBackward = selection.isBackward()
-  if (isBackward) {
-    return $isAtNodeEnd(focus) ? anchorNode : focusNode
-  } else {
-    return $isAtNodeEnd(anchor) ? anchorNode : focusNode
+export function getSelectedNode(selection: RangeSelection): TextNode | ElementNode | null {
+  try {
+    const anchor = selection.anchor
+    const focus = selection.focus
+
+    const anchorNode = selection.anchor.getNode()
+    const focusNode = selection.focus.getNode()
+    if (anchorNode === focusNode) {
+      return anchorNode
+    }
+    const isBackward = selection.isBackward()
+    if (isBackward) {
+      return $isAtNodeEnd(focus) ? anchorNode : focusNode
+    } else {
+      return $isAtNodeEnd(anchor) ? anchorNode : focusNode
+    }
+  } catch {
+    return null
   }
 }
 

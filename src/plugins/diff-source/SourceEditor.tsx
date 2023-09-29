@@ -1,33 +1,43 @@
 import { markdown as markdownLanguageSupport } from '@codemirror/lang-markdown'
-import type { CodeMirrorRef } from '@codesandbox/sandpack-react/components/CodeEditor/CodeMirror'
-import { SandpackProvider, CodeEditor as TheEditorFromSandpack } from '@codesandbox/sandpack-react'
+import { EditorState, Extension } from '@codemirror/state'
+import { EditorView, lineNumbers } from '@codemirror/view'
+import { basicLight } from 'cm6-theme-basic-light'
+import { basicSetup } from 'codemirror'
 import React from 'react'
 import { diffSourcePluginHooks } from '.'
 import { corePluginHooks } from '../core'
-import { EditorView } from '@codemirror/view'
+
+export const COMMON_STATE_CONFIG_EXTENSIONS: Extension[] = [basicSetup, basicLight, markdownLanguageSupport(), lineNumbers()]
 
 export const SourceEditor = () => {
   const [markdown, readOnly] = corePluginHooks.useEmitterValues('markdown', 'readOnly')
   const updateMarkdown = diffSourcePluginHooks.usePublisher('markdownSourceEditorValue')
-  const codeMirrorRef = React.useRef<CodeMirrorRef>(null)
+  const editorViewRef = React.useRef<EditorView | null>(null)
 
-  return (
-    <div>
-      <React.Suspense fallback={null}>
-        <SandpackProvider>
-          <TheEditorFromSandpack
-            readOnly={readOnly}
-            extensions={[EditorView.lineWrapping]}
-            showLineNumbers
-            additionalLanguages={[{ name: 'markdown', extensions: ['md'], language: markdownLanguageSupport() }]}
-            initMode="lazy"
-            filePath={`file.md`}
-            code={markdown}
-            onCodeUpdate={updateMarkdown}
-            ref={codeMirrorRef}
-          />
-        </SandpackProvider>
-      </React.Suspense>
-    </div>
+  const ref = React.useCallback(
+    (el: HTMLDivElement | null) => {
+      if (el !== null) {
+        const extensions = [
+          ...COMMON_STATE_CONFIG_EXTENSIONS,
+          EditorView.updateListener.of(({ state }) => {
+            updateMarkdown(state.doc.toString())
+          })
+        ]
+        if (readOnly) {
+          extensions.push(EditorState.readOnly.of(true))
+        }
+        el.innerHTML = ''
+        editorViewRef.current = new EditorView({
+          parent: el,
+          state: EditorState.create({ doc: markdown, extensions })
+        })
+      } else {
+        editorViewRef.current?.destroy()
+        editorViewRef.current = null
+      }
+    },
+    [markdown, readOnly, updateMarkdown]
   )
+
+  return <div ref={ref} className="cm-sourceView" />
 }

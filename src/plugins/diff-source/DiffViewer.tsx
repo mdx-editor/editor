@@ -1,25 +1,66 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import React from 'react'
-import { Diff, Hunk, parseDiff } from 'react-diff-view'
-import { diffLines, formatLines } from 'unidiff'
 
-import 'react-diff-view/style/index.css'
-import { corePluginHooks } from '../core'
 import { diffSourcePluginHooks } from '.'
+import { corePluginHooks } from '../core'
+
+import { MergeView } from '@codemirror/merge'
+import { EditorState } from '@codemirror/state'
+import { EditorView } from '@codemirror/view'
+import { COMMON_STATE_CONFIG_EXTENSIONS } from './SourceEditor'
 
 export const DiffViewer: React.FC = () => {
   const [newText] = corePluginHooks.useEmitterValues('markdown')
   const [oldText] = diffSourcePluginHooks.useEmitterValues('diffMarkdown')
+  const updateMarkdown = diffSourcePluginHooks.usePublisher('markdownSourceEditorValue')
+  return <CmMergeView oldMarkdown={oldText} newMarkdown={newText} onUpdate={updateMarkdown} />
+}
 
-  const diffText = formatLines(diffLines(oldText, newText), { context: 3 })
-  if (diffText.trim() === '') return <div>No changes</div>
-  const [diff] = parseDiff(diffText, { nearbySequences: 'zip' })
+interface CmMergeViewProps {
+  oldMarkdown: string
+  newMarkdown: string
+  onUpdate: (markdown: string) => void
+}
 
-  return (
-    <Diff viewType="split" diffType="modify" hunks={diff.hunks || []}>
-      {(hunks) => hunks.map((hunk) => <Hunk key={hunk.content} hunk={hunk} />)}
-    </Diff>
+const CmMergeView: React.FC<CmMergeViewProps> = ({ oldMarkdown, newMarkdown, onUpdate }) => {
+  const cmMergeViewRef = React.useRef<MergeView | null>(null)
+
+  const ref = React.useCallback(
+    (el: HTMLDivElement | null) => {
+      if (el !== null) {
+        cmMergeViewRef.current = new MergeView({
+          renderRevertControl: () => {
+            const el = document.createElement('button')
+            el.classList.add('cm-merge-revert')
+            el.appendChild(document.createTextNode('\u2B95'))
+            return el
+          },
+          parent: el,
+          orientation: 'a-b',
+          revertControls: 'a-to-b',
+          gutter: true,
+          collapseUnchanged: { margin: 2, minSize: 3 },
+          a: {
+            doc: oldMarkdown,
+            extensions: [...COMMON_STATE_CONFIG_EXTENSIONS, EditorState.readOnly.of(true)]
+          },
+          b: {
+            doc: newMarkdown,
+            extensions: [
+              ...COMMON_STATE_CONFIG_EXTENSIONS,
+              EditorView.updateListener.of(({ state }) => {
+                const md = state.doc.toString()
+                onUpdate(md)
+              })
+            ]
+          }
+        })
+      } else {
+        cmMergeViewRef.current?.destroy()
+        cmMergeViewRef.current = null
+      }
+    },
+    [newMarkdown, oldMarkdown, onUpdate]
   )
+
+  return <div ref={ref} />
 }

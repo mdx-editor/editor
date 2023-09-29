@@ -44,6 +44,9 @@ function getLinkNodeInSelection(selection: RangeSelection | null) {
     return null
   }
   const node = getSelectedNode(selection)
+  if (node === null) {
+    return null
+  }
   const parent = node.getParent()
   if ($isLinkNode(parent)) {
     return parent

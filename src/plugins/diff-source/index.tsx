@@ -29,7 +29,8 @@ export const diffSourceSystem = system(
         r.o.withLatestFrom(markdownSourceEditorValue)
       ),
       ([{ current }, markdownSourceFromEditor]) => {
-        if (current === 'source') {
+        if (current === 'source' || current === 'diff') {
+          console.log('setting markdown', markdownSourceFromEditor)
           r.pub(setMarkdown, markdownSourceFromEditor)
         }
       }

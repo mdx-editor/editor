@@ -8,12 +8,6 @@
 @import url('@radix-ui/colors/red.css');
 
 .mdxeditor {
-  & .diff {
-    --diff-font-family: var(--font-mono);
-    font-size: var(--text-xs);
-  }
-
-
   /** Code mirror */
   & .cm-editor {
     --sp-font-mono: var(--font-mono);
@@ -42,5 +36,24 @@
       overflow-wrap: anywhere;
       flex-shrink: 1;
     }
+  }
+
+  /** Diff viewer */
+  & .cm-mergeView .cm-scroller {
+    font-family: var(--font-mono);
+    line-height: 1.3rem;
+    font-size: var(--text-xs);
+  }
+
+  /** Diff viewer */
+  & .cm-sourceView .cm-scroller {
+    font-family: var(--font-mono);
+    line-height: 1.3rem;
+    font-size: var(--text-xs);
+  }
+
+  & .cm-gutters {
+    background: transparent;
+    font-size: var(--text-xxs);
   }
 }
