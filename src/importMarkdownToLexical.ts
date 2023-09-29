@@ -112,6 +112,11 @@ export function importMarkdownToLexical({ root, markdown, visitors, syntaxExtens
     mdastRoot.children.push({ type: 'paragraph', children: [] })
   }
 
+  // leave empty paragraph, so that the user can start typing
+  if (mdastRoot.children.at(-1)?.type !== 'paragraph') {
+    mdastRoot.children.push({ type: 'paragraph', children: [] })
+  }
+
   importMdastTreeToLexical({ root, mdastRoot, visitors })
 }
 
