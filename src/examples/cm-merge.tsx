@@ -1,10 +1,8 @@
 import React from 'react'
 import { MergeView } from '@codemirror/merge'
 import { markdown as markdownLanguageSupport } from '@codemirror/lang-markdown'
-import { oneDark } from '@codemirror/theme-one-dark'
-import { EditorState, EditorStateConfig, Extension } from '@codemirror/state'
+import { EditorState, Extension } from '@codemirror/state'
 import { EditorView, lineNumbers } from '@codemirror/view'
-import { syntaxHighlighting } from '@codemirror/language'
 import { basicLight } from 'cm6-theme-basic-light'
 import { basicSetup } from 'codemirror'
 
@@ -78,7 +76,7 @@ export function Codemirror() {
   const ref = React.useCallback((el: HTMLDivElement | null) => {
     if (el !== null) {
       el.innerHTML = ''
-      const e = new EditorView({
+      new EditorView({
         parent: el,
         state: EditorState.create({ doc: md1, extensions: [markdownLanguageSupport(), basicLight] })
       })

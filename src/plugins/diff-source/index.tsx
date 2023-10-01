@@ -30,7 +30,6 @@ export const diffSourceSystem = system(
       ),
       ([{ current }, markdownSourceFromEditor]) => {
         if (current === 'source' || current === 'diff') {
-          console.log('setting markdown', markdownSourceFromEditor)
           r.pub(setMarkdown, markdownSourceFromEditor)
         }
       }
