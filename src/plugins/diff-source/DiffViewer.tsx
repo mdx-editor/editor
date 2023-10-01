@@ -38,7 +38,6 @@ const CmMergeView: React.FC<CmMergeViewProps> = ({ oldMarkdown, newMarkdown, onU
           orientation: 'a-b',
           revertControls: 'a-to-b',
           gutter: true,
-          collapseUnchanged: { margin: 2, minSize: 3 },
           a: {
             doc: oldMarkdown,
             extensions: [...COMMON_STATE_CONFIG_EXTENSIONS, EditorState.readOnly.of(true)]
