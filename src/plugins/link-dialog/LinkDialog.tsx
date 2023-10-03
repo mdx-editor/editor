@@ -102,7 +102,7 @@ export function LinkEditForm({ initialUrl, initialTitle, onSubmit, onCancel, lin
           </button>
         </div>
 
-        <div className={styles.linkDialogAutocompleteContainer}>
+        <div className={styles.downshiftAutocompleteContainer}>
           <ul {...getMenuProps()} data-visible={dropdownIsVisible}>
             {items.map((item, index: number) => (
               <li

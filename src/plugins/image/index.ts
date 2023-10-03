@@ -31,23 +31,42 @@ export * from './ImageNode'
 export type ImageUploadHandler = ((image: File) => Promise<string>) | null
 export type ImagePreviewHandler = ((imageSource: string) => Promise<string>) | null
 
+export interface InsertImageFormValues {
+  src?: string
+  altText?: string
+  title?: string
+  file?: File
+}
+
 /** @internal */
 export const imageSystem = system(
   (r, [{ rootEditor }]) => {
-    const insertImage = r.node<string>()
+    const insertImage = r.node<InsertImageFormValues>()
     const imageAutocompleteSuggestions = r.node<string[]>([])
     const disableImageResize = r.node<boolean>(false)
     const imageUploadHandler = r.node<ImageUploadHandler>(null)
     const imagePreviewHandler = r.node<ImagePreviewHandler>(null)
 
-    r.sub(r.pipe(insertImage, r.o.withLatestFrom(rootEditor)), ([src, theEditor]) => {
-      theEditor?.update(() => {
-        const imageNode = $createImageNode({ altText: '', src, title: '' })
-        $insertNodes([imageNode])
-        if ($isRootOrShadowRoot(imageNode.getParentOrThrow())) {
-          $wrapNodeInElement(imageNode, $createParagraphNode).selectEnd()
-        }
-      })
+    r.sub(r.pipe(insertImage, r.o.withLatestFrom(rootEditor, imageUploadHandler)), ([values, theEditor, imageUploadHandler]) => {
+      function insertImage(src: string) {
+        theEditor?.update(() => {
+          const imageNode = $createImageNode({ altText: values.altText ?? '', src, title: values.title ?? '' })
+          $insertNodes([imageNode])
+          if ($isRootOrShadowRoot(imageNode.getParentOrThrow())) {
+            $wrapNodeInElement(imageNode, $createParagraphNode).selectEnd()
+          }
+        })
+      }
+
+      if (values.file) {
+        imageUploadHandler?.(values.file)
+          .then(insertImage)
+          .catch((e) => {
+            throw e
+          })
+      } else if (values.src) {
+        insertImage(values.src)
+      }
     })
 
     r.sub(rootEditor, (editor) => {

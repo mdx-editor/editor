@@ -28,6 +28,7 @@ import { imagePluginHooks } from '.'
 export interface ImageEditorProps {
   nodeKey: string
   src: string
+  alt?: string
   title?: string
   width: number | 'inherit'
   height: number | 'inherit'
@@ -50,6 +51,7 @@ function useSuspenseImage(src: string) {
 
 function LazyImage({
   title,
+  alt,
   className,
   imageRef,
   src,
@@ -57,6 +59,7 @@ function LazyImage({
   height
 }: {
   title: string
+  alt: string
   className: string | null
   imageRef: { current: null | HTMLImageElement }
   src: string
@@ -64,10 +67,21 @@ function LazyImage({
   height: number | 'inherit'
 }): JSX.Element {
   useSuspenseImage(src)
-  return <img className={className || undefined} src={src} title={title} ref={imageRef} draggable="false" width={width} height={height} />
+  return (
+    <img
+      className={className || undefined}
+      alt={alt}
+      src={src}
+      title={title}
+      ref={imageRef}
+      draggable="false"
+      width={width}
+      height={height}
+    />
+  )
 }
 
-export function ImageEditor({ src, title, nodeKey, width, height }: ImageEditorProps): JSX.Element | null {
+export function ImageEditor({ src, title, alt, nodeKey, width, height }: ImageEditorProps): JSX.Element | null {
   const imageRef = React.useRef<null | HTMLImageElement>(null)
   const buttonRef = React.useRef<HTMLButtonElement | null>(null)
   const [isSelected, setSelected, clearSelection] = useLexicalNodeSelection(nodeKey)
@@ -235,6 +249,7 @@ export function ImageEditor({ src, title, nodeKey, width, height }: ImageEditorP
             })}
             src={imageSource}
             title={title || ''}
+            alt={alt || ''}
             imageRef={imageRef}
           />
         </div>

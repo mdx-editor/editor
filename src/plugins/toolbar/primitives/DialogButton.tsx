@@ -171,7 +171,7 @@ const DialogForm: React.FC<{
           )}
         </div>
 
-        <div className={styles.linkDialogAutocompleteContainer}>
+        <div className={styles.downshiftAutocompleteContainer}>
           <ul {...getMenuProps()} data-visible={dropdownIsVisible}>
             {items.map((item, index: number) => (
               <li

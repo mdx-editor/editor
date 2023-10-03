@@ -171,7 +171,16 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
   }
 
   decorate(_parentEditor: LexicalEditor): JSX.Element {
-    return <ImageEditor src={this.getSrc()} title={this.getTitle()} nodeKey={this.getKey()} width={this.__width} height={this.__height} />
+    return (
+      <ImageEditor
+        src={this.getSrc()}
+        title={this.getTitle()}
+        nodeKey={this.getKey()}
+        width={this.__width}
+        height={this.__height}
+        alt={this.__altText}
+      />
+    )
   }
 }
 

@@ -1,5 +1,5 @@
 import React from 'react'
-import { DiffSourceToggleWrapper, MDXEditor, diffSourcePlugin, imagePlugin, jsxPlugin, toolbarPlugin } from '../'
+import { DiffSourceToggleWrapper, InsertImage, MDXEditor, diffSourcePlugin, imagePlugin, jsxPlugin, toolbarPlugin } from '../'
 
 const markdownWithHtmlImages = `
 Hello world
@@ -63,6 +63,27 @@ export function ImageWithPreviewHook() {
           diffSourcePlugin(),
           jsxPlugin(),
           toolbarPlugin({ toolbarContents: () => <DiffSourceToggleWrapper>:)</DiffSourceToggleWrapper> })
+        ]}
+        onChange={console.log}
+      />
+    </>
+  )
+}
+
+export function ImageDialogButtonExample() {
+  return (
+    <>
+      <MDXEditor
+        markdown=""
+        plugins={[
+          imagePlugin({
+            disableImageResize: true,
+            imageUploadHandler: async () => Promise.resolve('https://picsum.photos/200/300?grayscale'),
+            imageAutocompleteSuggestions: ['https://via.placeholder.com/150', 'https://via.placeholder.com/250']
+          }),
+          diffSourcePlugin(),
+          jsxPlugin(),
+          toolbarPlugin({ toolbarContents: () => <InsertImage /> })
         ]}
         onChange={console.log}
       />
