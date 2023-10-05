@@ -64,7 +64,7 @@ const linkDialogSystem = system(
     const linkDialogState = r.node<InactiveLinkDialog | PreviewLinkDialog | EditLinkDialog>({ type: 'inactive' }, true)
 
     // actions
-    const updateLinkUrl = r.node<[string, string]>()
+    const updateLink = r.node<{ url: string; title: string }>()
     const cancelLinkEdit = r.node<true>()
     const applyLinkChanges = r.node<true>()
     const switchFromPreviewToLinkEdit = r.node<true>()
@@ -169,58 +169,35 @@ const linkDialogSystem = system(
       linkDialogState
     )
 
-    r.sub(r.pipe(applyLinkChanges, r.o.withLatestFrom(linkDialogState, activeEditor)), ([, state, editor]) => {
-      if (state.type === 'edit') {
-        const url = state.url.trim()
-        const title = state.title.trim()
+    r.sub(r.pipe(updateLink, r.o.withLatestFrom(activeEditor, linkDialogState)), ([payload, editor, state]) => {
+      const url = payload.url.trim()
+      const title = payload.title.trim()
 
-        if (url.trim() !== '') {
-          editor?.dispatchCommand(TOGGLE_LINK_COMMAND, { url, title })
-          // the dispatch command implementation fails to set the link for a fresh link creation.
-          // Work around with the code below.
-          setTimeout(() => {
-            editor?.update(() => {
-              const node = getLinkNodeInSelection($getSelection() as RangeSelection)
-              node?.setTitle(title)
-            })
+      if (url.trim() !== '') {
+        editor?.dispatchCommand(TOGGLE_LINK_COMMAND, { url, title })
+        // the dispatch command implementation fails to set the link for a fresh link creation.
+        // Work around with the code below.
+        setTimeout(() => {
+          editor?.update(() => {
+            const node = getLinkNodeInSelection($getSelection() as RangeSelection)
+            node?.setTitle(title)
           })
-          r.pub(linkDialogState, {
-            type: 'preview',
-            linkNodeKey: state.linkNodeKey,
-            rectangle: state.rectangle,
-            url
-          })
-        } else {
-          if (state.initialUrl !== '') {
-            editor?.dispatchCommand(TOGGLE_LINK_COMMAND, null)
-          }
-          r.pub(linkDialogState, {
-            type: 'inactive'
-          })
-        }
+        })
+        r.pub(linkDialogState, {
+          type: 'preview',
+          linkNodeKey: state.linkNodeKey,
+          rectangle: state.rectangle,
+          url
+        } as PreviewLinkDialog)
       } else {
-        throw new Error('Cannot apply link edit when not in edit mode')
+        if (state.type === 'edit' && state.initialUrl !== '') {
+          editor?.dispatchCommand(TOGGLE_LINK_COMMAND, null)
+        }
+        r.pub(linkDialogState, {
+          type: 'inactive'
+        })
       }
     })
-
-    r.link(
-      r.pipe(
-        updateLinkUrl,
-        r.o.withLatestFrom(linkDialogState),
-        r.o.map(([[url, title], state]) => {
-          if (state.type === 'edit') {
-            return {
-              ...state,
-              url,
-              title
-            }
-          } else {
-            throw new Error('Cannot update link url when not in edit mode')
-          }
-        })
-      ),
-      linkDialogState
-    )
 
     r.link(
       r.pipe(
@@ -283,7 +260,7 @@ const linkDialogSystem = system(
       dialogState,
       onWindowChange,
       linkDialogState,
-      updateLinkUrl,
+      updateLink,
       switchFromPreviewToLinkEdit,
       cancelLinkEdit,
       removeLink,

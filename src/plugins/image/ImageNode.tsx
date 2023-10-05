@@ -50,7 +50,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
   __height: 'inherit' | number
 
   static getType(): string {
-    return 'image'
+    return 'icage'
   }
 
   static clone(node: ImageNode): ImageNode {
@@ -168,6 +168,14 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
 
   setTitle(title: string | undefined): void {
     this.getWritable().__title = title
+  }
+
+  setSrc(src: string): void {
+    this.getWritable().__src = src
+  }
+
+  setAltText(altText: string | undefined): void {
+    this.getWritable().__altText = altText ?? ''
   }
 
   decorate(_parentEditor: LexicalEditor): JSX.Element {

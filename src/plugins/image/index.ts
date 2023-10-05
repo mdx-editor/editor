@@ -2,6 +2,7 @@ import { $wrapNodeInElement } from '@lexical/utils'
 import {
   $createParagraphNode,
   $createRangeSelection,
+  $getNodeByKey,
   $getSelection,
   $insertNodes,
   $isNodeSelection,
@@ -25,6 +26,7 @@ import { $createImageNode, $isImageNode, CreateImageNodeOptions, ImageNode } fro
 import { LexicalImageVisitor } from './LexicalImageVisitor'
 import { MdastHtmlImageVisitor, MdastImageVisitor, MdastJsxImageVisitor } from './MdastImageVisitor'
 import { CAN_USE_DOM } from '../../utils/detectMac'
+import { ImageDialog } from './ImageDialog'
 
 export * from './ImageNode'
 
@@ -35,7 +37,21 @@ export interface InsertImageFormValues {
   src?: string
   altText?: string
   title?: string
-  file?: File
+  file: FileList
+}
+
+type InactiveImageDialogState = {
+  type: 'inactive'
+}
+
+type NewImageDialogState = {
+  type: 'new'
+}
+
+type EditingImageDialogState = {
+  type: 'editing'
+  nodeKey: string
+  initialValues: Omit<InsertImageFormValues, 'file'>
 }
 
 /** @internal */
@@ -46,28 +62,61 @@ export const imageSystem = system(
     const disableImageResize = r.node<boolean>(false)
     const imageUploadHandler = r.node<ImageUploadHandler>(null)
     const imagePreviewHandler = r.node<ImagePreviewHandler>(null)
+    const imageDialogState = r.node<InactiveImageDialogState | NewImageDialogState | EditingImageDialogState>({ type: 'inactive' })
+    const openNewImageDialog = r.node<true>()
+    const openEditImageDialog = r.node<Omit<EditingImageDialogState, 'type'>>()
+    const closeImageDialog = r.node<true>()
+    const saveImage = r.node<InsertImageFormValues>()
 
-    r.sub(r.pipe(insertImage, r.o.withLatestFrom(rootEditor, imageUploadHandler)), ([values, theEditor, imageUploadHandler]) => {
-      function insertImage(src: string) {
-        theEditor?.update(() => {
-          const imageNode = $createImageNode({ altText: values.altText ?? '', src, title: values.title ?? '' })
-          $insertNodes([imageNode])
-          if ($isRootOrShadowRoot(imageNode.getParentOrThrow())) {
-            $wrapNodeInElement(imageNode, $createParagraphNode).selectEnd()
-          }
-        })
-      }
+    r.link(r.pipe(closeImageDialog, r.o.mapTo({ type: 'inactive' })), imageDialogState)
+    r.link(r.pipe(openNewImageDialog, r.o.mapTo({ type: 'new' })), imageDialogState)
 
-      if (values.file) {
-        imageUploadHandler?.(values.file)
-          .then(insertImage)
-          .catch((e) => {
-            throw e
-          })
-      } else if (values.src) {
-        insertImage(values.src)
+    r.link(
+      r.pipe(
+        openEditImageDialog,
+        r.o.map((payload) => ({ type: 'editing', ...payload }))
+      ),
+      imageDialogState
+    )
+
+    r.sub(
+      r.pipe(saveImage, r.o.withLatestFrom(rootEditor, imageUploadHandler, imageDialogState)),
+      ([values, theEditor, imageUploadHandler, dialogState]) => {
+        const handler =
+          dialogState.type === 'editing'
+            ? (src: string) => {
+                theEditor?.update(() => {
+                  const { nodeKey } = dialogState
+                  const imageNode = $getNodeByKey(nodeKey) as ImageNode
+
+                  imageNode.setTitle(values.title)
+                  imageNode.setAltText(values.altText)
+                  imageNode.setSrc(src)
+                })
+                r.pub(imageDialogState, { type: 'inactive' })
+              }
+            : (src: string) => {
+                theEditor?.update(() => {
+                  const imageNode = $createImageNode({ altText: values.altText ?? '', src, title: values.title ?? '' })
+                  $insertNodes([imageNode])
+                  if ($isRootOrShadowRoot(imageNode.getParentOrThrow())) {
+                    $wrapNodeInElement(imageNode, $createParagraphNode).selectEnd()
+                  }
+                })
+                r.pub(imageDialogState, { type: 'inactive' })
+              }
+
+        if (values.file.length > 0) {
+          imageUploadHandler?.(values.file.item(0)!)
+            .then(handler)
+            .catch((e) => {
+              throw e
+            })
+        } else if (values.src) {
+          handler(values.src)
+        }
       }
-    })
+    )
 
     r.sub(rootEditor, (editor) => {
       editor?.registerCommand<InsertImagePayload>(
@@ -128,7 +177,10 @@ export const imageSystem = system(
           Promise.all(cbPayload.map((file) => imageUploadHandlerValue(file.getAsFile()!)))
             .then((urls) => {
               urls.forEach((url) => {
-                r.pub(insertImage, url)
+                editor.dispatchCommand(INSERT_IMAGE_COMMAND, {
+                  src: url,
+                  altText: ''
+                })
               })
             })
             .catch((e) => {
@@ -141,6 +193,11 @@ export const imageSystem = system(
     })
 
     return {
+      imageDialogState,
+      saveImage,
+      openNewImageDialog,
+      openEditImageDialog,
+      closeImageDialog,
       imageUploadHandler,
       imageAutocompleteSuggestions,
       disableImageResize,
@@ -180,6 +237,7 @@ export const [
     realm.pubKey('addImportVisitor', MdastJsxImageVisitor)
     realm.pubKey('addLexicalNode', ImageNode)
     realm.pubKey('addExportVisitor', LexicalImageVisitor)
+    realm.pubKey('addComposerChild', ImageDialog)
   }
 })
 

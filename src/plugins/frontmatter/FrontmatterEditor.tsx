@@ -65,7 +65,13 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
           <Dialog.Overlay className={styles.dialogOverlay} />
           <Dialog.Content className={styles.largeDialogContent} data-editor-type="frontmatter">
             <Dialog.Title className={styles.dialogTitle}>Edit document frontmatter</Dialog.Title>
-            <form onSubmit={handleSubmit(onSubmit)} onReset={() => setFrontmatterDialogOpen(false)}>
+            <form
+              onSubmit={(e) => {
+                void handleSubmit(onSubmit)(e)
+                e.nativeEvent.stopImmediatePropagation()
+              }}
+              onReset={() => setFrontmatterDialogOpen(false)}
+            >
               <table className={styles.propertyEditorTable}>
                 <colgroup>
                   <col />
@@ -116,11 +122,11 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
                 </tfoot>
               </table>
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--spacing-2)' }}>
-                <button type="reset" className={styles.secondaryButton}>
-                  Cancel
-                </button>
                 <button type="submit" className={styles.primaryButton}>
                   Save
+                </button>
+                <button type="reset" className={styles.secondaryButton}>
+                  Cancel
                 </button>
               </div>
             </form>

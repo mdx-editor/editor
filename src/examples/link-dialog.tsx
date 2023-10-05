@@ -7,7 +7,9 @@ import {
   directivesPlugin,
   headingsPlugin,
   quotePlugin,
-  listsPlugin
+  listsPlugin,
+  toolbarPlugin,
+  CreateLink
 } from '../'
 import admonitionMarkdown from './assets/admonition.md?raw'
 
@@ -46,6 +48,35 @@ export function ParentOffsetOfAnchor() {
         markdown={`Hello world [link](https://google.com/)`}
         plugins={[linkPlugin(), linkDialogPlugin({ linkAutocompleteSuggestions: ['https://msn.com/', 'https://virtuoso.dev/'] })]}
       />
+    </div>
+  )
+}
+
+export function EditorInAForm() {
+  return (
+    <div className="App">
+      <form
+        onSubmit={(evt) => {
+          evt.preventDefault()
+          alert('main form submitted')
+        }}
+      >
+        <MDXEditor
+          markdown="[Link](http://www.example.com)"
+          plugins={[
+            linkPlugin(),
+            linkDialogPlugin(),
+            toolbarPlugin({
+              toolbarContents: () => (
+                <>
+                  <CreateLink />
+                </>
+              )
+            })
+          ]}
+        />
+        <button type="submit">Submit</button>
+      </form>
     </div>
   )
 }

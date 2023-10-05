@@ -11,127 +11,75 @@ import CopyIcon from '../../icons/content_copy.svg'
 import EditIcon from '../../icons/edit.svg'
 import LinkOffIcon from '../../icons/link_off.svg'
 import OpenInNewIcon from '../../icons/open_in_new.svg'
-import DropDownIcon from '../../icons/arrow_drop_down.svg'
 import classNames from 'classnames'
-import { useCombobox } from 'downshift'
 import styles from '../../styles/ui.module.css'
 import { corePluginHooks } from '../core'
 import { linkDialogPluginHooks } from '.'
+import { useForm } from 'react-hook-form'
+import { DownshiftAutoComplete } from '../core/ui/DownshiftAutoComplete'
 
 export const OPEN_LINK_DIALOG: LexicalCommand<undefined> = createCommand()
 
 interface LinkEditFormProps {
-  initialUrl: string
-  initialTitle: string
-  onSubmit: (link: [string, string]) => void
+  url: string
+  title: string
+  onSubmit: (link: { url: string; title: string }) => void
   onCancel: () => void
   linkAutocompleteSuggestions: string[]
 }
 
-const MAX_SUGGESTIONS = 20
+interface LinkFormFields {
+  url: string
+  title: string
+}
 
-export function LinkEditForm({ initialUrl, initialTitle, onSubmit, onCancel, linkAutocompleteSuggestions }: LinkEditFormProps) {
-  const [items, setItems] = React.useState(linkAutocompleteSuggestions.slice(0, MAX_SUGGESTIONS))
-  const [title, setTitle] = React.useState(initialTitle)
-
-  const { isOpen, getToggleButtonProps, getMenuProps, getInputProps, highlightedIndex, getItemProps, selectedItem, inputValue } =
-    useCombobox({
-      initialInputValue: initialUrl,
-      onInputValueChange({ inputValue }) {
-        inputValue = inputValue?.toLowerCase() || ''
-        const matchingItems = []
-        for (const url of linkAutocompleteSuggestions) {
-          if (url.toLowerCase().includes(inputValue)) {
-            matchingItems.push(url)
-            if (matchingItems.length >= MAX_SUGGESTIONS) {
-              break
-            }
-          }
-        }
-        setItems(matchingItems)
-      },
-      items,
-      itemToString(item) {
-        return item ?? ''
-      }
-    })
-
-  const onSubmitEH = (e: React.FormEvent) => {
-    e.preventDefault()
-    onSubmit([inputValue, title])
-  }
-
-  const onKeyDownEH = React.useCallback(
-    (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === 'Escape') {
-        ;(e.target as HTMLInputElement).form?.reset()
-      } else if (e.key === 'Enter' && (!isOpen || items.length === 0)) {
-        e.preventDefault()
-        onSubmit([(e.target as HTMLInputElement).value, title])
-      }
-    },
-    [isOpen, items, onSubmit, title]
-  )
-
-  const handleSaveClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    event.stopPropagation()
-  }
-
-  const downshiftInputProps = getInputProps()
-
-  const inputProps = {
-    ...downshiftInputProps,
-    onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => {
-      onKeyDownEH(e)
-      downshiftInputProps.onKeyDown(e)
+export function LinkEditForm({ url, title, onSubmit, onCancel, linkAutocompleteSuggestions }: LinkEditFormProps) {
+  const {
+    register,
+    handleSubmit,
+    control,
+    setValue,
+    reset: _
+  } = useForm<LinkFormFields>({
+    values: {
+      url,
+      title
     }
-  }
-
-  const dropdownIsVisible = isOpen && items.length > 0
+  })
 
   return (
-    <form onSubmit={onSubmitEH} onReset={onCancel} className={classNames(styles.linkDialogEditForm)}>
-      <div>
+    <form
+      onSubmit={(e) => {
+        void handleSubmit(onSubmit)(e)
+        e.nativeEvent.stopImmediatePropagation()
+      }}
+      onReset={onCancel}
+      className={classNames(styles.multiFieldForm, styles.linkDialogEditForm)}
+    >
+      <div className={styles.formField}>
         <label htmlFor="link-url">URL</label>
+        <DownshiftAutoComplete
+          initialInputValue={url}
+          inputName="url"
+          suggestions={linkAutocompleteSuggestions}
+          setValue={setValue}
+          control={control}
+          placeholder="Select or paste an URL"
+          autofocus
+        />
       </div>
-      <div className={styles.linkDialogInputContainer}>
-        <div data-visible-dropdown={dropdownIsVisible} className={styles.linkDialogInputWrapper}>
-          <input id="link-url" className={styles.linkDialogInput} {...inputProps} autoFocus size={40} data-editor-dialog={true} />
-          <button aria-label="toggle menu" type="button" {...getToggleButtonProps()}>
-            <DropDownIcon />
-          </button>
-        </div>
 
-        <div className={styles.downshiftAutocompleteContainer}>
-          <ul {...getMenuProps()} data-visible={dropdownIsVisible}>
-            {items.map((item, index: number) => (
-              <li
-                data-selected={selectedItem === item}
-                data-highlighted={highlightedIndex === index}
-                key={`${item}${index}`}
-                {...getItemProps({ item, index })}
-              >
-                {item}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-      <div>
+      <div className={styles.formField}>
         <label htmlFor="link-title">Title</label>
-      </div>
-      <div>
-        <div className={styles.linkDialogInputWrapper}>
-          <input id="link-title" className={styles.linkDialogInput} size={40} value={title} onChange={(e) => setTitle(e.target.value)} />
-        </div>
+        <input id="link-title" className={styles.textInput} size={40} {...register('title')} />
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--spacing-2)' }}>
+        <button type="submit" title="Set URL" aria-label="Set URL" className={classNames(styles.primaryButton)}>
+          Save
+        </button>
         <button type="reset" title="Cancel change" aria-label="Cancel change" className={classNames(styles.secondaryButton)}>
           Cancel
-        </button>
-        <button type="submit" title="Set URL" aria-label="Set URL" className={classNames(styles.primaryButton)} onClick={handleSaveClick}>
-          Save
         </button>
       </div>
     </form>
@@ -147,11 +95,10 @@ export const LinkDialog: React.FC = () => {
     'linkDialogState',
     'linkAutocompleteSuggestions'
   )
-  const updateLinkUrl = linkDialogPluginHooks.usePublisher('updateLinkUrl')
+  const updateLink = linkDialogPluginHooks.usePublisher('updateLink')
   const cancelLinkEdit = linkDialogPluginHooks.usePublisher('cancelLinkEdit')
   const switchFromPreviewToLinkEdit = linkDialogPluginHooks.usePublisher('switchFromPreviewToLinkEdit')
   const removeLink = linkDialogPluginHooks.usePublisher('removeLink')
-  const applyLinkChanges = linkDialogPluginHooks.usePublisher('applyLinkChanges')
 
   React.useEffect(() => {
     const update = () => {
@@ -172,14 +119,6 @@ export const LinkDialog: React.FC = () => {
   const [copyUrlTooltipOpen, setCopyUrlTooltipOpen] = React.useState(false)
 
   const theRect = linkDialogState?.rectangle
-
-  const onSubmitEH = React.useCallback(
-    (payload: [string, string]) => {
-      updateLinkUrl(payload)
-      applyLinkChanges(true)
-    },
-    [applyLinkChanges, updateLinkUrl]
-  )
 
   const urlIsExternal = linkDialogState.type === 'preview' && linkDialogState.url.startsWith('http')
 
@@ -205,9 +144,9 @@ export const LinkDialog: React.FC = () => {
         >
           {linkDialogState.type === 'edit' && (
             <LinkEditForm
-              initialUrl={linkDialogState.url}
-              initialTitle={linkDialogState.title}
-              onSubmit={onSubmitEH}
+              url={linkDialogState.url}
+              title={linkDialogState.title}
+              onSubmit={updateLink}
               onCancel={cancelLinkEdit.bind(null, true)}
               linkAutocompleteSuggestions={linkAutocompleteSuggestions}
             />

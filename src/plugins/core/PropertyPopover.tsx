@@ -42,10 +42,11 @@ export const PropertyPopover: React.FC<PropertyPopoverProps> = ({ title, propert
       <PopoverPortal>
         <PopoverContent>
           <form
-            onSubmit={handleSubmit((values) => {
-              onChange(values)
+            onSubmit={(e) => {
+              void handleSubmit(onChange)(e)
               setOpen(false)
-            })}
+              e.nativeEvent.stopImmediatePropagation()
+            }}
           >
             <h3 className={styles.propertyPanelTitle}>{title} Attributes</h3>
             <table className={styles.propertyEditorTable}>

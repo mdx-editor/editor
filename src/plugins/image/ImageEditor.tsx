@@ -5,6 +5,7 @@ import type { GridSelection, LexicalEditor, NodeSelection, RangeSelection } from
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext.js'
 import { useLexicalNodeSelection } from '@lexical/react/useLexicalNodeSelection.js'
 import { mergeRegister } from '@lexical/utils'
+import classNames from 'classnames'
 import {
   $getNodeByKey,
   $getSelection,
@@ -19,11 +20,11 @@ import {
   KEY_ESCAPE_COMMAND,
   SELECTION_CHANGE_COMMAND
 } from 'lexical'
+import { imagePluginHooks } from '.'
+import SettingsIcon from '../../icons/settings.svg'
 import styles from '../../styles/ui.module.css'
-import classNames from 'classnames'
 import { $isImageNode } from './ImageNode'
 import ImageResizer from './ImageResizer'
-import { imagePluginHooks } from '.'
 
 export interface ImageEditorProps {
   nodeKey: string
@@ -92,6 +93,7 @@ export function ImageEditor({ src, title, alt, nodeKey, width, height }: ImageEd
   const [disableImageResize] = imagePluginHooks.useEmitterValues('disableImageResize')
   const [imagePreviewHandler] = imagePluginHooks.useEmitterValues('imagePreviewHandler')
   const [imageSource, setImageSource] = React.useState<string | null>(null)
+  const openEditImageDialog = imagePluginHooks.usePublisher('openEditImageDialog')
 
   const onDelete = React.useCallback(
     (payload: KeyboardEvent) => {
@@ -256,6 +258,22 @@ export function ImageEditor({ src, title, alt, nodeKey, width, height }: ImageEd
         {draggable && isFocused && !disableImageResize && (
           <ImageResizer editor={editor} imageRef={imageRef} onResizeStart={onResizeStart} onResizeEnd={onResizeEnd} />
         )}
+        <button
+          className={classNames(styles.iconButton, styles.editImageButton)}
+          title="Edit image"
+          onClick={() => {
+            openEditImageDialog({
+              nodeKey: nodeKey,
+              initialValues: {
+                src: imageSource,
+                title: title || '',
+                altText: alt || ''
+              }
+            })
+          }}
+        >
+          <SettingsIcon />
+        </button>
       </div>
     </React.Suspense>
   ) : null
