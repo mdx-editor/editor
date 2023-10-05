@@ -51,7 +51,8 @@ export function LinkEditForm({ url, title, onSubmit, onCancel, linkAutocompleteS
     <form
       onSubmit={(e) => {
         void handleSubmit(onSubmit)(e)
-        e.nativeEvent.stopImmediatePropagation()
+        e.stopPropagation()
+        e.preventDefault()
       }}
       onReset={onCancel}
       className={classNames(styles.multiFieldForm, styles.linkDialogEditForm)}

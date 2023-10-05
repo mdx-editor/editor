@@ -45,7 +45,8 @@ export const PropertyPopover: React.FC<PropertyPopoverProps> = ({ title, propert
             onSubmit={(e) => {
               void handleSubmit(onChange)(e)
               setOpen(false)
-              e.nativeEvent.stopImmediatePropagation()
+              e.preventDefault()
+              e.stopPropagation()
             }}
           >
             <h3 className={styles.propertyPanelTitle}>{title} Attributes</h3>

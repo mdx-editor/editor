@@ -47,7 +47,8 @@ export const ImageDialog: React.FC = () => {
             onSubmit={(e) => {
               void handleSubmit(saveImage)(e)
               reset({ src: '', title: '', altText: '' })
-              e.nativeEvent.stopImmediatePropagation()
+              e.preventDefault()
+              e.stopPropagation()
             }}
             className={styles.multiFieldForm}
           >

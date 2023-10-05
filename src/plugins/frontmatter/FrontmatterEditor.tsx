@@ -68,7 +68,7 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
             <form
               onSubmit={(e) => {
                 void handleSubmit(onSubmit)(e)
-                e.nativeEvent.stopImmediatePropagation()
+                e.stopPropagation()
               }}
               onReset={() => setFrontmatterDialogOpen(false)}
             >
