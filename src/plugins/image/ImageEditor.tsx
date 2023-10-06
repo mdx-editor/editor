@@ -259,6 +259,7 @@ export function ImageEditor({ src, title, alt, nodeKey, width, height }: ImageEd
           <ImageResizer editor={editor} imageRef={imageRef} onResizeStart={onResizeStart} onResizeEnd={onResizeEnd} />
         )}
         <button
+          type="button"
           className={classNames(styles.iconButton, styles.editImageButton)}
           title="Edit image"
           onClick={() => {

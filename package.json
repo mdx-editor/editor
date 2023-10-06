@@ -41,7 +41,6 @@
     "@codemirror/view": "^6.21.0",
     "@codesandbox/sandpack-react": "^2.6.7",
     "@lexical/clipboard": "^0.12.2",
-    "@lexical/code": "^0.12.2",
     "@lexical/link": "^0.12.2",
     "@lexical/list": "^0.12.2",
     "@lexical/markdown": "^0.12.2",
