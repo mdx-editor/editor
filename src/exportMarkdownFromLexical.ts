@@ -3,6 +3,8 @@ import * as Mdast from 'mdast'
 import type { MdxjsEsm } from 'mdast-util-mdx'
 import { Options as ToMarkdownOptions, toMarkdown } from 'mdast-util-to-markdown'
 import type { JsxComponentDescriptor } from './plugins/jsx'
+import { isMdastHTMLNode } from './plugins/core/MdastHTMLNode'
+import { mergeStyleAttributes } from './utils/mergeStyleAttributes'
 
 export type { Options as ToMarkdownOptions } from 'mdast-util-to-markdown'
 
@@ -80,6 +82,11 @@ export interface LexicalExportVisitor<LN extends LexicalNode, UN extends Mdast.C
    * For this to be called by the tree walk, shouldJoin must return true.
    */
   join?<T extends Mdast.Content>(prevNode: T, currentNode: T): T
+
+  /**
+   * Default 0, optional, sets the priority of the visitor. The higher the number, the earlier it will be called.
+   */
+  priority?: number
 }
 
 /**
@@ -113,6 +120,9 @@ export function exportLexicalTreeToMdast({
 }: ExportLexicalTreeOptions): Mdast.Root {
   let unistRoot: Mdast.Root | null = null
   const referredComponents = new Set<string>()
+
+  visitors = visitors.sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0))
+
   visit(root, null)
 
   function registerReferredComponent(componentName: string) {
@@ -237,12 +247,44 @@ export function exportLexicalTreeToMdast({
   }
 
   fixWrappingWhitespace(typedRoot, [])
+  collapseNestedHtmlTags(typedRoot)
 
   if (!jsxIsAvailable) {
     convertUnderlineJsxToHtml(typedRoot)
   }
 
   return typedRoot
+}
+
+function collapseNestedHtmlTags(node: Mdast.Parent | Mdast.Content) {
+  if ('children' in node) {
+    if (isMdastHTMLNode(node) && node.children.length === 1) {
+      const onlyChild = node.children[0]
+      if (onlyChild.type === 'mdxJsxTextElement' && onlyChild.name === 'span') {
+        ;(onlyChild.attributes || []).forEach((attribute) => {
+          if (attribute.type === 'mdxJsxAttribute') {
+            const parentAttribute = node.attributes?.find((attr) => attr.type === 'mdxJsxAttribute' && attr.name === attribute.name)
+            if (parentAttribute) {
+              if (attribute.name === 'className') {
+                const mergedClassesSet = new Set([
+                  ...(parentAttribute.value as string).split(' '),
+                  ...(attribute.value as string).split(' ')
+                ])
+                parentAttribute.value = Array.from(mergedClassesSet).join(' ')
+              } else if (attribute.name === 'style') {
+                parentAttribute.value = mergeStyleAttributes(parentAttribute.value as string, attribute.value as string)
+              }
+            } else {
+              node.attributes.push(attribute)
+            }
+          }
+        })
+        node.children = onlyChild.children
+      }
+    }
+
+    node.children.forEach((child) => collapseNestedHtmlTags(child))
+  }
 }
 
 function convertUnderlineJsxToHtml(node: Mdast.Parent | Mdast.Content) {

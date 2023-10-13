@@ -66,6 +66,10 @@ export interface MdastImportVisitor<UN extends Mdast.Content> {
    * The function that is called when the node is visited. See {@link MdastVisitParams} for details.
    */
   visitNode(params: MdastVisitParams<UN>): void
+  /**
+   * Default 0, optional, sets the priority of the visitor. The higher the number, the earlier it will be called.
+   */
+  priority?: number
 }
 
 function isParent(node: unknown): node is Mdast.Parent {
@@ -123,6 +127,8 @@ export function importMarkdownToLexical({ root, markdown, visitors, syntaxExtens
 /** @internal */
 export function importMdastTreeToLexical({ root, mdastRoot, visitors }: MdastTreeImportOptions): void {
   const formattingMap = new WeakMap<object, number>()
+
+  visitors = visitors.sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0))
 
   function visitChildren(mdastNode: Mdast.Parent, lexicalParent: LexicalNode) {
     if (!isParent(mdastNode)) {

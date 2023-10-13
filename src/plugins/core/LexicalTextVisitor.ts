@@ -2,6 +2,7 @@ import { $isTextNode, TextNode } from 'lexical'
 import * as Mdast from 'mdast'
 import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from '../../FormatConstants'
 import { LexicalExportVisitor } from '../../exportMarkdownFromLexical'
+import { type MdxJsxTextElement } from 'mdast-util-mdx-jsx'
 
 export function isMdastText(mdastNode: Mdast.Content): mdastNode is Mdast.Text {
   return mdastNode.type === 'text'
@@ -9,7 +10,15 @@ export function isMdastText(mdastNode: Mdast.Content): mdastNode is Mdast.Text {
 
 export const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text> = {
   shouldJoin: (prevNode, currentNode) => {
-    return ['text', 'emphasis', 'strong', 'mdxJsxTextElement'].includes(prevNode.type) && prevNode.type === currentNode.type
+    if (['text', 'emphasis', 'strong'].includes(prevNode.type)) {
+      return prevNode.type === currentNode.type
+    }
+
+    if (prevNode.type === 'mdxJsxTextElement' && (currentNode as unknown as MdxJsxTextElement).type === 'mdxJsxTextElement') {
+      const currentMdxNode: MdxJsxTextElement = currentNode as unknown as MdxJsxTextElement
+      return prevNode.name === currentMdxNode.name && JSON.stringify(prevNode.attributes) === JSON.stringify(currentMdxNode.attributes)
+    }
+    return false
   },
 
   join<T extends Mdast.Content>(prevNode: T, currentNode: T) {
@@ -33,6 +42,7 @@ export const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text> = {
     const textContent = lexicalNode.getTextContent()
     // if the node is only whitespace, ignore the format.
     const format = lexicalNode.getFormat() ?? 0
+    const style = lexicalNode.getStyle()
 
     if (format & IS_CODE) {
       actions.addAndStepInto('inlineCode', {
@@ -42,6 +52,15 @@ export const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text> = {
     }
 
     let localParentNode = mdastParent
+
+    if (style) {
+      localParentNode = actions.appendToParent(localParentNode, {
+        type: 'mdxJsxTextElement',
+        name: 'span',
+        children: [],
+        attributes: [{ type: 'mdxJsxAttribute', name: 'style', value: style }]
+      }) as Mdast.Parent
+    }
 
     if (prevFormat & format & IS_ITALIC) {
       localParentNode = actions.appendToParent(localParentNode, {
