@@ -53,6 +53,45 @@ export const CustomTheming = () => {
   return <MDXEditor className="dark-theme dark-editor" markdown={kitchenSinkMarkdown} plugins={ALL_PLUGINS} />
 }
 
+export const DarkTheme = () => {
+  return (
+    <MDXEditor
+      className="dark-theme dark-editor"
+      markdown={'hello world'}
+      plugins={[
+        toolbarPlugin({
+          toolbarContents: () => (
+            <>
+              <DiffSourceToggleWrapper>
+                <UndoRedo />
+                <BoldItalicUnderlineToggles />
+                <ListsToggle />
+                <Separator />
+                <BlockTypeSelect />
+                <CreateLink />
+                <InsertImage />
+                <Separator />
+              </DiffSourceToggleWrapper>
+            </>
+          )
+        }),
+        listsPlugin(),
+        quotePlugin(),
+        headingsPlugin(),
+        linkPlugin(),
+        linkDialogPlugin(),
+        imagePlugin(),
+        tablePlugin(),
+        thematicBreakPlugin(),
+        frontmatterPlugin(),
+        directivesPlugin({ directiveDescriptors: [YoutubeDirectiveDescriptor, AdmonitionDirectiveDescriptor] }),
+        diffSourcePlugin({ viewMode: 'rich-text', diffMarkdown: 'boo' }),
+        markdownShortcutPlugin()
+      ]}
+    />
+  )
+}
+
 export const ConditionalToolbar = () => {
   return (
     <MDXEditor

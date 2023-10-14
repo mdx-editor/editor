@@ -92,6 +92,7 @@ export const coreSystem = system((r) => {
 
   const rootEditor = r.node<LexicalEditor | null>(null)
   const activeEditor = r.node<LexicalEditor | null>(null, true)
+  const className = r.node<string>('')
   const contentEditableClassName = r.node<string>('')
   const readOnly = r.node<boolean>(false)
   const placeholder = r.node<React.ReactNode>('')
@@ -471,6 +472,7 @@ export const coreSystem = system((r) => {
 
     // DOM
     editorRootElementRef,
+    className,
     contentEditableClassName,
     placeholder,
     autoFocus,
@@ -505,6 +507,7 @@ export const coreSystem = system((r) => {
 
 interface CorePluginParams {
   initialMarkdown: string
+  className: string
   contentEditableClassName: string
   placeholder?: React.ReactNode
   autoFocus: boolean | { defaultSelection?: 'rootStart' | 'rootEnd'; preventScroll?: boolean | undefined }
@@ -525,6 +528,7 @@ export const [
 
   applyParamsToSystem(realm, params: CorePluginParams) {
     realm.pubKeys({
+      className: params.className,
       contentEditableClassName: params.contentEditableClassName,
       toMarkdownOptions: params.toMarkdownOptions,
       autoFocus: params.autoFocus,

@@ -226,6 +226,7 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>((pro
     <RealmPluginInitializer
       plugins={[
         corePlugin({
+          className: props.className ?? '',
           contentEditableClassName: props.contentEditableClassName ?? '',
           initialMarkdown: props.markdown,
           onChange: props.onChange ?? noop,
