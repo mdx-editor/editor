@@ -70,7 +70,10 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
                 void handleSubmit(onSubmit)(e)
                 e.stopPropagation()
               }}
-              onReset={() => setFrontmatterDialogOpen(false)}
+              onReset={(e) => {
+                e.stopPropagation()
+                setFrontmatterDialogOpen(false)
+              }}
             >
               <table className={styles.propertyEditorTable}>
                 <colgroup>

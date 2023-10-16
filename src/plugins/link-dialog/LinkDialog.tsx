@@ -54,7 +54,10 @@ export function LinkEditForm({ url, title, onSubmit, onCancel, linkAutocompleteS
         e.stopPropagation()
         e.preventDefault()
       }}
-      onReset={onCancel}
+      onReset={(e) => {
+        e.stopPropagation()
+        onCancel()
+      }}
       className={classNames(styles.multiFieldForm, styles.linkDialogEditForm)}
     >
       <div className={styles.formField}>

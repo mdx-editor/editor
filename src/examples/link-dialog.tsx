@@ -60,6 +60,9 @@ export function EditorInAForm() {
           evt.preventDefault()
           alert('main form submitted')
         }}
+        onReset={() => {
+          console.log('reset')
+        }}
       >
         <MDXEditor
           markdown="[Link](http://www.example.com)"
