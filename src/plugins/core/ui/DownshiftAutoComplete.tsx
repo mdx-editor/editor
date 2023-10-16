@@ -21,9 +21,9 @@ export const DownshiftAutoComplete: React.FC<{
 
   const { isOpen, getToggleButtonProps, getMenuProps, getInputProps, highlightedIndex, getItemProps, selectedItem } = useCombobox({
     initialInputValue,
-    onInputValueChange({ inputValue }) {
-      inputValue = inputValue?.toLowerCase() || ''
+    onInputValueChange({ inputValue = '' }) {
       setValue(inputName, inputValue)
+      inputValue = inputValue?.toLowerCase() || ''
       const matchingItems = []
       for (const suggestion of suggestions) {
         if (suggestion.toLowerCase().includes(inputValue)) {
