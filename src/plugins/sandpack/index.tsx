@@ -18,7 +18,7 @@ export interface SandpackPreset {
   /**
    * The label of the preset, displayed in the sandpack button dropdown.
    */
-  label: string
+  label: string | JSX.Element
   /**
    * The meta string that will be used to identify the preset from the fenced code block. e.g. "live react"
    */
