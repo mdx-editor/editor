@@ -19,7 +19,7 @@ export const BlockTypeSelect = () => {
   if (!hasQuote && !hasHeadings) {
     return null
   }
-  const items: { label: string; value: BlockType }[] = [{ label: 'Paragraph', value: 'paragraph' }]
+  const items: { label: string | JSX.Element; value: BlockType }[] = [{ label: 'Paragraph', value: 'paragraph' }]
 
   if (hasQuote) {
     items.push({ label: 'Quote', value: 'quote' })
