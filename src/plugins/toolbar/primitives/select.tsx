@@ -88,7 +88,7 @@ export interface SelectProps<T extends string> {
   onChange: (value: T) => void
   triggerTitle: string
   placeholder: string
-  items: ({ label: string; value: T } | 'separator')[]
+  items: ({ label: string | JSX.Element; value: T } | 'separator')[]
 }
 
 /**
