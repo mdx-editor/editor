@@ -181,7 +181,7 @@ const EditorRootElement: React.FC<{ children: React.ReactNode; className?: strin
     editorRootElementRef.current = popupContainer
     setEditorRootElementRef(editorRootElementRef)
     return () => {
-      document.body.removeChild(popupContainer)
+      popupContainer.remove()
     }
   }, [className, editorRootElementRef, setEditorRootElementRef])
   return <div className={classNames(styles.editorRoot, styles.editorWrapper, className, 'mdxeditor')}>{children}</div>
