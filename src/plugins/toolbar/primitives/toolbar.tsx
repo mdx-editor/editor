@@ -192,7 +192,7 @@ export interface ButtonOrDropdownButtonProps<T extends string> {
     /**
      * The label to show in the dropdown.
      */
-    label: string
+    label: string | JSX.Element
   }[]
 }
 
