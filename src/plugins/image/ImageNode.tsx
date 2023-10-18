@@ -50,7 +50,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
   __height: 'inherit' | number
 
   static getType(): string {
-    return 'icage'
+    return 'image'
   }
 
   static clone(node: ImageNode): ImageNode {
