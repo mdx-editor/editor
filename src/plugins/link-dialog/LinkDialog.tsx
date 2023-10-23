@@ -132,10 +132,10 @@ export const LinkDialog: React.FC = () => {
         data-visible={linkDialogState.type === 'edit'}
         className={styles.linkDialogAnchor}
         style={{
-          top: theRect?.top,
-          left: theRect?.left,
-          width: theRect?.width,
-          height: theRect?.height
+          top: `${theRect?.top ?? 0}px`,
+          left: `${theRect?.left ?? 0}px`,
+          width: `${theRect?.width ?? 0}px`,
+          height: `${theRect?.height ?? 0}px`
         }}
       />
 

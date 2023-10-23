@@ -79,30 +79,32 @@ const linkDialogSystem = system(
         r.o.filter(([, selection]) => $isRangeSelection(selection))
       ),
       ([, selection, editor]) => {
-        editor?.getEditorState().read(() => {
-          const node = getLinkNodeInSelection(selection)
-          const rectangle = getSelectionRectangle(editor)!
-          if (node) {
-            r.pub(linkDialogState, {
-              type: 'edit',
-              initialUrl: node.getURL(),
-              initialTitle: node.getTitle() || '',
-              url: node.getURL(),
-              title: node.getTitle() || '',
-              linkNodeKey: node.getKey(),
-              rectangle
-            })
-          } else {
-            r.pub(linkDialogState, {
-              type: 'edit',
-              initialUrl: '',
-              initialTitle: '',
-              title: '',
-              url: '',
-              linkNodeKey: '',
-              rectangle
-            })
-          }
+        editor?.focus(() => {
+          editor?.getEditorState().read(() => {
+            const node = getLinkNodeInSelection(selection)
+            const rectangle = getSelectionRectangle(editor)!
+            if (node) {
+              r.pub(linkDialogState, {
+                type: 'edit',
+                initialUrl: node.getURL(),
+                initialTitle: node.getTitle() || '',
+                url: node.getURL(),
+                title: node.getTitle() || '',
+                linkNodeKey: node.getKey(),
+                rectangle
+              })
+            } else {
+              r.pub(linkDialogState, {
+                type: 'edit',
+                initialUrl: '',
+                initialTitle: '',
+                title: '',
+                url: '',
+                linkNodeKey: '',
+                rectangle
+              })
+            }
+          })
         })
       }
     )
@@ -137,6 +139,7 @@ const linkDialogSystem = system(
             if ($isRangeSelection(selection) && (getLinkNodeInSelection(selection) || !selection.isCollapsed())) {
               r.pub(openLinkEditDialog, true)
               event.stopPropagation()
+              event.preventDefault()
               return true
             } else {
               return false

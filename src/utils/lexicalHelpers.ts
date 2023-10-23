@@ -58,10 +58,10 @@ export function getSelectionRectangle(editor: LexicalEditor) {
     }
 
     return {
-      top: rect.top,
-      left: rect.left,
-      width: rect.width,
-      height: rect.height
+      top: Math.round(rect.top),
+      left: Math.round(rect.left),
+      width: Math.round(rect.width),
+      height: Math.round(rect.height)
     }
   } else if (!activeElement || activeElement.className !== 'link-input') {
     return null
