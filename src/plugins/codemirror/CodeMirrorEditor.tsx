@@ -11,6 +11,12 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
   const [readOnly] = corePluginHooks.useEmitterValues('readOnly')
   const { setCode } = useCodeBlockEditorContext()
 
+  React.useEffect(() => {
+    codeMirrorRef.current?.getCodemirror()?.dom.addEventListener('paste', (e) => {
+      e.stopPropagation()
+    })
+  }, [codeMirrorRef])
+
   return (
     <div
       className={styles.sandpackWrapper}
