@@ -125,6 +125,10 @@ export class CodeBlockNode extends DecoratorNode<JSX.Element> {
       />
     )
   }
+
+  isInline(): boolean {
+    return false
+  }
 }
 
 interface CodeBlockEditorContainerProps extends CodeBlockEditorProps {
