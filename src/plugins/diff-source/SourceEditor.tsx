@@ -11,6 +11,7 @@ export const COMMON_STATE_CONFIG_EXTENSIONS: Extension[] = [basicSetup, basicLig
 
 export const SourceEditor = () => {
   const [markdown, readOnly] = corePluginHooks.useEmitterValues('markdown', 'readOnly')
+  const [cmExtensions] = diffSourcePluginHooks.useEmitterValues('cmExtensions')
   const updateMarkdown = diffSourcePluginHooks.usePublisher('markdownSourceEditorValue')
   const editorViewRef = React.useRef<EditorView | null>(null)
 
@@ -18,6 +19,8 @@ export const SourceEditor = () => {
     (el: HTMLDivElement | null) => {
       if (el !== null) {
         const extensions = [
+          // custom extensions should come first so that you can override the default extensions
+          ...cmExtensions,
           ...COMMON_STATE_CONFIG_EXTENSIONS,
           EditorView.updateListener.of(({ state }) => {
             updateMarkdown(state.doc.toString())
@@ -36,7 +39,7 @@ export const SourceEditor = () => {
         editorViewRef.current = null
       }
     },
-    [markdown, readOnly, updateMarkdown]
+    [markdown, readOnly, updateMarkdown, cmExtensions]
   )
 
   return <div ref={ref} className="cm-sourceView" />

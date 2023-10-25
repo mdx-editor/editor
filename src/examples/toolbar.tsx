@@ -25,11 +25,13 @@ import {
   CreateLink,
   DiffSourceToggleWrapper,
   InsertImage,
-  ListsToggle
+  ListsToggle,
+  KitchenSinkToolbar
 } from '..'
 import { ALL_PLUGINS, YoutubeDirectiveDescriptor, virtuosoSampleSandpackConfig } from './_boilerplate'
 import kitchenSinkMarkdown from './assets/kitchen-sink.md?raw'
 import './dark-editor.css'
+import { basicDark } from 'cm6-theme-basic-dark'
 import type { Story } from '@ladle/react'
 
 export const Basics = () => {
@@ -50,7 +52,30 @@ ReadOnly.argTypes = {
 }
 
 export const CustomTheming = () => {
-  return <MDXEditor className="dark-theme dark-editor" markdown={kitchenSinkMarkdown} plugins={ALL_PLUGINS} />
+  return (
+    <MDXEditor
+      className="dark-theme dark-editor"
+      markdown={kitchenSinkMarkdown}
+      plugins={[
+        toolbarPlugin({ toolbarContents: () => <KitchenSinkToolbar /> }),
+        listsPlugin(),
+        quotePlugin(),
+        headingsPlugin({ allowedHeadingLevels: [1, 2, 3] }),
+        linkPlugin(),
+        linkDialogPlugin(),
+        imagePlugin({ imageAutocompleteSuggestions: ['https://via.placeholder.com/150', 'https://via.placeholder.com/150'] }),
+        tablePlugin(),
+        thematicBreakPlugin(),
+        frontmatterPlugin(),
+        codeBlockPlugin({ defaultCodeBlockLanguage: 'txt' }),
+        sandpackPlugin({ sandpackConfig: virtuosoSampleSandpackConfig }),
+        codeMirrorPlugin({ codeBlockLanguages: { js: 'JavaScript', css: 'CSS', txt: 'text', tsx: 'TypeScript' } }),
+        directivesPlugin({ directiveDescriptors: [YoutubeDirectiveDescriptor, AdmonitionDirectiveDescriptor] }),
+        diffSourcePlugin({ viewMode: 'rich-text', diffMarkdown: 'boo', codeMirrorExtensions: [basicDark] }),
+        markdownShortcutPlugin()
+      ]}
+    />
+  )
 }
 
 export const ConditionalToolbar = () => {

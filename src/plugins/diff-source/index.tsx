@@ -1,3 +1,4 @@
+import { Extension } from '@codemirror/state'
 import { realmPlugin, system } from '../../gurx'
 import { coreSystem } from '../core'
 import { DiffSourceWrapper } from './DiffSourceWrapper'
@@ -10,6 +11,7 @@ export const diffSourceSystem = system(
   (r, [{ markdown, setMarkdown }]) => {
     const diffMarkdown = r.node('')
     const markdownSourceEditorValue = r.node('')
+    const cmExtensions = r.node<Extension[]>([])
 
     r.link(markdown, markdownSourceEditorValue)
     const viewMode = r.node<ViewMode>('rich-text')
@@ -34,10 +36,16 @@ export const diffSourceSystem = system(
         }
       }
     )
-    return { viewMode, diffMarkdown, markdownSourceEditorValue }
+    return { viewMode, diffMarkdown, markdownSourceEditorValue, cmExtensions }
   },
   [coreSystem]
 )
+
+export interface DiffSourcePluginParams {
+  viewMode?: ViewMode
+  diffMarkdown?: string
+  codeMirrorExtensions?: Extension[]
+}
 
 export const [
   /** @internal */
@@ -48,11 +56,12 @@ export const [
   id: 'diff-source',
   systemSpec: diffSourceSystem,
 
-  applyParamsToSystem(r, params?: { viewMode?: ViewMode; diffMarkdown?: string }) {
+  applyParamsToSystem(r, params?: DiffSourcePluginParams) {
     r.pubKey('viewMode', params?.viewMode || 'rich-text')
   },
-  init(r, params) {
+  init(r, params?: DiffSourcePluginParams) {
     r.pubKey('diffMarkdown', params?.diffMarkdown || '')
+    r.pubKey('cmExtensions', params?.codeMirrorExtensions || [])
     r.pubKey('addEditorWrapper', DiffSourceWrapper)
   }
 })

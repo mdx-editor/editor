@@ -23,6 +23,7 @@ interface CmMergeViewProps {
 
 const CmMergeView: React.FC<CmMergeViewProps> = ({ oldMarkdown, newMarkdown, onUpdate }) => {
   const cmMergeViewRef = React.useRef<MergeView | null>(null)
+  const [cmExtensions] = diffSourcePluginHooks.useEmitterValues('cmExtensions')
 
   const ref = React.useCallback(
     (el: HTMLDivElement | null) => {
@@ -40,11 +41,12 @@ const CmMergeView: React.FC<CmMergeViewProps> = ({ oldMarkdown, newMarkdown, onU
           gutter: true,
           a: {
             doc: oldMarkdown,
-            extensions: [...COMMON_STATE_CONFIG_EXTENSIONS, EditorState.readOnly.of(true)]
+            extensions: [...cmExtensions, ...COMMON_STATE_CONFIG_EXTENSIONS, EditorState.readOnly.of(true)]
           },
           b: {
             doc: newMarkdown,
             extensions: [
+              ...cmExtensions,
               ...COMMON_STATE_CONFIG_EXTENSIONS,
               EditorView.updateListener.of(({ state }) => {
                 const md = state.doc.toString()
@@ -58,7 +60,7 @@ const CmMergeView: React.FC<CmMergeViewProps> = ({ oldMarkdown, newMarkdown, onU
         cmMergeViewRef.current = null
       }
     },
-    [newMarkdown, oldMarkdown, onUpdate]
+    [newMarkdown, oldMarkdown, onUpdate, cmExtensions]
   )
 
   return <div ref={ref} />
