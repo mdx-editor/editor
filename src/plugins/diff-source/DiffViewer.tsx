@@ -4,29 +4,36 @@ import { diffSourcePluginHooks } from '.'
 import { corePluginHooks } from '../core'
 
 import { MergeView } from '@codemirror/merge'
-import { EditorState } from '@codemirror/state'
+import { EditorState, Extension } from '@codemirror/state'
 import { EditorView } from '@codemirror/view'
 import { COMMON_STATE_CONFIG_EXTENSIONS } from './SourceEditor'
 
 export const DiffViewer: React.FC = () => {
   const [newText] = corePluginHooks.useEmitterValues('markdown')
-  const [oldText] = diffSourcePluginHooks.useEmitterValues('diffMarkdown')
+  const [oldText, theme] = diffSourcePluginHooks.useEmitterValues('diffMarkdown', 'theme')
   const updateMarkdown = diffSourcePluginHooks.usePublisher('markdownSourceEditorValue')
-  return <CmMergeView oldMarkdown={oldText} newMarkdown={newText} onUpdate={updateMarkdown} />
+  return <CmMergeView theme={theme} oldMarkdown={oldText} newMarkdown={newText} onUpdate={updateMarkdown} />
 }
 
 interface CmMergeViewProps {
   oldMarkdown: string
   newMarkdown: string
+  theme: Extension | null
   onUpdate: (markdown: string) => void
 }
 
-const CmMergeView: React.FC<CmMergeViewProps> = ({ oldMarkdown, newMarkdown, onUpdate }) => {
+const CmMergeView: React.FC<CmMergeViewProps> = ({ oldMarkdown, newMarkdown, theme, onUpdate }) => {
   const cmMergeViewRef = React.useRef<MergeView | null>(null)
 
   const ref = React.useCallback(
     (el: HTMLDivElement | null) => {
       if (el !== null) {
+        const extensions = [...COMMON_STATE_CONFIG_EXTENSIONS]
+
+        if (theme) {
+          extensions.push(theme)
+        }
+
         cmMergeViewRef.current = new MergeView({
           renderRevertControl: () => {
             const el = document.createElement('button')
@@ -40,12 +47,12 @@ const CmMergeView: React.FC<CmMergeViewProps> = ({ oldMarkdown, newMarkdown, onU
           gutter: true,
           a: {
             doc: oldMarkdown,
-            extensions: [...COMMON_STATE_CONFIG_EXTENSIONS, EditorState.readOnly.of(true)]
+            extensions: [...extensions, EditorState.readOnly.of(true)]
           },
           b: {
             doc: newMarkdown,
             extensions: [
-              ...COMMON_STATE_CONFIG_EXTENSIONS,
+              ...extensions,
               EditorView.updateListener.of(({ state }) => {
                 const md = state.doc.toString()
                 onUpdate(md)
@@ -58,7 +65,7 @@ const CmMergeView: React.FC<CmMergeViewProps> = ({ oldMarkdown, newMarkdown, onU
         cmMergeViewRef.current = null
       }
     },
-    [newMarkdown, oldMarkdown, onUpdate]
+    [newMarkdown, oldMarkdown, onUpdate, theme]
   )
 
   return <div ref={ref} />

@@ -1,7 +1,17 @@
+import { Extension } from '@codemirror/state'
+import type { Story } from '@ladle/react'
+import { basicDark } from 'cm6-theme-basic-dark'
 import React from 'react'
 import {
   AdmonitionDirectiveDescriptor,
+  BlockTypeSelect,
+  BoldItalicUnderlineToggles,
+  CreateLink,
+  DiffSourceToggleWrapper,
+  InsertImage,
+  ListsToggle,
   MDXEditor,
+  Separator,
   UndoRedo,
   codeBlockPlugin,
   codeMirrorPlugin,
@@ -18,19 +28,11 @@ import {
   sandpackPlugin,
   tablePlugin,
   thematicBreakPlugin,
-  toolbarPlugin,
-  Separator,
-  BlockTypeSelect,
-  BoldItalicUnderlineToggles,
-  CreateLink,
-  DiffSourceToggleWrapper,
-  InsertImage,
-  ListsToggle
+  toolbarPlugin
 } from '..'
 import { ALL_PLUGINS, YoutubeDirectiveDescriptor, virtuosoSampleSandpackConfig } from './_boilerplate'
 import kitchenSinkMarkdown from './assets/kitchen-sink.md?raw'
 import './dark-editor.css'
-import type { Story } from '@ladle/react'
 
 export const Basics = () => {
   return <MDXEditor markdown={kitchenSinkMarkdown} plugins={ALL_PLUGINS} />
@@ -56,7 +58,7 @@ export const CustomTheming = () => {
 export const DarkTheme = () => {
   return (
     <MDXEditor
-      className="dark-theme dark-editor"
+      className="dark-theme"
       markdown={'hello world'}
       plugins={[
         toolbarPlugin({
@@ -85,7 +87,7 @@ export const DarkTheme = () => {
         thematicBreakPlugin(),
         frontmatterPlugin(),
         directivesPlugin({ directiveDescriptors: [YoutubeDirectiveDescriptor, AdmonitionDirectiveDescriptor] }),
-        diffSourcePlugin({ viewMode: 'rich-text', diffMarkdown: 'boo' }),
+        diffSourcePlugin({ viewMode: 'rich-text', diffMarkdown: 'BOO', theme: basicDark as Extension }),
         markdownShortcutPlugin()
       ]}
     />
