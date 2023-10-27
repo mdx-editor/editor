@@ -29,19 +29,63 @@ By default, Next.js uses `--moduleResolution node` setting in `tsconfig.json`. T
 
 In addition, we need to ensure that the editor component is used only on the client. Given its purpose, it makes little to no sense to do server processing. To do so, we can use the `dynamic` function from Next.js. This will ensure that the component is only loaded on the client.
 
-```tsx
-// You can use this code in a separate component that's imported in your pages.
-'use client';
-import '@mdxeditor/editor/style.css';
-import dynamic from 'next/dynamic'
+> **_NOTE:_**  Make sure all plugins are initialized on client side only. Using some plugins will cause hydration errors if imported during SSR.
 
-export const MDXEditor = dynamic(
-// preferred way
-  () => import('@mdxeditor/editor/MDXEditor').then((mod) => mod.MDXEditor), 
-// legacy, larger bundle
-// () => import('@mdxeditor/editor').then((mod) => mod.MDXEditor), 
-  { ssr: false }
-)
+```tsx
+"use client"
+// InitializedMDXEditor.tsx
+import type { ForwardedRef } from "react";
+import {
+  headingsPlugin,
+  listsPlugin,
+  quotePlugin,
+  thematicBreakPlugin,
+  markdownShortcutPlugin,
+  MDXEditor,
+  type MDXEditorMethods,
+  type MDXEditorProps,
+} from "@mdxeditor/editor";
+
+// Only import this to the next file
+export default function InitializedMDXEditor({
+  editorRef,
+  ...props
+}: { editorRef: ForwardedRef<MDXEditorMethods> | null } & MDXEditorProps) {
+  return (
+    <MDXEditor
+      plugins={[
+        // Example Plugin Usage
+        headingsPlugin(),
+        listsPlugin(),
+        quotePlugin(),
+        thematicBreakPlugin(),
+        markdownShortcutPlugin(),
+      ]}
+      {...props}
+      ref={editorRef}
+    />
+  );
+}
+```
+
+```tsx
+"use client"
+// ForwardRefEditor.tsx
+
+// This is the only place InitializedMDXEditor is imported directly.
+const MDEditor = dynamic(() => import("./InitializedMDXEditor"), {
+  // Make sure we turn SSR off
+  ssr: false,
+});
+
+// This is what is imported by other components. Pre-initialized with plugins, and ready
+// to accept other props, including a ref.
+export const ForwardRefEditor = forwardRef<MDXEditorMethods, MDXEditorProps>(
+  (props, ref) => <ForwardRefEditor {...props} editorRef={ref} />,
+);
+
+// TS complains without the following line
+ForwardRefEditor.displayName = "ForwardRefEditor";
 ```
 
 If you get stuck, check the [MDX editor in Next.js GitHub sample repository for a working example](https://github.com/mdx-editor/mdx-editor-in-next).
