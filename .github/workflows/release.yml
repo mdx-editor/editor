@@ -49,4 +49,6 @@ jobs:
         uses: benc-uk/workflow-dispatch@v1
         with:
           workflow: release.yml
+          ref: master
+          token: ${{ secrets.SITE_GH_TOKEN }}
           repo: mdx-editor/site
