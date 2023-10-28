@@ -16,12 +16,12 @@ const jsxComponentDescriptors: JsxComponentDescriptor[] = [
     // the source field is used to construct the import statement at the top of the markdown document. 
     // it won't be actually sourced.
     source: './external',
-    // Used to construc the property popover of the generic editor
+    // Used to construct the property popover of the generic editor
     props: [
       { name: 'foo', type: 'string' },
       { name: 'bar', type: 'string' }
     ],
-    // wether the component has children or not
+    // whether the component has children or not
     hasChildren: true,
     Editor: GenericJsxEditor
   },
