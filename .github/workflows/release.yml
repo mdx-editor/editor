@@ -43,8 +43,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npx semantic-release
-      - name: Invoke workflow in another repo with inputs
-        uses: benc-uk/workflow-dispatch@v1
-        with:
-          workflow: release.yml
-          repo: mdx-editor/site
+  publish-site:
+    uses: mdx-editor/site/.github/workflows/release.yml
+    secrets: inherit
+
