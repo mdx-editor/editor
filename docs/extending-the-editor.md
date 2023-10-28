@@ -13,11 +13,58 @@ MDXEditor code base is built with extensibility in mind. In fact, even the core 
 MDXEditor uses a composable, graph-based reactive state management system internally. When initialized, the component creates multiple systems of stateful and stateless observables (called nodes) into a **realm**. 
 From there on, the React layer (properties, user input, etc) and the Lexical editor interact with the realm by publishing into certain nodes and or by subscribing to changes in node values. 
 
-Each editor plugin can specify a new set of nodes (called **system**) that can optionally interact with the existing set of systems (declared as dependencies). A good (yet not-so-complex) example of [such system is the diff-source plugin](https://github.com/mdx-editor/editor/blob/plugins/src/plugins/diff-source/index.tsx), that interacts with the core system to change the value of the 'markdown' node when the user edits the content in source mode.
+Each editor plugin can declare a set of nodes (called **system**) and their interactions. The new nodes can optionally interact with the existing nodes if you declare the built-in systems as dependencies of the system. A good (yet not-so-complex) example of [such system is the diff-source plugin](https://github.com/mdx-editor/editor/blob/plugins/src/plugins/diff-source/index.tsx), that interacts with the core system to change the value of the 'markdown' node when the user edits the content in source mode.
+
+The state management systems are strongly typed. When you declare one as a dependency, the injected nodes will be available to you with strict TypeScript types defined. 
+
+The example below illustrates how state management systems work in practice:
+```tsx
+import { realmPlugin, system } from '@mdxeditor/editor'
+
+// The r(realm) parameter passed to the system constructor is the realm instance that is used 
+// to declare new nodes, and to connect existing nodes with operators. 
+// The operators are similar to the RxJS operators.
+const mySystem = system((r) => {
+  // declare a stateful node that holds a string value.
+  const myNode = r.node("") 
+  // This is a stateless node - it can be used as a signal pipe to pass values that trigger events in the system.
+  const mySignal = r.node<number>()
+  
+  // connect the signal node to the stateful node using the `pipe` operator.
+  // The pipe operator will execute the callback whenever the signal node changes.
+  r.link(r.pipe(mySignal, r.o.map(v => `mySignal has been called ${v} times`)), myNode)
+
+  // Finally, export the nodes that should be accessible from outside (like the React components, for example).
+  return {
+    myNode, 
+    mySignal
+  }
+// the empty array below is the list of dependencies. 
+}, [])
+
+// We can construct a new system that interacts with the nodes from the system above.
+// The system constructor receives a tuple of dependencies, where the first element is the realm instance, 
+// and the second element is the list of nodes exported by the dependency systems.
+const myOtherSystem = system((r, [{myNode}]) => {
+  // declare a stateful node that holds a string value.
+  const myOtherNode = r.node("") 
+
+  // connect the stateful node to the stateful node from the other system.
+  r.link(myNode, myOtherNode)
+
+  return {
+    myOtherNode
+  }
+}, [mySystem])
+```
+
+Following the approach above, you can access the built-in state management systems of the package. The most important one being the `coreSystem` - it includes stateful nodes like the `rootEditor` (the Lexical instance), `activeEditor` (can be the root editor or one of the nested editors). It also exposes convenient signals like `createRootEditorSubscription` and `createActiveEditorSubscription` that let you [hook up to the Lexical editor commands](https://lexical.dev/docs/concepts/commands#editorregistercommand).
+
+Most of the plugin systems also expose signal nodes that let you insert certain node types into the editor. For example, the `codeBlockSystem` has a node `insertCodeBlockNode` that can be used to insert a code block into the editor. 
 
 ## Accessing the state from React
 
-In addition to the plugin function itself, the `realmPlugin` function returns a set of React hooks (conventionally named `certainPluginHooks`) that let you interact with the nodes declared in the plugin system and its dependencies. The hooks return the node values or functions that can publish into certain nodes. The next example is taken from the diff-source plugin Toolbar item:
+The `realmPlugin` call returns the plugin itself and a set of React hooks (by convention, named `<plugin>Hooks`) that let you interact with the nodes declared in the plugin system and its dependencies. The hooks return the node values or functions that can be used to publish into certain nodes. The next example is taken from the diff-source plugin Toolbar item:
 
 ```tsx
 export const DiffSourceToggleWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -59,7 +106,7 @@ While using strings for the nodes, the hooks have strict TypeScript typings, so 
 
 ## Markdown / Editor state conversion
 
-In its `init` method a plugin can specify a set of MDAST/Lexical **visitors** that will be used to convert the markdown source into the editor state and vice versa. 
+In its `init` method, a plugin can specify a set of MDAST/Lexical **visitors** that will be used to convert the markdown source into the editor state and vice versa. 
 The visitors are plugged into the core system visitors node and then used for processing the markdown input/output. 
 The easiest way for you to get a grip of the mechanism is to take a look at the [core plugin visitors](https://github.com/mdx-editor/editor/tree/main/src/plugins/core), that are used to process the basic nodes like paragraphs, bold, italic, etc. The registration of each visitor looks like this (excerpt from the `core` plugin):
 

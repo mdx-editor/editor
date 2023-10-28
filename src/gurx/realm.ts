@@ -308,6 +308,10 @@ export function realm() {
     return new Set(nodes.map((s) => s.key))
   }
 
+  /**
+   * A low-level utility that connects multiple nodes to a sink node with a map function.
+   * The nodes can be active (sources) or passive (pulls).
+   */
   function connect<T extends unknown[] = unknown[]>({ sources, pulls = [], map, sink: { key: sink } }: RealmProjectionSpec<T>) {
     const dependency: RealmProjection<T> = {
       map,
@@ -320,14 +324,6 @@ export function realm() {
       graph.getOrCreate(sourceKey).add(dependency as RealmProjection<unknown[]>)
     })
     executionMaps.clear()
-  }
-
-  function debug() {
-    const obj = {} as Record<string, unknown>
-    Object.entries(labels).forEach(([name, value]) => {
-      obj[name] = state.get(value.key)
-    })
-    // console.table(obj)
   }
 
   function pub<T1>(...args: [RN<T1>, T1]): void
@@ -383,16 +379,31 @@ export function realm() {
     }) as unknown as NodesFromValues<T>
   }
 
+  /**
+   * Links the output of a node to another node.
+   */
   function link<T>(source: RealmNode<T>, sink: RealmNode<T>) {
     connect({ map: (done) => (value) => done(value), sink, sources: [source] })
   }
 
+  /**
+   * Constructs a new stateful node from an existing source.
+   * The source can be node(s) that get transformed from a set of operators.
+   * @example
+   * ```tsx
+   * const a = r.node(1)
+   * const b = r.derive(r.pipe(a, r.o.map((v) => v * 2)), 2)
+   * ```
+   */
   function derive<T>(source: RealmNode<T>, initial: T) {
     return tap(node(initial, true), (sink) => {
       connect({ map: (done) => (value) => done(value), sink, sources: [source] })
     })
   }
 
+  /**
+   * Operator that maps a the value of a node to a new node with a projection function.
+   */
   function map<I, O>(mapFunction: (value: I) => O) {
     return ((source: RealmNode<I>) => {
       const sink = node<O>()
@@ -407,6 +418,9 @@ export function realm() {
     }) as Operator<I, O>
   }
 
+  /**
+   * Operator that maps the output of a node to a fixed value.
+   */
   function mapTo<I, O>(value: O) {
     return ((source: RealmNode<I>) => {
       const sink = node<O>()
@@ -415,6 +429,10 @@ export function realm() {
     }) as Operator<I, O>
   }
 
+  /**
+   * Operator that filters the output of a node.
+   * If the predicate returns false, the emission is canceled.
+   */
   function filter<I, O = I>(predicate: (value: I) => boolean) {
     return ((source: RealmNode<I>) => {
       const sink = node<O>()
@@ -423,6 +441,10 @@ export function realm() {
     }) as Operator<I, O>
   }
 
+  /**
+   * Operator that captures the first emitted value of a node.
+   * Useful if you want to execute a side effect only once.
+   */
   function once<I>() {
     return ((source: RealmNode<I>) => {
       const sink = node<I>()
@@ -442,6 +464,10 @@ export function realm() {
     }) as Operator<I, I>
   }
 
+  /**
+   * Operator that runs with the latest and the current value of a node.
+   * Works like the {@link https://rxjs.dev/api/operators/scan | RxJS scan operator}.
+   */
   function scan<I, O>(accumulator: (current: O, value: I) => O, seed: O) {
     return ((source: RealmNode<I>) => {
       const sink = node<O>()
@@ -450,6 +476,9 @@ export function realm() {
     }) as Operator<I, O>
   }
 
+  /**
+   * Throttles the output of a node with the specified delay.
+   */
   function throttleTime<I>(delay: number) {
     return ((source: RealmNode<I>) => {
       const sink = node<I>()
@@ -473,6 +502,9 @@ export function realm() {
     }) as Operator<I, I>
   }
 
+  /**
+   * Delays the output of a node with `queueMicrotask`.
+   */
   function delayWithMicrotask<I>() {
     return ((source: RealmNode<I>) => {
       const sink = node<I>()
@@ -481,6 +513,9 @@ export function realm() {
     }) as Operator<I, I>
   }
 
+  /**
+   * Debounces the output of a node with the specified delay.
+   */
   function debounceTime<I>(delay: number) {
     return ((source: RealmNode<I>) => {
       const sink = node<I>()
@@ -503,6 +538,9 @@ export function realm() {
     }) as Operator<I, I>
   }
 
+  /**
+   * Buffers the stream of a node until the passed note emits.
+   */
   function onNext<I, O>(bufNode: RN<O>) {
     return ((source: RealmNode<I>) => {
       const sink = node<O>()
@@ -522,6 +560,10 @@ export function realm() {
     }) as Operator<I, [I, O]>
   }
 
+  /**
+   * Conditionally passes the stream of a node only if the passed note
+   * has emitted before a certain duration (in seconds).
+   */
   function passOnlyAfterNodeHasEmittedBefore<I>(starterNode: RN<unknown>, durationNode: RN<number>) {
     return (source: RealmNode<I>) => {
       const sink = node<I>()
@@ -540,6 +582,10 @@ export function realm() {
     }
   }
 
+  /**
+   * Pulls the latest values from the passed nodes.
+   * Note: The operator does not emit when the nodes emit. If you want to get that, use the `combine` function.
+   */
   function withLatestFrom<I, T1>(...nodes: [RN<T1>]): (source: RN<I>) => RN<[I, T1]> // prettier-ignore
   function withLatestFrom<I, T1, T2>(...nodes: [RN<T1>, RN<T2>]): (source: RN<I>) => RN<[I, T1, T2]> // prettier-ignore
   function withLatestFrom<I, T1, T2, T3>(...nodes: [RN<T1>, RN<T2>, RN<T3>]): (source: RN<I>) => RN<[I, T1, T2, T3]> // prettier-ignore
@@ -564,6 +610,21 @@ export function realm() {
     }
   }
 
+  /**
+   * Combines the values from multiple nodes into a single node
+   * that emits an array of the latest values the nodes.
+   * When one of the source nodes emits a value, the combined node
+   * emits an array of the latest values from each node.
+   * @example
+   * ```tsx
+   * const a = r.node(1)
+   * const b = r.node(2)
+   * const ab = r.combine(a, b)
+   * r.sub(ab, ([a, b]) => console.log(a, b))
+   * r.pub(a, 2)
+   * r.pub(b, 3)
+   * ```
+   */
   function combine<T1>(...nodes: [RN<T1>]): RN<T1> // prettier-ignore
   function combine<T1, T2>(...nodes: [RN<T1>, RN<T2>]): RN<[T1, T2]> // prettier-ignore
   function combine<T1, T2, T3>(...nodes: [RN<T1>, RN<T2>, RN<T3>]): RN<[T1, T2, T3]> // prettier-ignore
@@ -592,20 +653,35 @@ export function realm() {
     return sink
   }
 
+  /**
+   * Subscribes the passed callback to the output of a node.
+   * @param key - the key of the node.
+   */
   function subKey(key: string, subscription: Subscription<unknown>): UnsubscribeHandle {
     return sub(labels[key], subscription)
   }
 
+  /**
+   * Subscribes the passed callback to the output of multiple nodes.
+   * @param keys - the keys of the nodes.
+   */
   function subKeys(keys: string[], subscription: Subscription<unknown>): UnsubscribeHandle {
     const nodes = keys.map((key) => labels[key])
     // @ts-expect-error why?
     return sub(...nodes.concat(subscription))
   }
 
+  /**
+   * Publishes the passed value to the output of a node.
+   * @param key - the key of the node.
+   */
   function pubKey(key: string, value: unknown) {
     pubKeys({ [key]: value })
   }
 
+  /**
+   * Publishes a set of values to the output of multiple nodes.
+   */
   function pubKeys(values: Record<string, unknown>) {
     const valuesWithInternalKeys = Object.entries(values).reduce(
       (acc, [key, value]) =>
@@ -622,14 +698,25 @@ export function realm() {
     pubIn(valuesWithInternalKeys)
   }
 
+  /**
+   * Gets the current value of a node. The node must be stateful.
+   * @param key - the key of the node.
+   */
   function getKeyValue(key: string) {
     return state.get(labels[key].key)
   }
 
+  /**
+   * Gets the current value of a node. The node must be stateful.
+   * @param node - the node instance.
+   */
   function getValue<T>(node: RN<T>): T {
     return state.get(node.key) as T
   }
 
+  /**
+   * Gets the current values of multiple nodes. The nodes must be stateful.
+   */
   function getKeyValues(keys: string[]) {
     return keys.map((key) => {
       const label = labels[key]
@@ -643,7 +730,6 @@ export function realm() {
   return {
     combine,
     connect,
-    debug,
     derive,
     getKeyValue,
     getValue,

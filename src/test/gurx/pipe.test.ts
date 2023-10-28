@@ -226,4 +226,20 @@ describe('pipe', () => {
     r.pub(d, 7)
     expect(spy).toHaveBeenCalledWith([3, 4, 7])
   })
+
+  it('derives node values', () => {
+    const r = realm()
+    const a = r.node<number>(0)
+    const b = r.derive(
+      r.pipe(
+        a,
+        r.o.map((val) => val * 2)
+      ),
+      2
+    )
+    const spy = vi.fn()
+    r.sub(b, spy)
+    r.pub(a, 3)
+    expect(spy).toHaveBeenCalledWith(6)
+  })
 })
