@@ -44,6 +44,7 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npx semantic-release
   publish-site:
+    needs: release
     name: Publish site
     uses: mdx-editor/site/.github/workflows/release.yml@master
     secrets: inherit
