@@ -15,7 +15,7 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
     codeMirrorRef.current?.getCodemirror()?.dom.addEventListener('paste', (e) => {
       e.stopPropagation()
     })
-  }, [codeMirrorRef])
+  }, [codeMirrorRef, language])
 
   return (
     <div
