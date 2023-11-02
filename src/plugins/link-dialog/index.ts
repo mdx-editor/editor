@@ -178,7 +178,7 @@ const linkDialogSystem = system(
 
       if (url.trim() !== '') {
         editor?.dispatchCommand(TOGGLE_LINK_COMMAND, { url, title })
-        // the dispatch command implementation fails to set the link for a fresh link creation.
+        // the dispatch command implementation fails to set the title for a fresh link creation.
         // Work around with the code below.
         setTimeout(() => {
           editor?.update(() => {

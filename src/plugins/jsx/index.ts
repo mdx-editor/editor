@@ -77,10 +77,28 @@ export interface JsxEditorProps {
   descriptor: JsxComponentDescriptor
 }
 
-interface InsertJsxPayload {
+type JsxTextPayload = {
+  kind: 'text'
   name: string
-  kind: 'flow' | 'text'
   props: Record<string, string>
+  children?: MdxJsxTextElement['children']
+}
+
+type JsxFlowPayload = {
+  kind: 'flow'
+  name: string
+  props: Record<string, string>
+  children?: MdxJsxFlowElement['children']
+}
+
+type InsertJsxPayload = JsxTextPayload | JsxFlowPayload
+
+function toMdastJsxAttributes(attributes: Record<string, string>): MdastJsx['attributes'] {
+  return Object.entries(attributes).map(([name, value]) => ({
+    type: 'mdxJsxAttribute',
+    name,
+    value
+  }))
 }
 
 /** @internal */
@@ -91,14 +109,26 @@ export const jsxSystem = system(
     r.link(
       r.pipe(
         insertJsx,
-        r.o.map(({ name, kind, props }) => {
-          return () =>
-            $createLexicalJsxNode({
-              name,
-              type: kind === 'flow' ? 'mdxJsxFlowElement' : 'mdxJsxTextElement',
-              attributes: Object.entries(props).map(([name, value]) => ({ type: 'mdxJsxAttribute', name, value })),
-              children: []
-            })
+        r.o.map(({ kind, name, children, props }) => {
+          return () => {
+            const attributes = toMdastJsxAttributes(props)
+
+            if (kind === 'flow') {
+              return $createLexicalJsxNode({
+                type: 'mdxJsxFlowElement',
+                name,
+                children: children ?? [],
+                attributes
+              })
+            } else {
+              return $createLexicalJsxNode({
+                type: 'mdxJsxTextElement',
+                name,
+                children: children ?? [],
+                attributes
+              })
+            }
+          }
         })
       ),
       insertDecoratorNode

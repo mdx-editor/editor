@@ -53,17 +53,32 @@ const jsxComponentDescriptors: JsxComponentDescriptor[] = [
 const InsertMyLeaf = () => {
   const insertJsx = jsxPluginHooks.usePublisher('insertJsx')
   return (
-    <Button
-      onClick={() =>
-        insertJsx({
-          name: 'MyLeaf',
-          kind: 'text',
-          props: { foo: 'bar', bar: 'baz' }
-        })
-      }
-    >
-      Leaf
-    </Button>
+    <>
+      <Button
+        onClick={() =>
+          insertJsx({
+            name: 'MyLeaf',
+            kind: 'text',
+            props: { foo: 'bar', bar: 'baz' }
+          })
+        }
+      >
+        Leaf
+      </Button>
+
+      <Button
+        onClick={() =>
+          insertJsx({
+            name: 'MyLeaf',
+            kind: 'text',
+            props: { foo: 'bar', bar: 'baz' },
+            children: [{ type: 'text', value: 'Hello' }]
+          })
+        }
+      >
+        Leaf with text
+      </Button>
+    </>
   )
 }
 export const Example = () => {
