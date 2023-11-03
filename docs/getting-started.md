@@ -73,7 +73,7 @@ export default function InitializedMDXEditor({
 // ForwardRefEditor.tsx
 
 // This is the only place InitializedMDXEditor is imported directly.
-const MDEditor = dynamic(() => import("./InitializedMDXEditor"), {
+const Editor = dynamic(() => import("./InitializedMDXEditor"), {
   // Make sure we turn SSR off
   ssr: false,
 });
@@ -81,7 +81,7 @@ const MDEditor = dynamic(() => import("./InitializedMDXEditor"), {
 // This is what is imported by other components. Pre-initialized with plugins, and ready
 // to accept other props, including a ref.
 export const ForwardRefEditor = forwardRef<MDXEditorMethods, MDXEditorProps>(
-  (props, ref) => <ForwardRefEditor {...props} editorRef={ref} />,
+  (props, ref) => <Editor {...props} editorRef={ref} />,
 );
 
 // TS complains without the following line
