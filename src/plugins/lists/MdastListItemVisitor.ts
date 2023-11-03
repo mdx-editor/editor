@@ -4,7 +4,7 @@ import { MdastImportVisitor } from '../../importMarkdownToLexical'
 
 export const MdastListItemVisitor: MdastImportVisitor<Mdast.ListItem> = {
   testNode: 'listItem',
-  visitNode({ actions }) {
-    actions.addAndStepInto($createListItemNode())
+  visitNode({ mdastNode, actions }) {
+    actions.addAndStepInto($createListItemNode(mdastNode.checked ?? undefined))
   }
 }

@@ -124,6 +124,10 @@ const listsMarkdown = `
 
 1. more
 2. more
+
+* [x] Walk the dog
+* [ ] Watch movie
+* [ ] Have dinner with family
 `
 
 export function Lists() {

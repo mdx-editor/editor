@@ -14,6 +14,9 @@ export const lexicalTheme: EditorThemeClasses = {
   },
 
   list: {
+    listitem: styles.listitem,
+    listitemChecked: styles.listItemChecked,
+    listitemUnchecked: styles.listItemUnchecked,
     nested: {
       listitem: styles.nestedListItem
     }

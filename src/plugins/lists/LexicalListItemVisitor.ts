@@ -16,6 +16,7 @@ export const LexicalListItemVisitor: LexicalExportVisitor<ListItemNode, Mdast.Li
       // nest the children in a paragraph for MDAST compatibility
       const listItem = actions.appendToParent(mdastParent, {
         type: 'listItem' as const,
+        checked: lexicalNode.getChecked(),
         spread: false,
         children: [{ type: 'paragraph' as const, children: [] }]
       }) as Mdast.ListItem

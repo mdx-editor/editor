@@ -60,6 +60,78 @@
   list-style:none;
 }
 
+.listitem {
+  margin: 8px 0;
+}
+
+.listItemChecked,
+.listItemUnchecked {
+  position: relative;
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: 24px;
+  padding-right: 24px;
+  list-style-type: none;
+  outline: none;
+}
+
+.listItemChecked {
+  text-decoration: line-through;
+}
+
+.listItemUnchecked:before,
+.listItemChecked:before {
+  content: '';
+  width: 16px;
+  height: 16px;
+  top: 0;
+  left: 0;
+  cursor: pointer;
+  display: block;
+  background-size: cover;
+  position: absolute;
+}
+
+.listItemUnchecked[dir='rtl']:before,
+.listItemChecked[dir='rtl']:before {
+  left: auto;
+  right: 0;
+}
+
+.listItemUnchecked:focus:before,
+.listItemChecked:focus:before {
+  box-shadow: 0 0 0 2px #a6cdfe;
+  border-radius: 2px;
+}
+
+.listItemUnchecked:before {
+  border: 1px solid #999;
+  border-radius: 2px;
+}
+
+.listItemChecked:before {
+  border: 1px solid rgb(61, 135, 245);
+  border-radius: 2px;
+  background-color: #3d87f5;
+  background-repeat: no-repeat;
+}
+
+.listItemChecked:after {
+  content: '';
+  cursor: pointer;
+  border-color: #fff;
+  border-style: solid;
+  position: absolute;
+  display: block;
+  top: 4px;
+  width: 3px;
+  left: 7px;
+  right: 7px;
+  height: 6px;
+  transform: rotate(45deg);
+  border-width: 0 2px 2px 0;
+}
+
 .admonitionDanger, .admonitionInfo, .admonitionNote, .admonitionTip, .admonitionCaution {
   padding: var(--spacing-2);
   margin-top: var(--spacing-2);

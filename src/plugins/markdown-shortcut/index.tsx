@@ -12,7 +12,8 @@ import {
   ORDERED_LIST,
   QUOTE,
   TextFormatTransformer,
-  UNORDERED_LIST
+  UNORDERED_LIST,
+  CHECK_LIST
 } from '@lexical/markdown'
 import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin.js'
 import React from 'react'
@@ -97,7 +98,7 @@ function pickTransformersForActivePlugins(pluginIds: string[], allowedHeadingLev
     transformers.push(LINK)
   }
   if (pluginIds.includes('lists')) {
-    transformers.push(ORDERED_LIST, UNORDERED_LIST)
+    transformers.push(ORDERED_LIST, UNORDERED_LIST, CHECK_LIST)
   }
 
   if (pluginIds.includes('codeblock')) {
