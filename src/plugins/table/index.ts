@@ -7,28 +7,53 @@ import { LexicalTableVisitor } from './LexicalTableVisitor'
 import { MdastTableVisitor } from './MdastTableVisitor'
 import { $createTableNode, TableNode } from './TableNode'
 
-function seedTable(): Mdast.Table {
-  return {
+type InsertTablePayload = {
+  /**
+   * The nunber of rows of the table.
+   */
+  rows?: number
+  /**
+   * The nunber of columns of the table.
+   */
+  columns?: number
+}
+
+function seedTable(rows: number = 1, columns : number = 1): Mdast.Table {
+  const table: Mdast.Table = {
     type: 'table',
-    children: [
-      {
-        type: 'tableRow',
-        children: [{ type: 'tableCell', children: [] }]
-      }
-    ]
+    children: []
+  };
+
+  for (let i = 0; i < rows; i++) {
+    const tableRow: Mdast.TableRow = {
+      type: 'tableRow',
+      children: []
+    };
+
+    for (let j = 0; j < columns; j++) {
+      const cell: Mdast.TableCell = {
+        type: 'tableCell',
+        children: []
+      };
+      tableRow.children.push(cell);
+    }
+
+    table.children.push(tableRow);
   }
+
+  return table;
 }
 
 /** @internal */
 export const tableSystem = system(
   (r, [{ insertDecoratorNode }]) => {
-    const insertTable = r.node<true>()
+    const insertTable = r.node<InsertTablePayload>()
 
     r.link(
       r.pipe(
         insertTable,
-        r.o.mapTo(() => {
-          return $createTableNode(seedTable())
+        r.o.map(({rows, columns}) => {
+          return () => $createTableNode(seedTable(rows, columns))
         })
       ),
       insertDecoratorNode
