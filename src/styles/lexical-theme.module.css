@@ -61,7 +61,7 @@
 }
 
 .listitem {
-  margin: 8px 0;
+  margin: var(--spacing-2) 0;
 }
 
 .listItemChecked,
@@ -69,8 +69,8 @@
   position: relative;
   margin-left: 0;
   margin-right: 0;
-  padding-left: 24px;
-  padding-right: 24px;
+  padding-left: var(--spacing-6);
+  padding-right: var(--spacing-6);
   list-style-type: none;
   outline: none;
 }
@@ -82,8 +82,8 @@
 .listItemUnchecked:before,
 .listItemChecked:before {
   content: '';
-  width: 16px;
-  height: 16px;
+  width: var(--spacing-4);
+  height: var(--spacing-4);
   top: 0;
   left: 0;
   cursor: pointer;
@@ -100,19 +100,19 @@
 
 .listItemUnchecked:focus:before,
 .listItemChecked:focus:before {
-  box-shadow: 0 0 0 2px #a6cdfe;
-  border-radius: 2px;
+  box-shadow: 0 0 0 2px var(--accentBorderHover);
+  border-radius: var(--radius-small);
 }
 
 .listItemUnchecked:before {
   border: 1px solid #999;
-  border-radius: 2px;
+  border-radius: var(--radius-small);
 }
 
 .listItemChecked:before {
-  border: 1px solid rgb(61, 135, 245);
-  border-radius: 2px;
-  background-color: #3d87f5;
+  border: 1px solid var(--accentBorder);
+  border-radius: var(--radius-small);
+  background-color: var(--accentSolid);
   background-repeat: no-repeat;
 }
 
@@ -123,13 +123,13 @@
   border-style: solid;
   position: absolute;
   display: block;
-  top: 4px;
-  width: 3px;
-  left: 7px;
-  right: 7px;
-  height: 6px;
+  top: var(--spacing-0_5);
+  width: var(--spacing-1);
+  left: var(--spacing-1_5);
+  right: var(--spacing-1_5);
+  height: var(--spacing-2);
   transform: rotate(45deg);
-  border-width: 0 2px 2px 0;
+  border-width: 0 var(--spacing-0_5) var(--spacing-0_5) 0;
 }
 
 .admonitionDanger, .admonitionInfo, .admonitionNote, .admonitionTip, .admonitionCaution {

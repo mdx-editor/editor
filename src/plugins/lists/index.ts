@@ -89,15 +89,15 @@ export const [
   systemSpec: listsSystem,
 
   init: (realm) => {
-    realm.pubKey('addMdastExtension', gfmTaskListItemFromMarkdown())
-    realm.pubKey('addSyntaxExtension', gfmTaskListItem())
+    realm.pubKey('addMdastExtension', gfmTaskListItemFromMarkdown)
+    realm.pubKey('addSyntaxExtension', gfmTaskListItem)
     realm.pubKey('addImportVisitor', MdastListVisitor)
     realm.pubKey('addImportVisitor', MdastListItemVisitor)
     realm.pubKey('addLexicalNode', ListItemNode)
     realm.pubKey('addLexicalNode', ListNode)
     realm.pubKey('addExportVisitor', LexicalListVisitor)
     realm.pubKey('addExportVisitor', LexicalListItemVisitor)
-    realm.pubKey('addToMarkdownExtension', gfmTaskListItemToMarkdown())
+    realm.pubKey('addToMarkdownExtension', gfmTaskListItemToMarkdown)
 
     realm.getKeyValue('rootEditor')?.registerCommand(INDENT_CONTENT_COMMAND, () => !isIndentPermitted(7), COMMAND_PRIORITY_CRITICAL)
     realm.pubKey('addComposerChild', TabIndentationPlugin)
