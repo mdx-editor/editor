@@ -5,6 +5,7 @@ import { MdastListItemVisitor } from './MdastListItemVisitor'
 import { LexicalListVisitor } from './LexicalListVisitor'
 import { LexicalListItemVisitor } from './LexicalListItemVisitor'
 import {
+  INSERT_CHECK_LIST_COMMAND,
   INSERT_ORDERED_LIST_COMMAND,
   INSERT_UNORDERED_LIST_COMMAND,
   ListItemNode,
@@ -16,12 +17,18 @@ import { $isRootOrShadowRoot, LexicalCommand, RangeSelection } from 'lexical'
 import { $getListDepth, $isListItemNode, $isListNode } from '@lexical/list'
 import { $getSelection, $isElementNode, $isRangeSelection, COMMAND_PRIORITY_CRITICAL, ElementNode, INDENT_CONTENT_COMMAND } from 'lexical'
 import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin.js'
+import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin.js'
 import { ListPlugin } from '@lexical/react/LexicalListPlugin.js'
+
 import { $findMatchingParent, $getNearestNodeOfType } from '@lexical/utils'
+
+import { gfmTaskListItem } from 'micromark-extension-gfm-task-list-item'
+import { gfmTaskListItemFromMarkdown, gfmTaskListItemToMarkdown } from 'mdast-util-gfm-task-list-item'
 
 const ListTypeCommandMap = new Map<ListType | '', LexicalCommand<void>>([
   ['number', INSERT_ORDERED_LIST_COMMAND],
   ['bullet', INSERT_UNORDERED_LIST_COMMAND],
+  ['check', INSERT_CHECK_LIST_COMMAND],
   ['', REMOVE_LIST_COMMAND]
 ])
 
@@ -82,16 +89,20 @@ export const [
   systemSpec: listsSystem,
 
   init: (realm) => {
+    realm.pubKey('addMdastExtension', gfmTaskListItemFromMarkdown)
+    realm.pubKey('addSyntaxExtension', gfmTaskListItem)
     realm.pubKey('addImportVisitor', MdastListVisitor)
     realm.pubKey('addImportVisitor', MdastListItemVisitor)
     realm.pubKey('addLexicalNode', ListItemNode)
     realm.pubKey('addLexicalNode', ListNode)
     realm.pubKey('addExportVisitor', LexicalListVisitor)
     realm.pubKey('addExportVisitor', LexicalListItemVisitor)
+    realm.pubKey('addToMarkdownExtension', gfmTaskListItemToMarkdown)
 
     realm.getKeyValue('rootEditor')?.registerCommand(INDENT_CONTENT_COMMAND, () => !isIndentPermitted(7), COMMAND_PRIORITY_CRITICAL)
     realm.pubKey('addComposerChild', TabIndentationPlugin)
     realm.pubKey('addComposerChild', ListPlugin)
+    realm.pubKey('addComposerChild', CheckListPlugin)
   }
 })
 

@@ -18,30 +18,30 @@ type InsertTablePayload = {
   columns?: number
 }
 
-function seedTable(rows: number = 1, columns : number = 1): Mdast.Table {
+function seedTable(rows: number = 1, columns: number = 1): Mdast.Table {
   const table: Mdast.Table = {
     type: 'table',
     children: []
-  };
+  }
 
   for (let i = 0; i < rows; i++) {
     const tableRow: Mdast.TableRow = {
       type: 'tableRow',
       children: []
-    };
+    }
 
     for (let j = 0; j < columns; j++) {
       const cell: Mdast.TableCell = {
         type: 'tableCell',
         children: []
-      };
-      tableRow.children.push(cell);
+      }
+      tableRow.children.push(cell)
     }
 
-    table.children.push(tableRow);
+    table.children.push(tableRow)
   }
 
-  return table;
+  return table
 }
 
 /** @internal */
@@ -52,7 +52,7 @@ export const tableSystem = system(
     r.link(
       r.pipe(
         insertTable,
-        r.o.map(({rows, columns}) => {
+        r.o.map(({ rows, columns }) => {
           return () => $createTableNode(seedTable(rows, columns))
         })
       ),

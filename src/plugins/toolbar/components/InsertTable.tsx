@@ -14,7 +14,7 @@ export const InsertTable: React.FC = () => {
     <ButtonWithTooltip
       title="Insert table"
       onClick={() => {
-        insertTable({rows: 3, columns: 3})
+        insertTable({ rows: 3, columns: 3 })
       }}
     >
       <TableIcon />
