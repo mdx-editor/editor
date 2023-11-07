@@ -69,6 +69,7 @@
   position: relative;
   margin-left: 0;
   margin-right: 0;
+  margin-inline-start: -1rem;
   padding-left: var(--spacing-6);
   padding-right: var(--spacing-6);
   list-style-type: none;
@@ -100,12 +101,12 @@
 
 .listItemUnchecked:focus:before,
 .listItemChecked:focus:before {
-  box-shadow: 0 0 0 2px var(--accentBorderHover);
+  box-shadow: 0 0 0 2px var(--accentBgActive);
   border-radius: var(--radius-small);
 }
 
 .listItemUnchecked:before {
-  border: 1px solid #999;
+  border: 1px solid var(--baseBorder);
   border-radius: var(--radius-small);
 }
 
@@ -119,7 +120,7 @@
 .listItemChecked:after {
   content: '';
   cursor: pointer;
-  border-color: #fff;
+  border-color: var(--baseBase);
   border-style: solid;
   position: absolute;
   display: block;

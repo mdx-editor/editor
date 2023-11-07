@@ -38,7 +38,7 @@ const markdown = "> This is a quote"
 
 ## Lists
 
-The Lists plugin enables the usage of ordered and unordered lists, including multiple levels of nesting.
+The Lists plugin enables the usage of ordered, unordered and check lists, including multiple levels of nesting.
 
 ```tsx
 

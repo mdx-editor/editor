@@ -14,6 +14,7 @@ In here, you can find the following markdown elements:
 * Lists
   * Unordered
   * Ordered
+  * Check lists
   * And nested ;)
 * Links
 * Bold/Italic/Underline formatting
