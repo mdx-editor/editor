@@ -662,12 +662,12 @@
   }
 
   .tableColumnEditorTrigger, .tableRowEditorTrigger, .addRowButton, .addColumnButton, .iconButton {
-    opacity: .2;
+    opacity: .15;
   }
 
   &:hover {
     .tableColumnEditorTrigger, .tableRowEditorTrigger, .addRowButton, .addColumnButton, .iconButton {
-      opacity: .5;
+      opacity: 0.3;
 
       &:hover {
         opacity: 1;
@@ -691,7 +691,7 @@
   opacity: 0.2;
 
   &[data-active=true] {
-    opacity: 1;
+    opacity: 1 !important;
   }
 }
 
