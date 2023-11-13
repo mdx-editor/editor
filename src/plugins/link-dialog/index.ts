@@ -1,6 +1,8 @@
 import { $isLinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link'
 import {
+  $createTextNode,
   $getSelection,
+  $insertNodes,
   $isRangeSelection,
   COMMAND_PRIORITY_HIGH,
   COMMAND_PRIORITY_LOW,
@@ -136,7 +138,7 @@ const linkDialogSystem = system(
             const selection = $getSelection()
             // we open the dialog if there's an actual selection
             // or if the cursor is inside a link
-            if ($isRangeSelection(selection) && (getLinkNodeInSelection(selection) || !selection.isCollapsed())) {
+            if ($isRangeSelection(selection)) {
               r.pub(openLinkEditDialog, true)
               event.stopPropagation()
               event.preventDefault()
@@ -172,35 +174,54 @@ const linkDialogSystem = system(
       linkDialogState
     )
 
-    r.sub(r.pipe(updateLink, r.o.withLatestFrom(activeEditor, linkDialogState)), ([payload, editor, state]) => {
-      const url = payload.url.trim()
-      const title = payload.title.trim()
+    r.sub(
+      r.pipe(updateLink, r.o.withLatestFrom(activeEditor, linkDialogState, currentSelection)),
+      ([payload, editor, state, selection]) => {
+        const url = payload.url.trim()
+        const title = payload.title.trim()
 
-      if (url.trim() !== '') {
-        editor?.dispatchCommand(TOGGLE_LINK_COMMAND, { url, title })
-        // the dispatch command implementation fails to set the title for a fresh link creation.
-        // Work around with the code below.
-        setTimeout(() => {
-          editor?.update(() => {
-            const node = getLinkNodeInSelection($getSelection() as RangeSelection)
-            node?.setTitle(title)
+        if (url.trim() !== '') {
+          if (selection?.isCollapsed()) {
+            const linkContent = title || url
+            editor?.update(
+              () => {
+                if (!getLinkNodeInSelection(selection)) {
+                  const node = $createTextNode(linkContent)
+                  $insertNodes([node])
+                  node.select()
+                }
+              },
+              { discrete: true }
+            )
+          }
+
+          editor?.dispatchCommand(TOGGLE_LINK_COMMAND, { url, title })
+
+          // the dispatch command implementation fails to set the title for a fresh link creation.
+          // Work around with the code below.
+          setTimeout(() => {
+            editor?.update(() => {
+              const node = getLinkNodeInSelection($getSelection() as RangeSelection)
+              node?.setTitle(title)
+            })
+          }, 100)
+
+          r.pub(linkDialogState, {
+            type: 'preview',
+            linkNodeKey: state.linkNodeKey,
+            rectangle: state.rectangle,
+            url
+          } as PreviewLinkDialog)
+        } else {
+          if (state.type === 'edit' && state.initialUrl !== '') {
+            editor?.dispatchCommand(TOGGLE_LINK_COMMAND, null)
+          }
+          r.pub(linkDialogState, {
+            type: 'inactive'
           })
-        })
-        r.pub(linkDialogState, {
-          type: 'preview',
-          linkNodeKey: state.linkNodeKey,
-          rectangle: state.rectangle,
-          url
-        } as PreviewLinkDialog)
-      } else {
-        if (state.type === 'edit' && state.initialUrl !== '') {
-          editor?.dispatchCommand(TOGGLE_LINK_COMMAND, null)
         }
-        r.pub(linkDialogState, {
-          type: 'inactive'
-        })
       }
-    })
+    )
 
     r.link(
       r.pipe(

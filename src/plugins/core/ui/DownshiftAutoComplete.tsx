@@ -1,20 +1,39 @@
 import { useCombobox } from 'downshift'
 import React from 'react'
-import { Control, UseFormSetValue, Controller } from 'react-hook-form'
+import { Control, UseFormSetValue, Controller, UseFormRegister } from 'react-hook-form'
 import styles from '../../../styles/ui.module.css'
 import DropDownIcon from '../../../icons/arrow_drop_down.svg'
 
 const MAX_SUGGESTIONS = 20
 
-export const DownshiftAutoComplete: React.FC<{
+interface DownshiftAutoCompleteProps {
   suggestions: string[]
   control: Control<any, any>
   setValue: UseFormSetValue<any>
+  register: UseFormRegister<any>
   placeholder: string
   inputName: string
   autofocus?: boolean
   initialInputValue: string
-}> = ({ autofocus, suggestions, control, inputName, placeholder, initialInputValue, setValue }) => {
+}
+
+export const DownshiftAutoComplete: React.FC<DownshiftAutoCompleteProps> = (props) => {
+  if (props.suggestions.length > 0) {
+    return <DownshiftAutoCompleteWithSuggestions {...props} />
+  } else {
+    return <input className={styles.textInput} size={40} autoFocus {...props.register(props.inputName)} />
+  }
+}
+
+export const DownshiftAutoCompleteWithSuggestions: React.FC<DownshiftAutoCompleteProps> = ({
+  autofocus,
+  suggestions,
+  control,
+  inputName,
+  placeholder,
+  initialInputValue,
+  setValue
+}) => {
   const [items, setItems] = React.useState(suggestions.slice(0, MAX_SUGGESTIONS))
 
   const enableAutoComplete = suggestions.length > 0

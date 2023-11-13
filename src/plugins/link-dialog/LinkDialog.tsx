@@ -63,6 +63,7 @@ export function LinkEditForm({ url, title, onSubmit, onCancel, linkAutocompleteS
       <div className={styles.formField}>
         <label htmlFor="link-url">URL</label>
         <DownshiftAutoComplete
+          register={register}
           initialInputValue={url}
           inputName="url"
           suggestions={linkAutocompleteSuggestions}

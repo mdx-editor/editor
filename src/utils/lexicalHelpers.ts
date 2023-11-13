@@ -26,7 +26,7 @@ export function getSelectedNode(selection: RangeSelection): TextNode | ElementNo
     } else {
       return $isAtNodeEnd(anchor) ? anchorNode : focusNode
     }
-  } catch {
+  } catch (e) {
     return null
   }
 }
@@ -47,16 +47,25 @@ export function getSelectionRectangle(editor: LexicalEditor) {
   ) {
     const domRange = nativeSelection.getRangeAt(0)
     let rect
-    if (nativeSelection.anchorNode === rootElement) {
-      let inner = rootElement
-      while (inner.firstElementChild != null) {
-        inner = inner.firstElementChild as HTMLElement
-      }
-      rect = inner.getBoundingClientRect()
-    } else {
-      rect = domRange.getBoundingClientRect()
-    }
 
+    if (nativeSelection.isCollapsed) {
+      let node = nativeSelection.anchorNode
+      if (node?.nodeType == 3) {
+        node = node.parentNode
+      }
+      rect = (node as HTMLElement).getBoundingClientRect()
+      rect.width = 0
+    } else {
+      if (nativeSelection.anchorNode === rootElement) {
+        let inner = rootElement
+        while (inner.firstElementChild != null) {
+          inner = inner.firstElementChild as HTMLElement
+        }
+        rect = inner.getBoundingClientRect()
+      } else {
+        rect = domRange.getBoundingClientRect()
+      }
+    }
     return {
       top: Math.round(rect.top),
       left: Math.round(rect.left),
