@@ -133,6 +133,15 @@
   border-width: 0 var(--spacing-0_5) var(--spacing-0_5) 0;
 }
 
+.nestedListItem {
+  list-style-type: none;
+}
+
+.nestedListItem:before,
+.nestedListItem:after {
+  display: none;
+}
+
 .admonitionDanger, .admonitionInfo, .admonitionNote, .admonitionTip, .admonitionCaution {
   padding: var(--spacing-2);
   margin-top: var(--spacing-2);
