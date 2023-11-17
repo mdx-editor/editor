@@ -1,10 +1,9 @@
 import React from 'react'
-import { corePluginHooks } from '../../core'
-import { CodeBlockNode } from '../../codeblock/CodeBlockNode'
 import styles from '../../../styles/ui.module.css'
+import { CodeBlockNode } from '../../codeblock/CodeBlockNode'
+import { corePluginHooks } from '../../core'
 import { sandpackPluginHooks } from '../../sandpack'
 import { ButtonWithTooltip } from '.././primitives/toolbar'
-import DeleteIcon from '../../../icons/delete.svg'
 
 /**
  * A component that displays the focused live code block's name.
@@ -12,7 +11,7 @@ import DeleteIcon from '../../../icons/delete.svg'
  * See {@link ConditionalContents} for an example on how to display the dropdown only when a sandpack editor is in focus.
  */
 export const ShowSandpackInfo = () => {
-  const [editorInFocus, theEditor] = corePluginHooks.useEmitterValues('editorInFocus', 'activeEditor')
+  const [editorInFocus, theEditor, iconComponentFor] = corePluginHooks.useEmitterValues('editorInFocus', 'activeEditor', 'iconComponentFor')
   const sandpackNode = editorInFocus!.rootNode as CodeBlockNode
   const [sandpackConfig] = sandpackPluginHooks.useEmitterValues('sandpackConfig')
 
@@ -33,7 +32,7 @@ export const ShowSandpackInfo = () => {
           })
         }}
       >
-        <DeleteIcon />
+        {iconComponentFor('delete_big')}
       </ButtonWithTooltip>
 
       <label>Sandpack preset: {preset.name}</label>

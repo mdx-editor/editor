@@ -14,7 +14,7 @@
 
 @define-mixin icon-button {
   @mixin clear-form-element;
-  padding: var(--spacing-2);
+  padding: var(--spacing-1_5);
 
   & svg {
     display: block;
@@ -29,7 +29,8 @@
   }
 
   &[data-state=on], &:active {
-    background-color: var(--accentBgActive);
+    background-color: var(--baseBgHover);
+    color: var(--baseTextContrast);
   }
 }
 
@@ -47,6 +48,7 @@
   --accentText: var(--blue11);
   --accentTextContrast: var(--blue12);
 
+  --basePageBg: white;
   --baseBase: var(--slate1);
   --baseBgSubtle: var(--slate2);
   --baseBg: var(--slate3);
@@ -145,16 +147,16 @@
   flex-direction: row;
   gap: var(--spacing-1);
   border-radius: var(--radius-medium);
-  padding: var(--spacing-2) var(--spacing-2);
+  padding: var(--spacing-1_5);
   align-items: center;
   overflow-x: auto;
   position: sticky;
   top: 0;
-  background-color: var(--baseBgSubtle);
+  background-color: var(--baseBg);
   width: inherit;
 
   & div[role=separator] {
-    margin: var(--spacing-2) var(--spacing-2);
+    margin: var(--spacing-2) var(--spacing-1);
     border-left: 1px solid var(--baseBorder);
     border-right: 1px solid var(--baseBase);
     height: var(--spacing-4);
@@ -217,7 +219,7 @@
   }
 
   &:hover {
-    background-color: var(--baseBgHover);
+    background-color: var(--baseBgActive);
   }
 
   &:active svg {
@@ -225,7 +227,8 @@
   }
 
   &[data-state=on], &:active {
-    background-color: var(--accentBgActive);
+    color: var(--baseTextContrast);
+    background-color: var(--baseBgActive);
   }
 
   &[data-disabled] {
@@ -251,16 +254,21 @@
 .toolbarCodeBlockLanguageSelectContent,
 .selectContainer
 {
+  @mixin drop-shadow-sm;
   z-index: 3;
   width: var(--spacing-36);
   border-bottom-left-radius: var(--radius-base);
   border-bottom-right-radius: var(--radius-base);
-  background-color: var(--baseBgHover);
+  background-color: var(--basePageBg);
   font-size: var(--text-sm);
 }
 
 .toolbarButtonDropdownContainer {
   border-top-right-radius: var(--radius-base);
+
+  & .selectItem:first-child {
+    border-top-right-radius: var(--radius-base);
+  }
 }
 
 .toolbarNodeKindSelectTrigger, 
@@ -272,24 +280,21 @@
   color: inherit;
   align-items: center;
   width: var(--spacing-36);
-  padding: var(--spacing-1);
-  padding-inline-start: var(--spacing-4) ;
-  padding-inline-end: var(--spacing-2);
+  padding: var(--spacing-1) var(--spacing-2);
   border-radius: var(--radius-medium);
   white-space: nowrap;
   flex-wrap: nowrap;
   font-size: var(--text-sm);
-
-  &:hover {
-    background-color: var(--baseBgHover);
-  }
+  background-color: var(--basePageBg);
+  margin: 0 var(--spacing-1);
 
   &[data-state=open] {
+    @mixin drop-shadow-sm;
     border-bottom-right-radius: var(--radius-none);
     border-bottom-left-radius: var(--radius-none);
-    background-color: var(--baseBgHover);
   }
 }
+
 .selectTrigger[data-placeholder] > span:first-child {
   color: var(--baseBorderHover);
 }
@@ -299,6 +304,7 @@
   width: auto;
   padding-inline-start: var(--spacing-2) ;
   padding-inline-end: var(--spacing-1);
+  padding-block: var(--spacing-0_5);
 }
 
 .toolbarCodeBlockLanguageSelectTrigger, 
@@ -312,14 +318,15 @@
 {
   cursor: default;
   display: flex;
-  padding: var(--spacing-2) var(--spacing-4);
+  padding: var(--spacing-2);
 
   &[data-highlighted] {
-    background-color: var(--baseBgSubtle);
+    background-color: var(--baseBg);
   }
 
   &[data-state=checked] {
-    background-color: var(--accentBgActive);
+    color: var(--baseTextContrast);
+    background-color: var(--baseBg);
   }
 
   &[data-highlighted] {
@@ -335,6 +342,8 @@
 .toolbarNodeKindSelectDropdownArrow, 
 .selectDropdownArrow {
   margin-left: auto;
+  display: flex;
+  align-items: center;
 }
 
 .contentEditable {
@@ -445,7 +454,7 @@
   border: 1px solid var(--accentBorder);
   background-color: var(--accentSolidHover);
   color:var(--baseBase);
-  font-size: var(--text-sm);
+  font-size: var(--text-xs);
   border-radius: var(--radius-medium);
   &:disabled {
     background: var(--accentLine);
@@ -535,9 +544,9 @@
   align-items: center;
   gap: var(--spacing-0_5);
   border-radius:var(--radius-medium);
-  border: 1px solid var(--baseBorder);
-  background-color: var(--baseBgSubtle);
-  padding:var(--spacing-2) var(--spacing-2);
+  border: 1px solid var(--baseBg);
+  background-color: var(--basePageBg);
+  padding:var(--spacing-1) var(--spacing-2);
   font-size: var(--text-sm);
 }
 
@@ -577,10 +586,8 @@
 }
 
 .popoverArrow {
-  fill: var(--baseBgSubtle);
+  fill: var(--basePageBg);
 }
-
-
 
 .linkDialogPreviewAnchor {
   margin-right: var(--spacing-3);
@@ -602,6 +609,9 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+}
+.tooltipTrigger {
+  align-self: center;
 }
 
 .tooltipContent {
@@ -645,7 +655,7 @@
   }
 
   & > tbody > tr > td:not(.toolCell) {
-    border: 1px solid var(--baseBorder);
+    border: 1px solid var(--baseBgActive);
     padding: var(--spacing-1) var(--spacing-2);
     white-space: normal;
 
@@ -657,7 +667,7 @@
     }
 
     &[data-active=true] {
-      outline: solid 2px var(--accentSolid)
+      outline: solid 1px var(--baseSolid);
     }
   }
 
@@ -700,6 +710,7 @@
   & > button {
     @mixin icon-button;
   }
+
   & [role=separator] {
     margin-left: var(--spacing-1);
     margin-right: var(--spacing-1);
@@ -753,18 +764,21 @@
 
   display: flex;
   align-items: center;
-  border-radius: var(--radius-medium);
 }
 
 .addRowButton {
   width: 100%;
-  margin-top: var(--spacing-2);
+  margin-top: var(--spacing-px);
   box-sizing: border-box;
+  border-bottom-right-radius: var(--radius-medium);
+  border-bottom-left-radius: var(--radius-medium);
 }
 
 .addColumnButton {
-  margin-left: var(--spacing-2);
+  margin-left: var(--spacing-px);
   height: 100%;
+  border-top-right-radius: var(--radius-medium);
+  border-bottom-right-radius: var(--radius-medium);
 }
 
 /** Dialog */
@@ -881,7 +895,6 @@
 }
 
 .diffSourceToggle {
-  border: 1px solid var(--baseBorder);
   border-radius: var(--radius-medium);
   display: flex;
   .toolbarToggleItem {
@@ -889,7 +902,7 @@
 
     & > span {
       display: block;
-      padding: var(--spacing-2) var(--spacing-3);
+      padding: var(--spacing-1) var(--spacing-2);
     }
   }
 }
@@ -1086,13 +1099,17 @@
 form.multiFieldForm {
   display: flex;
   flex-direction: column;
-  padding: var(--spacing-4);
-  gap: var(--spacing-4);
+  padding: var(--spacing-2);
+  gap: var(--spacing-2);
 
   .formField {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-2);
+
+    & label {
+      font-size: var(--text-xs);
+    }
   }
 }
 

@@ -1,6 +1,5 @@
 import React from 'react'
 import { ButtonWithTooltip } from '.././primitives/toolbar'
-import FrameSourceIcon from '../../../icons/frame_source.svg'
 import { codeBlockPluginHooks } from '../../codeblock/'
 
 /**
@@ -10,6 +9,7 @@ import { codeBlockPluginHooks } from '../../codeblock/'
  */
 export const InsertCodeBlock: React.FC = () => {
   const insertCodeBlock = codeBlockPluginHooks.usePublisher('insertCodeBlock')
+  const [iconComponentFor] = codeBlockPluginHooks.useEmitterValues('iconComponentFor')
   return (
     <ButtonWithTooltip
       title="Insert code block"
@@ -17,7 +17,7 @@ export const InsertCodeBlock: React.FC = () => {
         insertCodeBlock({})
       }}
     >
-      <FrameSourceIcon />
+      {iconComponentFor('frame_source')}
     </ButtonWithTooltip>
   )
 }

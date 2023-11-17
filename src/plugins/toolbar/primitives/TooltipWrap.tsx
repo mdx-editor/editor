@@ -14,7 +14,7 @@ export const TooltipWrap = React.forwardRef<HTMLButtonElement, { title: string; 
     <Tooltip.Provider delayDuration={100}>
       <Tooltip.Root>
         <Tooltip.Trigger ref={ref} asChild>
-          <span>{children}</span>
+          <span className={styles.tooltipTrigger}>{children}</span>
         </Tooltip.Trigger>
         <Tooltip.Portal container={editorRootElementRef?.current}>
           <Tooltip.Content className={classNames(styles.tooltipContent)} sideOffset={10}>

@@ -1,8 +1,6 @@
 import { mergeRegister } from '@lexical/utils'
 import { CAN_REDO_COMMAND, CAN_UNDO_COMMAND, COMMAND_PRIORITY_CRITICAL, REDO_COMMAND, UNDO_COMMAND } from 'lexical'
 import React from 'react'
-import RedoIcon from '../../../icons/redo.svg'
-import UndoIcon from '../../../icons/undo.svg'
 import { IS_APPLE } from '../../../utils/detectMac'
 import { corePluginHooks } from '../../core'
 import { MultipleChoiceToggleGroup } from '.././primitives/toolbar'
@@ -11,6 +9,7 @@ import { MultipleChoiceToggleGroup } from '.././primitives/toolbar'
  * A toolbar component that lets the user undo and redo changes in the editor.
  */
 export const UndoRedo: React.FC = () => {
+  const [iconComponentFor] = corePluginHooks.useEmitterValues('iconComponentFor')
   const [activeEditor] = corePluginHooks.useEmitterValues('activeEditor')
   const [canUndo, setCanUndo] = React.useState(false)
   const [canRedo, setCanRedo] = React.useState(false)
@@ -44,14 +43,14 @@ export const UndoRedo: React.FC = () => {
         {
           title: IS_APPLE ? 'Undo (⌘Z)' : 'Undo (Ctrl+Z)',
           disabled: !canUndo,
-          contents: <UndoIcon />,
+          contents: iconComponentFor('undo'),
           active: false,
           onChange: () => activeEditor?.dispatchCommand(UNDO_COMMAND, undefined)
         },
         {
           title: IS_APPLE ? 'Redo (⌘Y)' : 'Redo (Ctrl+Y)',
           disabled: !canRedo,
-          contents: <RedoIcon />,
+          contents: iconComponentFor('redo'),
           active: false,
           onChange: () => activeEditor?.dispatchCommand(REDO_COMMAND, undefined)
         }

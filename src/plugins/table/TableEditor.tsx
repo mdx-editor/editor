@@ -17,30 +17,19 @@ import {
 } from 'lexical'
 import * as Mdast from 'mdast'
 import React from 'react'
-import { lexicalTheme } from '../../styles/lexicalTheme'
 import { exportLexicalTreeToMdast } from '../../exportMarkdownFromLexical'
 import { importMdastTreeToLexical } from '../../importMarkdownToLexical'
-import AddColumnIcon from '../../icons/add_column.svg'
-import AddRowIcon from '../../icons/add_row.svg'
-import DeleteSmallIcon from '../../icons/delete_small.svg'
-import AlignCenterIcon from '../../icons/format_align_center.svg'
-import AlignLeftIcon from '../../icons/format_align_left.svg'
-import AlignRightIcon from '../../icons/format_align_right.svg'
-import InsertColLeftIcon from '../../icons/insert_col_left.svg'
-import InsertColRightIcon from '../../icons/insert_col_right.svg'
-import InsertRowAboveIcon from '../../icons/insert_row_above.svg'
-import InsertRowBelowIcon from '../../icons/insert_row_below.svg'
-import MoreHorizIcon from '../../icons/more_horiz.svg'
+import { lexicalTheme } from '../../styles/lexicalTheme'
 import { TableNode } from './TableNode'
 
+import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin.js'
+import { mergeRegister } from '@lexical/utils'
 import * as RadixToolbar from '@radix-ui/react-toolbar'
 import classNames from 'classnames'
 import styles from '../../styles/ui.module.css'
-import { corePluginHooks } from '../core'
-import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin.js'
-import { mergeRegister } from '@lexical/utils'
 import { isPartOftheEditorUI } from '../../utils/isPartOftheEditorUI'
 import { uuidv4 } from '../../utils/uuid4'
+import { corePluginHooks } from '../core'
 
 const AlignToTailwindClassMap = {
   center: styles.centeredCell,
@@ -56,6 +45,7 @@ export interface TableEditorProps {
 
 export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEditor, lexicalTable }) => {
   const [activeCell, setActiveCell] = React.useState<[number, number] | null>(null)
+  const [iconComponentFor] = corePluginHooks.useEmitterValues('iconComponentFor')
   const getCellKey = React.useMemo(() => {
     const cellKeyMap = new WeakMap<Mdast.TableCell, string>()
     return (cell: Mdast.TableCell) => {
@@ -193,7 +183,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
                 })
               }}
             >
-              <DeleteSmallIcon />
+              {iconComponentFor('delete_small')}
             </button>
           </th>
           {Array.from({ length: mdastNode.children[0].children.length }, (_, colIndex) => {
@@ -243,7 +233,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
               {rowIndex === 0 && (
                 <th rowSpan={lexicalTable.getRowCount()} data-tool-cell={true}>
                   <button type="button" className={styles.addColumnButton} onClick={addColumnToRight}>
-                    <AddColumnIcon />
+                    {iconComponentFor('add_column')}
                   </button>
                 </th>
               )}
@@ -256,7 +246,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
           <th></th>
           <th colSpan={lexicalTable.getColCount()}>
             <button type="button" className={styles.addRowButton} onClick={addRowToBottom}>
-              <AddRowIcon />
+              {iconComponentFor('add_row')}
             </button>
           </th>
           <th></th>
@@ -422,6 +412,7 @@ const ColumnEditor: React.FC<ColumnEditorProps> = ({
   setActiveCellWithBoundaries
 }) => {
   const [editorRootElementRef] = corePluginHooks.useEmitterValues('editorRootElementRef')
+  const [iconComponentFor] = corePluginHooks.useEmitterValues('iconComponentFor')
 
   const insertColumnAt = React.useCallback(
     (colIndex: number) => {
@@ -457,7 +448,7 @@ const ColumnEditor: React.FC<ColumnEditorProps> = ({
         data-active={highlightedCoordinates[0] === colIndex + 1}
         title="Column menu"
       >
-        <MoreHorizIcon />
+        {iconComponentFor('more_horiz')}
       </RadixPopover.PopoverTrigger>
       <RadixPopover.Portal container={editorRootElementRef?.current}>
         <RadixPopover.PopoverContent
@@ -477,26 +468,27 @@ const ColumnEditor: React.FC<ColumnEditorProps> = ({
               aria-label="Text alignment"
             >
               <RadixToolbar.ToggleItem value="left" title="Align left">
-                <AlignLeftIcon />
+                {iconComponentFor('format_align_left')}
               </RadixToolbar.ToggleItem>
               <RadixToolbar.ToggleItem value="center" title="Align center">
-                <AlignCenterIcon />
+                {iconComponentFor('format_align_center')}
               </RadixToolbar.ToggleItem>
               <RadixToolbar.ToggleItem value="right" title="Align right">
-                <AlignRightIcon />
+                {iconComponentFor('format_align_right')}
               </RadixToolbar.ToggleItem>
             </RadixToolbar.ToggleGroup>
             <RadixToolbar.Separator />
             <RadixToolbar.Button onClick={insertColumnAt.bind(null, colIndex)} title="Insert a column to the left of this one">
-              <InsertColLeftIcon />
+              {iconComponentFor('insert_col_left')}
             </RadixToolbar.Button>
             <RadixToolbar.Button onClick={insertColumnAt.bind(null, colIndex + 1)} title="Insert a column to the right of this one">
-              <InsertColRightIcon />
+              {iconComponentFor('insert_col_right')}
             </RadixToolbar.Button>
             <RadixToolbar.Button onClick={deleteColumnAt.bind(null, colIndex)} title="Delete this column">
-              <DeleteSmallIcon />
+              {iconComponentFor('delete_small')}
             </RadixToolbar.Button>
           </RadixToolbar.Root>
+          <RadixPopover.Arrow className={styles.popoverArrow} />
         </RadixPopover.PopoverContent>
       </RadixPopover.Portal>
     </RadixPopover.Root>
@@ -518,6 +510,7 @@ const RowEditor: React.FC<RowEditorProps> = ({
   setActiveCellWithBoundaries
 }) => {
   const [editorRootElementRef] = corePluginHooks.useEmitterValues('editorRootElementRef')
+  const [iconComponentFor] = corePluginHooks.useEmitterValues('iconComponentFor')
 
   const insertRowAt = React.useCallback(
     (rowIndex: number) => {
@@ -541,7 +534,7 @@ const RowEditor: React.FC<RowEditorProps> = ({
   return (
     <RadixPopover.Root>
       <RadixPopover.PopoverTrigger className={styles.tableColumnEditorTrigger} data-active={highlightedCoordinates[1] === rowIndex}>
-        <MoreHorizIcon />
+        {iconComponentFor('more_horiz')}
       </RadixPopover.PopoverTrigger>
       <RadixPopover.Portal container={editorRootElementRef?.current}>
         <RadixPopover.PopoverContent
@@ -552,15 +545,16 @@ const RowEditor: React.FC<RowEditorProps> = ({
         >
           <RadixToolbar.Root className={styles.tableColumnEditorToolbar}>
             <RadixToolbar.Button onClick={insertRowAt.bind(null, rowIndex)} title="Insert a row above this one">
-              <InsertRowAboveIcon />
+              {iconComponentFor('insert_row_above')}
             </RadixToolbar.Button>
             <RadixToolbar.Button onClick={insertRowAt.bind(null, rowIndex + 1)} title="Insert a row below this one">
-              <InsertRowBelowIcon />
+              {iconComponentFor('insert_row_below')}
             </RadixToolbar.Button>
             <RadixToolbar.Button onClick={deleteRowAt.bind(null, rowIndex)} title="Delete this row">
-              <DeleteSmallIcon />
+              {iconComponentFor('delete_small')}
             </RadixToolbar.Button>
           </RadixToolbar.Root>
+          <RadixPopover.Arrow className={styles.popoverArrow} />
         </RadixPopover.PopoverContent>
       </RadixPopover.Portal>
     </RadixPopover.Root>

@@ -1,6 +1,5 @@
 import React from 'react'
 import * as RadixSelect from '@radix-ui/react-select'
-import DropDownIcon from '../../../icons/arrow_drop_down.svg'
 import classNames from 'classnames'
 import styles from '../../../styles/ui.module.css'
 import { TooltipWrap } from './TooltipWrap'
@@ -23,7 +22,7 @@ export const SelectItem = React.forwardRef<HTMLDivElement | null, { className?: 
  * @internal
  */
 export const SelectTrigger: React.FC<{ title: string; placeholder: string; className?: string }> = ({ title, placeholder, className }) => {
-  const [readOnly] = corePluginHooks.useEmitterValues('readOnly')
+  const [readOnly, iconComponentFor] = corePluginHooks.useEmitterValues('readOnly', 'iconComponentFor')
   return (
     <TooltipWrap title={title}>
       <RadixSelect.Trigger
@@ -33,9 +32,7 @@ export const SelectTrigger: React.FC<{ title: string; placeholder: string; class
         disabled={readOnly}
       >
         <RadixSelect.Value placeholder={placeholder} />
-        <RadixSelect.Icon className={styles.selectDropdownArrow}>
-          <DropDownIcon />
-        </RadixSelect.Icon>
+        <RadixSelect.Icon className={styles.selectDropdownArrow}>{iconComponentFor('arrow_drop_down')}</RadixSelect.Icon>
       </RadixSelect.Trigger>
     </TooltipWrap>
   )
@@ -67,14 +64,12 @@ export const SelectButtonTrigger: React.FC<{ children: React.ReactNode; title: s
   title,
   className
 }) => {
-  const [readOnly] = corePluginHooks.useEmitterValues('readOnly')
+  const [readOnly, iconComponentFor] = corePluginHooks.useEmitterValues('readOnly', 'iconComponentFor')
   return (
     <TooltipWrap title={title}>
       <RadixSelect.Trigger className={classNames(styles.toolbarButtonSelectTrigger, className)} disabled={readOnly}>
         {children}
-        <RadixSelect.Icon className={styles.selectDropdownArrow}>
-          <DropDownIcon />
-        </RadixSelect.Icon>
+        <RadixSelect.Icon className={styles.selectDropdownArrow}>{iconComponentFor('arrow_drop_down')}</RadixSelect.Icon>
       </RadixSelect.Trigger>
     </TooltipWrap>
   )

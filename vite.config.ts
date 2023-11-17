@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs'
 import react from '@vitejs/plugin-react'
 import dts from 'vite-plugin-dts'
 import svgr from 'vite-plugin-svgr'
-import fs from 'fs'
+import tsconfigPaths from 'vite-tsconfig-paths'
 
 const ext = {
   cjs: 'cjs',
@@ -42,6 +42,7 @@ export default defineConfig({
         replaceAttrValues: { 'black': 'currentColor' }
       }
     }),
+    tsconfigPaths()
   ],
   server: {
     proxy: {

@@ -5,18 +5,13 @@ import * as Popover from '@radix-ui/react-popover'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import React from 'react'
 
-import { createCommand, LexicalCommand } from 'lexical'
-import CheckIcon from '../../icons/check.svg'
-import CopyIcon from '../../icons/content_copy.svg'
-import EditIcon from '../../icons/edit.svg'
-import LinkOffIcon from '../../icons/link_off.svg'
-import OpenInNewIcon from '../../icons/open_in_new.svg'
+import { corePluginHooks } from '@/plugins/core'
+import { DownshiftAutoComplete } from '@/plugins/core/ui/DownshiftAutoComplete'
+import styles from '@/styles/ui.module.css'
 import classNames from 'classnames'
-import styles from '../../styles/ui.module.css'
-import { corePluginHooks } from '../core'
-import { linkDialogPluginHooks } from '.'
+import { createCommand, LexicalCommand } from 'lexical'
 import { useForm } from 'react-hook-form'
-import { DownshiftAutoComplete } from '../core/ui/DownshiftAutoComplete'
+import { linkDialogPluginHooks } from '.'
 
 export const OPEN_LINK_DIALOG: LexicalCommand<undefined> = createCommand()
 
@@ -95,6 +90,7 @@ export const LinkDialog: React.FC = () => {
   const [editorRootElementRef] = corePluginHooks.useEmitterValues('editorRootElementRef')
   const publishWindowChange = linkDialogPluginHooks.usePublisher('onWindowChange')
   const [activeEditor] = corePluginHooks.useEmitterValues('activeEditor')
+  const [iconComponentFor] = corePluginHooks.useEmitterValues('iconComponentFor')
 
   const [linkDialogState, linkAutocompleteSuggestions] = linkDialogPluginHooks.useEmitterValues(
     'linkDialogState',
@@ -166,10 +162,10 @@ export const LinkDialog: React.FC = () => {
                 title={urlIsExternal ? `Open ${linkDialogState.url} in new window` : linkDialogState.url}
               >
                 <span>{linkDialogState.url}</span>
-                {urlIsExternal && <OpenInNewIcon />}
+                {urlIsExternal && iconComponentFor('open_in_new')}
               </a>
               <ActionButton onClick={() => switchFromPreviewToLinkEdit(true)} title="Edit link URL" aria-label="Edit link URL">
-                <EditIcon />
+                {iconComponentFor('edit')}
               </ActionButton>
               <Tooltip.Provider>
                 <Tooltip.Root open={copyUrlTooltipOpen}>
@@ -184,7 +180,7 @@ export const LinkDialog: React.FC = () => {
                         })
                       }}
                     >
-                      {copyUrlTooltipOpen ? <CheckIcon /> : <CopyIcon />}
+                      {copyUrlTooltipOpen ? iconComponentFor('check') : iconComponentFor('content_copy')}
                     </ActionButton>
                   </Tooltip.Trigger>
                   <Tooltip.Portal container={editorRootElementRef?.current}>
@@ -197,10 +193,11 @@ export const LinkDialog: React.FC = () => {
               </Tooltip.Provider>
 
               <ActionButton title="Remove link" aria-label="Remove link" onClick={() => removeLink(true)}>
-                <LinkOffIcon />
+                {iconComponentFor('link_off')}
               </ActionButton>
             </>
           )}
+          <Popover.Arrow className={styles.popoverArrow} />
         </Popover.Content>
       </Popover.Portal>
     </Popover.Root>

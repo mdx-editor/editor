@@ -2,9 +2,6 @@ import React from 'react'
 import { corePluginHooks } from '../../core'
 import { IS_BOLD, IS_ITALIC, IS_UNDERLINE } from '../../../FormatConstants'
 import { MultipleChoiceToggleGroup } from '.././primitives/toolbar'
-import BoldIcon from '../../../icons/format_bold.svg'
-import ItalicIcon from '../../../icons/format_italic.svg'
-import UnderlinedIcon from '../../../icons/format_underlined.svg'
 
 /**
  * A toolbar component that lets the user toggle bold, italic and underline formatting.
@@ -20,15 +17,16 @@ export const BoldItalicUnderlineToggles: React.FC = () => {
   const boldTitle = boldIsOn ? 'Remove bold' : 'Bold'
   const italicTitle = italicIsOn ? 'Remove italic' : 'Italic'
   const underlineTitle = underlineIsOn ? 'Remove underline' : 'Underline'
+  const [iconComponentFor] = corePluginHooks.useEmitterValues('iconComponentFor')
 
   return (
     <MultipleChoiceToggleGroup
       items={[
-        { title: boldTitle, contents: <BoldIcon />, active: boldIsOn, onChange: applyFormat.bind(null, 'bold') },
-        { title: italicTitle, contents: <ItalicIcon />, active: italicIsOn, onChange: applyFormat.bind(null, 'italic') },
+        { title: boldTitle, contents: iconComponentFor('format_bold'), active: boldIsOn, onChange: applyFormat.bind(null, 'bold') },
+        { title: italicTitle, contents: iconComponentFor('format_italic'), active: italicIsOn, onChange: applyFormat.bind(null, 'italic') },
         {
           title: underlineTitle,
-          contents: <UnderlinedIcon style={{ transform: 'translateY(2px)' }} />,
+          contents: <div style={{ transform: 'translateY(2px)' }}>{iconComponentFor('format_underlined')}</div>,
           active: underlineIsOn,
           onChange: applyFormat.bind(null, 'underline')
         }

@@ -2,7 +2,7 @@ import { useCombobox } from 'downshift'
 import React from 'react'
 import { Control, UseFormSetValue, Controller, UseFormRegister } from 'react-hook-form'
 import styles from '../../../styles/ui.module.css'
-import DropDownIcon from '../../../icons/arrow_drop_down.svg'
+import { corePluginHooks } from '..'
 
 const MAX_SUGGESTIONS = 20
 
@@ -35,6 +35,7 @@ export const DownshiftAutoCompleteWithSuggestions: React.FC<DownshiftAutoComplet
   setValue
 }) => {
   const [items, setItems] = React.useState(suggestions.slice(0, MAX_SUGGESTIONS))
+  const [iconComponentFor] = corePluginHooks.useEmitterValues('iconComponentFor')
 
   const enableAutoComplete = suggestions.length > 0
 
@@ -85,7 +86,7 @@ export const DownshiftAutoCompleteWithSuggestions: React.FC<DownshiftAutoComplet
         />
         {enableAutoComplete && (
           <button aria-label="toggle menu" type="button" {...getToggleButtonProps()}>
-            <DropDownIcon />
+            {iconComponentFor('arrow_drop_down')}
           </button>
         )}
       </div>

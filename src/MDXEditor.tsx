@@ -10,6 +10,7 @@ import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary.js'
 import classNames from 'classnames'
 import { ToMarkdownOptions } from './exportMarkdownFromLexical'
 import { noop } from './utils/fp'
+import { IconKey } from './plugins/core/Icon'
 
 const LexicalProvider: React.FC<{ children: JSX.Element | string | (JSX.Element | string)[] }> = ({ children }) => {
   const [initialRootEditorState, nodes, readOnly] = corePluginHooks.useEmitterValues(
@@ -118,10 +119,20 @@ export interface MDXEditorProps {
    * Note: Don't use this mode to render content for consumption - render the markdown using a library of your choice instead.
    */
   readOnly?: boolean
+  /**
+   * Use this prop to customize the icons used across the editor. Pass a function that returns an icon (JSX) for a given icon key.
+   */
+  iconComponentFor?: (name: IconKey) => JSX.Element
 }
 
 const DEFAULT_MARKDOWN_OPTIONS: ToMarkdownOptions = {
   listItemIndent: 'one'
+}
+
+const DefaultIcon = React.lazy(() => import('./plugins/core/Icon'))
+
+const defaultIconComponentFor = (name: IconKey) => {
+  return <DefaultIcon name={name} />
 }
 
 /**
@@ -233,7 +244,8 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>((pro
           toMarkdownOptions: props.toMarkdownOptions ?? DEFAULT_MARKDOWN_OPTIONS,
           autoFocus: props.autoFocus ?? false,
           placeholder: props.placeholder ?? '',
-          readOnly: Boolean(props.readOnly)
+          readOnly: Boolean(props.readOnly),
+          iconComponentFor: props.iconComponentFor ?? defaultIconComponentFor
         }),
         ...(props.plugins || [])
       ]}

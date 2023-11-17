@@ -1,7 +1,4 @@
 import React from 'react'
-import BulletedListIcon from '../../../icons/format_list_bulleted.svg'
-import NumberedListIcon from '../../../icons/format_list_numbered.svg'
-import CheckedListIcon from '../../../icons/format_list_checked.svg'
 import { listsPluginHooks } from '../../lists'
 import { SingleChoiceToggleGroup } from '.././primitives/toolbar'
 
@@ -13,13 +10,14 @@ import { SingleChoiceToggleGroup } from '.././primitives/toolbar'
 export const ListsToggle: React.FC = () => {
   const [currentListType] = listsPluginHooks.useEmitterValues('currentListType')
   const applyListType = listsPluginHooks.usePublisher('applyListType')
+  const [iconComponentFor] = listsPluginHooks.useEmitterValues('iconComponentFor')
   return (
     <SingleChoiceToggleGroup
       value={currentListType || ''}
       items={[
-        { title: 'Bulleted list', contents: <BulletedListIcon />, value: 'bullet' },
-        { title: 'Numbered list', contents: <NumberedListIcon />, value: 'number' },
-        { title: 'Check list', contents: <CheckedListIcon />, value: 'check' }
+        { title: 'Bulleted list', contents: iconComponentFor('format_list_bulleted'), value: 'bullet' },
+        { title: 'Numbered list', contents: iconComponentFor('format_list_numbered'), value: 'number' },
+        { title: 'Check list', contents: iconComponentFor('format_list_checked'), value: 'check' }
       ]}
       onChange={applyListType}
     />

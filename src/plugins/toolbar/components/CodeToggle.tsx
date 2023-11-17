@@ -1,6 +1,5 @@
 import React from 'react'
 import { IS_CODE } from '../../../FormatConstants'
-import CodeIcon from '../../../icons/code.svg'
 import { corePluginHooks } from '../../core'
 import { MultipleChoiceToggleGroup } from '.././primitives/toolbar'
 
@@ -9,7 +8,7 @@ import { MultipleChoiceToggleGroup } from '.././primitives/toolbar'
  * Use for inline `code` elements (like variables, methods, etc).
  */
 export const CodeToggle: React.FC = () => {
-  const [currentFormat] = corePluginHooks.useEmitterValues('currentFormat')
+  const [currentFormat, iconComponentFor] = corePluginHooks.useEmitterValues('currentFormat', 'iconComponentFor')
   const applyFormat = corePluginHooks.usePublisher('applyFormat')
 
   const codeIsOn = (currentFormat & IS_CODE) !== 0
@@ -18,7 +17,7 @@ export const CodeToggle: React.FC = () => {
 
   return (
     <MultipleChoiceToggleGroup
-      items={[{ title: title, contents: <CodeIcon />, active: codeIsOn, onChange: applyFormat.bind(null, 'code') }]}
+      items={[{ title: title, contents: iconComponentFor('code'), active: codeIsOn, onChange: applyFormat.bind(null, 'code') }]}
     />
   )
 }

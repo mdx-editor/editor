@@ -47,6 +47,7 @@ import { SharedHistoryPlugin } from './SharedHistoryPlugin'
 import { noop } from '../../utils/fp'
 import { controlOrMeta } from '../../utils/detectMac'
 import { MdastBreakVisitor } from './MdastBreakVisitor'
+import { type IconKey } from './Icon'
 
 /** @internal */
 export type EditorSubscription = (activeEditor: LexicalEditor) => () => void
@@ -107,6 +108,10 @@ export const coreSystem = system((r) => {
   const editorInFocus = r.node<EditorInFocus | null>(null)
 
   const onBlur = r.node<FocusEvent>()
+
+  const iconComponentFor = r.node<(name: IconKey) => React.ReactNode>((name: IconKey) => {
+    throw new Error(`No icon component for ${name}`)
+  })
 
   const rebind = () =>
     r.o.scan((teardowns, [subs, activeEditorValue]: [EditorSubscription[], LexicalEditor]) => {
@@ -413,7 +418,7 @@ export const coreSystem = system((r) => {
                 } else {
                   $insertNodeToNearestRoot(node)
                 }
-                if (Object.hasOwn(node, 'select') && typeof node.select === 'function') {
+                if ('select' in node && typeof node.select === 'function') {
                   // eslint-disable-next-line @typescript-eslint/no-unsafe-call
                   setTimeout(() => node.select())
                 }
@@ -499,7 +504,9 @@ export const coreSystem = system((r) => {
     insertDecoratorNode,
 
     // Events
-    onBlur
+    onBlur,
+
+    iconComponentFor
   }
 }, [])
 
@@ -512,6 +519,7 @@ interface CorePluginParams {
   onBlur?: (e: FocusEvent) => void
   toMarkdownOptions: NonNullable<LexicalConvertOptions['toMarkdownOptions']>
   readOnly: boolean
+  iconComponentFor: (name: IconKey) => React.ReactElement
 }
 
 export const [
@@ -537,6 +545,7 @@ export const [
 
   init(realm, params: CorePluginParams) {
     realm.pubKey('initialMarkdown', params.initialMarkdown.trim())
+    realm.pubKey('iconComponentFor', params.iconComponentFor)
 
     // core import visitors
     realm.pubKey('addImportVisitor', MdastRootVisitor)

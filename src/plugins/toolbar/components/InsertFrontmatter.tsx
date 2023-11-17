@@ -1,6 +1,5 @@
 import React from 'react'
 import { ButtonWithTooltip } from '.././primitives/toolbar'
-import FrontmatterIcon from '../../../icons/frontmatter.svg'
 import { frontmatterPluginHooks } from '../../frontmatter'
 import styles from '../../../styles/ui.module.css'
 import classNames from 'classnames'
@@ -12,6 +11,7 @@ import classNames from 'classnames'
 export const InsertFrontmatter: React.FC = () => {
   const insertFrontmatter = frontmatterPluginHooks.usePublisher('insertFrontmatter')
   const [hasFrontmatter] = frontmatterPluginHooks.useEmitterValues('hasFrontmatter')
+  const [iconComponentFor] = frontmatterPluginHooks.useEmitterValues('iconComponentFor')
   return (
     <ButtonWithTooltip
       title={hasFrontmatter ? 'Edit frontmatter' : 'Insert frontmatter'}
@@ -20,7 +20,7 @@ export const InsertFrontmatter: React.FC = () => {
       })}
       onClick={insertFrontmatter.bind(null, true)}
     >
-      <FrontmatterIcon />
+      {iconComponentFor('frontmatter')}
     </ButtonWithTooltip>
   )
 }

@@ -23,6 +23,11 @@
       "@testing-library/jest-dom",
       "svgr"
     ],
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    },
     "plugins": [
       {
         "name": "typescript-plugin-css-modules"

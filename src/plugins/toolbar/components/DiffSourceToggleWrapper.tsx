@@ -1,9 +1,6 @@
 import React from 'react'
 import { diffSourcePluginHooks } from '../../diff-source'
 import { SingleChoiceToggleGroup } from '.././primitives/toolbar'
-import RichTextIcon from '../../../icons/rich_text.svg'
-import DiffIcon from '../../../icons/difference.svg'
-import SourceIcon from '../../../icons/markdown.svg'
 import styles from '../../../styles/ui.module.css'
 
 /**
@@ -23,6 +20,7 @@ import styles from '../../../styles/ui.module.css'
 export const DiffSourceToggleWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [viewMode] = diffSourcePluginHooks.useEmitterValues('viewMode')
   const changeViewMode = diffSourcePluginHooks.usePublisher('viewMode')
+  const [iconComponentFor] = diffSourcePluginHooks.useEmitterValues('iconComponentFor')
 
   return (
     <>
@@ -39,9 +37,9 @@ export const DiffSourceToggleWrapper: React.FC<{ children: React.ReactNode }> = 
           className={styles.diffSourceToggle}
           value={viewMode}
           items={[
-            { title: 'Rich text', contents: <RichTextIcon />, value: 'rich-text' },
-            { title: 'Diff mode', contents: <DiffIcon />, value: 'diff' },
-            { title: 'Source', contents: <SourceIcon />, value: 'source' }
+            { title: 'Rich text', contents: iconComponentFor('rich_text'), value: 'rich-text' },
+            { title: 'Diff mode', contents: iconComponentFor('difference'), value: 'diff' },
+            { title: 'Source', contents: iconComponentFor('markdown'), value: 'source' }
           ]}
           onChange={(value) => changeViewMode(value || 'rich-text')}
         />

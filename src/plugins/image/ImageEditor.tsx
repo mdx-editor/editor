@@ -21,8 +21,8 @@ import {
   SELECTION_CHANGE_COMMAND
 } from 'lexical'
 import { imagePluginHooks } from '.'
-import SettingsIcon from '../../icons/settings.svg'
 import styles from '../../styles/ui.module.css'
+import { corePluginHooks } from '../core'
 import { $isImageNode } from './ImageNode'
 import ImageResizer from './ImageResizer'
 
@@ -94,6 +94,7 @@ export function ImageEditor({ src, title, alt, nodeKey, width, height }: ImageEd
   const [imagePreviewHandler] = imagePluginHooks.useEmitterValues('imagePreviewHandler')
   const [imageSource, setImageSource] = React.useState<string | null>(null)
   const openEditImageDialog = imagePluginHooks.usePublisher('openEditImageDialog')
+  const [iconComponentFor] = corePluginHooks.useEmitterValues('iconComponentFor')
 
   const onDelete = React.useCallback(
     (payload: KeyboardEvent) => {
@@ -273,7 +274,7 @@ export function ImageEditor({ src, title, alt, nodeKey, width, height }: ImageEd
             })
           }}
         >
-          <SettingsIcon />
+          {iconComponentFor('settings')}
         </button>
       </div>
     </React.Suspense>

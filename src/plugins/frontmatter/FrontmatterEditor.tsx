@@ -4,8 +4,6 @@ import YamlParser from 'js-yaml'
 import React from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { frontmatterPluginHooks } from '.'
-import CloseIcon from '../../icons/close.svg'
-import DeleteIcon from '../../icons/delete.svg'
 import styles from '../../styles/ui.module.css'
 import { corePluginHooks } from '../core'
 
@@ -17,7 +15,11 @@ export interface FrontmatterEditorProps {
 }
 
 export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) => {
-  const [readOnly, editorRootElementRef] = corePluginHooks.useEmitterValues('readOnly', 'editorRootElementRef')
+  const [readOnly, editorRootElementRef, iconComponentFor] = corePluginHooks.useEmitterValues(
+    'readOnly',
+    'editorRootElementRef',
+    'iconComponentFor'
+  )
   const [frontmatterDialogOpen] = frontmatterPluginHooks.useEmitterValues('frontmatterDialogOpen')
   const setFrontmatterDialogOpen = frontmatterPluginHooks.usePublisher('frontmatterDialogOpen')
   const removeFrontmatter = frontmatterPluginHooks.usePublisher('removeFrontmatter')
@@ -100,7 +102,7 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
                         </td>
                         <td>
                           <button type="button" onClick={() => remove(index)} className={styles.iconButton} disabled={readOnly}>
-                            <DeleteIcon />
+                            {iconComponentFor('delete_big')}
                           </button>
                         </td>
                       </tr>
@@ -135,7 +137,7 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
             </form>
             <Dialog.Close asChild>
               <button className={styles.dialogCloseButton} aria-label="Close">
-                <CloseIcon />
+                {iconComponentFor('close')}
               </button>
             </Dialog.Close>
           </Dialog.Content>

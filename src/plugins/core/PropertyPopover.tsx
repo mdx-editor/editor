@@ -2,10 +2,10 @@
 import * as RadixPopover from '@radix-ui/react-popover'
 import React from 'react'
 import { useForm } from 'react-hook-form'
-import SettingsIcon from '../../icons/settings.svg'
 import styles from '../../styles/ui.module.css'
 
 import { PopoverContent, PopoverPortal } from './ui/PopoverUtils'
+import { corePluginHooks } from '.'
 
 /**
  * The properties of the {@link PropertyPopover} React component.
@@ -31,13 +31,14 @@ export interface PropertyPopoverProps {
  */
 export const PropertyPopover: React.FC<PropertyPopoverProps> = ({ title, properties, onChange }) => {
   const [open, setOpen] = React.useState(false)
+  const [iconComponentFor] = corePluginHooks.useEmitterValues('iconComponentFor')
 
   const { register, handleSubmit, reset } = useForm({ defaultValues: properties })
 
   return (
     <RadixPopover.Root open={open} onOpenChange={(v) => setOpen(v)}>
       <RadixPopover.Trigger className={styles.iconButton}>
-        <SettingsIcon style={{ display: 'block' }} />
+        <div>{iconComponentFor('settings')}</div>
       </RadixPopover.Trigger>
       <PopoverPortal>
         <PopoverContent>

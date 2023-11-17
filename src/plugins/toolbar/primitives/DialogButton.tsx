@@ -5,9 +5,6 @@ import React from 'react'
 
 import classNames from 'classnames'
 import { useCombobox } from 'downshift'
-import DropDownIcon from '../../../icons/arrow_drop_down.svg'
-import CheckIcon from '../../../icons/check.svg'
-import CloseIcon from '../../../icons/close.svg'
 import { corePluginHooks } from '../../core'
 import styles from '../../../styles/ui.module.css'
 import { TooltipWrap } from './TooltipWrap'
@@ -96,6 +93,7 @@ const DialogForm: React.FC<{
   onSubmitCallback: (value: string) => void
 }> = ({ autocompleteSuggestions, onSubmitCallback, dialogInputPlaceholder, submitButtonTitle }) => {
   const [items, setItems] = React.useState(autocompleteSuggestions.slice(0, MAX_SUGGESTIONS))
+  const [iconComponentFor] = corePluginHooks.useEmitterValues('iconComponentFor')
 
   const enableAutoComplete = autocompleteSuggestions.length > 0
 
@@ -166,7 +164,7 @@ const DialogForm: React.FC<{
           />
           {enableAutoComplete && (
             <button aria-label="toggle menu" type="button" {...getToggleButtonProps()}>
-              <DropDownIcon />
+              {iconComponentFor('arrow_drop_down')}
             </button>
           )}
         </div>
@@ -193,12 +191,10 @@ const DialogForm: React.FC<{
         aria-label={submitButtonTitle}
         className={classNames(styles.actionButton, styles.primaryActionButton)}
       >
-        <CheckIcon />
+        {iconComponentFor('check')}
       </button>
 
-      <Dialog.Close className={styles.actionButton}>
-        <CloseIcon />
-      </Dialog.Close>
+      <Dialog.Close className={styles.actionButton}>{iconComponentFor('close')}</Dialog.Close>
     </form>
   )
 }
