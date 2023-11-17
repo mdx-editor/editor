@@ -57,7 +57,13 @@
 }
 
 .nestedListItem {
-  list-style:none;
+  list-style: none;
+  list-style-type: none;
+}
+
+.nestedListItem:before,
+.nestedListItem:after {
+  display: none;
 }
 
 .listitem {

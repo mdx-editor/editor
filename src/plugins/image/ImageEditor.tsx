@@ -42,7 +42,7 @@ function useSuspenseImage(src: string) {
     throw new Promise((resolve) => {
       const img = new Image()
       img.src = src
-      img.onload = () => {
+      img.onerror = img.onload = () => {
         imageCache.add(src)
         resolve(null)
       }
