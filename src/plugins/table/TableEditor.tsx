@@ -45,7 +45,7 @@ export interface TableEditorProps {
 
 export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEditor, lexicalTable }) => {
   const [activeCell, setActiveCell] = React.useState<[number, number] | null>(null)
-  const [iconComponentFor] = corePluginHooks.useEmitterValues('iconComponentFor')
+  const [iconComponentFor, readOnly] = corePluginHooks.useEmitterValues('iconComponentFor', 'readOnly')
   const getCellKey = React.useMemo(() => {
     const cellKeyMap = new WeakMap<Mdast.TableCell, string>()
     return (cell: Mdast.TableCell) => {
@@ -168,51 +168,55 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
         <col />
       </colgroup>
 
-      <thead>
-        <tr>
-          <th className={styles.tableToolsColumn} data-tool-cell={true}>
-            <button
-              className={styles.iconButton}
-              type="button"
-              title="Delete table"
-              onClick={(e) => {
-                e.preventDefault()
-                parentEditor.update(() => {
-                  lexicalTable.selectNext()
-                  lexicalTable.remove()
-                })
-              }}
-            >
-              {iconComponentFor('delete_small')}
-            </button>
-          </th>
-          {Array.from({ length: mdastNode.children[0].children.length }, (_, colIndex) => {
-            return (
-              <th key={colIndex} data-tool-cell={true}>
-                <ColumnEditor
-                  {...{
-                    setActiveCellWithBoundaries,
-                    parentEditor,
-                    colIndex,
-                    highlightedCoordinates,
-                    lexicalTable,
-                    align: (mdastNode.align || [])[colIndex]
-                  }}
-                />
-              </th>
-            )
-          })}
-          <th className={styles.tableToolsColumn}></th>
-        </tr>
-      </thead>
+      {readOnly || (
+        <thead>
+          <tr>
+            <th className={styles.tableToolsColumn} data-tool-cell={true}>
+              <button
+                className={styles.iconButton}
+                type="button"
+                title="Delete table"
+                onClick={(e) => {
+                  e.preventDefault()
+                  parentEditor.update(() => {
+                    lexicalTable.selectNext()
+                    lexicalTable.remove()
+                  })
+                }}
+              >
+                {iconComponentFor('delete_small')}
+              </button>
+            </th>
+            {Array.from({ length: mdastNode.children[0].children.length }, (_, colIndex) => {
+              return (
+                <th key={colIndex} data-tool-cell={true}>
+                  <ColumnEditor
+                    {...{
+                      setActiveCellWithBoundaries,
+                      parentEditor,
+                      colIndex,
+                      highlightedCoordinates,
+                      lexicalTable,
+                      align: (mdastNode.align || [])[colIndex]
+                    }}
+                  />
+                </th>
+              )
+            })}
+            <th className={styles.tableToolsColumn}></th>
+          </tr>
+        </thead>
+      )}
 
       <tbody>
         {mdastNode.children.map((row, rowIndex) => {
           return (
             <tr key={rowIndex}>
-              <td className={styles.toolCell} data-tool-cell={true}>
-                <RowEditor {...{ setActiveCellWithBoundaries, parentEditor, rowIndex, highlightedCoordinates, lexicalTable }} />
-              </td>
+              {readOnly || (
+                <td className={styles.toolCell} data-tool-cell={true}>
+                  <RowEditor {...{ setActiveCellWithBoundaries, parentEditor, rowIndex, highlightedCoordinates, lexicalTable }} />
+                </td>
+              )}
               {row.children.map((mdastCell, colIndex) => {
                 return (
                   <Cell
@@ -225,33 +229,36 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
                       colIndex,
                       lexicalTable,
                       parentEditor,
-                      activeCell
+                      activeCell: readOnly ? [-1, -1] : activeCell
                     }}
                   />
                 )
               })}
-              {rowIndex === 0 && (
-                <th rowSpan={lexicalTable.getRowCount()} data-tool-cell={true}>
-                  <button type="button" className={styles.addColumnButton} onClick={addColumnToRight}>
-                    {iconComponentFor('add_column')}
-                  </button>
-                </th>
-              )}
+              {readOnly ||
+                (rowIndex === 0 && (
+                  <th rowSpan={lexicalTable.getRowCount()} data-tool-cell={true}>
+                    <button type="button" className={styles.addColumnButton} onClick={addColumnToRight}>
+                      {iconComponentFor('add_column')}
+                    </button>
+                  </th>
+                ))}
             </tr>
           )
         })}
       </tbody>
-      <tfoot>
-        <tr>
-          <th></th>
-          <th colSpan={lexicalTable.getColCount()}>
-            <button type="button" className={styles.addRowButton} onClick={addRowToBottom}>
-              {iconComponentFor('add_row')}
-            </button>
-          </th>
-          <th></th>
-        </tr>
-      </tfoot>
+      {readOnly || (
+        <tfoot>
+          <tr>
+            <th></th>
+            <th colSpan={lexicalTable.getColCount()}>
+              <button type="button" className={styles.addRowButton} onClick={addRowToBottom}>
+                {iconComponentFor('add_row')}
+              </button>
+            </th>
+            <th></th>
+          </tr>
+        </tfoot>
+      )}
     </table>
   )
 }

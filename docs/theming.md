@@ -29,6 +29,7 @@ The example below swaps the editor gray/blue colors with tomato/mauve. In additi
   --accentText: var(--tomato11);
   --accentTextContrast: var(--tomato12);
 
+  --basePageBg: white;
   --baseBase: var(--mauve1);
   --baseBgSubtle: var(--mauve2);
   --baseBg: var(--mauve3);
@@ -43,7 +44,7 @@ The example below swaps the editor gray/blue colors with tomato/mauve. In additi
   --baseTextContrast: var(--mauve12);
 
   color: var(--baseText);
-  background: var(--baseBg);
+  background: var(--basePageBg);
 }
 ```
 
