@@ -197,15 +197,6 @@ const linkDialogSystem = system(
 
           editor?.dispatchCommand(TOGGLE_LINK_COMMAND, { url, title })
 
-          // the dispatch command implementation fails to set the title for a fresh link creation.
-          // Work around with the code below.
-          setTimeout(() => {
-            editor?.update(() => {
-              const node = getLinkNodeInSelection($getSelection() as RangeSelection)
-              node?.setTitle(title)
-            })
-          }, 100)
-
           r.pub(linkDialogState, {
             type: 'preview',
             linkNodeKey: state.linkNodeKey,
