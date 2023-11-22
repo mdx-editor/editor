@@ -7,7 +7,13 @@ import React from 'react'
 import { diffSourcePluginHooks } from '.'
 import { corePluginHooks } from '../core'
 
-export const COMMON_STATE_CONFIG_EXTENSIONS: Extension[] = [basicSetup, basicLight, markdownLanguageSupport(), lineNumbers()]
+export const COMMON_STATE_CONFIG_EXTENSIONS: Extension[] = [
+  basicSetup,
+  basicLight,
+  markdownLanguageSupport(),
+  lineNumbers(),
+  EditorView.lineWrapping
+]
 
 export const SourceEditor = () => {
   const [markdown, readOnly] = corePluginHooks.useEmitterValues('markdown', 'readOnly')
