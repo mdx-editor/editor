@@ -77,4 +77,14 @@ export * from './plugins/toolbar/primitives/select'
 export * from './plugins/core/NestedLexicalEditor'
 export * from './plugins/core/PropertyPopover'
 
+// Helpers & utilities
+export * from './utils/detectMac'
+export * from './utils/fp'
+export * from './utils/isPartOftheEditorUI'
+export * from './utils/lexicalHelpers'
+export * from './utils/makeHslTransparent'
+export * from './utils/uuid4'
+export * from './utils/voidEmitter'
+export * from './utils/whitespaceConversion'
+
 export * from './gurx'
