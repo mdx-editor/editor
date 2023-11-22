@@ -56,4 +56,8 @@
     background: transparent;
     font-size: var(--text-xxs);
   }
+
+  & .cm-activeLine {
+    background: transparent;
+  }
 }
