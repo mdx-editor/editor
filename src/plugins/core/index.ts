@@ -194,6 +194,8 @@ export const coreSystem = system((r) => {
 
   const initialMarkdown = r.node<string>('')
   const markdown = r.node<string>('', true)
+  const markdownSignal = r.node<string>()
+  r.link(markdown, markdownSignal)
   r.link(initialMarkdown, markdown)
 
   // import configuration
@@ -473,6 +475,7 @@ export const coreSystem = system((r) => {
     initialMarkdown,
     setMarkdown,
     markdown,
+    markdownSignal,
 
     // DOM
     editorRootElementRef,
@@ -539,7 +542,7 @@ export const [
       placeholder: params.placeholder,
       readOnly: params.readOnly
     })
-    realm.singletonSubKey('markdown', params.onChange)
+    realm.singletonSubKey('markdownSignal', params.onChange)
     realm.singletonSubKey('onBlur', params.onBlur)
   },
 

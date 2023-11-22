@@ -8,12 +8,13 @@ export type ViewMode = 'rich-text' | 'source' | 'diff'
 
 /** @internal */
 export const diffSourceSystem = system(
-  (r, [{ markdown, setMarkdown }]) => {
+  (r, [{ markdown, setMarkdown, markdownSignal }]) => {
     const diffMarkdown = r.node('')
     const markdownSourceEditorValue = r.node('')
     const cmExtensions = r.node<Extension[]>([])
 
     r.link(markdown, markdownSourceEditorValue)
+    r.link(markdownSourceEditorValue, markdownSignal)
     const viewMode = r.node<ViewMode>('rich-text')
 
     r.sub(
