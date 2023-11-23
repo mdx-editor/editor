@@ -145,7 +145,20 @@ Check the working example that uses dynamic imports in the [MDX editor in Remix 
 
 ### Create React App
 
-There's nothing specific about the CRA setup. See the [MDX editor in CRA GitHub sample repository for a working example](https://github/com/mdx-editor/mdx-editor-in-cra).
+Here's a minimal example for App.tsx:
+
+```tsx
+import '@mdxeditor/editor/style.css'
+import {MDXEditor, headingsPlugin} from '@mdxeditor/editor';
+
+ function App() {
+  return <MDXEditor markdown={'# Hello World'} plugins={[headingsPlugin()]} />;
+}
+
+export default App
+```
+
+See the [MDX editor in CRA GitHub sample repository for a working example](https://github.com/mdx-editor/mdx-editor-in-cra).
 
 ## Basic usage
 
