@@ -6,7 +6,7 @@ import { uuidv4 } from '../utils/uuid4'
 import { Realm, realm, RealmNode, Subscription, UnsubscribeHandle } from './realm'
 
 /**
- * The system interface is the runtime representation of a state management module, a a record of nodes.
+ * The system interface is the runtime representation of a state management module, a record of nodes.
  */
 export interface System {
   [key: string]: RealmNode<any>
