@@ -16,6 +16,7 @@ import {
   COMMAND_PRIORITY_CRITICAL,
   DecoratorNode,
   ElementNode,
+  FOCUS_COMMAND,
   FORMAT_TEXT_COMMAND,
   KEY_DOWN_COMMAND,
   Klass,
@@ -233,8 +234,14 @@ export const coreSystem = system((r) => {
   const setMarkdown = r.node<string>()
 
   r.sub(
-    r.pipe(setMarkdown, r.o.withLatestFrom(rootEditor, importVisitors, mdastExtensions, syntaxExtensions, inFocus)),
-    ([theNewMarkdownValue, editor, importVisitors, mdastExtensions, syntaxExtensions, inFocus]) => {
+    r.pipe(
+      setMarkdown,
+      r.o.withLatestFrom(markdown, rootEditor, importVisitors, mdastExtensions, syntaxExtensions, inFocus),
+      r.o.filter(([newMarkdown, oldMarkdown]) => {
+        return newMarkdown.trim() !== oldMarkdown.trim()
+      })
+    ),
+    ([theNewMarkdownValue, , editor, importVisitors, mdastExtensions, syntaxExtensions, inFocus]) => {
       editor?.update(() => {
         $getRoot().clear()
         importMarkdownToLexical({
@@ -247,6 +254,8 @@ export const coreSystem = system((r) => {
 
         if (!inFocus) {
           $setSelection(null)
+        } else {
+          editor.focus()
         }
       })
     }
@@ -305,6 +314,17 @@ export const coreSystem = system((r) => {
             })
           }
         }
+        return false
+      },
+      COMMAND_PRIORITY_CRITICAL
+    )
+  })
+
+  r.pub(createRootEditorSubscription, (theEditor) => {
+    return theEditor.registerCommand(
+      FOCUS_COMMAND,
+      () => {
+        r.pub(inFocus, true)
         return false
       },
       COMMAND_PRIORITY_CRITICAL
