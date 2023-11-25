@@ -27,6 +27,7 @@ const additionalExports = [
   'jsx-editors/GenericJsxEditor',
   'plugins/core/PropertyPopover',
   'plugins/core/NestedLexicalEditor',
+  'utils',
 ]
 
 additionalExports.forEach(exp => { 

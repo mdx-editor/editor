@@ -232,6 +232,11 @@
       "import": "./dist/plugins/core/NestedLexicalEditor.js",
       "default": "./dist/plugins/core/NestedLexicalEditor.js"
     },
+    "./utils": {
+      "types": "./dist/utils.d.ts",
+      "import": "./dist/utils.js",
+      "default": "./dist/utils.js"
+    },
     "./plugins/codeblock": {
       "types": "./dist/plugins/codeblock/index.d.ts",
       "import": "./dist/plugins/codeblock/index.js",
