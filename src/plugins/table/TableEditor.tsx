@@ -43,8 +43,10 @@ export interface TableEditorProps {
   mdastNode: Mdast.Table
 }
 
+type Cell = [number, number] | null
+
 export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEditor, lexicalTable }) => {
-  const [activeCell, setActiveCell] = React.useState<[number, number] | null>(null)
+  const [activeCell, setActiveCell] = React.useState<Cell>(null)
   const [iconComponentFor, readOnly] = corePluginHooks.useEmitterValues('iconComponentFor', 'readOnly')
   const getCellKey = React.useMemo(() => {
     const cellKeyMap = new WeakMap<Mdast.TableCell, string>()
@@ -57,7 +59,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
   }, [])
 
   const setActiveCellWithBoundaries = React.useCallback(
-    (cell: [number, number] | null) => {
+    (cell: Cell) => {
       const colCount = lexicalTable.getColCount()
 
       if (cell === null) {
