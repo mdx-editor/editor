@@ -86,14 +86,18 @@ export function useMdastNodeUpdater<T extends Mdast.Content>() {
   const { parentEditor, mdastNode, lexicalNode } = useNestedEditorContext<T>()
 
   return function updateMdastNode(node: Partial<T>) {
-    parentEditor.update(() => {
-      $addUpdateTag('history-push')
-      const currentNode = $getNodeByKey(lexicalNode.getKey())
-      if (currentNode) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-        currentNode.setMdastNode({ ...mdastNode, ...node })
-      }
-    })
+    parentEditor.update(
+      () => {
+        $addUpdateTag('history-push')
+        const currentNode = $getNodeByKey(lexicalNode.getKey())
+        if (currentNode) {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+          currentNode.setMdastNode({ ...mdastNode, ...node })
+        }
+      },
+      { discrete: true }
+    )
+    parentEditor.dispatchCommand(NESTED_EDITOR_UPDATED_COMMAND, undefined)
   }
 }
 
@@ -219,7 +223,8 @@ export const NestedLexicalEditor = function <T extends Mdast.Content>(props: Nes
           root: $getRoot(),
           visitors: exportVisitors,
           jsxComponentDescriptors,
-          jsxIsAvailable
+          jsxIsAvailable,
+          addImportStatements: false
         })
         const content: Mdast.Content[] = block ? mdast.children : (mdast.children[0] as Mdast.Paragraph)!.children
         updateMdastNode(getUpdatedMdastNode(structuredClone(mdastNode) as any, content as any))

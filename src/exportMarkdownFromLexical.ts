@@ -103,6 +103,7 @@ export interface ExportLexicalTreeOptions {
   visitors: LexicalVisitor[]
   jsxComponentDescriptors: JsxComponentDescriptor[]
   jsxIsAvailable: boolean
+  addImportStatements?: boolean
 }
 
 function isParent(node: unknown): node is Mdast.Parent {
@@ -116,7 +117,8 @@ export function exportLexicalTreeToMdast({
   root,
   visitors,
   jsxComponentDescriptors,
-  jsxIsAvailable
+  jsxIsAvailable,
+  addImportStatements = true
 }: ExportLexicalTreeOptions): Mdast.Root {
   let unistRoot: Mdast.Root | null = null
   const referredComponents = new Set<string>()
@@ -240,10 +242,12 @@ export function exportLexicalTreeToMdast({
 
   const frontmatter = typedRoot.children.find((child) => child.type === 'yaml')
 
-  if (frontmatter) {
-    typedRoot.children.splice(typedRoot.children.indexOf(frontmatter) + 1, 0, ...imports)
-  } else {
-    typedRoot.children.unshift(...imports)
+  if (addImportStatements) {
+    if (frontmatter) {
+      typedRoot.children.splice(typedRoot.children.indexOf(frontmatter) + 1, 0, ...imports)
+    } else {
+      typedRoot.children.unshift(...imports)
+    }
   }
 
   fixWrappingWhitespace(typedRoot, [])
@@ -257,7 +261,7 @@ export function exportLexicalTreeToMdast({
 }
 
 function collapseNestedHtmlTags(node: Mdast.Parent | Mdast.Content) {
-  if ('children' in node) {
+  if ('children' in node && node.children) {
     if (isMdastHTMLNode(node) && node.children.length === 1) {
       const onlyChild = node.children[0]
       if (onlyChild.type === 'mdxJsxTextElement' && onlyChild.name === 'span') {
@@ -339,7 +343,7 @@ function fixWrappingWhitespace(node: Mdast.Parent | Mdast.Content, parentChain: 
       }
     }
   }
-  if (Object.hasOwn(node, 'children')) {
+  if ('children' in node && node.children) {
     const nodeAsParent = node as Mdast.Parent
     nodeAsParent.children.forEach((child) => fixWrappingWhitespace(child, [...parentChain, nodeAsParent]))
   }

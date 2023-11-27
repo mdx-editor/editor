@@ -8,13 +8,19 @@ export function isMdastText(mdastNode: Mdast.Content): mdastNode is Mdast.Text {
   return mdastNode.type === 'text'
 }
 
+const JOINABLE_TAGS = ['u', 'span']
+
 export const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text> = {
   shouldJoin: (prevNode, currentNode) => {
     if (['text', 'emphasis', 'strong'].includes(prevNode.type)) {
       return prevNode.type === currentNode.type
     }
 
-    if (prevNode.type === 'mdxJsxTextElement' && (currentNode as unknown as MdxJsxTextElement).type === 'mdxJsxTextElement') {
+    if (
+      prevNode.type === 'mdxJsxTextElement' &&
+      (currentNode as unknown as MdxJsxTextElement).type === 'mdxJsxTextElement' &&
+      JOINABLE_TAGS.includes((currentNode as unknown as MdxJsxTextElement).name as string)
+    ) {
       const currentMdxNode: MdxJsxTextElement = currentNode as unknown as MdxJsxTextElement
       return prevNode.name === currentMdxNode.name && JSON.stringify(prevNode.attributes) === JSON.stringify(currentMdxNode.attributes)
     }

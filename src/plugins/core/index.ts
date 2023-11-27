@@ -452,6 +452,10 @@ export const coreSystem = system((r) => {
                   setTimeout(() => node.select())
                 }
               })
+
+              setTimeout(() => {
+                theEditor.dispatchCommand(NESTED_EDITOR_UPDATED_COMMAND, undefined)
+              })
             }
           }
         })
