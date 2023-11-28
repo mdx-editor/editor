@@ -2,7 +2,7 @@ import { useCombobox } from 'downshift'
 import React from 'react'
 import { Control, UseFormSetValue, Controller, UseFormRegister } from 'react-hook-form'
 import styles from '../../../styles/ui.module.css'
-import { corePluginHooks } from '..'
+import DropDownIcon from '../../../icons/arrow_drop_down.svg'
 
 const MAX_SUGGESTIONS = 20
 
@@ -17,6 +17,8 @@ interface DownshiftAutoCompleteProps {
   initialInputValue: string
 }
 
+interface useComboxProps { isOpen, getToggleButtonProps, getMenuProps, getInputProps, highlightedIndex, getItemProps, selectedItem }
+
 export const DownshiftAutoComplete: React.FC<DownshiftAutoCompleteProps> = (props) => {
   if (props.suggestions.length > 0) {
     return <DownshiftAutoCompleteWithSuggestions {...props} />
@@ -25,27 +27,18 @@ export const DownshiftAutoComplete: React.FC<DownshiftAutoCompleteProps> = (prop
   }
 }
 
-export const DownshiftAutoCompleteWithSuggestions: React.FC<DownshiftAutoCompleteProps> = ({
-  autofocus,
-  suggestions,
-  control,
-  inputName,
-  placeholder,
-  initialInputValue,
-  setValue
-}) => {
-  const [items, setItems] = React.useState(suggestions.slice(0, MAX_SUGGESTIONS))
-  const [iconComponentFor] = corePluginHooks.useEmitterValues('iconComponentFor')
+export const DownshiftAutoCompleteWithSuggestions: React.FC<DownshiftAutoCompleteProps> = (props) => {
+  const [items, setItems] = React.useState(props.suggestions.slice(0, MAX_SUGGESTIONS))
 
-  const enableAutoComplete = suggestions.length > 0
+  const enableAutoComplete = props.suggestions.length > 0
 
-  const { isOpen, getToggleButtonProps, getMenuProps, getInputProps, highlightedIndex, getItemProps, selectedItem } = useCombobox({
-    initialInputValue,
+  const useComboxVariables = useCombobox({
+    initialInputValue: props.initialInputValue,
     onInputValueChange({ inputValue = '' }) {
-      setValue(inputName, inputValue)
+      props.setValue(props.inputName, inputValue)
       inputValue = inputValue?.toLowerCase() || ''
       const matchingItems = []
-      for (const suggestion of suggestions) {
+      for (const suggestion of props.suggestions) {
         if (suggestion.toLowerCase().includes(inputValue)) {
           matchingItems.push(suggestion)
           if (matchingItems.length >= MAX_SUGGESTIONS) {
@@ -61,44 +54,44 @@ export const DownshiftAutoCompleteWithSuggestions: React.FC<DownshiftAutoComplet
     }
   })
 
-  const dropdownIsVisible = isOpen && items.length > 0
+  const dropdownIsVisible = useComboxVariables.isOpen && items.length > 0
   return (
     <div className={styles.downshiftAutocompleteContainer}>
       <div data-visible-dropdown={dropdownIsVisible} className={styles.downshiftInputWrapper}>
         <Controller
-          name={inputName}
-          control={control}
+          name={props.inputName}
+          control={props.control}
           render={({ field }) => {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            const downshiftSrcProps = getInputProps()
+            const downshiftSrcProps = useComboxVariables.getInputProps()
             return (
               <input
                 {...downshiftSrcProps}
                 name={field.name}
-                placeholder={placeholder}
+                placeholder={props.placeholder}
                 className={styles.downshiftInput}
                 size={30}
                 data-editor-dialog={true}
-                autoFocus={autofocus}
+                autoFocus={props.autofocus}
               />
             )
           }}
         />
         {enableAutoComplete && (
-          <button aria-label="toggle menu" type="button" {...getToggleButtonProps()}>
-            {iconComponentFor('arrow_drop_down')}
+          <button aria-label="toggle menu" type="button" {...useComboxVariables.getToggleButtonProps()}>
+            <DropDownIcon />
           </button>
         )}
       </div>
 
       <div className={styles.downshiftAutocompleteContainer}>
-        <ul {...getMenuProps()} data-visible={dropdownIsVisible}>
+        <ul {...useComboxVariables.getMenuProps()} data-visible={dropdownIsVisible}>
           {items.map((item, index: number) => (
             <li
-              data-selected={selectedItem === item}
-              data-highlighted={highlightedIndex === index}
+              data-selected={useComboxVariables.selectedItem === item}
+              data-highlighted={useComboxVariables.highlightedIndex === index}
               key={`${item}${index}`}
-              {...getItemProps({ item, index })}
+              {...useComboxVariables.getItemProps({ item, index })}
             >
               {item}
             </li>

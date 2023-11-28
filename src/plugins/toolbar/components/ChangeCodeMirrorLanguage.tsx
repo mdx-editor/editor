@@ -12,7 +12,8 @@ import styles from '../../../styles/ui.module.css'
  */
 export const ChangeCodeMirrorLanguage = () => {
   const [editorInFocus, theEditor] = corePluginHooks.useEmitterValues('editorInFocus', 'activeEditor')
-  const codeBlockNode = editorInFocus!.rootNode as CodeBlockNode
+  if (editorInFocus === null) return
+  const codeBlockNode = editorInFocus.rootNode as CodeBlockNode
   const [codeBlockLanguages] = codeMirrorHooks.useEmitterValues('codeBlockLanguages')
 
   return (
@@ -21,14 +22,14 @@ export const ChangeCodeMirrorLanguage = () => {
       <Select
         value={codeBlockNode.getLanguage()}
         onChange={(language) => {
-          theEditor?.update(() => {
+          theEditor ? theEditor.update(() => {
             codeBlockNode.setLanguage(language)
             setTimeout(() => {
-              theEditor?.update(() => {
+              theEditor ? theEditor.update(() => {
                 codeBlockNode.getLatest().select()
-              })
+              }) : null
             })
-          })
+          }) : null
         }}
         triggerTitle="Select code block language"
         placeholder="Code block language"

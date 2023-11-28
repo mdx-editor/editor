@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-import { PhrasingContent } from 'mdast'
+import { Content, PhrasingContent } from 'mdast'
 import React from 'react'
 import { NestedLexicalEditor, useMdastNodeUpdater } from '../plugins/core/NestedLexicalEditor'
 import { PropertyPopover } from '../plugins/core/PropertyPopover'
 import styles from '../styles/ui.module.css'
 import { DirectiveEditorProps } from '../plugins/directives'
-import { Directive } from 'mdast-util-directive'
+import { ContainerDirective, Directive } from 'mdast-util-directive'
 
 /**
  * A generic editor that can be used as an universal UI for any directive.
@@ -42,9 +42,9 @@ export const GenericDirectiveEditor: React.FC<DirectiveEditorProps> = ({ mdastNo
         <NestedLexicalEditor<Directive>
           block={mdastNode.type === 'containerDirective'}
           getContent={(node) => node.children as PhrasingContent[]}
-          getUpdatedMdastNode={(mdastNode, children: any) => {
+          getUpdatedMdastNode={(mdastNode, children: Content[]) => {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            return { ...mdastNode, children }
+            return { ...mdastNode, children } as ContainerDirective
           }}
         />
       ) : (

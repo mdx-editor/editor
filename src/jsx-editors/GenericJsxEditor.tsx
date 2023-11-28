@@ -66,7 +66,7 @@ export const GenericJsxEditor: React.FC<JsxEditorProps> = ({ mdastNode, descript
           block={descriptor.kind === 'flow'}
           getContent={(node) => node.children as PhrasingContent[]}
           getUpdatedMdastNode={(mdastNode, children) => {
-            return { ...mdastNode, children } as any
+            return { ...mdastNode, children } as MdxJsxTextElement | MdxJsxFlowElement
           }}
         />
       ) : (

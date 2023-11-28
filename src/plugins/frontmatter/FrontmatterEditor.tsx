@@ -4,6 +4,8 @@ import YamlParser from 'js-yaml'
 import React from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { frontmatterPluginHooks } from '.'
+import CloseIcon from '../../icons/close.svg'
+import DeleteIcon from '../../icons/delete.svg'
 import styles from '../../styles/ui.module.css'
 import { corePluginHooks } from '../core'
 
@@ -14,30 +16,26 @@ export interface FrontmatterEditorProps {
   onChange: (yaml: string) => void
 }
 
-export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) => {
-  const [readOnly, editorRootElementRef, iconComponentFor] = corePluginHooks.useEmitterValues(
-    'readOnly',
-    'editorRootElementRef',
-    'iconComponentFor'
-  )
+export const FrontmatterEditor = (props: FrontmatterEditorProps) => {
+  const [readOnly, editorRootElementRef] = corePluginHooks.useEmitterValues('readOnly', 'editorRootElementRef')
   const [frontmatterDialogOpen] = frontmatterPluginHooks.useEmitterValues('frontmatterDialogOpen')
   const setFrontmatterDialogOpen = frontmatterPluginHooks.usePublisher('frontmatterDialogOpen')
   const removeFrontmatter = frontmatterPluginHooks.usePublisher('removeFrontmatter')
   const yamlConfig = React.useMemo<YamlConfig>(() => {
-    if (!yaml) {
+    if (!props.yaml) {
       return []
     }
-    return Object.entries(YamlParser.load(yaml) as Record<string, string>).map(([key, value]) => ({ key, value }))
-  }, [yaml])
+    return Object.entries(YamlParser.load(props.yaml) as Record<string, string>).map(([key, value]) => ({ key, value }))
+  }, [props.yaml])
 
-  const { register, control, handleSubmit } = useForm({
+  const useFormVariable = useForm({
     defaultValues: {
       yamlConfig
     }
   })
 
-  const { fields, append, remove } = useFieldArray({
-    control,
+  const useFieldArrayVariable = useFieldArray({
+    control: useFormVariable.control,
     name: 'yamlConfig'
   })
 
@@ -54,10 +52,10 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
         }
         return acc
       }, {} as Record<string, string>)
-      onChange(YamlParser.dump(yaml).trim())
+      props.onChange(YamlParser.dump(yaml).trim())
       setFrontmatterDialogOpen(false)
     },
-    [onChange, setFrontmatterDialogOpen, removeFrontmatter]
+    [props.onChange, setFrontmatterDialogOpen, removeFrontmatter]
   )
 
   return (
@@ -69,7 +67,7 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
             <Dialog.Title className={styles.dialogTitle}>Edit document frontmatter</Dialog.Title>
             <form
               onSubmit={(e) => {
-                void handleSubmit(onSubmit)(e)
+                void useFormVariable.handleSubmit(onSubmit)(e)
                 e.stopPropagation()
               }}
               onReset={(e) => {
@@ -91,18 +89,18 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
                   </tr>
                 </thead>
                 <tbody>
-                  {fields.map((item, index) => {
+                  {useFieldArrayVariable.fields.map((item, index) => {
                     return (
                       <tr key={item.id}>
                         <td>
-                          <TableInput {...register(`yamlConfig.${index}.key`, { required: true })} autofocusIfEmpty readOnly={readOnly} />
+                          <TableInput {...useFormVariable.register(`yamlConfig.${index}.key`, { required: true })} autofocusIfEmpty readOnly={readOnly} />
                         </td>
                         <td>
-                          <TableInput {...register(`yamlConfig.${index}.value`, { required: true })} readOnly={readOnly} />
+                          <TableInput {...useFormVariable.register(`yamlConfig.${index}.value`, { required: true })} readOnly={readOnly} />
                         </td>
                         <td>
-                          <button type="button" onClick={() => remove(index)} className={styles.iconButton} disabled={readOnly}>
-                            {iconComponentFor('delete_big')}
+                          <button type="button" onClick={() => useFieldArrayVariable.remove(index)} className={styles.iconButton} disabled={readOnly}>
+                            <DeleteIcon />
                           </button>
                         </td>
                       </tr>
@@ -117,7 +115,7 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
                         className={classNames(styles.primaryButton, styles.smallButton)}
                         type="button"
                         onClick={() => {
-                          append({ key: '', value: '' })
+                          useFieldArrayVariable.append({ key: '', value: '' })
                         }}
                       >
                         Add entry
@@ -137,7 +135,7 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
             </form>
             <Dialog.Close asChild>
               <button className={styles.dialogCloseButton} aria-label="Close">
-                {iconComponentFor('close')}
+                <CloseIcon />
               </button>
             </Dialog.Close>
           </Dialog.Content>
