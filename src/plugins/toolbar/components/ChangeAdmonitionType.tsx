@@ -11,19 +11,21 @@ import { ADMONITION_TYPES } from '../../../directive-editors/AdmonitionDirective
  */
 export const ChangeAdmonitionType = () => {
   const [editorInFocus, rootEditor] = corePluginHooks.useEmitterValues('editorInFocus', 'rootEditor')
-  const admonitionNode = editorInFocus!.rootNode as DirectiveNode
+  
+  if (editorInFocus === null) return
+  const admonitionNode = editorInFocus.rootNode as DirectiveNode
   return (
     <Select<AdmonitionKind>
       value={admonitionNode.getMdastNode().name as AdmonitionKind}
       onChange={(name) => {
-        rootEditor?.update(() => {
+        rootEditor ? rootEditor.update(() => {
           admonitionNode.setMdastNode({ ...admonitionNode.getMdastNode(), name: name })
           setTimeout(() => {
-            rootEditor?.update(() => {
+            rootEditor ? rootEditor.update(() => {
               admonitionNode.getLatest().select()
-            })
+            }) : null
           }, 80)
-        })
+        }) : null
       }}
       triggerTitle="Select admonition type"
       placeholder="Admonition type"
