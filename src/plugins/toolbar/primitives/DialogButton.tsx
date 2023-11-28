@@ -5,6 +5,9 @@ import React from 'react'
 
 import classNames from 'classnames'
 import { useCombobox } from 'downshift'
+import DropDownIcon from '../../../icons/arrow_drop_down.svg'
+import CheckIcon from '../../../icons/check.svg'
+import CloseIcon from '../../../icons/close.svg'
 import { corePluginHooks } from '../../core'
 import styles from '../../../styles/ui.module.css'
 import { TooltipWrap } from './TooltipWrap'
@@ -45,39 +48,49 @@ export interface DialogButtonProps {
 
 const MAX_SUGGESTIONS = 20
 
+interface PropVariable {
+  autocompleteSuggestions: never[]
+  submitButtonTitle: any
+  dialogInputPlaceholder: any
+  onSubmit: any
+  tooltipTitle: any
+  buttonContent: any
+
+}
+
 /**
  * Use this primitive to create a toolbar button that opens a dialog with a text input, autocomplete suggestions, and a submit button.
  *
  * See {@link DialogButtonProps} for the properties that can be passed to this component.
  */
 export const DialogButton = React.forwardRef<HTMLButtonElement, DialogButtonProps>(
-  ({ autocompleteSuggestions = [], submitButtonTitle, dialogInputPlaceholder, onSubmit, tooltipTitle, buttonContent }, forwardedRef) => {
+  (props: PropVariable, forwardedRef) => {
     const [editorRootElementRef, readOnly] = corePluginHooks.useEmitterValues('editorRootElementRef', 'readOnly')
     const [open, setOpen] = React.useState(false)
 
     const onSubmitCallback = React.useCallback(
       (value: string) => {
-        onSubmit(value)
+        props.onSubmit(value)
         setOpen(false)
       },
-      [onSubmit]
+      [props.onSubmit]
     )
 
     return (
       <Dialog.Root open={open} onOpenChange={setOpen}>
         <Dialog.Trigger asChild>
           <RadixToolbar.Button className={styles.toolbarButton} ref={forwardedRef} disabled={readOnly}>
-            <TooltipWrap title={tooltipTitle}>{buttonContent}</TooltipWrap>
+            <TooltipWrap title={props.tooltipTitle}>{props.buttonContent}</TooltipWrap>
           </RadixToolbar.Button>
         </Dialog.Trigger>
         <Dialog.Portal container={editorRootElementRef?.current}>
           <Dialog.Overlay className={styles.dialogOverlay} />
           <Dialog.Content className={styles.dialogContent}>
             <DialogForm
-              submitButtonTitle={submitButtonTitle}
-              autocompleteSuggestions={autocompleteSuggestions}
+              submitButtonTitle={props.submitButtonTitle}
+              autocompleteSuggestions={props.autocompleteSuggestions}
               onSubmitCallback={onSubmitCallback}
-              dialogInputPlaceholder={dialogInputPlaceholder}
+              dialogInputPlaceholder={props.dialogInputPlaceholder}
             />
           </Dialog.Content>
         </Dialog.Portal>
@@ -86,23 +99,24 @@ export const DialogButton = React.forwardRef<HTMLButtonElement, DialogButtonProp
   }
 )
 
-const DialogForm: React.FC<{
+interface DialogProp {
   submitButtonTitle: string
   autocompleteSuggestions: string[]
   dialogInputPlaceholder: string
   onSubmitCallback: (value: string) => void
-}> = ({ autocompleteSuggestions, onSubmitCallback, dialogInputPlaceholder, submitButtonTitle }) => {
-  const [items, setItems] = React.useState(autocompleteSuggestions.slice(0, MAX_SUGGESTIONS))
-  const [iconComponentFor] = corePluginHooks.useEmitterValues('iconComponentFor')
+}
 
-  const enableAutoComplete = autocompleteSuggestions.length > 0
+const DialogForm: React.FC<DialogProp> = (props) => {
+  const [items, setItems] = React.useState(props.autocompleteSuggestions.slice(0, MAX_SUGGESTIONS))
 
-  const { isOpen, getToggleButtonProps, getMenuProps, getInputProps, highlightedIndex, getItemProps, selectedItem } = useCombobox({
+  const enableAutoComplete = props.autocompleteSuggestions.length > 0
+
+  const useComboboxVariable = useCombobox({
     initialInputValue: '',
     onInputValueChange({ inputValue }) {
       inputValue = inputValue?.toLowerCase() || ''
       const matchingItems = []
-      for (const suggestion of autocompleteSuggestions) {
+      for (const suggestion of props.autocompleteSuggestions) {
         if (suggestion.toLowerCase().includes(inputValue)) {
           matchingItems.push(suggestion)
           if (matchingItems.length >= MAX_SUGGESTIONS) {
@@ -122,16 +136,16 @@ const DialogForm: React.FC<{
     (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === 'Escape') {
         ;(e.target as HTMLInputElement).form?.reset()
-      } else if (e.key === 'Enter' && (!isOpen || items.length === 0)) {
+      } else if (e.key === 'Enter' && (!useComboboxVariable.isOpen || items.length === 0)) {
         e.preventDefault()
-        onSubmitCallback((e.target as HTMLInputElement).value)
+        props.onSubmitCallback((e.target as HTMLInputElement).value)
       }
     },
-    [isOpen, items, onSubmitCallback]
+    [useComboboxVariable.isOpen, items, props.onSubmitCallback]
   )
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const downshiftInputProps = getInputProps()
+  const downshiftInputProps = useComboboxVariable.getInputProps()
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const inputProps = {
@@ -146,16 +160,16 @@ const DialogForm: React.FC<{
   const onSubmitEH = (e: React.FormEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    onSubmitCallback((inputProps as { value: string }).value)
+    props.onSubmitCallback((inputProps as { value: string }).value)
   }
 
-  const dropdownIsVisible = isOpen && items.length > 0
+  const dropdownIsVisible = useComboboxVariable.isOpen && items.length > 0
   return (
     <form onSubmit={onSubmitEH} className={classNames(styles.dialogForm)}>
       <div className={styles.linkDialogInputContainer}>
         <div data-visible-dropdown={dropdownIsVisible} className={styles.linkDialogInputWrapper}>
           <input
-            placeholder={dialogInputPlaceholder}
+            placeholder={props.dialogInputPlaceholder}
             className={styles.linkDialogInput}
             {...inputProps}
             autoFocus
@@ -163,20 +177,20 @@ const DialogForm: React.FC<{
             data-editor-dialog={true}
           />
           {enableAutoComplete && (
-            <button aria-label="toggle menu" type="button" {...getToggleButtonProps()}>
-              {iconComponentFor('arrow_drop_down')}
+            <button aria-label="toggle menu" type="button" {...useComboboxVariable.getToggleButtonProps()}>
+              <DropDownIcon />
             </button>
           )}
         </div>
 
         <div className={styles.downshiftAutocompleteContainer}>
-          <ul {...getMenuProps()} data-visible={dropdownIsVisible}>
+          <ul {...useComboboxVariable.getMenuProps()} data-visible={dropdownIsVisible}>
             {items.map((item, index: number) => (
               <li
-                data-selected={selectedItem === item}
-                data-highlighted={highlightedIndex === index}
+                data-selected={useComboboxVariable.selectedItem === item}
+                data-highlighted={useComboboxVariable.highlightedIndex === index}
                 key={`${item}${index}`}
-                {...getItemProps({ item, index })}
+                {...useComboboxVariable.getItemProps({ item, index })}
               >
                 {item}
               </li>
@@ -187,14 +201,16 @@ const DialogForm: React.FC<{
 
       <button
         type="submit"
-        title={submitButtonTitle}
-        aria-label={submitButtonTitle}
+        title={props.submitButtonTitle}
+        aria-label={props.submitButtonTitle}
         className={classNames(styles.actionButton, styles.primaryActionButton)}
       >
-        {iconComponentFor('check')}
+        <CheckIcon />
       </button>
 
-      <Dialog.Close className={styles.actionButton}>{iconComponentFor('close')}</Dialog.Close>
+      <Dialog.Close className={styles.actionButton}>
+        <CloseIcon />
+      </Dialog.Close>
     </form>
   )
 }
