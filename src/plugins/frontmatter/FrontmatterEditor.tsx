@@ -4,8 +4,6 @@ import YamlParser from 'js-yaml'
 import React from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { frontmatterPluginHooks } from '.'
-import CloseIcon from '../../icons/close.svg'
-import DeleteIcon from '../../icons/delete.svg'
 import styles from '../../styles/ui.module.css'
 import { corePluginHooks } from '../core'
 
@@ -16,8 +14,12 @@ export interface FrontmatterEditorProps {
   onChange: (yaml: string) => void
 }
 
-export const FrontmatterEditor = (props: FrontmatterEditorProps) => {
-  const [readOnly, editorRootElementRef] = corePluginHooks.useEmitterValues('readOnly', 'editorRootElementRef')
+export const FrontmatterEditor = (props: FrontmatterEditorProps)  => {
+  const [readOnly, editorRootElementRef, iconComponentFor] = corePluginHooks.useEmitterValues(
+    'readOnly',
+    'editorRootElementRef',
+    'iconComponentFor'
+  )
   const [frontmatterDialogOpen] = frontmatterPluginHooks.useEmitterValues('frontmatterDialogOpen')
   const setFrontmatterDialogOpen = frontmatterPluginHooks.usePublisher('frontmatterDialogOpen')
   const removeFrontmatter = frontmatterPluginHooks.usePublisher('removeFrontmatter')
@@ -28,14 +30,14 @@ export const FrontmatterEditor = (props: FrontmatterEditorProps) => {
     return Object.entries(YamlParser.load(props.yaml) as Record<string, string>).map(([key, value]) => ({ key, value }))
   }, [props.yaml])
 
-  const useFormVariable = useForm({
+  const { register, control, handleSubmit } = useForm({
     defaultValues: {
       yamlConfig
     }
   })
 
-  const useFieldArrayVariable = useFieldArray({
-    control: useFormVariable.control,
+  const { fields, append, remove } = useFieldArray({
+    control,
     name: 'yamlConfig'
   })
 
@@ -67,7 +69,7 @@ export const FrontmatterEditor = (props: FrontmatterEditorProps) => {
             <Dialog.Title className={styles.dialogTitle}>Edit document frontmatter</Dialog.Title>
             <form
               onSubmit={(e) => {
-                void useFormVariable.handleSubmit(onSubmit)(e)
+                void handleSubmit(onSubmit)(e)
                 e.stopPropagation()
               }}
               onReset={(e) => {
@@ -89,18 +91,18 @@ export const FrontmatterEditor = (props: FrontmatterEditorProps) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {useFieldArrayVariable.fields.map((item, index) => {
+                  {fields.map((item, index) => {
                     return (
                       <tr key={item.id}>
                         <td>
-                          <TableInput {...useFormVariable.register(`yamlConfig.${index}.key`, { required: true })} autofocusIfEmpty readOnly={readOnly} />
+                          <TableInput {...register(`yamlConfig.${index}.key`, { required: true })} autofocusIfEmpty readOnly={readOnly} />
                         </td>
                         <td>
-                          <TableInput {...useFormVariable.register(`yamlConfig.${index}.value`, { required: true })} readOnly={readOnly} />
+                          <TableInput {...register(`yamlConfig.${index}.value`, { required: true })} readOnly={readOnly} />
                         </td>
                         <td>
-                          <button type="button" onClick={() => useFieldArrayVariable.remove(index)} className={styles.iconButton} disabled={readOnly}>
-                            <DeleteIcon />
+                          <button type="button" onClick={() => remove(index)} className={styles.iconButton} disabled={readOnly}>
+                            {iconComponentFor('delete_big')}
                           </button>
                         </td>
                       </tr>
@@ -115,7 +117,7 @@ export const FrontmatterEditor = (props: FrontmatterEditorProps) => {
                         className={classNames(styles.primaryButton, styles.smallButton)}
                         type="button"
                         onClick={() => {
-                          useFieldArrayVariable.append({ key: '', value: '' })
+                          append({ key: '', value: '' })
                         }}
                       >
                         Add entry
@@ -135,7 +137,7 @@ export const FrontmatterEditor = (props: FrontmatterEditorProps) => {
             </form>
             <Dialog.Close asChild>
               <button className={styles.dialogCloseButton} aria-label="Close">
-                <CloseIcon />
+                {iconComponentFor('close')}
               </button>
             </Dialog.Close>
           </Dialog.Content>
