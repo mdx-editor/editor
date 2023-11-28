@@ -8,6 +8,7 @@ import { $createLexicalJsxNode, LexicalJsxNode } from './LexicalJsxNode'
 import { LexicalJsxVisitor } from './LexicalJsxVisitor'
 import { MdastMdxJsEsmVisitor } from './MdastMdxJsEsmVisitor'
 import { MdastMdxJsxElementVisitor } from './MdastMdxJsxElementVisitor'
+import * as Mdast from 'mdast'
 
 /**
  * @internal
@@ -92,6 +93,10 @@ type JsxFlowPayload = {
 }
 
 type InsertJsxPayload = JsxTextPayload | JsxFlowPayload
+
+export function isMdastJsxNode(node: Mdast.Content | Mdast.Parent | Mdast.Root): node is MdastJsx {
+  return node.type === 'mdxJsxFlowElement' || node.type === 'mdxJsxTextElement'
+}
 
 function toMdastJsxAttributes(attributes: Record<string, string>): MdastJsx['attributes'] {
   return Object.entries(attributes).map(([name, value]) => ({
