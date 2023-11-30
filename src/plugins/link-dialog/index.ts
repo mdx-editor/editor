@@ -41,6 +41,11 @@ type EditLinkDialog = {
   rectangle: RectData
 }
 
+type LinkDialogPluginParamsType = {
+  LinkDialog?: () => JSX.Element
+  linkAutocompleteSuggestions?: string[]
+}
+
 function getLinkNodeInSelection(selection: RangeSelection | null) {
   if (!selection) {
     return null
@@ -296,10 +301,10 @@ export const [
   id: 'link-dialog',
   dependencies: ['link'],
   systemSpec: linkDialogSystem,
-  applyParamsToSystem(r, params: { linkAutocompleteSuggestions?: string[] } = {}) {
+  applyParamsToSystem(r, params: LinkDialogPluginParamsType = {}) {
     r.pubKey('linkAutocompleteSuggestions', params.linkAutocompleteSuggestions || [])
   },
-  init(r) {
-    r.pubKey('addComposerChild', LinkDialog)
+  init(r, params) {
+    r.pubKey('addComposerChild', params?.LinkDialog || LinkDialog)
   }
 })
