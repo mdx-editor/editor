@@ -8,7 +8,7 @@ This is a **live demo** of MDXEditor with all default features on.
 
 [— Daring Fireball](https://daringfireball.net/projects/markdown/).
 
-In here, you can find the following markdown elements:
+In here, you <u>can find</u> the following markdown elements:
 
 * Headings
 * Lists

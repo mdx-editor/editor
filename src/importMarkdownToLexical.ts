@@ -128,7 +128,7 @@ export function importMarkdownToLexical({ root, markdown, visitors, syntaxExtens
 export function importMdastTreeToLexical({ root, mdastRoot, visitors }: MdastTreeImportOptions): void {
   const formattingMap = new WeakMap<object, number>()
 
-  visitors = visitors.sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0))
+  visitors = visitors.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0))
 
   function visitChildren(mdastNode: Mdast.Parent, lexicalParent: LexicalNode) {
     if (!isParent(mdastNode)) {
