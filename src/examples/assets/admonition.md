@@ -27,6 +27,12 @@ Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
 
 Some **content** with _Markdown_ `syntax`. Check [this `api`](#).
 
+* some bullet lists
+* more bullets
+* more bullets
+
 :::
 
 some content
+
+

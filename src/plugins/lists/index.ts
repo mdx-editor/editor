@@ -103,6 +103,10 @@ export const [
     realm.pubKey('addComposerChild', TabIndentationPlugin)
     realm.pubKey('addComposerChild', ListPlugin)
     realm.pubKey('addComposerChild', CheckListPlugin)
+
+    realm.pubKey('addNestedEditorChild', TabIndentationPlugin)
+    realm.pubKey('addNestedEditorChild', ListPlugin)
+    realm.pubKey('addNestedEditorChild', CheckListPlugin)
   }
 })
 
