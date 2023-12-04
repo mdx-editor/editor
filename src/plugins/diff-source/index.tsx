@@ -57,12 +57,10 @@ export const [
   id: 'diff-source',
   systemSpec: diffSourceSystem,
 
-  applyParamsToSystem(r, params?: DiffSourcePluginParams) {
-    r.pubKey('viewMode', params?.viewMode || 'rich-text')
-  },
   init(r, params?: DiffSourcePluginParams) {
     r.pubKey('diffMarkdown', params?.diffMarkdown || '')
     r.pubKey('cmExtensions', params?.codeMirrorExtensions || [])
     r.pubKey('addEditorWrapper', DiffSourceWrapper)
+    r.pubKey('viewMode', params?.viewMode || 'rich-text')
   }
 })
