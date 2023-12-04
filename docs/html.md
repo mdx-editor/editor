@@ -1,5 +1,5 @@
 ---
-title: HTML Support
+title: HTML support
 slug: html-support
 position: 98
 ---
