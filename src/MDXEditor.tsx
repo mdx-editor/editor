@@ -89,6 +89,10 @@ export interface MDXEditorProps {
    */
   onChange?: (markdown: string) => void
   /**
+   * Triggered when the markdown parser encounters an error. The payload includes the invalid source and the error message.
+   */
+  onError?: (payload: { error: string; source: string }) => void
+  /**
    * The markdown options used to generate the resulting markdown.
    * See {@link https://github.com/syntax-tree/mdast-util-to-markdown#options | the mdast-util-to-markdown docs} for the full list of options.
    */
@@ -123,6 +127,10 @@ export interface MDXEditorProps {
    * Use this prop to customize the icons used across the editor. Pass a function that returns an icon (JSX) for a given icon key.
    */
   iconComponentFor?: (name: IconKey) => JSX.Element
+  /**
+   * Set to false if you want to suppress the processing of HTML tags.
+   */
+  suppressHtmlProcessing?: boolean
 }
 
 const DEFAULT_MARKDOWN_OPTIONS: ToMarkdownOptions = {
@@ -245,7 +253,9 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>((pro
           autoFocus: props.autoFocus ?? false,
           placeholder: props.placeholder ?? '',
           readOnly: Boolean(props.readOnly),
-          iconComponentFor: props.iconComponentFor ?? defaultIconComponentFor
+          iconComponentFor: props.iconComponentFor ?? defaultIconComponentFor,
+          suppressHtmlProcessing: props.suppressHtmlProcessing ?? false,
+          onError: props.onError ?? noop
         }),
         ...(props.plugins || [])
       ]}

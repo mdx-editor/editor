@@ -33,7 +33,13 @@ import * as Mdast from 'mdast'
 import React from 'react'
 import { LexicalConvertOptions, exportMarkdownFromLexical } from '../../exportMarkdownFromLexical'
 import { RealmNode, realmPlugin, system } from '../../gurx'
-import { MarkdownParseOptions, MdastImportVisitor, importMarkdownToLexical } from '../../importMarkdownToLexical'
+import {
+  MarkdownParseError,
+  MarkdownParseOptions,
+  MdastImportVisitor,
+  UnrecognizedMarkdownConstructError,
+  importMarkdownToLexical
+} from '../../importMarkdownToLexical'
 import type { JsxComponentDescriptor } from '../jsx'
 import { LexicalLinebreakVisitor } from './LexicalLinebreakVisitor'
 import { LexicalParagraphVisitor } from './LexicalParagraphVisitor'
@@ -107,6 +113,16 @@ export const coreSystem = system((r) => {
   const autoFocus = r.node<boolean | { defaultSelection?: 'rootStart' | 'rootEnd'; preventScroll?: boolean }>(false)
   const inFocus = r.node(false, true)
   const currentFormat = r.node(0, true)
+  const markdownProcessingError = r.node<{ error: string; source: string } | null>(null)
+  const markdownErrorSignal = r.node<{ error: string; source: string }>()
+
+  r.link(
+    r.pipe(
+      markdownProcessingError,
+      r.o.filter((e) => e !== null)
+    ),
+    markdownErrorSignal
+  )
 
   const applyFormat = r.node<TextFormatType>()
   const currentSelection = r.node<RangeSelection | null>(null)
@@ -179,6 +195,10 @@ export const coreSystem = system((r) => {
   // Export handler
   r.pub(createRootEditorSubscription, (theRootEditor) => {
     return theRootEditor.registerUpdateListener(({ dirtyElements, dirtyLeaves, editorState }) => {
+      const err = r.getValue(markdownProcessingError)
+      if (err !== null) {
+        return
+      }
       if (dirtyElements.size === 0 && dirtyLeaves.size === 0) {
         return
       }
@@ -233,24 +253,46 @@ export const coreSystem = system((r) => {
   const addToMarkdownExtension = createAppendNodeFor(toMarkdownExtensions)
   const setMarkdown = r.node<string>()
 
+  function tryImportingMarkdown(markdownValue: string) {
+    try {
+      ////////////////////////
+      // Import initial value
+      ////////////////////////
+      importMarkdownToLexical({
+        root: $getRoot(),
+        visitors: r.getValue(importVisitors),
+        mdastExtensions: r.getValue(mdastExtensions),
+        markdown: markdownValue,
+        syntaxExtensions: r.getValue(syntaxExtensions)
+      })
+      r.pub(markdownProcessingError, null)
+    } catch (e) {
+      if (e instanceof MarkdownParseError || e instanceof UnrecognizedMarkdownConstructError) {
+        r.pubIn({
+          [markdown.key]: markdownValue,
+          [markdownProcessingError.key]: {
+            error: e.message,
+            source: markdown
+          }
+        })
+      } else {
+        throw e
+      }
+    }
+  }
+
   r.sub(
     r.pipe(
       setMarkdown,
-      r.o.withLatestFrom(markdown, rootEditor, importVisitors, mdastExtensions, syntaxExtensions, inFocus),
+      r.o.withLatestFrom(markdown, rootEditor, inFocus),
       r.o.filter(([newMarkdown, oldMarkdown]) => {
         return newMarkdown.trim() !== oldMarkdown.trim()
       })
     ),
-    ([theNewMarkdownValue, , editor, importVisitors, mdastExtensions, syntaxExtensions, inFocus]) => {
+    ([theNewMarkdownValue, , editor, inFocus]) => {
       editor?.update(() => {
         $getRoot().clear()
-        importMarkdownToLexical({
-          root: $getRoot(),
-          visitors: importVisitors,
-          mdastExtensions,
-          markdown: theNewMarkdownValue,
-          syntaxExtensions
-        })
+        tryImportingMarkdown(theNewMarkdownValue)
 
         if (!inFocus) {
           $setSelection(null)
@@ -266,16 +308,7 @@ export const coreSystem = system((r) => {
     r.pub(rootEditor, theRootEditor)
     r.pub(activeEditor, theRootEditor)
 
-    ////////////////////////
-    // Import initial value
-    ////////////////////////
-    importMarkdownToLexical({
-      root: $getRoot(),
-      visitors: r.getValue(importVisitors),
-      mdastExtensions: r.getValue(mdastExtensions),
-      markdown: r.getValue(initialMarkdown),
-      syntaxExtensions: r.getValue(syntaxExtensions)
-    })
+    tryImportingMarkdown(r.getValue(initialMarkdown))
 
     const autoFocusValue = r.getValue(autoFocus)
     if (autoFocusValue) {
@@ -540,7 +573,11 @@ export const coreSystem = system((r) => {
     // Events
     onBlur,
 
-    iconComponentFor
+    iconComponentFor,
+
+    // error handling
+    markdownProcessingError,
+    markdownErrorSignal
   }
 }, [])
 
@@ -551,9 +588,11 @@ interface CorePluginParams {
   autoFocus: boolean | { defaultSelection?: 'rootStart' | 'rootEnd'; preventScroll?: boolean | undefined }
   onChange: (markdown: string) => void
   onBlur?: (e: FocusEvent) => void
+  onError?: (payload: { error: string; source: string }) => void
   toMarkdownOptions: NonNullable<LexicalConvertOptions['toMarkdownOptions']>
   readOnly: boolean
   iconComponentFor: (name: IconKey) => React.ReactElement
+  suppressHtmlProcessing?: boolean
 }
 
 export const [
@@ -575,16 +614,12 @@ export const [
     })
     realm.singletonSubKey('markdownSignal', params.onChange)
     realm.singletonSubKey('onBlur', params.onBlur)
+    realm.singletonSubKey('markdownErrorSignal', params.onError)
   },
 
   init(realm, params: CorePluginParams) {
     realm.pubKey('initialMarkdown', params.initialMarkdown.trim())
     realm.pubKey('iconComponentFor', params.iconComponentFor)
-
-    // Use the JSX extension to parse HTML
-    realm.pubKey('addMdastExtension', mdxJsxFromMarkdown())
-    realm.pubKey('addSyntaxExtension', mdxJsx())
-    realm.pubKey('addToMarkdownExtension', mdxJsxToMarkdown())
 
     // core import visitors
     realm.pubKey('addImportVisitor', MdastRootVisitor)
@@ -593,7 +628,6 @@ export const [
     realm.pubKey('addImportVisitor', MdastFormattingVisitor)
     realm.pubKey('addImportVisitor', MdastInlineCodeVisitor)
     realm.pubKey('addImportVisitor', MdastBreakVisitor)
-    realm.pubKey('addImportVisitor', MdastHTMLVisitor)
 
     // basic lexical nodes
     realm.pubKey('addLexicalNode', ParagraphNode)
@@ -608,5 +642,13 @@ export const [
     realm.pubKey('addExportVisitor', LexicalGenericHTMLVisitor)
 
     realm.pubKey('addComposerChild', SharedHistoryPlugin)
+
+    // Use the JSX extension to parse HTML
+    if (!params.suppressHtmlProcessing) {
+      realm.pubKey('addMdastExtension', mdxJsxFromMarkdown())
+      realm.pubKey('addSyntaxExtension', mdxJsx())
+      realm.pubKey('addToMarkdownExtension', mdxJsxToMarkdown())
+      realm.pubKey('addImportVisitor', MdastHTMLVisitor)
+    }
   }
 })

@@ -2,6 +2,7 @@
 import { ElementNode, LexicalNode, RootNode as LexicalRootNode } from 'lexical'
 import * as Mdast from 'mdast'
 import { fromMarkdown } from 'mdast-util-from-markdown'
+import { toMarkdown } from 'mdast-util-to-markdown'
 import { ParseOptions } from 'micromark-util-types'
 import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from './FormatConstants'
 
@@ -105,12 +106,36 @@ export type MdastExtension = NonNullable<MdastExtensions>[number]
  */
 export type SyntaxExtension = MarkdownParseOptions['syntaxExtensions'][number]
 
+export class MarkdownParseError extends Error {
+  constructor(message: string, cause: unknown) {
+    super(message)
+    this.name = 'MarkdownParseError'
+    this.cause = cause
+  }
+}
+
+export class UnrecognizedMarkdownConstructError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'UnrecognizedMarkdownConstructError'
+  }
+}
+
 /** @internal */
 export function importMarkdownToLexical({ root, markdown, visitors, syntaxExtensions, mdastExtensions }: MarkdownParseOptions): void {
-  const mdastRoot = fromMarkdown(markdown, {
-    extensions: syntaxExtensions,
-    mdastExtensions
-  })
+  let mdastRoot: Mdast.Root
+  try {
+    mdastRoot = fromMarkdown(markdown, {
+      extensions: syntaxExtensions,
+      mdastExtensions
+    })
+  } catch (e: unknown) {
+    if (e instanceof Error) {
+      throw new MarkdownParseError(`Error parsing markdown: ${e.message}`, e)
+    } else {
+      throw new MarkdownParseError(`Error parsing markdown: ${e}`, e)
+    }
+  }
 
   if (mdastRoot.children.length === 0) {
     mdastRoot.children.push({ type: 'paragraph', children: [] })
@@ -145,9 +170,7 @@ export function importMdastTreeToLexical({ root, mdastRoot, visitors }: MdastTre
       return visitor.testNode(mdastNode)
     })
     if (!visitor) {
-      throw new Error(`no MdastImportVisitor found for ${mdastNode.type} ${JSON.stringify(mdastNode)}`, {
-        cause: mdastNode
-      })
+      throw new UnrecognizedMarkdownConstructError(`Unsupported markdown syntax: ${toMarkdown(mdastNode)}`)
     }
 
     visitor.visitNode({

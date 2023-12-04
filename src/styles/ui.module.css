@@ -77,6 +77,8 @@
   --admonitionNoteBg: var(--slate4);
   --admonitionNoteBorder: var(--slate8);
 
+  --error-color: var(--red10);
+
   --spacing-0:0px;
   --spacing-px:1px;
   --spacing-0_5:0.125rem;
@@ -1111,6 +1113,15 @@ form.multiFieldForm {
       font-size: var(--text-xs);
     }
   }
+}
+
+.markdownParseError {
+  border-radius: var(--radius-base);
+  border: 1px solid var(--error-color);
+  padding: var(--spacing-2);
+  margin-block: var(--spacing-2);
+  color: var(--error-color);
+  font-size: var(--text-xs);
 }
 
 
