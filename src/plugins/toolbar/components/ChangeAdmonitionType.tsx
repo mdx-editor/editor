@@ -27,7 +27,7 @@ export const ChangeAdmonitionType = () => {
       }}
       triggerTitle="Select admonition type"
       placeholder="Admonition type"
-      items={ADMONITION_TYPES.map((type) => ({ label: type, value: type }))}
+      items={ADMONITION_TYPES.map((type) => ({ label: type.replace(/^./, (l) => l.toUpperCase()), value: type }))}
     />
   )
 }
