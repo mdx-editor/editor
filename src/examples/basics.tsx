@@ -215,6 +215,7 @@ export function DiffSourcePlugin() {
     <MDXEditor
       onChange={console.log}
       markdown={'hello world'}
+      onBlur={(evt) => console.log('blur event', evt)}
       plugins={[
         diffSourcePlugin({ diffMarkdown: 'An older version', viewMode: 'rich-text' }),
         toolbarPlugin({

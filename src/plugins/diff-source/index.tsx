@@ -11,6 +11,7 @@ export const diffSourceSystem = system(
   (r, [{ markdown, setMarkdown, markdownSignal }]) => {
     const diffMarkdown = r.node('')
     const markdownSourceEditorValue = r.node('')
+    const onBlur = r.node<FocusEvent>()
     const cmExtensions = r.node<Extension[]>([])
 
     r.link(markdown, markdownSourceEditorValue)
@@ -37,7 +38,8 @@ export const diffSourceSystem = system(
         }
       }
     )
-    return { viewMode, diffMarkdown, markdownSourceEditorValue, cmExtensions }
+
+    return { viewMode, diffMarkdown, markdownSourceEditorValue, cmExtensions, onBlur }
   },
   [coreSystem]
 )
