@@ -19,6 +19,7 @@ export const SourceEditor = () => {
   const [markdown, readOnly] = corePluginHooks.useEmitterValues('markdown', 'readOnly')
   const [cmExtensions] = diffSourcePluginHooks.useEmitterValues('cmExtensions')
   const updateMarkdown = diffSourcePluginHooks.usePublisher('markdownSourceEditorValue')
+  const triggerOnBlur = corePluginHooks.usePublisher('onBlur')
   const editorViewRef = React.useRef<EditorView | null>(null)
 
   const ref = React.useCallback(
@@ -30,6 +31,12 @@ export const SourceEditor = () => {
           ...COMMON_STATE_CONFIG_EXTENSIONS,
           EditorView.updateListener.of(({ state }) => {
             updateMarkdown(state.doc.toString())
+          }),
+          EditorView.focusChangeEffect.of((_, focused) => {
+            if (!focused) {
+              triggerOnBlur(new FocusEvent('blur'))
+            }
+            return null
           })
         ]
         if (readOnly) {
@@ -45,7 +52,7 @@ export const SourceEditor = () => {
         editorViewRef.current = null
       }
     },
-    [markdown, readOnly, updateMarkdown, cmExtensions]
+    [markdown, readOnly, updateMarkdown, cmExtensions, triggerOnBlur]
   )
 
   return <div ref={ref} className="cm-sourceView" />

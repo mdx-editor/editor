@@ -24,6 +24,7 @@ interface CmMergeViewProps {
 const CmMergeView: React.FC<CmMergeViewProps> = ({ oldMarkdown, newMarkdown, onUpdate }) => {
   const cmMergeViewRef = React.useRef<MergeView | null>(null)
   const [cmExtensions] = diffSourcePluginHooks.useEmitterValues('cmExtensions')
+  const triggerOnBlur = corePluginHooks.usePublisher('onBlur')
 
   const ref = React.useCallback(
     (el: HTMLDivElement | null) => {
@@ -51,6 +52,12 @@ const CmMergeView: React.FC<CmMergeViewProps> = ({ oldMarkdown, newMarkdown, onU
               EditorView.updateListener.of(({ state }) => {
                 const md = state.doc.toString()
                 onUpdate(md)
+              }),
+              EditorView.focusChangeEffect.of((_, focused) => {
+                if (!focused) {
+                  triggerOnBlur(new FocusEvent('blur'))
+                }
+                return null
               })
             ]
           }
@@ -60,7 +67,7 @@ const CmMergeView: React.FC<CmMergeViewProps> = ({ oldMarkdown, newMarkdown, onU
         cmMergeViewRef.current = null
       }
     },
-    [newMarkdown, oldMarkdown, onUpdate, cmExtensions]
+    [newMarkdown, oldMarkdown, onUpdate, cmExtensions, triggerOnBlur]
   )
 
   return <div ref={ref} />
