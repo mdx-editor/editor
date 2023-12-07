@@ -7,6 +7,7 @@ import { toolbarPlugin } from '../plugins/toolbar'
 import { Button } from '../plugins/toolbar/primitives/toolbar'
 import { NestedLexicalEditor } from '../plugins/core/NestedLexicalEditor'
 import { MdxJsxTextElement } from 'mdast-util-mdx'
+import { headingsPlugin } from '..'
 
 const jsxComponentDescriptors: JsxComponentDescriptor[] = [
   {
@@ -97,5 +98,21 @@ export const Example = () => {
         })
       ]}
     />
+  )
+}
+
+const markdown = `
+# Hello world
+
+<div style="background: red">
+  Content
+</div>
+`
+
+export const Html = () => {
+  return (
+    <div>
+      <MDXEditor markdown={markdown} plugins={[headingsPlugin(), jsxPlugin({ jsxComponentDescriptors: [] })]} />
+    </div>
   )
 }

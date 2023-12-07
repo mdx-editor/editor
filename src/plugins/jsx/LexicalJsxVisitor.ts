@@ -22,5 +22,6 @@ export const LexicalJsxVisitor: LexicalExportVisitor<LexicalJsxNode, MdxJsxFlowE
     actions.registerReferredComponent(mdastNode.name!)
     traverseNestedJsxNodes(mdastNode)
     actions.appendToParent(mdastParent, mdastNode)
-  }
+  },
+  priority: -200
 }
