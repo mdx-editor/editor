@@ -879,7 +879,7 @@
 }
 
 .nestedEditor {
-  background: white;
+  background: var(--basePageBg);
   padding: var(--spacing-1) var(--spacing-2);
   border-radius: var(--radius-medium);
   & > p {

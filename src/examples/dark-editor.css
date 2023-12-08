@@ -47,5 +47,6 @@
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
   color: var(--baseText);
-  background: var(--baseBg);
+  --basePageBg: black;
+  background: var(--basePageBg);
 }
