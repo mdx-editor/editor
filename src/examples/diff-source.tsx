@@ -16,3 +16,20 @@ export function GetMarkdownInSourceMode() {
     </div>
   )
 }
+
+export function ChangeDiffMakrkdown() {
+  const ref = useRef<MDXEditorMethods>(null)
+  const [diffMarkdown, setDiffMarkdown] = React.useState('foo')
+  return (
+    <div className="App">
+      <button onClick={() => setDiffMarkdown('bar')}>Change Diff Markdown</button>
+      <MDXEditor
+        ref={ref}
+        onChange={(md) => console.log('change', md)}
+        markdown="Hello world"
+        plugins={[diffSourcePlugin({ viewMode: 'diff', diffMarkdown })]}
+      />
+      <button onClick={() => console.log(ref.current?.getMarkdown())}>Get Markdown</button>
+    </div>
+  )
+}

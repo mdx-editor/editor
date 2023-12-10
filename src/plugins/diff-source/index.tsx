@@ -56,6 +56,9 @@ export const [
 ] = realmPlugin({
   id: 'diff-source',
   systemSpec: diffSourceSystem,
+  applyParamsToSystem: (r, params?: DiffSourcePluginParams) => {
+    r.pubKey('diffMarkdown', params?.diffMarkdown || '')
+  },
 
   init(r, params?: DiffSourcePluginParams) {
     r.pubKey('diffMarkdown', params?.diffMarkdown || '')
