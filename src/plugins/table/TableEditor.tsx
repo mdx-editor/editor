@@ -47,12 +47,11 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
   const [activeCell, setActiveCell] = React.useState<[number, number] | null>(null)
   const [iconComponentFor, readOnly] = corePluginHooks.useEmitterValues('iconComponentFor', 'readOnly')
   const getCellKey = React.useMemo(() => {
-    const cellKeyMap = new WeakMap<Mdast.TableCell, string>()
-    return (cell: Mdast.TableCell) => {
-      if (!cellKeyMap.has(cell)) {
-        cellKeyMap.set(cell, uuidv4())
+    return (cell: Mdast.TableCell & { __cacheKey?: string }) => {
+      if (!cell.__cacheKey) {
+        cell.__cacheKey = uuidv4()
       }
-      return cellKeyMap.get(cell)!
+      return cell.__cacheKey
     }
   }, [])
 
