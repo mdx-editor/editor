@@ -139,8 +139,15 @@ const DEFAULT_MARKDOWN_OPTIONS: ToMarkdownOptions = {
 
 const DefaultIcon = React.lazy(() => import('./plugins/core/Icon'))
 
+const IconFallback = () => {
+  return <svg width="24" height="24" viewBox="0 0 24 24" fill="none"></svg>
+}
 const defaultIconComponentFor = (name: IconKey) => {
-  return <DefaultIcon name={name} />
+  return (
+    <React.Suspense fallback={<IconFallback />}>
+      <DefaultIcon name={name} />
+    </React.Suspense>
+  )
 }
 
 /**

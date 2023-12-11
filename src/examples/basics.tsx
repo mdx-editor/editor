@@ -238,3 +238,28 @@ export function MarkdownShortcuts() {
     />
   )
 }
+
+export function ConditionalRendering() {
+  const [isOpen, setIsOpen] = React.useState(false)
+
+  return (
+    <div>
+      <button onClick={() => setIsOpen(!isOpen)}>Editor is {isOpen ? 'open' : 'closed'}</button>
+      {isOpen && (
+        <MDXEditor
+          markdown="# Hello world"
+          plugins={[
+            toolbarPlugin({
+              toolbarContents: () => (
+                <>
+                  <UndoRedo />
+                  {/* If you comment this out, the editor works */}
+                </>
+              )
+            })
+          ]}
+        />
+      )}
+    </div>
+  )
+}
