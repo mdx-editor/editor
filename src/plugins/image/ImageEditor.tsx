@@ -93,6 +93,7 @@ export function ImageEditor({ src, title, alt, nodeKey, width, height }: ImageEd
   const [disableImageResize] = imagePluginHooks.useEmitterValues('disableImageResize')
   const [imagePreviewHandler] = imagePluginHooks.useEmitterValues('imagePreviewHandler')
   const [imageSource, setImageSource] = React.useState<string | null>(null)
+  const [initialImagePath, setInitialImagePath] = React.useState<string | null>(null)
   const openEditImageDialog = imagePluginHooks.usePublisher('openEditImageDialog')
   const [iconComponentFor] = corePluginHooks.useEmitterValues('iconComponentFor')
 
@@ -148,6 +149,7 @@ export function ImageEditor({ src, title, alt, nodeKey, width, height }: ImageEd
   React.useEffect(() => {
     if (imagePreviewHandler) {
       const callPreviewHandler = async () => {
+        if (!initialImagePath) setInitialImagePath(src)
         const updatedSrc = await imagePreviewHandler(src)
         setImageSource(updatedSrc)
       }
@@ -267,7 +269,7 @@ export function ImageEditor({ src, title, alt, nodeKey, width, height }: ImageEd
             openEditImageDialog({
               nodeKey: nodeKey,
               initialValues: {
-                src: imageSource,
+                src: !initialImagePath ? imageSource : initialImagePath,
                 title: title || '',
                 altText: alt || ''
               }
