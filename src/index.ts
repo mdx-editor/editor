@@ -28,10 +28,6 @@ export * from './plugins/quote'
 export * from './plugins/jsx'
 export * from './jsx-editors/GenericJsxEditor'
 
-// code blocks
-export * from './plugins/sandpack'
-export * from './plugins/codemirror'
-export * from './plugins/codemirror/CodeMirrorEditor'
 export * from './plugins/codeblock'
 
 // directives
@@ -44,26 +40,21 @@ export * from './plugins/link-dialog'
 
 export * from './plugins/toolbar'
 
-export * from './plugins/diff-source'
 export * from './plugins/markdown-shortcut'
 
 // Toolbar components
 export * from './plugins/toolbar/components/BlockTypeSelect'
 export * from './plugins/toolbar/components/BoldItalicUnderlineToggles'
 export * from './plugins/toolbar/components/ChangeAdmonitionType'
-export * from './plugins/toolbar/components/ChangeCodeMirrorLanguage'
 export * from './plugins/toolbar/components/CodeToggle'
 export * from './plugins/toolbar/components/CreateLink'
-export * from './plugins/toolbar/components/DiffSourceToggleWrapper'
 export * from './plugins/toolbar/components/InsertAdmonition'
 export * from './plugins/toolbar/components/InsertCodeBlock'
 export * from './plugins/toolbar/components/InsertFrontmatter'
 export * from './plugins/toolbar/components/InsertImage'
-export * from './plugins/toolbar/components/InsertSandpack'
 export * from './plugins/toolbar/components/InsertTable'
 export * from './plugins/toolbar/components/InsertThematicBreak'
 export * from './plugins/toolbar/components/ListsToggle'
-export * from './plugins/toolbar/components/ShowSandpackInfo'
 export * from './plugins/toolbar/components/UndoRedo'
 export * from './plugins/toolbar/components/KitchenSinkToolbar'
 
