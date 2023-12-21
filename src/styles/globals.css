@@ -8,6 +8,7 @@
 @import url('@radix-ui/colors/red.css');
 
 .mdxeditor {
+
   /** Code mirror */
   & .cm-editor {
     --sp-font-mono: var(--font-mono);
@@ -63,5 +64,10 @@
 
   & .cm-activeLine {
     background: transparent;
+  }
+
+
+  hr[data-lexical-decorator=true].selected {
+    outline: 2px solid highlight;
   }
 }

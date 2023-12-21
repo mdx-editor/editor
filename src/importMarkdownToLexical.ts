@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { ElementNode, LexicalNode, RootNode as LexicalRootNode } from 'lexical'
 import * as Mdast from 'mdast'
-import { fromMarkdown } from 'mdast-util-from-markdown'
+import { fromMarkdown, type Options } from 'mdast-util-from-markdown'
 import { toMarkdown } from 'mdast-util-to-markdown'
 import { ParseOptions } from 'micromark-util-types'
 import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from './FormatConstants'
 
 /** @internal */
-export type MdastExtensions = NonNullable<Parameters<typeof fromMarkdown>[1]>['mdastExtensions']
+export type MdastExtensions = Options['mdastExtensions']
 /**
  * A set of actions that can be used to modify the lexical tree while visiting the mdast tree.
  */
