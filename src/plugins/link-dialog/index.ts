@@ -26,6 +26,7 @@ type InactiveLinkDialog = {
 
 type PreviewLinkDialog = {
   type: 'preview'
+  title: string
   url: string
   linkNodeKey: string
   rectangle: RectData
@@ -168,6 +169,7 @@ const linkDialogSystem = system(
               type: 'edit' as const,
               initialUrl: state.url,
               url: state.url,
+              title: state.title,
               linkNodeKey: state.linkNodeKey,
               rectangle: state.rectangle
             }
@@ -206,6 +208,7 @@ const linkDialogSystem = system(
             type: 'preview',
             linkNodeKey: state.linkNodeKey,
             rectangle: state.rectangle,
+            title,
             url
           } as PreviewLinkDialog)
         } else {
@@ -259,6 +262,7 @@ const linkDialogSystem = system(
                 type: 'preview' as const,
                 url: node.getURL(),
                 linkNodeKey: node.getKey(),
+                title: node.getTitle(),
                 rectangle: getSelectionRectangle(activeEditor)
               }
             } else {
