@@ -1,7 +1,7 @@
 {
-  "name": "@mdxeditor/editor",
+  "name": "@betty-blocks/mdxeditor",
   "author": "Petyo Ivanov",
-  "homepage": "https://mdxeditor.dev/",
+  "homepage": "https://github.com/bettyblocks/mdxeditor/",
   "bugs": {
     "url": "https://github.com/mdx-editor/editor/issues",
     "email": "petyo@virtuoso.dev"
@@ -9,8 +9,8 @@
   "private": false,
   "sideEffects": false,
   "type": "module",
-  "version": "0.0.0-development",
-  "description": "React component for rich text markdown editing",
+  "version": "1.0.0",
+  "description": "Fork of https://www.npmjs.com/package/@mdxeditor/editor without sandpack",
   "scripts": {
     "build": "vite build",
     "build:docs:api": "./scripts/build_docs_api.sh",
@@ -154,7 +154,7 @@
   "packageManager": "npm@9.5.1",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mdx-editor/editor.git"
+    "url": "https://github.com/bettyblocks/mdxeditor/editor.git"
   },
   "release": {
     "branches": [
