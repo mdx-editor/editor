@@ -52,7 +52,6 @@ function App() {
                 { when: (editor) => editor?.editorType === 'sandpack', contents: () => <ShowSandpackInfo /> },
                 { fallback: () => ( <> 
                 <InsertCodeBlock />
-                <InsertSandpack />
               </>) }
               ]}
             />)
