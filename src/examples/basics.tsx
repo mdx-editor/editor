@@ -128,10 +128,31 @@ const listsMarkdown = `
 * [x] Walk the dog
 * [ ] Watch movie
 * [ ] Have dinner with family
+
+... an all empty list
+
+* [ ] Walk the dog
+* [ ] Watch movie
+* [ ] Have dinner with family
 `
 
 export function Lists() {
-  return <MDXEditor markdown={listsMarkdown} plugins={[listsPlugin()]} />
+  return (
+    <MDXEditor
+      markdown={listsMarkdown}
+      plugins={[
+        listsPlugin(),
+        diffSourcePlugin(),
+        toolbarPlugin({
+          toolbarContents: () => (
+            <DiffSourceToggleWrapper>
+              <UndoRedo />
+            </DiffSourceToggleWrapper>
+          )
+        })
+      ]}
+    />
+  )
 }
 
 export function Table() {
