@@ -198,6 +198,7 @@ const EditorRootElement: React.FC<{ children: React.ReactNode; className?: strin
   React.useEffect(() => {
     const popupContainer = document.createElement('div')
     popupContainer.classList.add(styles.editorRoot)
+    popupContainer.classList.add(styles.popupContainer)
     if (className) {
       className.split(' ').forEach((c) => {
         popupContainer.classList.add(c)

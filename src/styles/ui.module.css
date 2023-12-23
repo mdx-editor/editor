@@ -1124,4 +1124,7 @@ form.multiFieldForm {
   font-size: var(--text-xs);
 }
 
-
+.popupContainer {
+  position: relative;
+  z-index: 1;
+}
