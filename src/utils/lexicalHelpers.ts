@@ -3,6 +3,10 @@ import { $isAtNodeEnd } from '@lexical/selection'
 import { tap } from './fp'
 import { ExportMarkdownFromLexicalOptions, exportMarkdownFromLexical } from '../exportMarkdownFromLexical'
 
+/**
+ * Fetches a value from the Lexical editor read cycle.
+ * @group Utils
+ */
 export function fromWithinEditorRead<T>(editor: LexicalEditor, fn: () => T): T {
   let result: T | null = null
   editor.getEditorState().read(() => {
@@ -10,6 +14,11 @@ export function fromWithinEditorRead<T>(editor: LexicalEditor, fn: () => T): T {
   })
   return result as T
 }
+
+/**
+ * Gets the selected node from the Lexical editor.
+ * @group Utils
+ */
 export function getSelectedNode(selection: RangeSelection): TextNode | ElementNode | null {
   try {
     const anchor = selection.anchor
@@ -31,6 +40,10 @@ export function getSelectedNode(selection: RangeSelection): TextNode | ElementNo
   }
 }
 
+/**
+ * Gets the coordinates of the selection in the Lexical editor.
+ * @group Utils
+ */
 export function getSelectionRectangle(editor: LexicalEditor) {
   const selection = $getSelection()
   const nativeSelection = window.getSelection()
@@ -78,6 +91,7 @@ export function getSelectionRectangle(editor: LexicalEditor) {
   return null
 }
 
+/** @internal */
 export function getStateAsMarkdown(editor: LexicalEditor, exportParams: Omit<ExportMarkdownFromLexicalOptions, 'root'>) {
   return tap({ markdown: '' }, (result) => {
     editor.getEditorState().read(() => {

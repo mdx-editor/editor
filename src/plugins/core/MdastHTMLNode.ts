@@ -1,25 +1,57 @@
 import * as Mdast from 'mdast'
 import { MdxJsxFlowElement, MdxJsxTextElement } from 'mdast-util-mdx-jsx'
 
-interface MdastBlockHTMLNode extends MdxJsxFlowElement {
+/**
+ * A block-level HTML node.
+ * @group HTML
+ */
+export interface MdastBlockHTMLNode extends MdxJsxFlowElement {
+  /**
+   * the tag name of the node
+   */
   name: (typeof htmlTags)[number]
 }
 
-interface MdastInlineHTMLNode extends MdxJsxTextElement {
+/**
+ * An inline HTML node.
+ * @group HTML
+ */
+export interface MdastInlineHTMLNode extends MdxJsxTextElement {
+  /**
+   * the tag name of the node
+   */
   name: (typeof htmlTags)[number]
 }
 
+/**
+ * A HTML MDAST node.
+ * @group HTML
+ */
 export type MdastHTMLNode = MdastBlockHTMLNode | MdastInlineHTMLNode
 
-export const MDX_NODE_TYPES = ['mdxJsxTextElement', 'mdxJsxFlowElement'] as const
+const MDX_NODE_TYPES = ['mdxJsxTextElement', 'mdxJsxFlowElement'] as const
 
+/**
+ * The MDAST jsx distinction value used to differentiate inline and block level elements.
+ * @group HTML
+ */
+export type MdxNodeType = MdastHTMLNode['type']
+
+/**
+ * Determines if the given node is a HTML MDAST node.
+ * @group HTML
+ */
 export function isMdastHTMLNode(node: Mdast.Parent | Mdast.Content | Mdast.Root): node is MdastHTMLNode {
   return (
-    MDX_NODE_TYPES.includes(node.type as unknown as 'mdxJsxTextElement' | 'mdxJsxFlowElement') &&
+    MDX_NODE_TYPES.includes(node.type as unknown as MdxNodeType) &&
     (htmlTags as readonly string[]).includes((node as MdastHTMLNode).name?.toLowerCase() ?? '')
   )
 }
 
+/**
+ * All the HTML tags supported by the generic html node.
+ * @group HTML
+ */
 export const htmlTags = [
   'a',
   'abbr',

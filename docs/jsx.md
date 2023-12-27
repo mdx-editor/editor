@@ -6,14 +6,14 @@ position: 0.815
 
 # JSX
 
-The jsx plugin allows you to process and associate custom editors with the JSX components in your markdown source - a capability enabled by [MDX](https://mdxjs.com/). The package includes a generic editor component, but you can also create your own custom editors. The next example includes three JSX descriptors and an example of a custom editor that uses the `NestedLexicalEditor` component to edit the markdown contents of a JSX component.
+The JSX plugin allows you to process and associate custom editors with the JSX components in your markdown source - a capability enabled by [MDX](https://mdxjs.com/). The package includes a generic editor component, but you can also create your custom editors. The next example includes three JSX descriptors and an example of a custom editor that uses the `NestedLexicalEditor` component to edit the markdown contents of a JSX component.
 
 ```tsx
 const jsxComponentDescriptors: JsxComponentDescriptor[] = [
   {
     name: 'MyLeaf',
     kind: 'text', // 'text' for inline, 'flow' for block
-    // the source field is used to construct the import statement at the top of the markdown document. 
+    // the source field is used to construct the import statement at the top of the markdown document.
     // it won't be actually sourced.
     source: './external',
     // Used to construct the property popover of the generic editor
@@ -100,6 +100,6 @@ A paragraph with inline jsx component <MyLeaf foo="fooValue">Nested _markdown_</
 <BlockNode foo="fooValue">
  Content *foo*
 
- more Content
+more Content
 </BlockNode>
 ```

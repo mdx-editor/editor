@@ -1,13 +1,14 @@
 import React from 'react'
 import { MDXEditor } from '../MDXEditor'
 import { GenericJsxEditor } from '../jsx-editors/GenericJsxEditor'
-import { JsxComponentDescriptor, jsxPlugin, jsxPluginHooks } from '../plugins/jsx'
+import { JsxComponentDescriptor, insertJsx$, jsxPlugin } from '../plugins/jsx'
 import jsxMarkdown from './assets/jsx.md?raw'
 import { toolbarPlugin } from '../plugins/toolbar'
 import { Button } from '../plugins/toolbar/primitives/toolbar'
 import { NestedLexicalEditor } from '../plugins/core/NestedLexicalEditor'
 import { MdxJsxTextElement } from 'mdast-util-mdx'
 import { headingsPlugin } from '..'
+import { usePublisher } from '@mdxeditor/gurx'
 
 const jsxComponentDescriptors: JsxComponentDescriptor[] = [
   {
@@ -52,7 +53,7 @@ const jsxComponentDescriptors: JsxComponentDescriptor[] = [
 ]
 
 const InsertMyLeaf = () => {
-  const insertJsx = jsxPluginHooks.usePublisher('insertJsx')
+  const insertJsx = usePublisher(insertJsx$)
   return (
     <>
       <Button

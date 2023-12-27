@@ -3,9 +3,10 @@ import classNames from 'classnames'
 import React from 'react'
 import { useForm } from 'react-hook-form'
 import styles from '../../styles/ui.module.css'
-import { corePluginHooks } from '../core/index'
-import { imagePluginHooks } from './index'
+import { editorRootElementRef$ } from '../core/index'
+import { closeImageDialog$, imageAutocompleteSuggestions$, imageDialogState$, saveImage$ } from './index'
 import { DownshiftAutoComplete } from '../core/ui/DownshiftAutoComplete'
+import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 
 interface ImageFormFields {
   src: string
@@ -15,10 +16,13 @@ interface ImageFormFields {
 }
 
 export const ImageDialog: React.FC = () => {
-  const [imageAutocompleteSuggestions, state] = imagePluginHooks.useEmitterValues('imageAutocompleteSuggestions', 'imageDialogState')
-  const saveImage = imagePluginHooks.usePublisher('saveImage')
-  const [editorRootElementRef] = corePluginHooks.useEmitterValues('editorRootElementRef')
-  const closeImageDialog = imagePluginHooks.usePublisher('closeImageDialog')
+  const [imageAutocompleteSuggestions, state, editorRootElementRef] = useCellValues(
+    imageAutocompleteSuggestions$,
+    imageDialogState$,
+    editorRootElementRef$
+  )
+  const saveImage = usePublisher(saveImage$)
+  const closeImageDialog = usePublisher(closeImageDialog$)
 
   const { register, handleSubmit, control, setValue, reset } = useForm<ImageFormFields>({
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -30,7 +34,7 @@ export const ImageDialog: React.FC = () => {
       open={state.type !== 'inactive'}
       onOpenChange={(open) => {
         if (!open) {
-          closeImageDialog(true)
+          closeImageDialog()
           reset({ src: '', title: '', altText: '' })
         }
       }}

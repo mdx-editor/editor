@@ -1,7 +1,5 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import matchers from '@testing-library/jest-dom/matchers'
-import { expect } from 'vitest'
+import { afterEach } from 'vitest'
+import { cleanup } from '@testing-library/react'
+import '@testing-library/jest-dom/vitest'
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-expect.extend(matchers)
+afterEach(cleanup)

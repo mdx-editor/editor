@@ -8,9 +8,9 @@ import {
   MdastImportVisitor,
   ShowSandpackInfo,
   UndoRedo,
+  addImportVisitor$,
   diffSourcePlugin,
   realmPlugin,
-  system,
   toolbarPlugin
 } from '../'
 import markdown from './assets/buggy-markdown.md?raw'
@@ -71,11 +71,9 @@ const CatchAllVisitor: MdastImportVisitor<Mdast.Content> = {
   priority: -500
 }
 
-const [catchAllPlugin] = realmPlugin({
-  id: 'catch-all',
-  systemSpec: system(() => ({})),
-  init: (realm) => {
-    realm.pubKey('addImportVisitor', CatchAllVisitor)
+const catchAllPlugin = realmPlugin({
+  init(realm) {
+    realm.pub(addImportVisitor$, CatchAllVisitor)
   }
 })
 

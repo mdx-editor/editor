@@ -5,21 +5,25 @@ import { NestedLexicalEditor, useMdastNodeUpdater } from '../plugins/core/Nested
 import { PropertyPopover } from '../plugins/core/PropertyPopover'
 import styles from '../styles/ui.module.css'
 import { DirectiveEditorProps } from '../plugins/directives'
-import { Directive } from 'mdast-util-directive'
+import { Directives } from 'mdast-util-directive'
 
 /**
  * A generic editor that can be used as an universal UI for any directive.
  * Allows editing of the directive content and properties.
  * Use this editor for the {@link DirectiveDescriptor} Editor option.
+ * @group Directive
  */
 export const GenericDirectiveEditor: React.FC<DirectiveEditorProps> = ({ mdastNode, descriptor }) => {
   const updateMdastNode = useMdastNodeUpdater()
 
   const properties = React.useMemo(() => {
-    return descriptor.attributes.reduce((acc, attributeName) => {
-      acc[attributeName] = (mdastNode.attributes || {})[attributeName] || ''
-      return acc
-    }, {} as Record<string, string>)
+    return descriptor.attributes.reduce(
+      (acc, attributeName) => {
+        acc[attributeName] = (mdastNode.attributes || {})[attributeName] || ''
+        return acc
+      },
+      {} as Record<string, string>
+    )
   }, [mdastNode, descriptor])
 
   const onChange = React.useCallback(
@@ -39,7 +43,7 @@ export const GenericDirectiveEditor: React.FC<DirectiveEditorProps> = ({ mdastNo
         <PropertyPopover properties={properties} title={mdastNode.name || ''} onChange={onChange} />
       ) : null}
       {descriptor.hasChildren ? (
-        <NestedLexicalEditor<Directive>
+        <NestedLexicalEditor<Directives>
           block={mdastNode.type === 'containerDirective'}
           getContent={(node) => node.children as PhrasingContent[]}
           getUpdatedMdastNode={(mdastNode, children: any) => {

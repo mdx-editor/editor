@@ -1,8 +1,10 @@
+import { realmPlugin } from '../../RealmWithPlugins'
 import {
   BOLD_ITALIC_STAR,
   BOLD_ITALIC_UNDERSCORE,
   BOLD_STAR,
   BOLD_UNDERSCORE,
+  CHECK_LIST,
   CODE,
   ElementTransformer,
   INLINE_CODE,
@@ -12,33 +14,30 @@ import {
   ORDERED_LIST,
   QUOTE,
   TextFormatTransformer,
-  UNORDERED_LIST,
-  CHECK_LIST
+  TextMatchTransformer,
+  UNORDERED_LIST
 } from '@lexical/markdown'
 import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin.js'
-import React from 'react'
-import { realmPlugin, system } from '../../gurx'
-import { $createCodeBlockNode, CodeBlockNode } from '../codeblock/CodeBlockNode'
-import { coreSystem } from '../core'
-import { TextMatchTransformer } from '@lexical/markdown'
-import { HeadingNode, $isHeadingNode, HeadingTagType, $createHeadingNode } from '@lexical/rich-text'
+import { $createHeadingNode, $isHeadingNode, HeadingNode, HeadingTagType } from '@lexical/rich-text'
 import { ElementNode } from 'lexical'
-import { HEADING_LEVEL } from '../headings'
+import React from 'react'
+import { $createCodeBlockNode, CodeBlockNode } from '../codeblock/CodeBlockNode'
+import { activePlugins$, addComposerChild$, addNestedEditorChild$ } from '../core'
+import { HEADING_LEVEL, allowedHeadingLevels$ } from '../headings'
 
-/** @internal */
-export const [markdownShortcutPlugin] = realmPlugin({
-  id: 'markdown-shortcut',
-  dependencies: [],
-  systemSpec: system((_) => ({}), [coreSystem]),
-
-  init: (realm, _, pluginIds) => {
-    const allowedHeadingLevels: ReadonlyArray<HEADING_LEVEL> = pluginIds.includes('headings')
-      ? // @ts-expect-error we query the realm for the allowed heading levels
-        (realm.getKeyValue('allowedHeadingLevels') as ReadonlyArray<HEADING_LEVEL>)
-      : []
+/**
+ * A plugin that adds markdown shortcuts to the editor.
+ * @group Markdown Shortcuts
+ */
+export const markdownShortcutPlugin = realmPlugin({
+  init(realm) {
+    const pluginIds = realm.getValue(activePlugins$)
+    const allowedHeadingLevels: ReadonlyArray<HEADING_LEVEL> = pluginIds.includes('headings') ? realm.getValue(allowedHeadingLevels$) : []
     const transformers = pickTransformersForActivePlugins(pluginIds, allowedHeadingLevels)
-    realm.pubKey('addComposerChild', () => <MarkdownShortcutPlugin transformers={transformers} />)
-    realm.pubKey('addNestedEditorChild', () => <MarkdownShortcutPlugin transformers={transformers} />)
+    realm.pubIn({
+      [addComposerChild$]: () => <MarkdownShortcutPlugin transformers={transformers} />,
+      [addNestedEditorChild$]: () => <MarkdownShortcutPlugin transformers={transformers} />
+    })
   }
 })
 

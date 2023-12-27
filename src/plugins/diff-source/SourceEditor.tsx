@@ -4,8 +4,9 @@ import { EditorView, lineNumbers } from '@codemirror/view'
 import { basicLight } from 'cm6-theme-basic-light'
 import { basicSetup } from 'codemirror'
 import React from 'react'
-import { diffSourcePluginHooks } from '.'
-import { corePluginHooks } from '../core'
+import { cmExtensions$ } from '.'
+import { markdown$, markdownSourceEditorValue$, onBlur$, readOnly$ } from '../core'
+import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 
 export const COMMON_STATE_CONFIG_EXTENSIONS: Extension[] = [
   basicSetup,
@@ -16,10 +17,9 @@ export const COMMON_STATE_CONFIG_EXTENSIONS: Extension[] = [
 ]
 
 export const SourceEditor = () => {
-  const [markdown, readOnly] = corePluginHooks.useEmitterValues('markdown', 'readOnly')
-  const [cmExtensions] = diffSourcePluginHooks.useEmitterValues('cmExtensions')
-  const updateMarkdown = diffSourcePluginHooks.usePublisher('markdownSourceEditorValue')
-  const triggerOnBlur = corePluginHooks.usePublisher('onBlur')
+  const [markdown, readOnly, cmExtensions] = useCellValues(markdown$, readOnly$, cmExtensions$)
+  const updateMarkdown = usePublisher(markdownSourceEditorValue$)
+  const triggerOnBlur = usePublisher(onBlur$)
   const editorViewRef = React.useRef<EditorView | null>(null)
 
   const ref = React.useCallback(

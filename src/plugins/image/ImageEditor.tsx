@@ -1,6 +1,6 @@
 import React from 'react'
 
-import type { GridSelection, LexicalEditor, NodeSelection, RangeSelection } from 'lexical'
+import type { BaseSelection, LexicalEditor } from 'lexical'
 
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext.js'
 import { useLexicalNodeSelection } from '@lexical/react/useLexicalNodeSelection.js'
@@ -20,11 +20,12 @@ import {
   KEY_ESCAPE_COMMAND,
   SELECTION_CHANGE_COMMAND
 } from 'lexical'
-import { imagePluginHooks } from '.'
+import { disableImageResize$, imagePreviewHandler$, openEditImageDialog$ } from '.'
 import styles from '../../styles/ui.module.css'
-import { corePluginHooks } from '../core'
+import { iconComponentFor$ } from '../core'
 import { $isImageNode } from './ImageNode'
 import ImageResizer from './ImageResizer'
+import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 
 export interface ImageEditorProps {
   nodeKey: string
@@ -83,19 +84,22 @@ function LazyImage({
 }
 
 export function ImageEditor({ src, title, alt, nodeKey, width, height }: ImageEditorProps): JSX.Element | null {
+  const [disableImageResize, imagePreviewHandler, iconComponentFor] = useCellValues(
+    disableImageResize$,
+    imagePreviewHandler$,
+    iconComponentFor$
+  )
+
+  const openEditImageDialog = usePublisher(openEditImageDialog$)
   const imageRef = React.useRef<null | HTMLImageElement>(null)
   const buttonRef = React.useRef<HTMLButtonElement | null>(null)
   const [isSelected, setSelected, clearSelection] = useLexicalNodeSelection(nodeKey)
   const [editor] = useLexicalComposerContext()
-  const [selection, setSelection] = React.useState<RangeSelection | NodeSelection | GridSelection | null>(null)
+  const [selection, setSelection] = React.useState<BaseSelection | null>(null)
   const activeEditorRef = React.useRef<LexicalEditor | null>(null)
   const [isResizing, setIsResizing] = React.useState<boolean>(false)
-  const [disableImageResize] = imagePluginHooks.useEmitterValues('disableImageResize')
-  const [imagePreviewHandler] = imagePluginHooks.useEmitterValues('imagePreviewHandler')
   const [imageSource, setImageSource] = React.useState<string | null>(null)
   const [initialImagePath, setInitialImagePath] = React.useState<string | null>(null)
-  const openEditImageDialog = imagePluginHooks.usePublisher('openEditImageDialog')
-  const [iconComponentFor] = corePluginHooks.useEmitterValues('iconComponentFor')
 
   const onDelete = React.useCallback(
     (payload: KeyboardEvent) => {
@@ -157,7 +161,7 @@ export function ImageEditor({ src, title, alt, nodeKey, width, height }: ImageEd
     } else {
       setImageSource(src)
     }
-  }, [src, imagePreviewHandler])
+  }, [src, imagePreviewHandler, initialImagePath])
 
   React.useEffect(() => {
     let isMounted = true

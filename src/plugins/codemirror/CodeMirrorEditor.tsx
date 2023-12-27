@@ -3,12 +3,14 @@ import React from 'react'
 import styles from '../../styles/ui.module.css'
 import { CodeBlockEditorProps } from '../codeblock'
 import { useCodeBlockEditorContext } from '../codeblock/CodeBlockNode'
-import { corePluginHooks } from '../core'
+import { readOnly$ } from '../core'
 import { useCodeMirrorRef } from '../sandpack/useCodeMirrorRef'
+import { useCellValue } from '@mdxeditor/gurx'
 
+/** @internal */
 export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: CodeBlockEditorProps) => {
   const codeMirrorRef = useCodeMirrorRef(nodeKey, 'codeblock', 'jsx', focusEmitter)
-  const [readOnly] = corePluginHooks.useEmitterValues('readOnly')
+  const readOnly = useCellValue(readOnly$)
   const { setCode } = useCodeBlockEditorContext()
 
   React.useEffect(() => {

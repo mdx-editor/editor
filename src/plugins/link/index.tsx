@@ -1,25 +1,24 @@
 import React from 'react'
-import { realmPlugin, system } from '../../gurx'
-import { coreSystem } from '../core'
 import { MdastLinkVisitor } from './MdastLinkVisitor'
 import { LexicalLinkVisitor } from './LexicalLinkVisitor'
 import { AutoLinkNode, LinkNode } from '@lexical/link'
 import { LinkPlugin as LexicalLinkPlugin } from '@lexical/react/LexicalLinkPlugin.js'
 import { LexicalAutoLinkPlugin } from './AutoLinkPlugin'
-
-const linkSystem = system(
-  (r) => {
-    const disableAutoLink = r.node<boolean>(false)
-
-    return { disableAutoLink }
-  },
-  [coreSystem]
-)
+import { Cell } from '@mdxeditor/gurx'
+import { realmPlugin } from '../../RealmWithPlugins'
+import { addImportVisitor$, addLexicalNode$, addExportVisitor$, addComposerChild$, addActivePlugin$ } from '../core'
 
 /**
- * The parameters used to configure the link plugin
+ * Holds whether the auto-linking of URLs and email addresses is disabled.
+ * @group Links
  */
-interface LinkPluginParams {
+export const disableAutoLink$ = Cell(false)
+
+/**
+ * A plugin that adds support for links in the editor.
+ * @group Links
+ */
+export const linkPlugin = realmPlugin<{
   /**
    * An optional function to validate the URL of a link.
    * By default, no validation is performed.
@@ -30,28 +29,22 @@ interface LinkPluginParams {
    * @default false
    */
   disableAutoLink?: boolean
-}
-
-/**
- * @internal
- */
-export const [linkPlugin] = realmPlugin({
-  id: 'link',
-  systemSpec: linkSystem,
-
-  init: (realm, params?: LinkPluginParams) => {
+}>({
+  init(realm, params) {
     const disableAutoLink = Boolean(params?.disableAutoLink)
-    realm.pubKey('addImportVisitor', MdastLinkVisitor)
-    realm.pubKey('addLexicalNode', LinkNode)
-    realm.pubKey('addLexicalNode', AutoLinkNode)
-    realm.pubKey('addExportVisitor', LexicalLinkVisitor)
-    realm.pubKey('disableAutoLink', disableAutoLink)
     const linkPluginProps = params?.validateUrl ? { validateUrl: params.validateUrl } : {}
-    realm.pubKey('addComposerChild', () => (
-      <>
-        <LexicalLinkPlugin {...linkPluginProps} />
-        {disableAutoLink ? null : <LexicalAutoLinkPlugin />}
-      </>
-    ))
+    realm.pubIn({
+      [addActivePlugin$]: 'link',
+      [addImportVisitor$]: MdastLinkVisitor,
+      [addLexicalNode$]: [LinkNode, AutoLinkNode],
+      [addExportVisitor$]: LexicalLinkVisitor,
+      [disableAutoLink$]: disableAutoLink,
+      [addComposerChild$]: () => (
+        <>
+          <LexicalLinkPlugin {...linkPluginProps} />
+          {disableAutoLink ? null : <LexicalAutoLinkPlugin />}
+        </>
+      )
+    })
   }
 })

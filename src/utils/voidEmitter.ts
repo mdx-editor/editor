@@ -3,6 +3,7 @@ import { noop } from './fp'
 /**
  * An emitter object that has a single subscription that will be executed.
  * The construct is used so that the lexical nodes can focus their React component editors.
+ * @group Utils
  */
 export type VoidEmitter = {
   /**
@@ -11,6 +12,10 @@ export type VoidEmitter = {
   subscribe: (cb: () => void) => void
 }
 
+/**
+ * Creates a void emitter.
+ * @group Utils
+ */
 export function voidEmitter() {
   let subscription = noop
   return {

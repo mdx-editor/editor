@@ -1,13 +1,12 @@
 import React from 'react'
-import { diffSourcePluginHooks } from '.'
 import { DiffViewer } from './DiffViewer'
 import { SourceEditor } from './SourceEditor'
-import { corePluginHooks } from '../core'
+import { markdownProcessingError$, viewMode$ } from '../core'
 import styles from '../../styles/ui.module.css'
+import { useCellValues } from '@mdxeditor/gurx'
 
 export const DiffSourceWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [error] = corePluginHooks.useEmitterValues('markdownProcessingError')
-  const [viewMode] = diffSourcePluginHooks.useEmitterValues('viewMode')
+  const [error, viewMode] = useCellValues(markdownProcessingError$, viewMode$)
   // keep the RTE always mounted, otherwise the state is lost
   return (
     <div>

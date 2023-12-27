@@ -6,10 +6,10 @@ position: 0.99
 
 # Front-matter
 
-The [front-matter](https://jekyllrb.com/docs/front-matter/) plugin enables an key-value form that edits the front-matter contents of the markdown document, while allowing the user to insert new rows. 
+The [front-matter](https://jekyllrb.com/docs/front-matter/) plugin enables a key-value form that edits the front-matter contents of the markdown document while allowing the user to insert new rows.
 
 ```tsx
-// you can try a markdown without the front-matter, 
+// you can try a markdown without the front-matter,
 // the `InsertFrontmatter` button from the toolbar will create a new block.
 
 const frontmatterMarkdown = `

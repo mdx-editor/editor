@@ -1,16 +1,17 @@
 import { mergeRegister } from '@lexical/utils'
+import { useCellValues } from '@mdxeditor/gurx'
 import { CAN_REDO_COMMAND, CAN_UNDO_COMMAND, COMMAND_PRIORITY_CRITICAL, REDO_COMMAND, UNDO_COMMAND } from 'lexical'
 import React from 'react'
 import { IS_APPLE } from '../../../utils/detectMac'
-import { corePluginHooks } from '../../core'
+import { activeEditor$, iconComponentFor$ } from '../../core'
 import { MultipleChoiceToggleGroup } from '.././primitives/toolbar'
 
 /**
  * A toolbar component that lets the user undo and redo changes in the editor.
+ * @group Toolbar Components
  */
 export const UndoRedo: React.FC = () => {
-  const [iconComponentFor] = corePluginHooks.useEmitterValues('iconComponentFor')
-  const [activeEditor] = corePluginHooks.useEmitterValues('activeEditor')
+  const [iconComponentFor, activeEditor] = useCellValues(iconComponentFor$, activeEditor$)
   const [canUndo, setCanUndo] = React.useState(false)
   const [canRedo, setCanRedo] = React.useState(false)
 

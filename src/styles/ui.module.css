@@ -28,94 +28,95 @@
     transform: translate(1px, 1px);
   }
 
-  &[data-state=on], &:active {
+  &[data-state=on],
+  &:active {
     background-color: var(--baseBgHover);
     color: var(--baseTextContrast);
   }
 }
 
 .editorRoot {
-  --accentBase: var(--blue1);
-  --accentBgSubtle: var(--blue2);
-  --accentBg: var(--blue3);
-  --accentBgHover: var(--blue4);
-  --accentBgActive: var(--blue5);
-  --accentLine: var(--blue6);
-  --accentBorder: var(--blue7);
-  --accentBorderHover: var(--blue8);
-  --accentSolid: var(--blue9);
-  --accentSolidHover: var(--blue10);
-  --accentText: var(--blue11);
-  --accentTextContrast: var(--blue12);
+  --accentBase: var(--blue-1);
+  --accentBgSubtle: var(--blue-2);
+  --accentBg: var(--blue-3);
+  --accentBgHover: var(--blue-4);
+  --accentBgActive: var(--blue-5);
+  --accentLine: var(--blue-6);
+  --accentBorder: var(--blue-7);
+  --accentBorderHover: var(--blue-8);
+  --accentSolid: var(--blue-9);
+  --accentSolidHover: var(--blue-10);
+  --accentText: var(--blue-11);
+  --accentTextContrast: var(--blue-12);
 
   --basePageBg: white;
-  --baseBase: var(--slate1);
-  --baseBgSubtle: var(--slate2);
-  --baseBg: var(--slate3);
-  --baseBgHover: var(--slate4);
-  --baseBgActive: var(--slate5);
-  --baseLine: var(--slate6);
-  --baseBorder: var(--slate7);
-  --baseBorderHover: var(--slate8);
-  --baseSolid: var(--slate9);
-  --baseSolidHover: var(--slate10);
-  --baseText: var(--slate11);
-  --baseTextContrast: var(--slate12);
+  --baseBase: var(--slate-1);
+  --baseBgSubtle: var(--slate-2);
+  --baseBg: var(--slate-3);
+  --baseBgHover: var(--slate-4);
+  --baseBgActive: var(--slate-5);
+  --baseLine: var(--slate-6);
+  --baseBorder: var(--slate-7);
+  --baseBorderHover: var(--slate-8);
+  --baseSolid: var(--slate-9);
+  --baseSolidHover: var(--slate-10);
+  --baseText: var(--slate-11);
+  --baseTextContrast: var(--slate-12);
 
-  --admonitionTipBg: var(--cyan4);
-  --admonitionTipBorder: var(--cyan8);
-  
-  --admonitionInfoBg: var(--grass4);
-  --admonitionInfoBorder: var(--grass8);
+  --admonitionTipBg: var(--cyan-4);
+  --admonitionTipBorder: var(--cyan-8);
 
-  --admonitionCautionBg: var(--amber4);
-  --admonitionCautionBorder: var(--amber8);
+  --admonitionInfoBg: var(--grass-4);
+  --admonitionInfoBorder: var(--grass-8);
 
-  --admonitionDangerBg: var(--red4);
-  --admonitionDangerBorder: var(--red8);
+  --admonitionCautionBg: var(--amber-4);
+  --admonitionCautionBorder: var(--amber-8);
 
-  --admonitionNoteBg: var(--slate4);
-  --admonitionNoteBorder: var(--slate8);
+  --admonitionDangerBg: var(--red-4);
+  --admonitionDangerBorder: var(--red-8);
 
-  --error-color: var(--red10);
+  --admonitionNoteBg: var(--slate-4);
+  --admonitionNoteBorder: var(--slate-8);
 
-  --spacing-0:0px;
-  --spacing-px:1px;
-  --spacing-0_5:0.125rem;
-  --spacing-1:0.25rem;
-  --spacing-1_5:0.375rem;
-  --spacing-2:0.5rem;
-  --spacing-2_5:0.625rem;
-  --spacing-3:0.75rem;
-  --spacing-3_5:0.875rem;
-  --spacing-4:1rem;
-  --spacing-5:1.25rem;
-  --spacing-6:1.5rem;
-  --spacing-7:1.75rem;
-  --spacing-8:2rem;
-  --spacing-9:2.25rem;
-  --spacing-10:2.5rem;
-  --spacing-11:2.75rem;
-  --spacing-12:3rem;
-  --spacing-14:3.5rem;
-  --spacing-16:4rem;
-  --spacing-20:5rem;
-  --spacing-24:6rem;
-  --spacing-28:7rem;
-  --spacing-32:8rem;
-  --spacing-36:9rem;
-  --spacing-40:10rem;
-  --spacing-44:11rem;
-  --spacing-48:12rem;
-  --spacing-52:13rem;
-  --spacing-56:14rem;
-  --spacing-60:15rem;
-  --spacing-64:16rem;
-  --spacing-72:18rem;
-  --spacing-80:20rem;
-  --spacing-96:24rem;
+  --error-color: var(--red-10);
 
-  --radius-none:0px;
+  --spacing-0: 0px;
+  --spacing-px: 1px;
+  --spacing-0_5: 0.125rem;
+  --spacing-1: 0.25rem;
+  --spacing-1_5: 0.375rem;
+  --spacing-2: 0.5rem;
+  --spacing-2_5: 0.625rem;
+  --spacing-3: 0.75rem;
+  --spacing-3_5: 0.875rem;
+  --spacing-4: 1rem;
+  --spacing-5: 1.25rem;
+  --spacing-6: 1.5rem;
+  --spacing-7: 1.75rem;
+  --spacing-8: 2rem;
+  --spacing-9: 2.25rem;
+  --spacing-10: 2.5rem;
+  --spacing-11: 2.75rem;
+  --spacing-12: 3rem;
+  --spacing-14: 3.5rem;
+  --spacing-16: 4rem;
+  --spacing-20: 5rem;
+  --spacing-24: 6rem;
+  --spacing-28: 7rem;
+  --spacing-32: 8rem;
+  --spacing-36: 9rem;
+  --spacing-40: 10rem;
+  --spacing-44: 11rem;
+  --spacing-48: 12rem;
+  --spacing-52: 13rem;
+  --spacing-56: 14rem;
+  --spacing-60: 15rem;
+  --spacing-64: 16rem;
+  --spacing-72: 18rem;
+  --spacing-80: 20rem;
+  --spacing-96: 24rem;
+
+  --radius-none: 0px;
   --radius-small: var(--spacing-0_5);
   --radius-base: var(--spacing-1);
   --radius-medium: var(--spacing-1_5);
@@ -135,8 +136,7 @@
   color: var(--baseText);
 }
 
-.editorWrapper {
-}
+.editorWrapper {}
 
 .nestedListItem {
   list-style: none;
@@ -168,7 +168,8 @@
 .readOnlyToolbarRoot {
   pointer-events: none;
   background: var(--baseBase);
-  & > div {
+
+  &>div {
     opacity: 0.5;
   }
 }
@@ -187,8 +188,9 @@
     padding-inline-end: var(--spacing-4);
     padding-inline-start: var(--spacing-4);
 
-    &:active, &[data-state=on] {
-      background-color:var(--baseBorder);
+    &:active,
+    &[data-state=on] {
+      background-color: var(--baseBorder);
     }
   }
 }
@@ -199,7 +201,7 @@
 }
 
 .toolbarToggleSingleGroup:first-of-type .toolbarToggleItem:only-child,
-.toolbarToggleSingleGroup:only-child .toolbarToggleItem:first-child, 
+.toolbarToggleSingleGroup:only-child .toolbarToggleItem:first-child,
 .toolbarModeSwitch .toolbarToggleItem:first-child {
   border-top-left-radius: var(--radius-base);
   border-bottom-left-radius: var(--radius-base);
@@ -212,7 +214,8 @@
   border-bottom-right-radius: var(--radius-base);
 }
 
-.toolbarToggleItem, .toolbarButton {
+.toolbarToggleItem,
+.toolbarButton {
   @mixin clear-form-element;
   padding: var(--spacing-1);
 
@@ -228,7 +231,8 @@
     transform: translate(1px, 1px);
   }
 
-  &[data-state=on], &:active {
+  &[data-state=on],
+  &:active {
     color: var(--baseTextContrast);
     background-color: var(--baseBgActive);
   }
@@ -251,11 +255,10 @@
   white-space: nowrap;
 }
 
-.toolbarNodeKindSelectContainer, 
+.toolbarNodeKindSelectContainer,
 .toolbarButtonDropdownContainer,
 .toolbarCodeBlockLanguageSelectContent,
-.selectContainer
-{
+.selectContainer {
   @mixin drop-shadow-sm;
   z-index: 3;
   width: var(--spacing-36);
@@ -273,7 +276,7 @@
   }
 }
 
-.toolbarNodeKindSelectTrigger, 
+.toolbarNodeKindSelectTrigger,
 .toolbarButtonSelectTrigger,
 .selectTrigger {
   border: 0;
@@ -297,27 +300,25 @@
   }
 }
 
-.selectTrigger[data-placeholder] > span:first-child {
+.selectTrigger[data-placeholder]>span:first-child {
   color: var(--baseBorderHover);
 }
 
 /** used in the sandpack */
 .toolbarButtonSelectTrigger {
   width: auto;
-  padding-inline-start: var(--spacing-2) ;
+  padding-inline-start: var(--spacing-2);
   padding-inline-end: var(--spacing-1);
   padding-block: var(--spacing-0_5);
 }
 
-.toolbarCodeBlockLanguageSelectTrigger, 
-.toolbarCodeBlockLanguageSelectContent 
-{
+.toolbarCodeBlockLanguageSelectTrigger,
+.toolbarCodeBlockLanguageSelectContent {
   width: var(--spacing-48);
 }
 
-.toolbarNodeKindSelectItem, 
-.selectItem
-{
+.toolbarNodeKindSelectItem,
+.selectItem {
   cursor: default;
   display: flex;
   padding: var(--spacing-2);
@@ -341,7 +342,7 @@
   }
 }
 
-.toolbarNodeKindSelectDropdownArrow, 
+.toolbarNodeKindSelectDropdownArrow,
 .selectDropdownArrow {
   margin-left: auto;
   display: flex;
@@ -352,14 +353,16 @@
   box-sizing: border-box;
   width: 100%;
   color: var(--baseTextContrast);
+
   &:focus {
     outline: none;
   }
+
   padding: var(--spacing-3);
 }
 
 .sandpackWrapper {
-  margin-bottom:var(--spacing-5);
+  margin-bottom: var(--spacing-5);
 }
 
 .frontmatterWrapper {
@@ -376,7 +379,7 @@
   @mixin clear-form-element;
   display: flex;
   align-items: center;
-  gap:var(--spacing-1);
+  gap: var(--spacing-1);
   font-size: var(--text-sm);
 }
 
@@ -391,6 +394,7 @@
 .propertyEditorTable {
   table-layout: fixed;
   border-spacing: var(--spacing-2);
+
   & th {
     text-align: left;
     font-size: var(--text-sm);
@@ -441,23 +445,28 @@
 
 .iconButton {
   @mixin clear-form-element;
-  color:var(--baseText);
+  color: var(--baseText);
+
   &:hover {
     color: var(--accentText);
   }
-  &:disabled, &:disabled:hover {
-    color:var(--baseLine);
+
+  &:disabled,
+  &:disabled:hover {
+    color: var(--baseLine);
   }
 }
 
-.primaryButton, .secondaryButton {
+.primaryButton,
+.secondaryButton {
   @mixin clear-form-element;
   padding: var(--spacing-2) var(--spacing-3);
   border: 1px solid var(--accentBorder);
   background-color: var(--accentSolidHover);
-  color:var(--baseBase);
+  color: var(--baseBase);
   font-size: var(--text-xs);
   border-radius: var(--radius-medium);
+
   &:disabled {
     background: var(--accentLine);
     border-color: var(--accentBg);
@@ -473,7 +482,7 @@
 .secondaryButton {
   border: 1px solid var(--baseBorder);
   background-color: var(--baseSolidHover);
-  color:var(--baseBase);
+  color: var(--baseBase);
 }
 
 .dialogForm {
@@ -502,25 +511,27 @@
   background-color: var(--baseBase);
 
   border-radius: var(--radius-base);
-  border:1px solid var(--baseBorder);
+  border: 1px solid var(--baseBorder);
 
   &[data-visible-dropdown=true] {
-    border-bottom-left-radius: var(--radius-none) ;
-    border-bottom-right-radius: var(--radius-none) ;
+    border-bottom-left-radius: var(--radius-none);
+    border-bottom-right-radius: var(--radius-none);
     border-bottom-width: 0;
   }
 
-  & > button {
+  &>button {
     @mixin clear-form-element;
     padding-right: var(--spacing-2);
   }
 }
 
-.linkDialogInput, .dialogInput {
+.linkDialogInput,
+.dialogInput {
   @mixin clear-form-element;
   width: 20rem;
   padding: var(--spacing-2) var(--spacing-3);
   font-size: var(--text-sm);
+
   &::placeholder {
     color: var(--baseBorder);
   }
@@ -540,25 +551,27 @@
   }
 }
 
-.linkDialogPopoverContent, .tableColumnEditorPopoverContent, .dialogContent {
+.linkDialogPopoverContent,
+.tableColumnEditorPopoverContent,
+.dialogContent {
   @mixin drop-shadow-sm;
   display: flex;
   align-items: center;
   gap: var(--spacing-0_5);
-  border-radius:var(--radius-medium);
+  border-radius: var(--radius-medium);
   border: 1px solid var(--baseBg);
   background-color: var(--basePageBg);
-  padding:var(--spacing-1) var(--spacing-2);
+  padding: var(--spacing-1) var(--spacing-2);
   font-size: var(--text-sm);
 }
 
 .largeDialogContent {
   @mixin drop-shadow-sm;
   gap: var(--spacing-0_5);
-  border-radius:var(--radius-medium);
+  border-radius: var(--radius-medium);
   border: 1px solid var(--baseBorder);
   background-color: var(--baseBgSubtle);
-  padding:var(--spacing-4);
+  padding: var(--spacing-4);
   font-size: var(--text-sm);
 }
 
@@ -580,9 +593,9 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-0_5);
-  border-radius:var(--radius-medium);
+  border-radius: var(--radius-medium);
   background-color: var(--baseBgSubtle);
-  padding:var(--spacing-2) var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-2);
   font-size: var(--text-sm);
   z-index: 1;
 }
@@ -603,6 +616,7 @@
     height: var(--spacing-5);
     margin-left: var(--spacing-2);
   }
+
   border: 1px solid transparent;
 
   & span {
@@ -612,6 +626,7 @@
     white-space: nowrap;
   }
 }
+
 .tooltipTrigger {
   align-self: center;
 }
@@ -638,10 +653,11 @@
 
 .primaryActionButton {
   background-color: var(--accentSolid);
-  color:var(--baseBase);
+  color: var(--baseBase);
+
   &:hover {
     background-color: var(--accentSolidHover);
-    color:var(--baseBase);
+    color: var(--baseBase);
   }
 }
 
@@ -652,18 +668,19 @@
   border-spacing: 0;
   border-collapse: collapse;
 
-  & thead > tr > th {
+  & thead>tr>th {
     text-align: right;
   }
 
-  & > tbody > tr > td:not(.toolCell) {
+  &>tbody>tr>td:not(.toolCell) {
     border: 1px solid var(--baseBgActive);
     padding: var(--spacing-1) var(--spacing-2);
     white-space: normal;
 
-    & > div {
+    &>div {
       outline: none;
-      & > p {
+
+      &>p {
         margin: 0;
       }
     }
@@ -673,12 +690,21 @@
     }
   }
 
-  .tableColumnEditorTrigger, .tableRowEditorTrigger, .addRowButton, .addColumnButton, .iconButton {
+  .tableColumnEditorTrigger,
+  .tableRowEditorTrigger,
+  .addRowButton,
+  .addColumnButton,
+  .iconButton {
     opacity: .15;
   }
 
   &:hover {
-    .tableColumnEditorTrigger, .tableRowEditorTrigger, .addRowButton, .addColumnButton, .iconButton {
+
+    .tableColumnEditorTrigger,
+    .tableRowEditorTrigger,
+    .addRowButton,
+    .addColumnButton,
+    .iconButton {
       opacity: 0.3;
 
       &:hover {
@@ -690,6 +716,7 @@
 
 .toolCell {
   text-align: right;
+
   & button {
     margin: auto;
     display: block;
@@ -709,7 +736,8 @@
 
 .tableColumnEditorToolbar {
   display: flex;
-  & > button {
+
+  &>button {
     @mixin icon-button;
   }
 
@@ -722,6 +750,7 @@
 
 .toggleGroupRoot {
   display: inline-flex;
+
   & button {
     @mixin icon-button;
 
@@ -739,6 +768,7 @@
 
 .tableToolsColumn {
   width: 3rem;
+
   & button {
     margin: auto;
     display: block;
@@ -757,9 +787,11 @@
   text-align: center;
 }
 
-.addColumnButton, .addRowButton {
+.addColumnButton,
+.addRowButton {
   @mixin icon-button;
   background-color: var(--baseBase);
+
   & svg {
     margin: auto;
   }
@@ -793,7 +825,8 @@
   opacity: 0.5;
 }
 
-.dialogContent, .largeDialogContent {
+.dialogContent,
+.largeDialogContent {
   position: fixed;
   top: 50%;
   left: 50%;
@@ -802,7 +835,8 @@
   z-index: 52;
 }
 
-.dialogContent:focus, .largeDialogContent:focus {
+.dialogContent:focus,
+.largeDialogContent:focus {
   outline: none;
 }
 
@@ -811,6 +845,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: .5;
   }
@@ -821,6 +856,7 @@
     opacity: 0;
     transform: translate(-50%, -48%) scale(0.96);
   }
+
   to {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
@@ -837,7 +873,8 @@
 }
 
 .imageWrapper[draggable=true] {
-  cursor: move; /* fallback if grab cursor is unsupported */
+  cursor: move;
+  /* fallback if grab cursor is unsupported */
   cursor: grab;
   cursor: -moz-grab;
   cursor: -webkit-grab;
@@ -882,9 +919,11 @@
   background: var(--basePageBg);
   padding: var(--spacing-1) var(--spacing-2);
   border-radius: var(--radius-medium);
-  & > p {
+
+  &>p {
     margin: 0;
   }
+
   &:focus {
     outline: none;
   }
@@ -899,10 +938,11 @@
 .diffSourceToggle {
   border-radius: var(--radius-medium);
   display: flex;
+
   .toolbarToggleItem {
     padding: 0;
 
-    & > span {
+    &>span {
       display: block;
       padding: var(--spacing-1) var(--spacing-2);
     }
@@ -915,9 +955,10 @@
   gap: var(--spacing-2);
   margin-left: var(--spacing-2);
 
-  & > label {
+  &>label {
     font-size: var(--text-sm);
   }
+
   .selectTrigger {
     border: 1px solid var(--baseBorder);
   }
@@ -991,18 +1032,18 @@
 }
 
 .placeholder {
-    color: var(--baseSolid);
-    overflow: hidden;
-    position: absolute;
-    top: 0;
-    padding: var(--spacing-3);
-    text-overflow: ellipsis;
-    user-select: none;
-    white-space: nowrap;
-    display: inline-block;
-    pointer-events: none;
+  color: var(--baseSolid);
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  padding: var(--spacing-3);
+  text-overflow: ellipsis;
+  user-select: none;
+  white-space: nowrap;
+  display: inline-block;
+  pointer-events: none;
 }
-  
+
 .rootContentEditableWrapper {
   position: relative;
 }
@@ -1021,15 +1062,15 @@
   background-color: var(--baseBase);
 
   border-radius: var(--radius-base);
-  border:1px solid var(--baseBorder);
+  border: 1px solid var(--baseBorder);
 
   &[data-visible-dropdown=true] {
-    border-bottom-left-radius: var(--radius-none) ;
-    border-bottom-right-radius: var(--radius-none) ;
+    border-bottom-left-radius: var(--radius-none);
+    border-bottom-right-radius: var(--radius-none);
     border-bottom-width: 0;
   }
 
-  & > button {
+  &>button {
     @mixin clear-form-element;
     padding-right: var(--spacing-2);
   }
@@ -1040,6 +1081,7 @@
   width: 20rem;
   padding: var(--spacing-2) var(--spacing-3);
   font-size: var(--text-sm);
+
   &::placeholder {
     color: var(--baseBorder);
   }
@@ -1055,8 +1097,8 @@
     font-size: var(--text-sm);
     width: 100%;
     display: none;
-    border-bottom-left-radius: var(--radius-medium) ;
-    border-bottom-right-radius: var(--radius-medium) ;
+    border-bottom-left-radius: var(--radius-medium);
+    border-bottom-right-radius: var(--radius-medium);
     max-height: var(--spacing-48);
     overflow-x: hidden;
     overflow-y: auto;
@@ -1074,6 +1116,7 @@
       margin-bottom: var(--spacing-1);
       overflow-x: hidden;
       text-overflow: ellipsis;
+
       &[data-selected=true] {
         background-color: var(--baseBgSubtle);
       }
@@ -1083,8 +1126,8 @@
       }
 
       &:last-of-type {
-        border-bottom-left-radius: var(--radius-medium) ;
-        border-bottom-right-radius: var(--radius-medium) ;
+        border-bottom-left-radius: var(--radius-medium);
+        border-bottom-right-radius: var(--radius-medium);
       }
     }
   }
@@ -1093,7 +1136,7 @@
 .textInput {
   all: unset;
   border-radius: var(--radius-base);
-  border:1px solid var(--baseBorder);
+  border: 1px solid var(--baseBorder);
   background-color: var(--baseBase);
   padding: var(--spacing-2) var(--spacing-3);
 }

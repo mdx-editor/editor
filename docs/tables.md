@@ -8,7 +8,6 @@ position: 0.5
 
 The table plugin enables the usage of [GFM markdown tables](https://github.github.com/gfm/#tables-extension-).
 
-
 ```tsx
 const markdown = `
 | foo | bar |
@@ -16,19 +15,18 @@ const markdown = `
 | baz | bim |
 `
 //...
-<MDXEditor 
+<MDXEditor
   markdown={markdown}
   plugins={[
-    tablePlugin(), 
+    tablePlugin(),
     toolbarPlugin({toolbarContents: () => <InsertTable />})
   ]
-  } 
+  }
 />
 ```
 
 ## The table editor
 
-The table editor allows the user to insert and remove rows and columns and to change the alignment of the columns. 
-Each cell can include markdown content like formatting, links, images, etc.
+The table editor allows the user to insert and remove rows and columns and to change the alignment of the columns. Each cell can include markdown content like formatting, links, images, etc.
 
-Note: HTML tables are not supported. 
+Note: HTML tables are not supported.

@@ -1,3 +1,4 @@
+/** @internal */
 export function isPartOftheEditorUI(element: HTMLElement | null, editorRoot: HTMLElement): boolean {
   if (element === null || element === editorRoot) {
     return false

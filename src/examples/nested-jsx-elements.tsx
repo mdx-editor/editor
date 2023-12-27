@@ -8,10 +8,11 @@ import {
   NestedLexicalEditor,
   UndoRedo,
   diffSourcePlugin,
+  insertJsx$,
   jsxPlugin,
-  jsxPluginHooks,
   toolbarPlugin
 } from '../'
+import { usePublisher } from '@mdxeditor/gurx'
 const jsxMarkdown = `<Grid foo="fooValue">
   Content *foo*more Content
   </Grid>`
@@ -54,7 +55,7 @@ const jsxComponentDescriptors: JsxComponentDescriptor[] = [
 ]
 
 const InsertCard = () => {
-  const insertJsx = jsxPluginHooks.usePublisher('insertJsx')
+  const insertJsx = usePublisher(insertJsx$)
   return (
     <>
       <Button
@@ -73,7 +74,7 @@ const InsertCard = () => {
 }
 
 const InsertGrid = () => {
-  const insertJsx = jsxPluginHooks.usePublisher('insertJsx')
+  const insertJsx = usePublisher(insertJsx$)
   return (
     <>
       <Button

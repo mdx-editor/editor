@@ -22,6 +22,8 @@ const externalPackages = [
   ...Object.keys(packageJson.dependencies),
   ...Object.keys(packageJson.peerDependencies),
   /@lexical\/react\/.*/,
+  'react/jsx-runtime', 
+  'react/jsx-dev-runtime'
 ]
 
 // https://vitejs.dev/config/
@@ -29,14 +31,13 @@ export default defineConfig({
   plugins: [
     react(IN_LADLE ? {} : { jsxRuntime: 'classic' } as const),
     dts({
-      rollupTypes: false,
+      rollupTypes: true,
       staticImport: true,
       compilerOptions: {
         skipLibCheck: true,
       },
     }),
     svgr({
-      exportAsDefault: true,
       svgrOptions: {
         svgo: true,
         replaceAttrValues: { 'black': 'currentColor' }

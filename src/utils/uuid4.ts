@@ -1,3 +1,4 @@
+/** @internal */
 export function uuidv4() {
   const hex = [...Array(256).keys()].map((index) => index.toString(16).padStart(2, '0'))
 

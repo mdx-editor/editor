@@ -5,13 +5,22 @@ import * as Popover from '@radix-ui/react-popover'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import React from 'react'
 
-import { corePluginHooks } from '@/plugins/core'
-import { DownshiftAutoComplete } from '@/plugins/core/ui/DownshiftAutoComplete'
+import { activeEditor$, editorRootElementRef$, iconComponentFor$ } from '../core'
+import { DownshiftAutoComplete } from '../core/ui/DownshiftAutoComplete'
 import styles from '@/styles/ui.module.css'
 import classNames from 'classnames'
 import { createCommand, LexicalCommand } from 'lexical'
 import { useForm } from 'react-hook-form'
-import { linkDialogPluginHooks } from '.'
+import {
+  cancelLinkEdit$,
+  linkAutocompleteSuggestions$,
+  linkDialogState$,
+  onWindowChange$,
+  removeLink$,
+  switchFromPreviewToLinkEdit$,
+  updateLink$
+} from '.'
+import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 
 export const OPEN_LINK_DIALOG: LexicalCommand<undefined> = createCommand()
 
@@ -86,20 +95,20 @@ export function LinkEditForm({ url, title, onSubmit, onCancel, linkAutocompleteS
   )
 }
 
+/** @internal */
 export const LinkDialog: React.FC = () => {
-  const [editorRootElementRef] = corePluginHooks.useEmitterValues('editorRootElementRef')
-  const publishWindowChange = linkDialogPluginHooks.usePublisher('onWindowChange')
-  const [activeEditor] = corePluginHooks.useEmitterValues('activeEditor')
-  const [iconComponentFor] = corePluginHooks.useEmitterValues('iconComponentFor')
-
-  const [linkDialogState, linkAutocompleteSuggestions] = linkDialogPluginHooks.useEmitterValues(
-    'linkDialogState',
-    'linkAutocompleteSuggestions'
+  const [editorRootElementRef, activeEditor, iconComponentFor, linkDialogState, linkAutocompleteSuggestions] = useCellValues(
+    editorRootElementRef$,
+    activeEditor$,
+    iconComponentFor$,
+    linkDialogState$,
+    linkAutocompleteSuggestions$
   )
-  const updateLink = linkDialogPluginHooks.usePublisher('updateLink')
-  const cancelLinkEdit = linkDialogPluginHooks.usePublisher('cancelLinkEdit')
-  const switchFromPreviewToLinkEdit = linkDialogPluginHooks.usePublisher('switchFromPreviewToLinkEdit')
-  const removeLink = linkDialogPluginHooks.usePublisher('removeLink')
+  const publishWindowChange = usePublisher(onWindowChange$)
+  const updateLink = usePublisher(updateLink$)
+  const cancelLinkEdit = usePublisher(cancelLinkEdit$)
+  const switchFromPreviewToLinkEdit = usePublisher(switchFromPreviewToLinkEdit$)
+  const removeLink = usePublisher(removeLink$)
 
   React.useEffect(() => {
     const update = () => {
@@ -148,7 +157,7 @@ export const LinkDialog: React.FC = () => {
               url={linkDialogState.url}
               title={linkDialogState.title}
               onSubmit={updateLink}
-              onCancel={cancelLinkEdit.bind(null, true)}
+              onCancel={cancelLinkEdit.bind(null)}
               linkAutocompleteSuggestions={linkAutocompleteSuggestions}
             />
           )}
@@ -164,7 +173,7 @@ export const LinkDialog: React.FC = () => {
                 <span>{linkDialogState.url}</span>
                 {urlIsExternal && iconComponentFor('open_in_new')}
               </a>
-              <ActionButton onClick={() => switchFromPreviewToLinkEdit(true)} title="Edit link URL" aria-label="Edit link URL">
+              <ActionButton onClick={() => switchFromPreviewToLinkEdit()} title="Edit link URL" aria-label="Edit link URL">
                 {iconComponentFor('edit')}
               </ActionButton>
               <Tooltip.Provider>
@@ -192,7 +201,7 @@ export const LinkDialog: React.FC = () => {
                 </Tooltip.Root>
               </Tooltip.Provider>
 
-              <ActionButton title="Remove link" aria-label="Remove link" onClick={() => removeLink(true)}>
+              <ActionButton title="Remove link" aria-label="Remove link" onClick={() => removeLink()}>
                 {iconComponentFor('link_off')}
               </ActionButton>
             </>

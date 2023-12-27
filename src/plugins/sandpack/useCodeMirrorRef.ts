@@ -3,11 +3,12 @@ import { $createParagraphNode, $getNodeByKey } from 'lexical'
 import React from 'react'
 import { VoidEmitter } from '../../utils/voidEmitter'
 import { useCodeBlockEditorContext } from '../codeblock/CodeBlockNode'
-import { corePluginHooks } from '../core'
+import { activeEditor$, editorInFocus$ } from '../core'
+import { useCellValue, usePublisher } from '@mdxeditor/gurx'
 
 export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'sandpack', language: string, focusEmitter: VoidEmitter) {
-  const [theEditor] = corePluginHooks.useEmitterValues('activeEditor')
-  const setEditorInFocus = corePluginHooks.usePublisher('editorInFocus')
+  const activeEditor = useCellValue(activeEditor$)
+  const setEditorInFocus = usePublisher(editorInFocus$)
   // const setActiveEditorType = usePublisher('activeEditorType')
   const codeMirrorRef = React.useRef<CodeMirrorRef>(null)
   const { lexicalNode } = useCodeBlockEditorContext()
@@ -38,7 +39,7 @@ export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'san
               atBottom.current = true
             } else {
               // escaping twice
-              theEditor?.update(() => {
+              activeEditor?.update(() => {
                 const node = $getNodeByKey(nodeKey)!
                 const nextSibling = node.getNextSibling()
                 if (nextSibling) {
@@ -63,7 +64,7 @@ export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'san
               atTop.current = true
             } else {
               // escaping twice
-              theEditor?.update(() => {
+              activeEditor?.update(() => {
                 const node = $getNodeByKey(nodeKey)!
                 const previousSibling = node.getPreviousSibling()
                 if (previousSibling) {
@@ -81,7 +82,7 @@ export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'san
         e.stopPropagation()
       }
     },
-    [theEditor, nodeKey]
+    [activeEditor, nodeKey]
   )
 
   React.useEffect(() => {

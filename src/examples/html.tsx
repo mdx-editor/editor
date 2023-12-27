@@ -2,18 +2,20 @@ import React from 'react'
 import {
   DiffSourceToggleWrapper,
   MDXEditor,
-  corePluginHooks,
   diffSourcePlugin,
   headingsPlugin,
   toolbarPlugin,
-  $createGenericHTMLNode
+  $createGenericHTMLNode,
+  activeEditor$,
+  currentSelection$
 } from '../'
 import { $patchStyleText } from '@lexical/selection'
 import { $getRoot, $getSelection, $isRangeSelection, $isTextNode, ElementNode, LexicalNode } from 'lexical'
-import { $isGenericHTMLNode } from '@/plugins/core/GenericHTMLNode'
-import { GenericHTMLNode } from '@/plugins/core/GenericHTMLNode'
+import { $isGenericHTMLNode } from '../plugins/core/GenericHTMLNode'
+import { GenericHTMLNode } from '../plugins/core/GenericHTMLNode'
 import { MdxJsxAttribute } from 'mdast-util-mdx'
 import { $getNearestNodeOfType } from '@lexical/utils'
+import { useCellValues } from '@mdxeditor/gurx'
 
 const markdownWithSpan = `
   # Hello World
@@ -46,7 +48,7 @@ export function SpanWithColor() {
 }
 
 const HTMLToolbarComponent = () => {
-  const [currentSelection, activeEditor] = corePluginHooks.useEmitterValues('currentSelection', 'activeEditor')
+  const [currentSelection, activeEditor] = useCellValues(currentSelection$, activeEditor$)
 
   const currentStyle = React.useMemo(() => {
     return (

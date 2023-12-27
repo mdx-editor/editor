@@ -1,14 +1,16 @@
+import { applyFormat$, currentFormat$, iconComponentFor$ } from '../../core'
+import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 import React from 'react'
-import { corePluginHooks } from '../../core'
 import { IS_BOLD, IS_ITALIC, IS_UNDERLINE } from '../../../FormatConstants'
 import { MultipleChoiceToggleGroup } from '.././primitives/toolbar'
 
 /**
  * A toolbar component that lets the user toggle bold, italic and underline formatting.
+ * @group Toolbar Components
  */
 export const BoldItalicUnderlineToggles: React.FC = () => {
-  const [currentFormat] = corePluginHooks.useEmitterValues('currentFormat')
-  const applyFormat = corePluginHooks.usePublisher('applyFormat')
+  const [currentFormat, iconComponentFor] = useCellValues(currentFormat$, iconComponentFor$)
+  const applyFormat = usePublisher(applyFormat$)
 
   const boldIsOn = (currentFormat & IS_BOLD) !== 0
   const italicIsOn = (currentFormat & IS_ITALIC) !== 0
@@ -17,7 +19,6 @@ export const BoldItalicUnderlineToggles: React.FC = () => {
   const boldTitle = boldIsOn ? 'Remove bold' : 'Bold'
   const italicTitle = italicIsOn ? 'Remove italic' : 'Italic'
   const underlineTitle = underlineIsOn ? 'Remove underline' : 'Underline'
-  const [iconComponentFor] = corePluginHooks.useEmitterValues('iconComponentFor')
 
   return (
     <MultipleChoiceToggleGroup

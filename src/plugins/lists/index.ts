@@ -1,5 +1,17 @@
-import { realmPlugin, system } from '../../gurx'
-import { coreSystem } from '../core'
+import {
+  activeEditor$,
+  addActivePlugin$,
+  addComposerChild$,
+  addExportVisitor$,
+  addImportVisitor$,
+  addLexicalNode$,
+  addMdastExtension$,
+  addNestedEditorChild$,
+  addSyntaxExtension$,
+  addToMarkdownExtension$,
+  currentSelection$,
+  rootEditor$
+} from '../core'
 import { MdastListVisitor } from './MdastListVisitor'
 import { MdastListItemVisitor } from './MdastListItemVisitor'
 import { LexicalListVisitor } from './LexicalListVisitor'
@@ -24,6 +36,8 @@ import { $findMatchingParent, $getNearestNodeOfType } from '@lexical/utils'
 
 import { gfmTaskListItem } from 'micromark-extension-gfm-task-list-item'
 import { gfmTaskListItemFromMarkdown, gfmTaskListItemToMarkdown } from 'mdast-util-gfm-task-list-item'
+import { Cell, Signal, withLatestFrom } from '@mdxeditor/gurx'
+import { realmPlugin } from '../../RealmWithPlugins'
 
 const ListTypeCommandMap = new Map<ListType | '', LexicalCommand<void>>([
   ['number', INSERT_ORDERED_LIST_COMMAND],
@@ -32,81 +46,73 @@ const ListTypeCommandMap = new Map<ListType | '', LexicalCommand<void>>([
   ['', REMOVE_LIST_COMMAND]
 ])
 
-/** @internal */
-export const listsSystem = system(
-  (r, [{ activeEditor, currentSelection }]) => {
-    const currentListType = r.node<ListType | ''>('')
-    const applyListType = r.node<ListType | ''>()
+/**
+ * The current list type in the editor.
+ * @group Lists
+ */
+export const currentListType$ = Cell<ListType | ''>('', (r) => {
+  r.sub(r.pipe(currentSelection$, withLatestFrom(activeEditor$)), ([selection, theEditor]) => {
+    if (!selection || !theEditor) {
+      return
+    }
 
-    r.sub(r.pipe(applyListType, r.o.withLatestFrom(activeEditor)), ([listType, theEditor]) => {
-      theEditor?.dispatchCommand(ListTypeCommandMap.get(listType)!, undefined)
+    const anchorNode = selection.anchor.getNode()
+    let element =
+      anchorNode.getKey() === 'root'
+        ? anchorNode
+        : $findMatchingParent(anchorNode, (e) => {
+            const parent = e.getParent()
+            return parent !== null && $isRootOrShadowRoot(parent)
+          })
+
+    if (element === null) {
+      element = anchorNode.getTopLevelElementOrThrow()
+    }
+
+    const elementKey = element.getKey()
+    const elementDOM = theEditor.getElementByKey(elementKey)
+
+    if (elementDOM !== null) {
+      if ($isListNode(element)) {
+        const parentList = $getNearestNodeOfType<ListNode>(anchorNode, ListNode)
+        const type = parentList ? parentList.getListType() : element.getListType()
+        r.pub(currentListType$, type)
+      } else {
+        r.pub(currentListType$, '')
+      }
+    }
+  })
+})
+
+/**
+ * Converts the current selection to the specified list type.
+ * @group Lists
+ */
+export const applyListType$ = Signal<ListType | ''>((r) => {
+  r.sub(r.pipe(applyListType$, withLatestFrom(activeEditor$)), ([listType, theEditor]) => {
+    theEditor?.dispatchCommand(ListTypeCommandMap.get(listType)!, undefined)
+  })
+})
+
+/**
+ * A plugin that adds support for markdown lists.
+ * @group Lists
+ */
+export const listsPlugin = realmPlugin({
+  init(realm) {
+    realm.getValue(rootEditor$)?.registerCommand(INDENT_CONTENT_COMMAND, () => !isIndentPermitted(7), COMMAND_PRIORITY_CRITICAL)
+
+    realm.pubIn({
+      [addActivePlugin$]: 'lists',
+      [addMdastExtension$]: gfmTaskListItemFromMarkdown(),
+      [addSyntaxExtension$]: gfmTaskListItem(),
+      [addImportVisitor$]: [MdastListVisitor, MdastListItemVisitor],
+      [addLexicalNode$]: [ListItemNode, ListNode],
+      [addExportVisitor$]: [LexicalListVisitor, LexicalListItemVisitor],
+      [addToMarkdownExtension$]: gfmTaskListItemToMarkdown(),
+      [addComposerChild$]: [TabIndentationPlugin, ListPlugin, CheckListPlugin],
+      [addNestedEditorChild$]: [TabIndentationPlugin, ListPlugin, CheckListPlugin]
     })
-
-    r.sub(r.pipe(currentSelection, r.o.withLatestFrom(activeEditor)), ([selection, theEditor]) => {
-      if (!selection || !theEditor) {
-        return
-      }
-
-      const anchorNode = selection.anchor.getNode()
-      let element =
-        anchorNode.getKey() === 'root'
-          ? anchorNode
-          : $findMatchingParent(anchorNode, (e) => {
-              const parent = e.getParent()
-              return parent !== null && $isRootOrShadowRoot(parent)
-            })
-
-      if (element === null) {
-        element = anchorNode.getTopLevelElementOrThrow()
-      }
-
-      const elementKey = element.getKey()
-      const elementDOM = theEditor.getElementByKey(elementKey)
-
-      if (elementDOM !== null) {
-        if ($isListNode(element)) {
-          const parentList = $getNearestNodeOfType<ListNode>(anchorNode, ListNode)
-          const type = parentList ? parentList.getListType() : element.getListType()
-          r.pub(currentListType, type)
-        } else {
-          r.pub(currentListType, null)
-        }
-      }
-    })
-
-    return { currentListType, applyListType }
-  },
-  [coreSystem]
-)
-
-export const [
-  /** @internal */
-  listsPlugin,
-  /** @internal */
-  listsPluginHooks
-] = realmPlugin({
-  id: 'lists',
-  systemSpec: listsSystem,
-
-  init: (realm) => {
-    realm.pubKey('addMdastExtension', gfmTaskListItemFromMarkdown)
-    realm.pubKey('addSyntaxExtension', gfmTaskListItem)
-    realm.pubKey('addImportVisitor', MdastListVisitor)
-    realm.pubKey('addImportVisitor', MdastListItemVisitor)
-    realm.pubKey('addLexicalNode', ListItemNode)
-    realm.pubKey('addLexicalNode', ListNode)
-    realm.pubKey('addExportVisitor', LexicalListVisitor)
-    realm.pubKey('addExportVisitor', LexicalListItemVisitor)
-    realm.pubKey('addToMarkdownExtension', gfmTaskListItemToMarkdown)
-
-    realm.getKeyValue('rootEditor')?.registerCommand(INDENT_CONTENT_COMMAND, () => !isIndentPermitted(7), COMMAND_PRIORITY_CRITICAL)
-    realm.pubKey('addComposerChild', TabIndentationPlugin)
-    realm.pubKey('addComposerChild', ListPlugin)
-    realm.pubKey('addComposerChild', CheckListPlugin)
-
-    realm.pubKey('addNestedEditorChild', TabIndentationPlugin)
-    realm.pubKey('addNestedEditorChild', ListPlugin)
-    realm.pubKey('addNestedEditorChild', CheckListPlugin)
   }
 })
 

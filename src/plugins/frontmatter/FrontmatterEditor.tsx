@@ -3,9 +3,10 @@ import classNames from 'classnames'
 import YamlParser from 'js-yaml'
 import React from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
-import { frontmatterPluginHooks } from '.'
+import { frontmatterDialogOpen$, removeFrontmatter$ } from '.'
 import styles from '../../styles/ui.module.css'
-import { corePluginHooks } from '../core'
+import { editorRootElementRef$, iconComponentFor$, readOnly$ } from '../core'
+import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 
 type YamlConfig = { key: string; value: string }[]
 
@@ -15,14 +16,14 @@ export interface FrontmatterEditorProps {
 }
 
 export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) => {
-  const [readOnly, editorRootElementRef, iconComponentFor] = corePluginHooks.useEmitterValues(
-    'readOnly',
-    'editorRootElementRef',
-    'iconComponentFor'
+  const [readOnly, editorRootElementRef, iconComponentFor, frontmatterDialogOpen] = useCellValues(
+    readOnly$,
+    editorRootElementRef$,
+    iconComponentFor$,
+    frontmatterDialogOpen$
   )
-  const [frontmatterDialogOpen] = frontmatterPluginHooks.useEmitterValues('frontmatterDialogOpen')
-  const setFrontmatterDialogOpen = frontmatterPluginHooks.usePublisher('frontmatterDialogOpen')
-  const removeFrontmatter = frontmatterPluginHooks.usePublisher('removeFrontmatter')
+  const setFrontmatterDialogOpen = usePublisher(frontmatterDialogOpen$)
+  const removeFrontmatter = usePublisher(removeFrontmatter$)
   const yamlConfig = React.useMemo<YamlConfig>(() => {
     if (!yaml) {
       return []
@@ -44,16 +45,19 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
   const onSubmit = React.useCallback(
     ({ yamlConfig }: { yamlConfig: YamlConfig }) => {
       if (yamlConfig.length === 0) {
-        removeFrontmatter(true)
+        removeFrontmatter()
         setFrontmatterDialogOpen(false)
         return
       }
-      const yaml = yamlConfig.reduce((acc, { key, value }) => {
-        if (key && value) {
-          acc[key] = value
-        }
-        return acc
-      }, {} as Record<string, string>)
+      const yaml = yamlConfig.reduce(
+        (acc, { key, value }) => {
+          if (key && value) {
+            acc[key] = value
+          }
+          return acc
+        },
+        {} as Record<string, string>
+      )
       onChange(YamlParser.dump(yaml).trim())
       setFrontmatterDialogOpen(false)
     },

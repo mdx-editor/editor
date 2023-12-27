@@ -6,6 +6,7 @@ import { TableEditor } from './TableEditor'
 
 /**
  * A serialized representation of a {@link TableNode}.
+ * @group Table
  */
 export type SerializedTableNode = Spread<
   {
@@ -31,25 +32,33 @@ function coordinatesEmitter() {
 }
 
 /**
- * A lexical node that represents a table, with features specific to the markdown tables.
+ * A Lexical node that represents a markdown table.
  * Use {@link "$createTableNode"} to construct one.
+ * @group Table
  */
 export class TableNode extends DecoratorNode<JSX.Element> {
+  /** @internal */
   __mdastNode: Mdast.Table
+
+  /** @internal */
   focusEmitter = coordinatesEmitter()
 
+  /** @internal */
   static getType(): string {
     return 'table'
   }
 
+  /** @internal */
   static clone(node: TableNode): TableNode {
     return new TableNode(structuredClone(node.__mdastNode), node.__key)
   }
 
+  /** @internal */
   static importJSON(serializedNode: SerializedTableNode): TableNode {
     return $createTableNode(serializedNode.mdastNode)
   }
 
+  /** @internal */
   exportJSON(): SerializedTableNode {
     return {
       mdastNode: structuredClone(this.__mdastNode),
@@ -58,31 +67,47 @@ export class TableNode extends DecoratorNode<JSX.Element> {
     }
   }
 
+  /**
+   * Returns the mdast node that this node is constructed from.
+   */
   getMdastNode(): Mdast.Table {
     return this.__mdastNode
   }
 
+  /**
+   * Returns the number of rows in the table.
+   */
   getRowCount(): number {
     return this.__mdastNode.children.length
   }
 
+  /**
+   * Returns the number of columns in the table.
+   */
   getColCount(): number {
     return this.__mdastNode.children[0]?.children.length || 0
   }
 
+  /**
+   * Constructs a new {@link TableNode} with the specified MDAST table node as the object to edit.
+   * See {@link https://github.com/micromark/micromark-extension-gfm-table | micromark/micromark-extension-gfm-table} for more information on the MDAST table node.
+   */
   constructor(mdastNode?: Mdast.Table, key?: NodeKey) {
     super(key)
     this.__mdastNode = mdastNode || { type: 'table', children: [] }
   }
 
+  /** @internal */
   createDOM(): HTMLElement {
     return document.createElement('div')
   }
 
+  /** @internal */
   updateDOM(): false {
     return false
   }
 
+  /** @internal */
   updateCellContents(colIndex: number, rowIndex: number, children: Mdast.PhrasingContent[]): void {
     const self = this.getWritable()
     const table = self.__mdastNode
@@ -162,14 +187,20 @@ export class TableNode extends DecoratorNode<JSX.Element> {
     table.align[colIndex] = align
   }
 
+  /** @internal */
   decorate(parentEditor: LexicalEditor): JSX.Element {
     return <TableEditor lexicalTable={this} mdastNode={this.__mdastNode} parentEditor={parentEditor} />
   }
 
+  /**
+   * Focuses the table cell at the specified coordinates.
+   * Pass `undefined` to remove the focus.
+   */
   select(coords?: [colIndex: number, rowIndex: number]): void {
     this.focusEmitter.publish(coords || [0, 0])
   }
 
+  /** @internal */
   isInline(): false {
     return false
   }
@@ -177,14 +208,16 @@ export class TableNode extends DecoratorNode<JSX.Element> {
 
 /**
  * Retruns true if the given node is a {@link TableNode}.
+ * @group Table
  */
 export function $isTableNode(node: LexicalNode | null | undefined): node is TableNode {
   return node instanceof TableNode
 }
 
 /**
- * Creates a {@link TableNode}
+ * Creates a {@link TableNode}. Use this instead of the constructor to follow the Lexical conventions.
  * @param mdastNode - The mdast node to create the {@link TableNode} from.
+ * @group Table
  */
 export function $createTableNode(mdastNode: Mdast.Table): TableNode {
   return new TableNode(mdastNode)

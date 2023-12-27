@@ -25,6 +25,7 @@ function convertImageElement(domNode: Node): null | DOMConversionOutput {
 
 /**
  * A serialized representation of an {@link ImageNode}.
+ * @group Image
  */
 export type SerializedImageNode = Spread<
   {
@@ -41,22 +42,31 @@ export type SerializedImageNode = Spread<
 
 /**
  * A lexical node that represents an image. Use {@link "$createImageNode"} to construct one.
+ * @group Image
  */
 export class ImageNode extends DecoratorNode<JSX.Element> {
+  /** @internal */
   __src: string
+  /** @internal */
   __altText: string
+  /** @internal */
   __title: string | undefined
+  /** @internal */
   __width: 'inherit' | number
+  /** @internal */
   __height: 'inherit' | number
 
+  /** @internal */
   static getType(): string {
     return 'image'
   }
 
+  /** @internal */
   static clone(node: ImageNode): ImageNode {
     return new ImageNode(node.__src, node.__altText, node.__title, node.__width, node.__height, node.__key)
   }
 
+  /** @internal */
   static importJSON(serializedNode: SerializedImageNode): ImageNode {
     const { altText, title, src, width, height } = serializedNode
     const node = $createImageNode({
@@ -69,6 +79,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     return node
   }
 
+  /** @internal */
   exportDOM(): DOMExportOutput {
     const element = document.createElement('img')
     element.setAttribute('src', this.__src)
@@ -85,6 +96,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     return { element }
   }
 
+  /** @internal */
   static importDOM(): DOMConversionMap | null {
     return {
       img: () => ({
@@ -94,6 +106,10 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     }
   }
 
+  /**
+   * Constructs a new {@link ImageNode} with the specified image parameters.
+   * Use {@link $createImageNode} to construct one.
+   */
   constructor(
     src: string,
     altText: string,
@@ -110,6 +126,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     this.__height = height || 'inherit'
   }
 
+  /** @internal */
   exportJSON(): SerializedImageNode {
     return {
       altText: this.getAltText(),
@@ -122,12 +139,16 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     }
   }
 
+  /**
+   * Sets the image dimensions
+   */
   setWidthAndHeight(width: 'inherit' | number, height: 'inherit' | number): void {
     const writable = this.getWritable()
     writable.__width = width
     writable.__height = height
   }
 
+  /** @internal */
   createDOM(config: EditorConfig): HTMLElement {
     const span = document.createElement('span')
     const theme = config.theme
@@ -138,6 +159,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     return span
   }
 
+  /** @internal */
   updateDOM(): false {
     return false
   }
@@ -162,10 +184,6 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     return this.__width
   }
 
-  hasExplicitDimensions(): boolean {
-    return this.__width !== 'inherit' || this.__height !== 'inherit'
-  }
-
   setTitle(title: string | undefined): void {
     this.getWritable().__title = title
   }
@@ -178,6 +196,12 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     this.getWritable().__altText = altText ?? ''
   }
 
+  /** @internal */
+  hasExplicitDimensions(): boolean {
+    return this.__width !== 'inherit' || this.__height !== 'inherit'
+  }
+
+  /** @internal */
   decorate(_parentEditor: LexicalEditor): JSX.Element {
     return (
       <ImageEditor
@@ -193,9 +217,10 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
 }
 
 /**
- * The payload to create an {@link ImageNode}.
+ * The parameters used to create an {@link ImageNode} through {@link $createImageNode}.
+ * @group Image
  */
-export interface CreateImageNodeOptions {
+export interface CreateImageNodeParameters {
   altText: string
   width?: number
   height?: number
@@ -206,15 +231,17 @@ export interface CreateImageNodeOptions {
 
 /**
  * Creates an {@link ImageNode}.
- * @param options - The payload to create an image. The keys map to the img tag attributes.
+ * @param params - The image attributes.
+ * @group Image
  */
-export function $createImageNode(options: CreateImageNodeOptions): ImageNode {
-  const { altText, title, src, key, width, height } = options
+export function $createImageNode(params: CreateImageNodeParameters): ImageNode {
+  const { altText, title, src, key, width, height } = params
   return new ImageNode(src, altText, title, width, height, key)
 }
 
 /**
  * Retruns true if the node is an {@link ImageNode}.
+ * @group Image
  */
 export function $isImageNode(node: LexicalNode | null | undefined): node is ImageNode {
   return node instanceof ImageNode

@@ -2,7 +2,8 @@ import { useCombobox } from 'downshift'
 import React from 'react'
 import { Control, UseFormSetValue, Controller, UseFormRegister } from 'react-hook-form'
 import styles from '../../../styles/ui.module.css'
-import { corePluginHooks } from '..'
+import { iconComponentFor$ } from '..'
+import { useCellValue } from '@mdxeditor/gurx'
 
 const MAX_SUGGESTIONS = 20
 
@@ -35,7 +36,7 @@ export const DownshiftAutoCompleteWithSuggestions: React.FC<DownshiftAutoComplet
   setValue
 }) => {
   const [items, setItems] = React.useState(suggestions.slice(0, MAX_SUGGESTIONS))
-  const [iconComponentFor] = corePluginHooks.useEmitterValues('iconComponentFor')
+  const iconComponentFor = useCellValue(iconComponentFor$)
 
   const enableAutoComplete = suggestions.length > 0
 

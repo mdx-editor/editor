@@ -4,7 +4,8 @@ import { CodeBlockEditorProps } from '../codeblock'
 import { useCodeMirrorRef } from './useCodeMirrorRef'
 import { SandpackCodeEditor, SandpackLayout, SandpackPreview, SandpackProvider, useSandpack } from '@codesandbox/sandpack-react'
 import { useCodeBlockEditorContext } from '../codeblock/CodeBlockNode'
-import { corePluginHooks } from '../core'
+import { readOnly$ } from '../core'
+import { useCellValue } from '@mdxeditor/gurx'
 
 interface CodeUpdateEmitterProps {
   snippetFileName: string
@@ -23,7 +24,7 @@ export interface SandpackEditorProps extends CodeBlockEditorProps {
 
 export const SandpackEditor = ({ nodeKey, code, focusEmitter, preset }: SandpackEditorProps) => {
   const codeMirrorRef = useCodeMirrorRef(nodeKey, 'sandpack', 'jsx', focusEmitter)
-  const [readOnly] = corePluginHooks.useEmitterValues('readOnly')
+  const readOnly = useCellValue(readOnly$)
   const { setCode } = useCodeBlockEditorContext()
 
   return (

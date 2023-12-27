@@ -6,13 +6,12 @@ position: 98
 
 # HTML Support
 
-Markdown documents can occasionally include additional HTML elements. Out of the box, MDXEditor converts those into 
-generic HTML nodes, which extend [Lexical's Element nodes](https://lexical.dev/docs/concepts/nodes#elementnode). This allows the user to edit the HTML content (i.e. the nested markdown inside those elements). 
+Markdown documents can occasionally include additional HTML elements. Out of the box, MDXEditor converts those into
+generic HTML nodes, which extend [Lexical's Element nodes](https://lexical.dev/docs/concepts/nodes#elementnode). This allows the user to edit the HTML content (i.e. the nested markdown inside those elements).
 
-**Note:** while using HTML can be tempting (and easy when it comes to parsing/rendering afterwards), it goes against the principles of markdown being human-readable, limited by intention format. If you need to extend the tooling available, it's better to consider directives and custom JSX components instead.
+**Note:** while using HTML can be tempting (and easy when it comes to parsing/rendering afterward), it goes against the principles of markdown being human-readable, limited by intention format. If you need to extend the tooling available, it's better to consider directives and custom JSX components instead.
 
-Out of the box, the editor does not include UI that allows the user to add, remove or configure the HTML elements' properties. You can, however use the Lexical API to build toolbar components that do so. Below is a simple example of a toolbar component that lets the user change the CSS class of the element under the cursor. You can replace the input with a dropdown or an UI of your choice. 
-
+Out of the box, the editor does not include a UI that allows the user to add, remove, or configure the HTML elements' properties. You can, however, use the Lexical API to build toolbar components that do so. Below is a simple example of a toolbar component that lets the user change the CSS class of the element under the cursor. You can replace the input with a dropdown or a UI of your choice.
 
 ```tsx
 const HTMLToolbarComponent = () => {
@@ -56,4 +55,3 @@ function getCssClass(node: GenericHTMLNode | null) {
   return (node?.getAttributes().find((attr) => attr.name === 'class')?.value as string) ?? ''
 }
 ```
-

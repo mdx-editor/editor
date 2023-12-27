@@ -1,0 +1,57 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": [
+    "./src/index.ts",
+  ],
+  "out": "docs/api",
+  "plugin": [
+    "typedoc-plugin-markdown"
+  ],
+  "watch": false,
+  "excludeExternals": true,
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "readme": "none",
+  "categorizeByGroup": true,
+  "disableSources": true,
+  "cleanOutputDir": true,
+  "navigation": {
+    "includeGroups": true,
+    "includeCategories": true
+  },
+  "validation": {
+    "notExported": true,
+    "invalidLink": true,
+    "notDocumented": false
+  },
+  "allReflectionsHaveOwnDocument": true,
+  "hideBreadcrumbs": true,
+  "groupOrder": [
+    "MDXEditor",
+    "Headings",
+    "Quote",
+    "Links",
+    "Link Dialog",
+    "Lists",
+    "Image",
+    "Table",
+    "Thematic Break",
+    "Toolbar",
+    "Toolbar Components",
+    "Toolbar Primitives",
+    "Code Block",
+    "CodeMirror",
+    "Sandpack",
+    "Diff/Source",
+    "Directive",
+    "HTML",
+    "JSX",
+    "Frontmatter",
+    "Markdown Shortcuts",
+    "Markdown Processing",
+    "Core",
+    "Custom Editor Primitives",
+    "Utils",
+    "*"
+  ]
+}

@@ -10,16 +10,25 @@ import {
   Spread
 } from 'lexical'
 import { MdxJsxAttribute } from 'mdast-util-mdx-jsx'
-import { MDX_NODE_TYPES, htmlTags } from './MdastHTMLNode'
+import { MdxNodeType, htmlTags } from './MdastHTMLNode'
 
+/**
+ * All recognized HTML tags.
+ * @group HTML
+ */
 export type KnownHTMLTagType = (typeof htmlTags)[number]
 
-const TYPE_NAME = 'generic-html' as const
+/** @internal */
+export const TYPE_NAME = 'generic-html' as const
 
+/**
+ * A serialized representation of a {@link GenericHTMLNode}.
+ * @group HTML
+ */
 export type SerializedGenericHTMLNode = Spread<
   {
     tag: KnownHTMLTagType
-    type: typeof TYPE_NAME
+    type: 'generic-html'
     mdxType: MdxNodeType
     attributes: MdxJsxAttribute[]
     version: 1
@@ -27,22 +36,32 @@ export type SerializedGenericHTMLNode = Spread<
   SerializedElementNode
 >
 
-type MdxNodeType = (typeof MDX_NODE_TYPES)[number]
-
+/**
+ * A Lexical node that represents a generic HTML element. Use {@link $createGenericHTMLNode} to construct one.
+ * The generic HTML node is used as a "fallback" for HTML elements that are not explicitly supported by the editor.
+ * @group HTML
+ */
 export class GenericHTMLNode extends ElementNode {
   /** @internal */
   __tag: KnownHTMLTagType
+  /** @internal */
   __nodeType: MdxNodeType
+  /** @internal */
   __attributes: MdxJsxAttribute[]
 
+  /** @internal */
   static getType(): string {
     return TYPE_NAME
   }
 
+  /** @internal */
   static clone(node: GenericHTMLNode): GenericHTMLNode {
     return new GenericHTMLNode(node.__tag, node.__nodeType, node.__attributes, node.__key)
   }
 
+  /**
+   * Constructs a new {@link GenericHTMLNode} with the specified MDAST HTML node as the object to edit.
+   */
   constructor(tag: KnownHTMLTagType, type: MdxNodeType, attributes: MdxJsxAttribute[], key?: NodeKey) {
     super(key)
     this.__tag = tag
@@ -163,10 +182,18 @@ export class GenericHTMLNode extends ElementNode {
   }
 }
 
+/**
+ * Creates a new {@link GenericHTMLNode} with the specified MDAST HTML node as the object to edit.
+ * @group HTML
+ */
 export function $createGenericHTMLNode(tag: KnownHTMLTagType, type: MdxNodeType, attributes: MdxJsxAttribute[]): GenericHTMLNode {
   return $applyNodeReplacement(new GenericHTMLNode(tag, type, attributes))
 }
 
+/**
+ * Determines if the specified node is a {@link GenericHTMLNode}.
+ * @group HTML
+ */
 export function $isGenericHTMLNode(node: LexicalNode | null | undefined): node is GenericHTMLNode {
   return node instanceof GenericHTMLNode
 }

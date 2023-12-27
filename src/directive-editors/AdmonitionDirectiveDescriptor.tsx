@@ -20,6 +20,7 @@ export type AdmonitionKind = (typeof ADMONITION_TYPES)[number]
  *   directivesPlugin({ directiveDescriptors: [ AdmonitionDirectiveDescriptor] }),
  *  ]} />
  * ```
+ * @group Directive
  */
 export const AdmonitionDirectiveDescriptor: DirectiveDescriptor = {
   name: 'admonition',

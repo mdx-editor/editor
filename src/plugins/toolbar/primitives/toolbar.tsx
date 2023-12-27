@@ -5,7 +5,8 @@ import React from 'react'
 import styles from '../../../styles/ui.module.css'
 import { TooltipWrap } from './TooltipWrap'
 import { SelectButtonTrigger, SelectContent, SelectItem } from './select'
-import { EditorInFocus, corePluginHooks } from '../../core'
+import { EditorInFocus, editorInFocus$, readOnly$ } from '../../core'
+import { useCellValue } from '@mdxeditor/gurx'
 
 //
 // function decorate<P extends { className?: string | undefined }>(Component: React.ComponentType<P>, decoratedProps: P) {
@@ -52,11 +53,13 @@ export const Root: React.FC<{ readOnly: boolean; children: React.ReactNode }> = 
 
 /**
  * A toolbar button primitive.
+ * @group Toolbar Primitives
  */
 export const Button = decorateWithRef(RadixToolbar.Button, { className: styles.toolbarButton, 'data-toolbar-item': true })
 
 /**
- * A toolbar button with a custom toolbar primitive.
+ * A toolbar button with tooltip primitive.
+ * @group Toolbar Primitives
  */
 export const ButtonWithTooltip = addTooltipToChildren(Button)
 
@@ -100,6 +103,7 @@ export const ToggleSingleGroupWithItem = React.forwardRef<
 
 /**
  * A toolbar primitive that allows you to build an UI with multiple non-exclusive toggle groups, like the bold/italic/underline toggle.
+ * @group Toolbar Primitives
  */
 export const MultipleChoiceToggleGroup: React.FC<{
   items: {
@@ -128,9 +132,15 @@ export const MultipleChoiceToggleGroup: React.FC<{
 }
 
 /**
- * The properties of the {@link SingleChoiceToggleGroup} React component.
+ * A toolbar primitive that allows you to build an UI with multiple exclusive toggle groups, like the list type toggle.
+ * @group Toolbar Primitives
  */
-export interface SingleChoiceToggleGroupProps<T extends string> {
+export const SingleChoiceToggleGroup = <T extends string>({
+  value,
+  onChange,
+  className,
+  items
+}: {
   items: {
     title: string
     value: T
@@ -139,12 +149,7 @@ export interface SingleChoiceToggleGroupProps<T extends string> {
   onChange: (value: T) => void
   value: T
   className?: string
-}
-
-/**
- * A toolbar primitive that allows you to build an UI with multiple exclusive toggle groups, like the list type toggle.
- */
-export const SingleChoiceToggleGroup = <T extends string>({ value, onChange, className, items }: SingleChoiceToggleGroupProps<T>) => {
+}) => {
   return (
     <div className={styles.toolbarGroupOfGroups}>
       <RadixToolbar.ToggleGroup
@@ -165,9 +170,10 @@ export const SingleChoiceToggleGroup = <T extends string>({ value, onChange, cla
 }
 
 /**
- * The properties of the {@link ButtonOrDropdownButton} React component.
+ * Use this primitive to create a toolbar button that can be either a button or a dropdown, depending on the number of items passed.
+ * @group Toolbar Primitives
  */
-export interface ButtonOrDropdownButtonProps<T extends string> {
+export const ButtonOrDropdownButton = <T extends string>(props: {
   /**
    * The contents of the button - usually an icon.
    */
@@ -194,15 +200,8 @@ export interface ButtonOrDropdownButtonProps<T extends string> {
      */
     label: string | JSX.Element
   }[]
-}
-
-/**
- * Use this primitive to create a toolbar button that can be either a button or a dropdown, depending on the number of items passed.
- *
- * @see {@link ButtonOrDropdownButtonProps} for the properties of the React component.
- */
-export const ButtonOrDropdownButton = <T extends string>(props: ButtonOrDropdownButtonProps<T>) => {
-  const [readOnly] = corePluginHooks.useEmitterValues('readOnly')
+}) => {
+  const readOnly = useCellValue(readOnly$)
   return (
     <>
       {props.items.length === 1 ? (
@@ -228,6 +227,7 @@ export const ButtonOrDropdownButton = <T extends string>(props: ButtonOrDropdown
 
 /**
  * An object that describes a possible option to be displayed in the {@link ConditionalContents} component.
+ * @group Toolbar Primitives
  */
 export type ConditionalContentsOption = {
   /**
@@ -242,28 +242,17 @@ export type ConditionalContentsOption = {
 
 /**
  * A default option to be displayed in the {@link ConditionalContents} component if none of the other options match.
+ * @group Toolbar Primitives
  */
-export type FallBackOption = {
+export type FallbackOption = {
   /**
    * The contents to display
    */
   fallback: () => React.ReactNode
 }
 
-function isConditionalContentsOption(option: ConditionalContentsOption | FallBackOption): option is ConditionalContentsOption {
+function isConditionalContentsOption(option: ConditionalContentsOption | FallbackOption): option is ConditionalContentsOption {
   return Object.hasOwn(option, 'when')
-}
-
-/**
- * The properties of the {@link ConditionalContents} React component.
- */
-export interface ConditionalContentsProps {
-  /**
-   * A set of options that define the contents to show based on the editor that is in focus.
-   * Can be either a {@link ConditionalContentsOption} or a {@link FallBackOption}.
-   * See the {@link ConditionalContents} documentation for an example.
-   */
-  options: (ConditionalContentsOption | FallBackOption)[]
 }
 
 /**
@@ -287,9 +276,17 @@ export interface ConditionalContentsProps {
  *      ]}
  *    />
  * ```
+ * @group Toolbar Primitives
  */
-export const ConditionalContents: React.FC<ConditionalContentsProps> = ({ options }) => {
-  const [editorInFocus] = corePluginHooks.useEmitterValues('editorInFocus')
+export const ConditionalContents: React.FC<{
+  /**
+   * A set of options that define the contents to show based on the editor that is in focus.
+   * Can be either a {@link ConditionalContentsOption} or a {@link FallbackOption}.
+   * See the {@link ConditionalContents} documentation for an example.
+   */
+  options: (ConditionalContentsOption | FallbackOption)[]
+}> = ({ options }) => {
+  const editorInFocus = useCellValue(editorInFocus$)
   const contents = React.useMemo(() => {
     const option = options.find((option) => {
       if (isConditionalContentsOption(option)) {
@@ -309,5 +306,6 @@ export const ConditionalContents: React.FC<ConditionalContentsProps> = ({ option
 /**
  * A toolbar primitive that allows you to show a separator between toolbar items.
  * By default, the separator is styled as vertical line.
+ * @group Toolbar Primitives
  */
 export const Separator = RadixToolbar.Separator

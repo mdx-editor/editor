@@ -11,20 +11,24 @@ import { JsxEditorProps } from '../plugins/jsx'
  * A generic editor that can be used as an universal UI for any JSX element.
  * Allows editing of the element content and properties.
  * Use this editor for the {@link JsxComponentDescriptor} Editor option.
+ * @group JSX
  */
 export const GenericJsxEditor: React.FC<JsxEditorProps> = ({ mdastNode, descriptor }) => {
   const updateMdastNode = useMdastNodeUpdater()
 
   const properties = React.useMemo(() => {
-    return descriptor.props.reduce((acc, descriptor) => {
-      const attribute = mdastNode.attributes.find((attr) => (attr as MdxJsxAttribute).name === descriptor.name)
-      if (attribute) {
-        acc[descriptor.name] = attribute.value as string
-      } else {
-        acc[descriptor.name] = ''
-      }
-      return acc
-    }, {} as Record<string, string>)
+    return descriptor.props.reduce(
+      (acc, descriptor) => {
+        const attribute = mdastNode.attributes.find((attr) => (attr as MdxJsxAttribute).name === descriptor.name)
+        if (attribute) {
+          acc[descriptor.name] = attribute.value as string
+        } else {
+          acc[descriptor.name] = ''
+        }
+        return acc
+      },
+      {} as Record<string, string>
+    )
   }, [mdastNode, descriptor])
 
   const onChange = React.useCallback(

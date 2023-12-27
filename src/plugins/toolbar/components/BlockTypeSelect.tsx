@@ -1,20 +1,22 @@
 import { $createHeadingNode, $createQuoteNode } from '@lexical/rich-text'
+import { useCellValue, usePublisher } from '@mdxeditor/gurx'
 import { $createParagraphNode } from 'lexical'
 import React from 'react'
-import { useHasPlugin } from '../../../gurx'
-import { BlockType, corePluginHooks } from '../../core'
+import { BlockType, activePlugins$, convertSelectionToNode$, currentBlockType$ } from '../../core'
+import { allowedHeadingLevels$ } from '../../headings'
 import { Select } from '.././primitives/select'
-import { headingsPluginHooks } from '../../headings'
 
 /**
  * A toolbar component that allows the user to change the block type of the current selection.
  * Supports paragraphs, headings and block quotes.
+ * @group Toolbar Components
  */
 export const BlockTypeSelect = () => {
-  const convertSelectionToNode = corePluginHooks.usePublisher('convertSelectionToNode')
-  const [currentBlockType] = corePluginHooks.useEmitterValues('currentBlockType')
-  const hasQuote = useHasPlugin('quote')
-  const hasHeadings = useHasPlugin('headings')
+  const convertSelectionToNode = usePublisher(convertSelectionToNode$)
+  const currentBlockType = useCellValue(currentBlockType$)
+  const activePlugins = useCellValue(activePlugins$)
+  const hasQuote = activePlugins.includes('quote')
+  const hasHeadings = activePlugins.includes('headings')
 
   if (!hasQuote && !hasHeadings) {
     return null
@@ -26,8 +28,9 @@ export const BlockTypeSelect = () => {
   }
 
   if (hasHeadings) {
-    const [allowedHeadingLevels] = headingsPluginHooks.useEmitterValues('allowedHeadingLevels')
-    items.push(...allowedHeadingLevels.map((n) => ({ label: `Heading ${n}`, value: `h${n}` } as const)))
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const allowedHeadingLevels = useCellValue(allowedHeadingLevels$)
+    items.push(...allowedHeadingLevels.map((n) => ({ label: `Heading ${n}`, value: `h${n}` }) as const))
   }
 
   return (

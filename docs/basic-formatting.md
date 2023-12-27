@@ -6,29 +6,26 @@ position: 0.1
 
 # Basic Formatting
 
-In its bare form, MDXEditor supports only the most basic formatting - **bold**, *italic*, <u>underline</u> and `inline code`. It's enough to write a simple text, but not much more. There are several plugins that allow the users to create a document structure and apply semantic formatting.
+In its bare form, MDXEditor supports only the most basic formatting - **bold**, \_italic, underline, and `inline code``. It's enough to write a simple text, but not much more. Several plugins allow the users to create a document structure and apply semantic formatting.
 
 ## Headings
 
-The Headings plugin enables the usage of markdown headings which translate to `H1` - `H6` in HTML. 
+The Headings plugin enables the usage of markdown headings which translate to `H1` - `H6` in HTML.
 
 ```tsx
-
-import { MDXEditor } from '@mdxeditor/editor/MDXEditor'
-import { headingsPlugin } from '@mdxeditor/editor/plugins/headings'
+import { MDXEditor, headingsPlugin } from '@mdxeditor/editor'
 
 //...
-<MDXEditor markdown='# Hello world' plugins={[headingsPlugin()]} />
+;<MDXEditor markdown="# Hello world" plugins={[headingsPlugin()]} />
 ```
 
 ## Quotes
 
-The Quote plugin enables the usage of quotes which translate to `blockquote` in HTML. 
+The Quote plugin enables the usage of quotes that translate to `blockquote`` in HTML.
 
 ```tsx
 
-import { MDXEditor } from '@mdxeditor/editor/MDXEditor'
-import { quotePlugin } from '@mdxeditor/editor/plugins/quote'
+import { quotePlugin , MDXEditor } from '@mdxeditor/editor'
 
 const markdown = "> This is a quote"
 
@@ -38,12 +35,11 @@ const markdown = "> This is a quote"
 
 ## Lists
 
-The Lists plugin enables the usage of ordered, unordered and check lists, including multiple levels of nesting.
+The Lists plugin enables the usage of ordered, unordered, and checklists, including multiple levels of nesting.
 
 ```tsx
 
-import { MDXEditor } from '@mdxeditor/editor/MDXEditor'
-import { listsPlugin } from '@mdxeditor/editor/plugins/lists'
+import { listsPlugin, MDXEditor } from '@mdxeditor/editor'
 
 const markdown = `
   * Item 1
@@ -64,8 +60,7 @@ const markdown = `
 The Thematic Break plugin enables the usage of thematic breaks which translate to `hr` in HTML.
 
 ```tsx
-import { MDXEditor } from '@mdxeditor/editor/MDXEditor'
-import { thematicBreakPlugin } from '@mdxeditor/editor/plugins/thematic-break'
+import { thematicBreakPlugin, MDXEditor } from '@mdxeditor/editor'
 
 const markdown = `
 Hello
@@ -77,3 +72,4 @@ World
 
 //...
 <MDXEditor markdown={markdown} plugins={[thematicBreakPlugin()]} />
+```

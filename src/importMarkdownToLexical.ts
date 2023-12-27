@@ -8,54 +8,11 @@ import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from './FormatConstants'
 
 /** @internal */
 export type MdastExtensions = Options['mdastExtensions']
-/**
- * A set of actions that can be used to modify the lexical tree while visiting the mdast tree.
- */
-export interface MdastVisitActions {
-  /**
-   * Iterate the children of the node with the lexical node as the parent.
-   */
-  visitChildren(node: Mdast.Parent, lexicalParent: LexicalNode): void
-
-  /**
-   * Add the given node to the lexical tree, and iterate the current mdast node's children with the newly created lexical node as a parent.
-   */
-  addAndStepInto(lexicalNode: LexicalNode): void
-
-  /**
-   * Adds formatting as a context for the current node and its children.
-   * This is necessary due to mdast treating formatting as a node, while lexical considering it an attribute of a node.
-   */
-  addFormatting(format: typeof IS_BOLD | typeof IS_ITALIC | typeof IS_UNDERLINE | typeof IS_CODE, node?: Mdast.Content): void
-
-  /**
-   * Adds formatting as a context for the current node and its children.
-   * This is necessary due to mdast treating formatting as a node, while lexical considering it an attribute of a node.
-   */
-  removeFormatting(format: typeof IS_BOLD | typeof IS_ITALIC | typeof IS_UNDERLINE | typeof IS_CODE, node?: Mdast.Content): void
-  /**
-   * Access the current formatting context.
-   */
-  getParentFormatting(): number
-}
-
-/**
- * Parameters passed to the {@link MdastImportVisitor.visitNode} function.
- * @param mdastNode - The node that is currently being visited.
- * @param lexicalParent - The parent lexical node to which the results of the processing should be added.
- * @param actions - A set of convenience utilities that can be used to add nodes to the lexical tree.
- * @typeParam T - The type of the mdast node that is being visited.
- */
-export interface MdastVisitParams<T extends Mdast.Content> {
-  mdastNode: T
-  mdastParent: Mdast.Parent | null
-  lexicalParent: LexicalNode
-  actions: MdastVisitActions
-}
 
 /**
  * Implement this interface to convert certian mdast nodes into lexical nodes.
  * @typeParam UN - The type of the mdast node that is being visited.
+ * @group Markdown Processing
  */
 export interface MdastImportVisitor<UN extends Mdast.Content> {
   /**
@@ -63,10 +20,50 @@ export interface MdastImportVisitor<UN extends Mdast.Content> {
    * As a convenience, you can also pass a string here, which will be compared to the node's type.
    */
   testNode: ((mdastNode: Mdast.Content | Mdast.Root) => boolean) | string
-  /**
-   * The function that is called when the node is visited. See {@link MdastVisitParams} for details.
-   */
-  visitNode(params: MdastVisitParams<UN>): void
+  visitNode(params: {
+    /**
+     * The node that is currently being visited.
+     */
+    mdastNode: UN
+    /**
+     * The MDAST parent of the node that is currently being visited.
+     */
+    mdastParent: Mdast.Parent | null
+    /**
+     * The parent lexical node to which the results of the processing should be added.
+     */
+    lexicalParent: LexicalNode
+    /**
+     * A set of convenience utilities that can be used to add nodes to the lexical tree.
+     */
+    actions: {
+      /**
+       * Iterate the children of the node with the lexical node as the parent.
+       */
+      visitChildren(node: Mdast.Parent, lexicalParent: LexicalNode): void
+
+      /**
+       * Add the given node to the lexical tree, and iterate the current mdast node's children with the newly created lexical node as a parent.
+       */
+      addAndStepInto(lexicalNode: LexicalNode): void
+
+      /**
+       * Adds formatting as a context for the current node and its children.
+       * This is necessary due to mdast treating formatting as a node, while lexical considering it an attribute of a node.
+       */
+      addFormatting(format: typeof IS_BOLD | typeof IS_ITALIC | typeof IS_UNDERLINE | typeof IS_CODE, node?: Mdast.Content): void
+
+      /**
+       * Removes formatting as a context for the current node and its children.
+       * This is necessary due to mdast treating formatting as a node, while lexical considering it an attribute of a node.
+       */
+      removeFormatting(format: typeof IS_BOLD | typeof IS_ITALIC | typeof IS_UNDERLINE | typeof IS_CODE, node?: Mdast.Content): void
+      /**
+       * Access the current formatting context.
+       */
+      getParentFormatting(): number
+    }
+  }): void
   /**
    * Default 0, optional, sets the priority of the visitor. The higher the number, the earlier it will be called.
    */
@@ -106,6 +103,10 @@ export type MdastExtension = NonNullable<MdastExtensions>[number]
  */
 export type SyntaxExtension = MarkdownParseOptions['syntaxExtensions'][number]
 
+/**
+ * An error that gets thrown when the Markdown parsing fails due to a syntax error.
+ * @group Markdown Processing
+ */
 export class MarkdownParseError extends Error {
   constructor(message: string, cause: unknown) {
     super(message)
@@ -114,6 +115,10 @@ export class MarkdownParseError extends Error {
   }
 }
 
+/**
+ * An error that gets thrown when the Markdown parsing encounters an node that has no corresponding {@link MdastImportVisitor}.
+ * @group Markdown Processing
+ */
 export class UnrecognizedMarkdownConstructError extends Error {
   constructor(message: string) {
     super(message)

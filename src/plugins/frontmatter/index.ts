@@ -1,78 +1,92 @@
-import { realmPlugin, system } from '../../gurx'
-import { coreSystem } from '../core'
-import { frontmatterToMarkdown, frontmatterFromMarkdown } from 'mdast-util-frontmatter'
-import { frontmatter } from 'micromark-extension-frontmatter'
-import { MdastFrontmatterVisitor } from './MdastFrontmatterVisitor'
-import { LexicalFrontmatterVisitor } from './LexicalFrontmatterVisitor'
+import { realmPlugin } from '../../RealmWithPlugins'
+import {
+  addExportVisitor$,
+  addImportVisitor$,
+  addLexicalNode$,
+  addMdastExtension$,
+  addSyntaxExtension$,
+  addToMarkdownExtension$,
+  createRootEditorSubscription$,
+  rootEditor$
+} from '../core'
+import { Action, Cell, withLatestFrom } from '@mdxeditor/gurx'
 import { $getRoot } from 'lexical'
-import { $isFrontmatterNode, $createFrontmatterNode, FrontmatterNode } from './FrontmatterNode'
+import { frontmatterFromMarkdown, frontmatterToMarkdown } from 'mdast-util-frontmatter'
+import { frontmatter } from 'micromark-extension-frontmatter'
+import { $createFrontmatterNode, $isFrontmatterNode, FrontmatterNode } from './FrontmatterNode'
+import { LexicalFrontmatterVisitor } from './LexicalFrontmatterVisitor'
+import { MdastFrontmatterVisitor } from './MdastFrontmatterVisitor'
 
-/** @internal */
-export const frontmatterSystem = system(
-  (r, [{ rootEditor, createRootEditorSubscription }]) => {
-    const insertFrontmatter = r.node<true>()
-    const removeFrontmatter = r.node<true>()
-    const frontmatterDialogOpen = r.node<boolean>(false)
-    const hasFrontmatter = r.node<boolean>(false)
+/**
+ * Whether the frontmatter dialog is open.
+ * @group Frontmatter
+ */
+export const frontmatterDialogOpen$ = Cell(false)
 
-    r.sub(r.pipe(insertFrontmatter, r.o.withLatestFrom(rootEditor)), ([, theEditor]) => {
-      theEditor?.update(() => {
-        const firstItem = $getRoot().getFirstChild()
-        if (!$isFrontmatterNode(firstItem)) {
-          const fmNode = $createFrontmatterNode('"": ""')
-          if (firstItem) {
-            firstItem.insertBefore(fmNode)
-          } else {
-            $getRoot().append(fmNode)
-          }
+/**
+ * Inserts a frontmatter node at the beginning of the markdown document.
+ * @group Frontmatter
+ */
+export const insertFrontmatter$ = Action((r) => {
+  r.sub(r.pipe(insertFrontmatter$, withLatestFrom(rootEditor$)), ([, rootEditor]) => {
+    rootEditor?.update(() => {
+      const firstItem = $getRoot().getFirstChild()
+      if (!$isFrontmatterNode(firstItem)) {
+        const fmNode = $createFrontmatterNode('"": ""')
+        if (firstItem) {
+          firstItem.insertBefore(fmNode)
+        } else {
+          $getRoot().append(fmNode)
         }
-      })
-      r.pub(frontmatterDialogOpen, true)
+      }
     })
+    r.pub(frontmatterDialogOpen$, true)
+  })
+})
 
-    r.sub(r.pipe(removeFrontmatter, r.o.withLatestFrom(rootEditor)), ([, theEditor]) => {
-      theEditor?.update(() => {
-        const firstItem = $getRoot().getFirstChild()
-        if ($isFrontmatterNode(firstItem)) {
-          firstItem.remove()
-        }
-      })
-      r.pub(frontmatterDialogOpen, false)
+/**
+ * Removes the frontmatter node from the markdown document.
+ * @group Frontmatter
+ */
+export const removeFrontmatter$ = Action((r) => {
+  r.sub(r.pipe(removeFrontmatter$, withLatestFrom(rootEditor$)), ([, rootEditor]) => {
+    rootEditor?.update(() => {
+      const firstItem = $getRoot().getFirstChild()
+      if ($isFrontmatterNode(firstItem)) {
+        firstItem.remove()
+      }
     })
+    r.pub(frontmatterDialogOpen$, false)
+  })
+})
 
-    r.pub(createRootEditorSubscription, (rootEditor) => {
-      return rootEditor.registerUpdateListener(({ editorState }) => {
-        editorState.read(() => {
-          r.pub(hasFrontmatter, $isFrontmatterNode($getRoot().getFirstChild()))
-        })
+/**
+ * Whether the markdown document has a frontmatter node.
+ * @group Frontmatter
+ */
+export const hasFrontmatter$ = Cell(false, (r) => {
+  r.pub(createRootEditorSubscription$, (rootEditor) => {
+    return rootEditor.registerUpdateListener(({ editorState }) => {
+      editorState.read(() => {
+        r.pub(hasFrontmatter$, $isFrontmatterNode($getRoot().getFirstChild()))
       })
     })
+  })
+})
 
-    return {
-      insertFrontmatter,
-      removeFrontmatter,
-      hasFrontmatter,
-      frontmatterDialogOpen
-    }
-  },
-  [coreSystem]
-)
-
-export const [
-  /** @internal */
-  frontmatterPlugin,
-  /** @internal */
-  frontmatterPluginHooks
-] = realmPlugin({
-  id: 'frontmatter',
-  systemSpec: frontmatterSystem,
-
+/**
+ * A plugin that adds support for frontmatter.
+ * @group Frontmatter
+ */
+export const frontmatterPlugin = realmPlugin({
   init: (realm) => {
-    realm.pubKey('addMdastExtension', frontmatterFromMarkdown('yaml'))
-    realm.pubKey('addSyntaxExtension', frontmatter())
-    realm.pubKey('addLexicalNode', FrontmatterNode)
-    realm.pubKey('addImportVisitor', MdastFrontmatterVisitor)
-    realm.pubKey('addExportVisitor', LexicalFrontmatterVisitor)
-    realm.pubKey('addToMarkdownExtension', frontmatterToMarkdown('yaml'))
+    realm.pubIn({
+      [addMdastExtension$]: frontmatterFromMarkdown('yaml'),
+      [addSyntaxExtension$]: frontmatter(),
+      [addLexicalNode$]: FrontmatterNode,
+      [addImportVisitor$]: MdastFrontmatterVisitor,
+      [addExportVisitor$]: LexicalFrontmatterVisitor,
+      [addToMarkdownExtension$]: frontmatterToMarkdown('yaml')
+    })
   }
 })

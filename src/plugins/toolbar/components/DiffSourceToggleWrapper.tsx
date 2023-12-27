@@ -1,7 +1,8 @@
+import { iconComponentFor$, viewMode$ } from '../../core'
+import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 import React from 'react'
-import { diffSourcePluginHooks } from '../../diff-source'
-import { SingleChoiceToggleGroup } from '.././primitives/toolbar'
 import styles from '../../../styles/ui.module.css'
+import { SingleChoiceToggleGroup } from '.././primitives/toolbar'
 
 /**
  * A wrapper element for the toolbar contents that lets the user toggle between rich text, diff and source mode.
@@ -16,11 +17,12 @@ import styles from '../../../styles/ui.module.css'
  *    }), diffSourcePlugin()]}
  *  />
  * ```
+ *
+ * @group Toolbar Components
  */
 export const DiffSourceToggleWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [viewMode] = diffSourcePluginHooks.useEmitterValues('viewMode')
-  const changeViewMode = diffSourcePluginHooks.usePublisher('viewMode')
-  const [iconComponentFor] = diffSourcePluginHooks.useEmitterValues('iconComponentFor')
+  const [viewMode, iconComponentFor] = useCellValues(viewMode$, iconComponentFor$)
+  const changeViewMode = usePublisher(viewMode$)
 
   return (
     <>

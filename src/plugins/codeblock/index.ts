@@ -1,15 +1,18 @@
 import { CodeBlockVisitor } from './CodeBlockVisitor'
-import { realmPlugin, system } from '../../gurx'
 import { MdastCodeVisitor } from './MdastCodeVisitor'
-import { coreSystem } from '../core'
+import { Appender, addActivePlugin$, addExportVisitor$, addImportVisitor$, addLexicalNode$, insertDecoratorNode$ } from '../core'
 import { $createCodeBlockNode, CodeBlockNode, CreateCodeBlockNodeOptions } from './CodeBlockNode'
 import { VoidEmitter } from '../../utils/voidEmitter'
+import { Cell, Signal, map, withLatestFrom } from '@mdxeditor/gurx'
+import { realmPlugin } from '../../RealmWithPlugins'
+export * from './CodeBlockNode'
 
 export type { CodeBlockEditorContextValue, CreateCodeBlockNodeOptions } from './CodeBlockNode'
 export { useCodeBlockEditorContext } from './CodeBlockNode'
 
 /**
  * The properties passed to the {@link CodeBlockEditorDescriptor.Editor} component.
+ * @group Code Block
  */
 export interface CodeBlockEditorProps {
   /**
@@ -37,7 +40,8 @@ export interface CodeBlockEditorProps {
 
 /**
  * Implement this interface to create a custom code block editor.
- * Pass the object in the codeBlockPlugin parameters.
+ * Pass the object in the {@link codeBlockPlugin} parameters.
+ * @group Code Block
  */
 export interface CodeBlockEditorDescriptor {
   /**
@@ -58,90 +62,67 @@ export interface CodeBlockEditorDescriptor {
 }
 
 /**
- * @internal
+ * Contains the currently registered code block descriptors.
+ * @group Code Block
  */
-export const codeBlockSystem = system(
-  (r, [{ insertDecoratorNode }]) => {
-    const codeBlockEditorDescriptors = r.node<CodeBlockEditorDescriptor[]>([])
-    const appendCodeBlockEditorDescriptor = r.node<CodeBlockEditorDescriptor>()
-    const insertCodeBlock = r.node<Partial<CreateCodeBlockNodeOptions>>()
-    const defaultCodeBlockLanguage = r.node<string>('')
-
-    r.link(
-      r.pipe(
-        insertCodeBlock,
-        r.o.withLatestFrom(defaultCodeBlockLanguage),
-        r.o.map(
-          ([payload, defaultCodeBlockLanguage]) =>
-            () =>
-              $createCodeBlockNode({ language: defaultCodeBlockLanguage, ...payload })
-        )
-      ),
-      insertDecoratorNode
-    )
-
-    r.link(
-      r.pipe(
-        appendCodeBlockEditorDescriptor,
-        r.o.withLatestFrom(codeBlockEditorDescriptors),
-        r.o.map(([newValue, values]) => {
-          if (values.includes(newValue)) {
-            return values
-          }
-          return [...values, newValue]
-        })
-      ),
-      codeBlockEditorDescriptors
-    )
-
-    return {
-      codeBlockEditorDescriptors,
-      defaultCodeBlockLanguage,
-      appendCodeBlockEditorDescriptor,
-      insertCodeBlock
-    }
-  },
-  [coreSystem]
-)
+export const codeBlockEditorDescriptors$ = Cell<CodeBlockEditorDescriptor[]>([])
 
 /**
- * The parameters passed to the codeBlockPlugin initializer.
+ * Contains the default language to use when creating a new code block if no language is passed.
+ * @group Code Block
  */
-export interface CodeBlockPluginParams {
+export const defaultCodeBlockLanguage$ = Cell<string>('')
+
+/**
+ * A signal that inserts a new code block into the editor with the published options.
+ * @group Code Block
+ */
+export const insertCodeBlock$ = Signal<Partial<CreateCodeBlockNodeOptions>>((r) => {
+  r.link(
+    r.pipe(
+      insertCodeBlock$,
+      withLatestFrom(defaultCodeBlockLanguage$),
+      map(
+        ([payload, defaultCodeBlockLanguage]) =>
+          () =>
+            $createCodeBlockNode({ language: defaultCodeBlockLanguage, ...payload })
+      )
+    ),
+    insertDecoratorNode$
+  )
+})
+
+/**
+ * A signal that appends a code block editor descriptor to the list of descriptors.
+ * @group Code Block
+ */
+export const appendCodeBlockEditorDescriptor$ = Appender(codeBlockEditorDescriptors$)
+
+/**
+ * A plugin that adds support for code blocks and custom code block editors.
+ * @group Code Block
+ */
+export const codeBlockPlugin = realmPlugin<{
   /**
-   * Use this to register custom code block editors.
+   * Pass an array of {@link CodeBlockEditorDescriptor} to register custom code block editors.
    */
   codeBlockEditorDescriptors?: CodeBlockEditorDescriptor[]
   /**
    * The default language to use when creating a new code block if no language is passed.
    */
   defaultCodeBlockLanguage?: string
-}
-
-export const [
-  /**
-   * @internal
-   */
-  codeBlockPlugin,
-
-  /**
-   * @internal
-   */
-  codeBlockPluginHooks
-] = realmPlugin({
-  id: 'codeblock',
-  systemSpec: codeBlockSystem,
-
-  applyParamsToSystem(realm, params?: CodeBlockPluginParams) {
-    realm.pubKey('defaultCodeBlockLanguage', params?.defaultCodeBlockLanguage || '')
+}>({
+  update(realm, params) {
+    realm.pub(defaultCodeBlockLanguage$, params?.defaultCodeBlockLanguage || '')
   },
 
-  init: (realm, params: CodeBlockPluginParams) => {
-    realm.pubKey('codeBlockEditorDescriptors', params?.codeBlockEditorDescriptors || [])
-    // import
-    realm.pubKey('addImportVisitor', MdastCodeVisitor)
-    // export
-    realm.pubKey('addLexicalNode', CodeBlockNode)
-    realm.pubKey('addExportVisitor', CodeBlockVisitor)
+  init(realm, params) {
+    realm.pubIn({
+      [addActivePlugin$]: 'codeblock',
+      [codeBlockEditorDescriptors$]: params?.codeBlockEditorDescriptors || [],
+      [addImportVisitor$]: MdastCodeVisitor,
+      [addLexicalNode$]: CodeBlockNode,
+      [addExportVisitor$]: CodeBlockVisitor
+    })
   }
 })

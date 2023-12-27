@@ -1,8 +1,8 @@
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin.js'
 import React from 'react'
-import { corePluginHooks } from '.'
+import { historyState$ } from '.'
+import { useCellValue } from '@mdxeditor/gurx'
 
 export const SharedHistoryPlugin = () => {
-  const [historyState] = corePluginHooks.useEmitterValues('historyState')
-  return <HistoryPlugin externalHistoryState={historyState} />
+  return <HistoryPlugin externalHistoryState={useCellValue(historyState$)} />
 }

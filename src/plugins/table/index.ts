@@ -1,22 +1,21 @@
+import { realmPlugin } from '../../RealmWithPlugins'
+import { Signal, map } from '@mdxeditor/gurx'
 import * as Mdast from 'mdast'
 import { gfmTableFromMarkdown, gfmTableToMarkdown } from 'mdast-util-gfm-table'
 import { gfmTable } from 'micromark-extension-gfm-table'
-import { realmPlugin, system } from '../../gurx'
-import { coreSystem } from '../core'
+import {
+  addExportVisitor$,
+  addImportVisitor$,
+  addLexicalNode$,
+  addMdastExtension$,
+  addSyntaxExtension$,
+  addToMarkdownExtension$,
+  insertDecoratorNode$
+} from '../core'
 import { LexicalTableVisitor } from './LexicalTableVisitor'
 import { MdastTableVisitor } from './MdastTableVisitor'
 import { $createTableNode, TableNode } from './TableNode'
-
-type InsertTablePayload = {
-  /**
-   * The nunber of rows of the table.
-   */
-  rows?: number
-  /**
-   * The nunber of columns of the table.
-   */
-  columns?: number
-}
+export * from './TableNode'
 
 function seedTable(rows: number = 1, columns: number = 1): Mdast.Table {
   const table: Mdast.Table = {
@@ -44,46 +43,53 @@ function seedTable(rows: number = 1, columns: number = 1): Mdast.Table {
   return table
 }
 
-/** @internal */
-export const tableSystem = system(
-  (r, [{ insertDecoratorNode }]) => {
-    const insertTable = r.node<InsertTablePayload>()
+/**
+ * A signal that will insert a table with the published amount of rows and columns into the active editor.
+ * @example
+ * ```tsx
+ * const insertTable = usePublisher(insertTable$)
+ * // ...
+ * insertTable({ rows: 3, columns: 4 })
+ * ```
+ *
+ * @group Table
+ */
+export const insertTable$ = Signal<{
+  /**
+   * The nunber of rows of the table.
+   */
+  rows?: number
+  /**
+   * The nunber of columns of the table.
+   */
+  columns?: number
+}>((r) => {
+  r.link(
+    r.pipe(
+      insertTable$,
+      map(({ rows, columns }) => {
+        return () => $createTableNode(seedTable(rows, columns))
+      })
+    ),
+    insertDecoratorNode$
+  )
+})
 
-    r.link(
-      r.pipe(
-        insertTable,
-        r.o.map(({ rows, columns }) => {
-          return () => $createTableNode(seedTable(rows, columns))
-        })
-      ),
-      insertDecoratorNode
-    )
-
-    return {
-      insertTable
-    }
-  },
-  [coreSystem]
-)
-
-export const [
-  /** @internal */
-  tablePlugin,
-  /** @internal */
-  tablePluginHooks
-] = realmPlugin({
-  id: 'table',
-  systemSpec: tableSystem,
-
-  init: (realm) => {
-    // import
-    realm.pubKey('addMdastExtension', gfmTableFromMarkdown)
-    realm.pubKey('addSyntaxExtension', gfmTable)
-    realm.pubKey('addImportVisitor', MdastTableVisitor)
-
-    // export
-    realm.pubKey('addLexicalNode', TableNode)
-    realm.pubKey('addExportVisitor', LexicalTableVisitor)
-    realm.pubKey('addToMarkdownExtension', gfmTableToMarkdown({ tableCellPadding: true, tablePipeAlign: true }))
+/**
+ * A plugin that adds support for tables to the editor.
+ * @group Table
+ */
+export const tablePlugin = realmPlugin({
+  init(realm) {
+    realm.pubIn({
+      // import
+      [addMdastExtension$]: gfmTableFromMarkdown(),
+      [addSyntaxExtension$]: gfmTable(),
+      [addImportVisitor$]: MdastTableVisitor,
+      // export
+      [addLexicalNode$]: TableNode,
+      [addExportVisitor$]: LexicalTableVisitor,
+      [addToMarkdownExtension$]: gfmTableToMarkdown({ tableCellPadding: true, tablePipeAlign: true })
+    })
   }
 })

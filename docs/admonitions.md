@@ -6,7 +6,7 @@ position: 0.815
 
 # Admonitions
 
-Admonitions (also known as callouts or tips) are a common way to highlight some text in a markdown document. [Docusaurus uses them extensively](https://docusaurus.io/docs/markdown-features/admonitions) in its documentation, and provides a pre-made styling (icons, colors, etc).
+Admonitions (also known as callouts or tips) are a common way to highlight some text in a markdown document. [Docusaurus uses them extensively](https://docusaurus.io/docs/markdown-features/admonitions) in its documentation and provides pre-made styling (icons, colors, etc).
 
 The admonitions are, in fact, just [conventional container directives](./custom-directive-editors). The MDXEditor package ships a pre-made directive `AdmonitionDirectiveDescriptor` that enables the usage of admonitions in your markdown document.
 
@@ -33,7 +33,6 @@ Some **content** with _Markdown_ syntax.
 Some **content** with _Markdown_ syntax.
 :::
 `
-
 
 export const Admonitions: React.FC = () => {
   return (

@@ -1,9 +1,36 @@
 /**
- * The `@mdxeditor/editor` package exports the MDXEditor React component and a set of plugins and pre-made components for custom editing/editor chrome.
+ * The `@mdxeditor/editor` package exports the MDXEditor React component and a set of plugins and
+ * pre-made components for  editing/editor UI.
+ *
+ * The API Reference is organized around the various features of the editor. Usually, each feature is implemented as a plugin.
+ *
+ * Several note-worthy types of exports are available:
+ *
+ * **dollar-suffixed variables** (e.g. `markdown$`, `applyBlockType$`, etc.). These are [reactive Gurx primitives (Cells and Signals)](https://mdx-editor.github.io/gurx/)
+ * which let you interact with the editor state and extend it with your own custom logic.
+ *
+ * The MDXEditor package re-exports Gurx's React hooks, so you can use them like this for example:
+ * ```tsx
+ * // use the markdown$ cell to get the current markdown value,
+ * // and the rootEditor$ cell to get the Lexical editor instance.
+ * const [markdown, rootEditor] = useCellValues([markdown$, rootEditor$])
+ * // use the applyBlockType$ signal to apply a block type to the current selection
+ * const applyBlockType = usePublisher(applyBlockType$)
+ * ```
+ *
+ * **dollar-prefixed functions** (e.g. `$isCodeBlockNode`, etc.). These are following the conventions of the Lexical API, and are usually usable within the Lexical editor read/update cycles.
+ *
+ * **`plugin` functions** - these are functions that return a plugin object that can be passed to the `plugins` prop of the MDXEditor component. They usually accept a set of configuration options specific to the features they provide.
+ *
+ * **MDAST Nodes, Lexical Nodes and Import/Export visitors** - these are part of the bi-directional Markdown to/from Lexical state conversion API.
+ *
+ * **Toolbar plugins and primitives** - React components that can be used in the Editor toolbar. The primitives are meant to be used to build your own toolbar items.
+ *
  * @packageDocumentation
  */
 import './styles/globals.css'
 
+export * from '@mdxeditor/gurx'
 // editor component
 export * from './MDXEditor'
 
@@ -85,6 +112,5 @@ export * from './utils/lexicalHelpers'
 export * from './utils/makeHslTransparent'
 export * from './utils/uuid4'
 export * from './utils/voidEmitter'
-export * from './utils/whitespaceConversion'
 
-export * from './gurx'
+export * from './RealmWithPlugins'

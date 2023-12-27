@@ -1,23 +1,33 @@
-import { Directive } from 'mdast-util-directive'
-import { realmPlugin, system } from '../../gurx'
-import { coreSystem } from '../core'
+import { realmPlugin } from '../../RealmWithPlugins'
+import {
+  addExportVisitor$,
+  addImportVisitor$,
+  addLexicalNode$,
+  addMdastExtension$,
+  addSyntaxExtension$,
+  addToMarkdownExtension$,
+  insertDecoratorNode$
+} from '../core'
+import { Cell, Signal, map } from '@mdxeditor/gurx'
+import { LexicalEditor } from 'lexical'
+import { Directives, directiveFromMarkdown, directiveToMarkdown } from 'mdast-util-directive'
 import { directive } from 'micromark-extension-directive'
-import { directiveFromMarkdown, directiveToMarkdown } from 'mdast-util-directive'
-import { DirectiveNode, $createDirectiveNode } from './DirectiveNode'
+import { $createDirectiveNode, DirectiveNode } from './DirectiveNode'
 import { DirectiveVisitor } from './DirectiveVisitor'
 import { MdastDirectiveVisitor } from './MdastDirectiveVisitor'
-import { LexicalEditor } from 'lexical'
+export * from './DirectiveNode'
 
 /**
  * Implement this interface to create a custom editor for markdown directives.
  * Pass the object in the `directivesPlugin` parameters.
+ * @group Directive
  */
-export interface DirectiveDescriptor<T extends Directive = Directive> {
+export interface DirectiveDescriptor<T extends Directives = Directives> {
   /**
    * Whether the descriptor's Editor should be used for the given node.
    * @param node - The directive mdast node. You can code your logic against the node's name, type, attributes, children, etc.
    */
-  testNode(node: Directive): boolean
+  testNode(node: Directives): boolean
   /**
    * The name of the descriptor - use this if you're building UI for the user to select a directive.
    */
@@ -42,8 +52,9 @@ export interface DirectiveDescriptor<T extends Directive = Directive> {
 
 /**
  * The properties passed to the {@link DirectiveDescriptor.Editor} component.
+ * @group Directive
  */
-export interface DirectiveEditorProps<T extends Directive = Directive> {
+export interface DirectiveEditorProps<T extends Directives = Directives> {
   /**
    * The mdast directive node.
    */
@@ -62,71 +73,56 @@ export interface DirectiveEditorProps<T extends Directive = Directive> {
   descriptor: DirectiveDescriptor
 }
 
-interface InsertDirectivePayload {
-  type: Directive['type']
-  name: string
-  attributes?: Directive['attributes']
-}
-
-/** @internal */
-export const directivesSystem = system(
-  (r, [{ insertDecoratorNode }]) => {
-    const directiveDescriptors = r.node<DirectiveDescriptor<any>[]>([])
-
-    const insertDirective = r.node<InsertDirectivePayload>()
-
-    r.link(
-      r.pipe(
-        insertDirective,
-        r.o.map((payload) => {
-          return () => $createDirectiveNode({ children: [], ...payload })
-        })
-      ),
-      insertDecoratorNode
-    )
-
-    return {
-      directiveDescriptors,
-      insertDirective
-    }
-  },
-  [coreSystem]
-)
+/**
+ * Contains the currently registered directive descriptors.
+ * @group Directive
+ */
+export const directiveDescriptors$ = Cell<DirectiveDescriptor<any>[]>([])
 
 /**
- * The parameters used to configure the `directivesPlugin` function.
+ * A signal that inserts a new directive node with the published payload.
+ * @group Directive
  */
-export interface DirectivesPluginParams {
+export const insertDirective$ = Signal<{
+  type: Directives['type']
+  name: string
+  attributes?: Directives['attributes']
+}>((r) => {
+  r.link(
+    r.pipe(
+      insertDirective$,
+      map((payload) => {
+        return () => $createDirectiveNode({ children: [], ...payload })
+      })
+    ),
+    insertDecoratorNode$
+  )
+})
+
+/**
+ * A plugin that adds support for markdown directives.
+ * @group Directive
+ */
+export const directivesPlugin = realmPlugin<{
   /**
    * Use this to register your custom directive editors. You can also use the built-in {@link GenericDirectiveEditor}.
    */
   directiveDescriptors: DirectiveDescriptor<any>[]
-}
-
-/**
- * The plugin that adds support for markdown directives.
- */
-export const [
-  /** @internal */
-  directivesPlugin,
-  /** @internal */
-  directivesPluginHooks
-] = realmPlugin({
-  id: 'directives',
-  systemSpec: directivesSystem,
-  applyParamsToSystem: (realm, params: DirectivesPluginParams) => {
-    realm.pubKey('directiveDescriptors', params?.directiveDescriptors || [])
+}>({
+  update: (realm, params) => {
+    realm.pub(directiveDescriptors$, params?.directiveDescriptors || [])
   },
 
-  init: (realm, _: DirectivesPluginParams) => {
-    // import
-    realm.pubKey('addMdastExtension', directiveFromMarkdown)
-    realm.pubKey('addSyntaxExtension', directive())
-    realm.pubKey('addImportVisitor', MdastDirectiveVisitor)
-
-    // export
-    realm.pubKey('addLexicalNode', DirectiveNode)
-    realm.pubKey('addExportVisitor', DirectiveVisitor)
-    realm.pubKey('addToMarkdownExtension', directiveToMarkdown)
+  init: (realm) => {
+    realm.pubIn({
+      // import
+      [addMdastExtension$]: directiveFromMarkdown(),
+      [addSyntaxExtension$]: directive(),
+      [addImportVisitor$]: MdastDirectiveVisitor,
+      // export
+      [addLexicalNode$]: DirectiveNode,
+      [addExportVisitor$]: DirectiveVisitor,
+      [addToMarkdownExtension$]: directiveToMarkdown()
+    })
   }
 })

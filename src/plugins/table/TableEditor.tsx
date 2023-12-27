@@ -29,7 +29,18 @@ import classNames from 'classnames'
 import styles from '../../styles/ui.module.css'
 import { isPartOftheEditorUI } from '../../utils/isPartOftheEditorUI'
 import { uuidv4 } from '../../utils/uuid4'
-import { corePluginHooks } from '../core'
+import {
+  editorRootElementRef$,
+  exportVisitors$,
+  iconComponentFor$,
+  importVisitors$,
+  jsxComponentDescriptors$,
+  jsxIsAvailable$,
+  readOnly$,
+  rootEditor$,
+  usedLexicalNodes$
+} from '../core'
+import { useCellValues } from '@mdxeditor/gurx'
 
 const AlignToTailwindClassMap = {
   center: styles.centeredCell,
@@ -45,7 +56,7 @@ export interface TableEditorProps {
 
 export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEditor, lexicalTable }) => {
   const [activeCell, setActiveCell] = React.useState<[number, number] | null>(null)
-  const [iconComponentFor, readOnly] = corePluginHooks.useEmitterValues('iconComponentFor', 'readOnly')
+  const [iconComponentFor, readOnly] = useCellValues(iconComponentFor$, readOnly$)
   const getCellKey = React.useMemo(() => {
     return (cell: Mdast.TableCell & { __cacheKey?: string }) => {
       if (!cell.__cacheKey) {
@@ -293,15 +304,14 @@ const Cell: React.FC<Omit<CellProps, 'focus'>> = ({ align, ...props }) => {
 }
 
 const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, lexicalTable, contents, colIndex, rowIndex }) => {
-  const [importVisitors, exportVisitors, usedLexicalNodes, jsxComponentDescriptors, jsxIsAvailable, rootEditor] =
-    corePluginHooks.useEmitterValues(
-      'importVisitors',
-      'exportVisitors',
-      'usedLexicalNodes',
-      'jsxComponentDescriptors',
-      'jsxIsAvailable',
-      'rootEditor'
-    )
+  const [importVisitors, exportVisitors, usedLexicalNodes, jsxComponentDescriptors, jsxIsAvailable, rootEditor] = useCellValues(
+    importVisitors$,
+    exportVisitors$,
+    usedLexicalNodes$,
+    jsxComponentDescriptors$,
+    jsxIsAvailable$,
+    rootEditor$
+  )
 
   const [editor] = React.useState(() => {
     const editor = createEditor({
@@ -417,8 +427,7 @@ const ColumnEditor: React.FC<ColumnEditorProps> = ({
   colIndex,
   setActiveCellWithBoundaries
 }) => {
-  const [editorRootElementRef] = corePluginHooks.useEmitterValues('editorRootElementRef')
-  const [iconComponentFor] = corePluginHooks.useEmitterValues('iconComponentFor')
+  const [editorRootElementRef, iconComponentFor] = useCellValues(editorRootElementRef$, iconComponentFor$)
 
   const insertColumnAt = React.useCallback(
     (colIndex: number) => {
@@ -515,8 +524,7 @@ const RowEditor: React.FC<RowEditorProps> = ({
   rowIndex,
   setActiveCellWithBoundaries
 }) => {
-  const [editorRootElementRef] = corePluginHooks.useEmitterValues('editorRootElementRef')
-  const [iconComponentFor] = corePluginHooks.useEmitterValues('iconComponentFor')
+  const [editorRootElementRef, iconComponentFor] = useCellValues(editorRootElementRef$, iconComponentFor$)
 
   const insertRowAt = React.useCallback(
     (rowIndex: number) => {
