@@ -110,7 +110,7 @@ Check the [MDX editor in Next.js (pages) GitHub sample repository for a working 
 
 ### Vite
 
-MDXEditor "just works" in Vite, assuming that you use a recent version of it. The only thing you need to watch out for is for the imports to come from the specific path rather than the catch-all one, since TypeScript autocompletes both.
+MDXEditor "just works" in Vite, assuming that you use a recent version of it. 
 
 Here's a minimal example for App.tsx:
 
@@ -132,8 +132,7 @@ If you get stuck, check the [MDX editor in Vite GitHub sample repository for a w
 
 ### Remix
 
-Remix seems [to struggle with ESM-only packages](https://github.com/remix-run/remix/issues/109), like MDXEditor itself and several of its dependencies. To work around that, ensure that you list all problematic modules in the `serverDependenciesToBundle` field.
-Check the working example that uses dynamic imports in the [MDX editor in the Remix GitHub sample repository](https://github.com/mdx-editor/mdx-editor-in-remix).
+The component works well with the [ClientOnly remix utility](https://github.com/sergiodxa/remix-utils/tree/main?tab=readme-ov-file#clientonly). Check the working example in the [MDX editor in the Remix GitHub sample repository](https://github.com/mdx-editor/mdx-editor-in-remix).
 
 ### Create React App
 
