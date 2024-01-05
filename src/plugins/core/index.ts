@@ -730,7 +730,7 @@ export const viewMode$ = Cell<ViewMode>('rich-text', (r) => {
       filter((mode) => mode.current === 'rich-text'),
       withLatestFrom(activeEditor$)
     ),
-    ([mode, editor]) => {
+    ([, editor]) => {
       editor?.dispatchCommand(NESTED_EDITOR_UPDATED_COMMAND, undefined)
     }
   )

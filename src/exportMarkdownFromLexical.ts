@@ -13,7 +13,7 @@ export type { Options as ToMarkdownOptions } from 'mdast-util-to-markdown'
  * This is part of the process that converts the editor contents to markdown.
  * @group Markdown Processing
  */
-export interface LexicalExportVisitor<LN extends LexicalNode, UN extends Mdast.Content> {
+export interface LexicalExportVisitor<LN extends LexicalNode, UN extends Mdast.Nodes> {
   /**
    * Return true if the given node is of the type that this visitor can process.
    * You can safely use the node type guard functions (as in $isParagraphNode, $isLinkNode, etc.) here.
@@ -66,13 +66,13 @@ export interface LexicalExportVisitor<LN extends LexicalNode, UN extends Mdast.C
    * Return true if the current node should be joined with the previous node.
    * This is necessary due to some inconsistencies between the lexical tree and the mdast tree when it comes to formatting.
    */
-  shouldJoin?(prevNode: Mdast.Content, currentNode: UN): boolean
+  shouldJoin?(prevNode: Mdast.RootContent, currentNode: UN): boolean
 
   /**
    * Join the current node with the previous node, returning the resulting new node
    * For this to be called by the tree walk, shouldJoin must return true.
    */
-  join?<T extends Mdast.Content>(prevNode: T, currentNode: T): T
+  join?<T extends Mdast.RootContent>(prevNode: T, currentNode: T): T
 
   /**
    * Default 0, optional, sets the priority of the visitor. The higher the number, the earlier it will be called.
@@ -84,7 +84,7 @@ export interface LexicalExportVisitor<LN extends LexicalNode, UN extends Mdast.C
  * A generic visitor that can be used to process any lexical node.
  * @group Markdown Processing
  */
-export type LexicalVisitor = LexicalExportVisitor<LexicalNode, Mdast.Content>
+export type LexicalVisitor = LexicalExportVisitor<LexicalNode, Mdast.RootContent>
 
 /**
  * @internal
@@ -122,7 +122,7 @@ export function exportLexicalTreeToMdast({
     referredComponents.add(componentName)
   }
 
-  function appendToParent<T extends Mdast.Parent, C extends Mdast.Content>(parentNode: T, node: C): C | Mdast.Root {
+  function appendToParent<T extends Mdast.Parent, C extends Mdast.RootContent>(parentNode: T, node: C): C | Mdast.Root {
     if (unistRoot === null) {
       unistRoot = node as unknown as Mdast.Root
       return unistRoot
@@ -172,7 +172,7 @@ export function exportLexicalTreeToMdast({
             ...props,
             ...(hasChildren ? { children: [] } : {})
           }
-          appendToParent(mdastParent!, newNode as unknown as Mdast.Content)
+          appendToParent(mdastParent!, newNode as unknown as Mdast.RootContent)
           if ($isElementNode(lexicalNode) && hasChildren) {
             visitChildren(lexicalNode, newNode as Mdast.Parent)
           }
@@ -251,7 +251,7 @@ export function exportLexicalTreeToMdast({
   return typedRoot
 }
 
-function collapseNestedHtmlTags(node: Mdast.Parent | Mdast.Content) {
+function collapseNestedHtmlTags(node: Mdast.Nodes) {
   if ('children' in node && node.children) {
     if (isMdastHTMLNode(node) && node.children.length === 1) {
       const onlyChild = node.children[0]
@@ -282,10 +282,10 @@ function collapseNestedHtmlTags(node: Mdast.Parent | Mdast.Content) {
   }
 }
 
-function convertUnderlineJsxToHtml(node: Mdast.Parent | Mdast.Content) {
+function convertUnderlineJsxToHtml(node: Mdast.Parent | Mdast.RootContent) {
   if (Object.hasOwn(node, 'children')) {
     const nodeAsParent = node as Mdast.Parent
-    const newChildren = [] as Mdast.Content[]
+    const newChildren = [] as Mdast.RootContent[]
     nodeAsParent.children.forEach((child) => {
       if (child.type === 'mdxJsxTextElement' && child.name === 'u') {
         newChildren.push(...[{ type: 'html', value: '<u>' } as const, ...child.children, { type: 'html', value: '</u>' } as const])
@@ -300,7 +300,7 @@ function convertUnderlineJsxToHtml(node: Mdast.Parent | Mdast.Content) {
 
 const TRAILING_WHITESPACE_REGEXP = /\s+$/
 const LEADING_WHITESPACE_REGEXP = /^\s+/
-function fixWrappingWhitespace(node: Mdast.Parent | Mdast.Content, parentChain: Mdast.Parent[]) {
+function fixWrappingWhitespace(node: Mdast.Parent | Mdast.RootContent, parentChain: Mdast.Parent[]) {
   if (node.type === 'strong' || node.type === 'emphasis') {
     const lastChild = node.children.at(-1)
     if (lastChild?.type === 'text') {
@@ -309,7 +309,7 @@ function fixWrappingWhitespace(node: Mdast.Parent | Mdast.Content, parentChain: 
         lastChild.value = lastChild.value.replace(TRAILING_WHITESPACE_REGEXP, '')
         const parent = parentChain.at(-1)
         if (parent) {
-          parent.children.splice(parent.children.indexOf(node as unknown as Mdast.Content) + 1, 0, {
+          parent.children.splice(parent.children.indexOf(node as unknown as Mdast.RootContent) + 1, 0, {
             type: 'text',
             value: trailingWhitespace[0]
           })
@@ -325,7 +325,7 @@ function fixWrappingWhitespace(node: Mdast.Parent | Mdast.Content, parentChain: 
 
         const parent = parentChain.at(-1)
         if (parent) {
-          parent.children.splice(parent.children.indexOf(node as unknown as Mdast.Content), 0, {
+          parent.children.splice(parent.children.indexOf(node as unknown as Mdast.RootContent), 0, {
             type: 'text',
             value: leadingWhitespace[0]
           })

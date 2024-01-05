@@ -9,7 +9,7 @@ export const LexicalJsxVisitor: LexicalExportVisitor<LexicalJsxNode, MdxJsxFlowE
   visitLexicalNode({ actions, mdastParent, lexicalNode }) {
     function traverseNestedJsxNodes(node: Mdast.Content | Mdast.Parent) {
       if ('children' in node && node.children instanceof Array) {
-        node.children.forEach((child: Mdast.Content | Mdast.Parent) => {
+        node.children.forEach((child: Mdast.Nodes) => {
           if (isMdastJsxNode(child)) {
             actions.registerReferredComponent(child.name!)
           }
