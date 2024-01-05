@@ -1,5 +1,6 @@
 import React from 'react'
 import { DiffSourceToggleWrapper, InsertImage, MDXEditor, diffSourcePlugin, imagePlugin, jsxPlugin, toolbarPlugin } from '../'
+import { Story } from '@ladle/react'
 
 const markdownWithHtmlImages = `
 Hello world
@@ -17,11 +18,12 @@ some more
 some
 `
 
-export function HtmlImage() {
+export const HtmlImage: Story<{ readOnly: boolean }> = ({ readOnly }) => {
   return (
     <>
       <MDXEditor
         markdown={markdownWithHtmlImages}
+        readOnly={readOnly}
         plugins={[
           imagePlugin({ imageUploadHandler: async () => Promise.resolve('https://picsum.photos/200/300') }),
           diffSourcePlugin(),
@@ -31,6 +33,18 @@ export function HtmlImage() {
       />
     </>
   )
+}
+
+HtmlImage.args = {
+  readOnly: false
+}
+
+HtmlImage.argTypes = {
+  readOnly: {
+    control: {
+      type: 'boolean'
+    }
+  }
 }
 
 export function JsxImage() {

@@ -22,7 +22,7 @@ import {
 } from 'lexical'
 import { disableImageResize$, imagePreviewHandler$, openEditImageDialog$ } from '.'
 import styles from '../../styles/ui.module.css'
-import { iconComponentFor$ } from '../core'
+import { iconComponentFor$, readOnly$ } from '../core'
 import { $isImageNode } from './ImageNode'
 import ImageResizer from './ImageResizer'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
@@ -84,10 +84,11 @@ function LazyImage({
 }
 
 export function ImageEditor({ src, title, alt, nodeKey, width, height }: ImageEditorProps): JSX.Element | null {
-  const [disableImageResize, imagePreviewHandler, iconComponentFor] = useCellValues(
+  const [disableImageResize, imagePreviewHandler, iconComponentFor, readOnly] = useCellValues(
     disableImageResize$,
     imagePreviewHandler$,
-    iconComponentFor$
+    iconComponentFor$,
+    readOnly$
   )
 
   const openEditImageDialog = usePublisher(openEditImageDialog$)
@@ -269,6 +270,7 @@ export function ImageEditor({ src, title, alt, nodeKey, width, height }: ImageEd
           type="button"
           className={classNames(styles.iconButton, styles.editImageButton)}
           title="Edit image"
+          disabled={readOnly}
           onClick={() => {
             openEditImageDialog({
               nodeKey: nodeKey,
