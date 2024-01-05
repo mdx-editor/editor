@@ -30,6 +30,7 @@ import styles from '../../styles/ui.module.css'
 import { isPartOftheEditorUI } from '../../utils/isPartOftheEditorUI'
 import { uuidv4 } from '../../utils/uuid4'
 import {
+  NESTED_EDITOR_UPDATED_COMMAND,
   editorRootElementRef$,
   exportVisitors$,
   iconComponentFor$,
@@ -390,6 +391,15 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
           if (isPartOftheEditorUI(relatedTarget, rootEditor!.getRootElement()!)) {
             return false
           }
+          saveAndFocus(null)
+          return true
+        },
+        COMMAND_PRIORITY_CRITICAL
+      ),
+
+      editor.registerCommand(
+        NESTED_EDITOR_UPDATED_COMMAND,
+        () => {
           saveAndFocus(null)
           return true
         },

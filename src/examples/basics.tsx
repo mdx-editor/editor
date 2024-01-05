@@ -156,7 +156,22 @@ export function Lists() {
 }
 
 export function Table() {
-  return <MDXEditor markdown={tableMarkdown} plugins={[tablePlugin()]} />
+  return (
+    <MDXEditor
+      markdown={tableMarkdown}
+      plugins={[
+        tablePlugin(),
+        diffSourcePlugin(),
+        toolbarPlugin({
+          toolbarContents: () => (
+            <DiffSourceToggleWrapper>
+              <UndoRedo />
+            </DiffSourceToggleWrapper>
+          )
+        })
+      ]}
+    />
+  )
 }
 
 export function Link() {

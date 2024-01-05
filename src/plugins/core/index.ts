@@ -706,24 +706,32 @@ export type ViewMode = 'rich-text' | 'source' | 'diff'
  * @group Diff/Source
  */
 export const viewMode$ = Cell<ViewMode>('rich-text', (r) => {
+  function currentNextViewMode() {
+    return scan(
+      (prev, next: ViewMode) => {
+        return {
+          current: prev.next,
+          next
+        }
+      },
+      { current: 'rich-text' as ViewMode, next: 'rich-text' as ViewMode }
+    )
+  }
+  r.sub(r.pipe(viewMode$, currentNextViewMode(), withLatestFrom(markdownSourceEditorValue$)), ([{ current }, markdownSourceFromEditor]) => {
+    if (current === 'source' || current === 'diff') {
+      r.pub(setMarkdown$, markdownSourceFromEditor)
+    }
+  })
+
   r.sub(
     r.pipe(
       viewMode$,
-      scan(
-        (prev, next) => {
-          return {
-            current: prev.next,
-            next
-          }
-        },
-        { current: 'rich-text' as ViewMode, next: 'rich-text' as ViewMode }
-      ),
-      withLatestFrom(markdownSourceEditorValue$)
+      currentNextViewMode(),
+      filter((mode) => mode.current === 'rich-text'),
+      withLatestFrom(activeEditor$)
     ),
-    ([{ current }, markdownSourceFromEditor]) => {
-      if (current === 'source' || current === 'diff') {
-        r.pub(setMarkdown$, markdownSourceFromEditor)
-      }
+    ([mode, editor]) => {
+      editor?.dispatchCommand(NESTED_EDITOR_UPDATED_COMMAND, undefined)
     }
   )
 })
