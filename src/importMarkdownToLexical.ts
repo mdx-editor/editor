@@ -14,12 +14,12 @@ export type MdastExtensions = Options['mdastExtensions']
  * @typeParam UN - The type of the mdast node that is being visited.
  * @group Markdown Processing
  */
-export interface MdastImportVisitor<UN extends Mdast.Content> {
+export interface MdastImportVisitor<UN extends Mdast.Nodes> {
   /**
    * The test function that determines if this visitor should be used for the given node.
    * As a convenience, you can also pass a string here, which will be compared to the node's type.
    */
-  testNode: ((mdastNode: Mdast.Content | Mdast.Root) => boolean) | string
+  testNode: ((mdastNode: Mdast.Nodes) => boolean) | string
   visitNode(params: {
     /**
      * The node that is currently being visited.
@@ -51,13 +51,13 @@ export interface MdastImportVisitor<UN extends Mdast.Content> {
        * Adds formatting as a context for the current node and its children.
        * This is necessary due to mdast treating formatting as a node, while lexical considering it an attribute of a node.
        */
-      addFormatting(format: typeof IS_BOLD | typeof IS_ITALIC | typeof IS_UNDERLINE | typeof IS_CODE, node?: Mdast.Content): void
+      addFormatting(format: typeof IS_BOLD | typeof IS_ITALIC | typeof IS_UNDERLINE | typeof IS_CODE, node?: Mdast.RootContent): void
 
       /**
        * Removes formatting as a context for the current node and its children.
        * This is necessary due to mdast treating formatting as a node, while lexical considering it an attribute of a node.
        */
-      removeFormatting(format: typeof IS_BOLD | typeof IS_ITALIC | typeof IS_UNDERLINE | typeof IS_CODE, node?: Mdast.Content): void
+      removeFormatting(format: typeof IS_BOLD | typeof IS_ITALIC | typeof IS_UNDERLINE | typeof IS_CODE, node?: Mdast.RootContent): void
       /**
        * Access the current formatting context.
        */
@@ -80,7 +80,7 @@ function isParent(node: unknown): node is Mdast.Parent {
  */
 export interface MdastTreeImportOptions {
   root: LexicalRootNode
-  visitors: MdastImportVisitor<Mdast.Content>[]
+  visitors: MdastImportVisitor<Mdast.RootContent>[]
   mdastRoot: Mdast.Root
 }
 
@@ -167,7 +167,7 @@ export function importMdastTreeToLexical({ root, mdastRoot, visitors }: MdastTre
     mdastNode.children.forEach((child) => visit(child, lexicalParent, mdastNode))
   }
 
-  function visit(mdastNode: Mdast.Content | Mdast.Root, lexicalParent: LexicalNode, mdastParent: Mdast.Parent | null) {
+  function visit(mdastNode: Mdast.RootContent | Mdast.Root, lexicalParent: LexicalNode, mdastParent: Mdast.Parent | null) {
     const visitor = visitors.find((visitor) => {
       if (typeof visitor.testNode === 'string') {
         return visitor.testNode === mdastNode.type

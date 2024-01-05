@@ -22,6 +22,24 @@ const markdownWithSpan = `
 
   A paragraph with <span style="color: red" class="some">some red text <span style="color: blue">with some blue nesting.</span> in here.</span> in it.
 `
+export function HTag() {
+  return (
+    <>
+      <MDXEditor
+        markdown={`
+Hello world
+
+<h1>hello world</h1>
+
+`}
+        plugins={[headingsPlugin(), diffSourcePlugin()]}
+        onChange={(md) => {
+          console.log('change', md)
+        }}
+      />
+    </>
+  )
+}
 
 export function SpanWithColor() {
   return (

@@ -32,8 +32,10 @@ import {
   createCommand
 } from 'lexical'
 import * as Mdast from 'mdast'
+
 import { mdxJsxFromMarkdown, mdxJsxToMarkdown } from 'mdast-util-mdx-jsx'
 import { mdxJsx } from 'micromark-extension-mdx-jsx'
+import { mdxMd } from 'micromark-extension-mdx-md'
 import React from 'react'
 import { LexicalConvertOptions, exportMarkdownFromLexical } from '../../exportMarkdownFromLexical'
 import {
@@ -210,7 +212,7 @@ const markdownSignal$ = Signal<string>((r) => {
 
 // import configuration
 /** @internal */
-export const importVisitors$ = Cell<MdastImportVisitor<Mdast.Content>[]>([])
+export const importVisitors$ = Cell<MdastImportVisitor<Mdast.Nodes>[]>([])
 /** @internal */
 export const syntaxExtensions$ = Cell<MarkdownParseOptions['syntaxExtensions']>([])
 /** @internal */
@@ -791,7 +793,7 @@ export const corePlugin = realmPlugin<{
     if (!params?.suppressHtmlProcessing) {
       r.pubIn({
         [addMdastExtension$]: mdxJsxFromMarkdown(),
-        [addSyntaxExtension$]: mdxJsx(),
+        [addSyntaxExtension$]: [mdxJsx(), mdxMd()],
         [addToMarkdownExtension$]: mdxJsxToMarkdown(),
         [addImportVisitor$]: MdastHTMLVisitor
       })

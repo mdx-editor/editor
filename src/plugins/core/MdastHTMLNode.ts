@@ -41,7 +41,7 @@ export type MdxNodeType = MdastHTMLNode['type']
  * Determines if the given node is a HTML MDAST node.
  * @group HTML
  */
-export function isMdastHTMLNode(node: Mdast.Parent | Mdast.Content | Mdast.Root): node is MdastHTMLNode {
+export function isMdastHTMLNode(node: Mdast.Nodes): node is MdastHTMLNode {
   return (
     MDX_NODE_TYPES.includes(node.type as unknown as MdxNodeType) &&
     (htmlTags as readonly string[]).includes((node as MdastHTMLNode).name?.toLowerCase() ?? '')

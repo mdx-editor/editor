@@ -98,7 +98,7 @@ export interface JsxEditorProps {
  * Determines wether the given node is a JSX node.
  * @group JSX
  */
-export function isMdastJsxNode(node: Mdast.Content | Mdast.Parent | Mdast.Root): node is MdastJsx {
+export function isMdastJsxNode(node: Mdast.Nodes): node is MdastJsx {
   return node.type === 'mdxJsxFlowElement' || node.type === 'mdxJsxTextElement'
 }
 

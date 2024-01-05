@@ -78,6 +78,7 @@
     "micromark-extension-gfm-table": "^2.0.0",
     "micromark-extension-gfm-task-list-item": "^2.0.1",
     "micromark-extension-mdx-jsx": "^3.0.0",
+    "micromark-extension-mdx-md": "^2.0.0",
     "micromark-extension-mdxjs": "^3.0.0",
     "react-hook-form": "^7.44.2",
     "unidiff": "^1.0.2"
