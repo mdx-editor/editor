@@ -273,13 +273,14 @@ export const imagePlugin = realmPlugin<{
   imageAutocompleteSuggestions?: string[]
   disableImageResize?: boolean
   imagePreviewHandler?: ImagePreviewHandler
+  ImageDialog?: (() => JSX.Element) | React.FC
 }>({
-  init(realm) {
+  init(realm, params) {
     realm.pubIn({
       [addImportVisitor$]: [MdastImageVisitor, MdastHtmlImageVisitor, MdastJsxImageVisitor],
       [addLexicalNode$]: ImageNode,
       [addExportVisitor$]: LexicalImageVisitor,
-      [addComposerChild$]: ImageDialog
+      [addComposerChild$]: params?.ImageDialog || ImageDialog
     })
   },
 
