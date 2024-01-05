@@ -45,9 +45,11 @@ export function RealmWithPlugins({ children, plugins }: { children: React.ReactN
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  for (const plugin of plugins) {
-    plugin.update?.(theRealm)
-  }
+  React.useEffect(() => {
+    for (const plugin of plugins) {
+      plugin.update?.(theRealm)
+    }
+  })
 
   return <RealmContext.Provider value={theRealm}>{children}</RealmContext.Provider>
 }
