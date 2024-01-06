@@ -104,7 +104,6 @@
     "@types/node": "^20.2.5",
     "@types/react": "^18.2.7",
     "@types/react-dom": "^18.2.4",
-    "@types/testing-library__jest-dom": "^6.0.0",
     "@types/unist": "^3.0.2",
     "@typescript-eslint/eslint-plugin": "^6.17.0",
     "@typescript-eslint/parser": "^6.17.0",
