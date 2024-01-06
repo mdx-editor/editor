@@ -132,7 +132,10 @@ export const ALL_PLUGINS = [
   headingsPlugin({ allowedHeadingLevels: [1, 2, 3] }),
   linkPlugin(),
   linkDialogPlugin(),
-  imagePlugin({ imageAutocompleteSuggestions: ['https://via.placeholder.com/150', 'https://via.placeholder.com/150'] }),
+  imagePlugin({
+    imageAutocompleteSuggestions: ['https://via.placeholder.com/150', 'https://via.placeholder.com/150'],
+    imageUploadHandler: async () => Promise.resolve('https://picsum.photos/200/300')
+  }),
   tablePlugin(),
   thematicBreakPlugin(),
   frontmatterPlugin(),

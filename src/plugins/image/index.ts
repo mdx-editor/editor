@@ -1,5 +1,4 @@
-import { realmPlugin } from '../../RealmWithPlugins'
-import { $wrapNodeInElement } from '@lexical/utils'
+import { $wrapNodeInElement, mergeRegister } from '@lexical/utils'
 import { Action, Cell, Signal, map, mapTo, withLatestFrom } from '@mdxeditor/gurx'
 import {
   $createParagraphNode,
@@ -22,8 +21,16 @@ import {
   PASTE_COMMAND,
   createCommand
 } from 'lexical'
+import { realmPlugin } from '../../RealmWithPlugins'
 import { CAN_USE_DOM } from '../../utils/detectMac'
-import { addComposerChild$, addExportVisitor$, addImportVisitor$, addLexicalNode$, rootEditor$ } from '../core'
+import {
+  activeEditor$,
+  addComposerChild$,
+  addExportVisitor$,
+  addImportVisitor$,
+  addLexicalNode$,
+  createActiveEditorSubscription$
+} from '../core'
 import { ImageDialog } from './ImageDialog'
 import { $createImageNode, $isImageNode, CreateImageNodeParameters, ImageNode } from './ImageNode'
 import { LexicalImageVisitor } from './LexicalImageVisitor'
@@ -114,7 +121,7 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
   { type: 'inactive' },
   (r) => {
     r.sub(
-      r.pipe(saveImage$, withLatestFrom(rootEditor$, imageUploadHandler$, imageDialogState$)),
+      r.pipe(saveImage$, withLatestFrom(activeEditor$, imageUploadHandler$, imageDialogState$)),
       ([values, theEditor, imageUploadHandler, dialogState]) => {
         const handler =
           dialogState.type === 'editing'
@@ -152,77 +159,76 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
       }
     )
 
-    r.sub(rootEditor$, (editor) => {
-      editor?.registerCommand<InsertImagePayload>(
-        INSERT_IMAGE_COMMAND,
-        (payload) => {
-          const imageNode = $createImageNode(payload)
-          $insertNodes([imageNode])
-          if ($isRootOrShadowRoot(imageNode.getParentOrThrow())) {
-            $wrapNodeInElement(imageNode, $createParagraphNode).selectEnd()
-          }
-
-          return true
-        },
-        COMMAND_PRIORITY_EDITOR
-      )
-
+    r.pub(createActiveEditorSubscription$, (editor) => {
       const theUploadHandler = r.getValue(imageUploadHandler$)
+      return mergeRegister(
+        editor?.registerCommand<InsertImagePayload>(
+          INSERT_IMAGE_COMMAND,
+          (payload) => {
+            const imageNode = $createImageNode(payload)
+            $insertNodes([imageNode])
+            if ($isRootOrShadowRoot(imageNode.getParentOrThrow())) {
+              $wrapNodeInElement(imageNode, $createParagraphNode).selectEnd()
+            }
 
-      editor?.registerCommand<DragEvent>(
-        DRAGSTART_COMMAND,
-        (event) => {
-          return onDragStart(event)
-        },
-        COMMAND_PRIORITY_HIGH
-      )
-      editor?.registerCommand<DragEvent>(
-        DRAGOVER_COMMAND,
-        (event) => {
-          return onDragover(event)
-        },
-        COMMAND_PRIORITY_LOW
-      )
+            return true
+          },
+          COMMAND_PRIORITY_EDITOR
+        ),
+        editor?.registerCommand<DragEvent>(
+          DRAGSTART_COMMAND,
+          (event) => {
+            return onDragStart(event)
+          },
+          COMMAND_PRIORITY_HIGH
+        ),
+        editor?.registerCommand<DragEvent>(
+          DRAGOVER_COMMAND,
+          (event) => {
+            return onDragover(event)
+          },
+          COMMAND_PRIORITY_LOW
+        ),
 
-      editor?.registerCommand<DragEvent>(
-        DROP_COMMAND,
-        (event) => {
-          return onDrop(event, editor, r.getValue(imageUploadHandler$))
-        },
-        COMMAND_PRIORITY_HIGH
-      )
+        editor?.registerCommand<DragEvent>(
+          DROP_COMMAND,
+          (event) => {
+            return onDrop(event, editor, r.getValue(imageUploadHandler$))
+          },
+          COMMAND_PRIORITY_HIGH
+        ),
+        ...(theUploadHandler !== null
+          ? [
+              editor?.registerCommand(
+                PASTE_COMMAND,
+                (event: ClipboardEvent) => {
+                  let cbPayload = Array.from(event.clipboardData?.items || [])
+                  cbPayload = cbPayload.filter((i) => /image/.test(i.type)) // Strip out the non-image bits
 
-      if (theUploadHandler === null) {
-        return
-      }
+                  if (!cbPayload.length || cbPayload.length === 0) {
+                    return false
+                  } // If no image was present in the collection, bail.
 
-      editor?.registerCommand(
-        PASTE_COMMAND,
-        (event: ClipboardEvent) => {
-          let cbPayload = Array.from(event.clipboardData?.items || [])
-          cbPayload = cbPayload.filter((i) => /image/.test(i.type)) // Strip out the non-image bits
+                  const imageUploadHandlerValue = r.getValue(imageUploadHandler$)!
 
-          if (!cbPayload.length || cbPayload.length === 0) {
-            return false
-          } // If no image was present in the collection, bail.
-
-          const imageUploadHandlerValue = r.getValue(imageUploadHandler$)!
-
-          Promise.all(cbPayload.map((file) => imageUploadHandlerValue(file.getAsFile()!)))
-            .then((urls) => {
-              urls.forEach((url) => {
-                editor.dispatchCommand(INSERT_IMAGE_COMMAND, {
-                  src: url,
-                  altText: ''
-                })
-              })
-            })
-            .catch((e) => {
-              throw e
-            })
-          return true
-        },
-        COMMAND_PRIORITY_CRITICAL
+                  Promise.all(cbPayload.map((file) => imageUploadHandlerValue(file.getAsFile()!)))
+                    .then((urls) => {
+                      urls.forEach((url) => {
+                        editor.dispatchCommand(INSERT_IMAGE_COMMAND, {
+                          src: url,
+                          altText: ''
+                        })
+                      })
+                    })
+                    .catch((e) => {
+                      throw e
+                    })
+                  return true
+                },
+                COMMAND_PRIORITY_CRITICAL
+              )
+            ]
+          : [])
       )
     })
   }
