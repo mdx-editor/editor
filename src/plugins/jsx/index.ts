@@ -167,7 +167,7 @@ export const jsxPlugin = realmPlugin<{
    */
   jsxComponentDescriptors: JsxComponentDescriptor[]
 }>({
-  init: (realm) => {
+  init: (realm, params) => {
     realm.pubIn({
       // import
       [jsxIsAvailable$]: true,
@@ -178,7 +178,8 @@ export const jsxPlugin = realmPlugin<{
       // export
       [addLexicalNode$]: LexicalJsxNode,
       [addExportVisitor$]: LexicalJsxVisitor,
-      [addToMarkdownExtension$]: mdxToMarkdown()
+      [addToMarkdownExtension$]: mdxToMarkdown(),
+      [jsxComponentDescriptors$]: params?.jsxComponentDescriptors || []
     })
   },
 
