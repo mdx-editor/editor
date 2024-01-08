@@ -56,7 +56,7 @@ const jsxComponentDescriptors: JsxComponentDescriptor[] = [
 
 // a toolbar button that will insert a JSX element into the editor.
 const InsertMyLeaf = () => {
-  const insertJsx = jsxPluginHooks.usePublisher('insertJsx')
+  const insertJsx = usePublisher(insertJsx$)
   return (
     <Button
       onClick={() =>

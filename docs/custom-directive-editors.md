@@ -84,7 +84,7 @@ Below you can find an example toolbar dialog button that will insert an YouTube 
 const YouTubeButton = () => {
   // grab the insertDirective action (a.k.a. publisher) from the 
   // state management system of the directivesPlugin
-  const insertDirective = directivesPluginHooks.usePublisher('insertDirective')
+  const insertDirective = usePublisher(insertDirective$)
 
   return (
     <DialogButton
