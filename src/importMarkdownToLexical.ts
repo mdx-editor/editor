@@ -79,7 +79,7 @@ function isParent(node: unknown): node is Mdast.Parent {
  * @internal
  */
 export interface MdastTreeImportOptions {
-  root: LexicalRootNode
+  root: LexicalNode
   visitors: MdastImportVisitor<Mdast.RootContent>[]
   mdastRoot: Mdast.Root
 }
