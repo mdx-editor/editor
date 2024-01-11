@@ -39,6 +39,7 @@ import { TextDirective, Directives, LeafDirective, directiveFromMarkdown, direct
 import { directive } from 'micromark-extension-directive'
 import { ElementNode } from 'lexical'
 import { usePublisher } from '@mdxeditor/gurx'
+import { YoutubeDirectiveDescriptor } from './_boilerplate'
 
 const youtubeMarkdown = `
 This should be an youtube video:
@@ -88,7 +89,7 @@ export const Youtube: React.FC = () => {
     <MDXEditor
       markdown={youtubeMarkdown}
       plugins={[
-        directivesPlugin({ directiveDescriptors: [] }),
+        directivesPlugin({ directiveDescriptors: [YoutubeDirectiveDescriptor] }),
         toolbarPlugin({
           toolbarContents: () => {
             return <YouTubeButton />
