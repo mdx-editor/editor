@@ -317,7 +317,7 @@ export const insertMarkdown$ = Signal<string>((r) => {
         const rootNodes: LexicalNode[] = []
         // The shadow root is not the actual editor RootNode, it's more like a placeholder root
         // that will be used to import markdown content because 'tryImportingMarkdown' utility
-        // will import and convert markdown content Mdast tree and then convert to lexical nodes,
+        // will import and convert markdown content to Mdast tree first and then convert to lexical nodes,
         // during which process we need a root lexical node to host all children nodes
         // while we're visiting the Mdast tree nodes.
         const shadowRoot: RootNode = new RootNode()
