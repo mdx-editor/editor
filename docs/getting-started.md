@@ -22,6 +22,16 @@ Note: the package is tree-shakeable, which means that your bundle will only incl
 
 Following are the specifics below for the most popular React frameworks.
 
+## A note on style dependencies
+> [!TIP]
+> MDXEditor has a CSS style file dependency, used to provide rendering support for the various formatting options available (bold, italic, underline, superscript, subscript, etc.).  Without the use of 
+> ```tsx
+> import '@mdxeditor/editor/style.css'
+> ```
+> (which is listed in most examples) you may find unexpected behavior present (i.e. unable to merge styles, unable to see formats for underline/subscript/crossout).  If you're experiencing this kind of issue, a missing
+> style file reference is the most likely culprit. =) 
+
+
 ### Next.js (App router)
 
 MDXEditor does not support server rendering, so we need to ensure that the editor component is rendered only on the client. Given its purpose, it makes little to no sense to do server processing anyway. To do so, we can use the `dynamic` function from Next.js. This will ensure that the component is only loaded on the client.
