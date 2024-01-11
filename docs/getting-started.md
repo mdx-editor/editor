@@ -171,6 +171,20 @@ return (
 )
 ```
 
+If you want to insert markdown content after the editor is initialized, you can use `insertMarkdown` ref method to insert markdown content to the current cursor position of the active editor.
+
+```tsx
+// create a ref to the editor component
+const ref = React.useRef<MDXEditorMethods>(null)
+return (
+  <>
+    <button onClick={() => ref.current?.insertMarkdown('new markdown to insert')}>Insert new markdown</button>
+    <button onClick={() => console.log(ref.current?.getMarkdown())}>Get markdown</button>
+    <MDXEditor ref={ref} markdown="hello world" onChange={console.log} />
+  </>
+)
+```
+
 ## Next steps
 
 Hopefully, at this point, the editor component is installed and working in your setup, but it's not very useful. Depending on your use case, you will need some additional features. To ensure that the bundle size stays small, MDXEditor uses a plugin system. Below is an example of a few basic plugins being enabled for the editor.

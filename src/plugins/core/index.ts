@@ -26,6 +26,7 @@ import {
   LexicalNode,
   ParagraphNode,
   RangeSelection,
+  RootNode,
   SELECTION_CHANGE_COMMAND,
   TextFormatType,
   TextNode,
@@ -63,8 +64,6 @@ import { MdastParagraphVisitor } from './MdastParagraphVisitor'
 import { MdastRootVisitor } from './MdastRootVisitor'
 import { MdastTextVisitor } from './MdastTextVisitor'
 import { SharedHistoryPlugin } from './SharedHistoryPlugin'
-import { $createMarkdownImporterNode, MarkdownImporterNode } from './MarkdownImporterNode'
-import { LexicalMarkdownImporterNodeVisitor } from './LexicalMarkdownImporterNodeVisitor'
 export * from './MdastHTMLNode'
 export * from './GenericHTMLNode'
 export * from './Icon'
@@ -294,7 +293,7 @@ export const setMarkdown$ = Signal<string>((r) => {
     ([theNewMarkdownValue, , editor, inFocus]) => {
       editor?.update(() => {
         $getRoot().clear()
-        tryImportingMarkdown($getRoot(), r, theNewMarkdownValue)
+        tryImportingMarkdown(r, $getRoot(), theNewMarkdownValue)
 
         if (!inFocus) {
           $setSelection(null)
@@ -307,42 +306,28 @@ export const setMarkdown$ = Signal<string>((r) => {
 })
 
 /**
- * Inserts new markdown value into the current selection of the active editor.
+ * Inserts new markdown value into the current cursor position of the active editor.
  * @group Core
  */
-export const insertMarkdown$ = Signal<Partial<string>>((r) => {
-  r.sub(
-    r.pipe(insertMarkdown$, withLatestFrom(activeEditor$, importVisitors$, syntaxExtensions$, mdastExtensions$, inFocus$)),
-    ([content, theEditor, theImportVisitors, theSyntaxExtensions, theMdastExtensions, inFocus]) => {
-      if (theEditor !== null) {
-        theEditor.update(() => {
-          const selection = $getSelection()
-          if (selection === null) {
-            return
-          }
-
-          // Create a new markdown importer node.
-          const markdownImporterNode = $createMarkdownImporterNode()
-          selection?.insertNodes([markdownImporterNode])
-
-          // Insert the markdown content to the current selection.
-          importMarkdownToLexical({
-            root: markdownImporterNode,
-            markdown: content,
-            visitors: theImportVisitors,
-            mdastExtensions: theMdastExtensions,
-            syntaxExtensions: theSyntaxExtensions
-          })
-
-          if (!inFocus) {
-            $setSelection(null)
-          } else {
-            theEditor.focus()
-          }
-        })
+export const insertMarkdown$ = Signal<string>((r) => {
+  r.sub(r.pipe(insertMarkdown$, withLatestFrom(activeEditor$, inFocus$)), ([markdownToInsert, editor, inFocus]) => {
+    editor?.update(() => {
+      const selection = $getSelection()
+      if (selection !== null) {
+        const rootNodes: LexicalNode[] = []
+        const fakedRoot: RootNode = new RootNode()
+        fakedRoot.append(...rootNodes)
+        tryImportingMarkdown(r, fakedRoot, markdownToInsert)
+        $insertNodes(rootNodes)
       }
-    }
-  )
+
+      if (!inFocus) {
+        $setSelection(null)
+      } else {
+        editor.focus()
+      }
+    })
+  })
 })
 
 function rebind() {
@@ -572,7 +557,7 @@ export const createActiveEditorSubscription$ = Appender(activeEditorSubscription
   ])
 })
 
-function tryImportingMarkdown(node: LexicalNode, r: Realm, markdownValue: string) {
+function tryImportingMarkdown(r: Realm, node: RootNode, markdownValue: string) {
   try {
     ////////////////////////
     // Import initial value
@@ -607,7 +592,7 @@ export const initialRootEditorState$ = Cell<InitialEditorStateType | null>(null,
     r.pub(rootEditor$, theRootEditor)
     r.pub(activeEditor$, theRootEditor)
 
-    tryImportingMarkdown($getRoot(), r, r.getValue(initialMarkdown$))
+    tryImportingMarkdown(r, $getRoot(), r.getValue(initialMarkdown$))
 
     const autoFocusValue = r.getValue(autoFocus$)
     if (autoFocusValue) {
@@ -826,14 +811,13 @@ export const corePlugin = realmPlugin<{
         MdastInlineCodeVisitor,
         MdastBreakVisitor
       ],
-      [addLexicalNode$]: [ParagraphNode, TextNode, GenericHTMLNode, MarkdownImporterNode],
+      [addLexicalNode$]: [ParagraphNode, TextNode, GenericHTMLNode],
       [addExportVisitor$]: [
         LexicalRootVisitor,
         LexicalParagraphVisitor,
         LexicalTextVisitor,
         LexicalLinebreakVisitor,
-        LexicalGenericHTMLVisitor,
-        LexicalMarkdownImporterNodeVisitor
+        LexicalGenericHTMLVisitor
       ],
 
       [addComposerChild$]: SharedHistoryPlugin
