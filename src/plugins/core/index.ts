@@ -320,9 +320,16 @@ export const insertMarkdown$ = Signal<string>((r) => {
         // will import and convert markdown content to Mdast tree first and then convert to lexical nodes,
         // during which process we need a root lexical node to host all children nodes
         // while we're visiting the Mdast tree nodes.
-        const shadowRoot: RootNode = new RootNode()
-        shadowRoot.append(...rootNodes)
-        tryImportingMarkdown(r, shadowRoot, markdownToInsert)
+        const shadowRoot = {
+          append(node: LexicalNode) {
+            rootNodes.push(node)
+          },
+          getType() {
+            return selection?.getNodes()[0].getType()
+          }
+        }
+
+        tryImportingMarkdown(r, shadowRoot as RootNode, markdownToInsert)
         $insertNodes(rootNodes)
       }
 
