@@ -161,6 +161,7 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
 
     r.pub(createActiveEditorSubscription$, (editor) => {
       const theUploadHandler = r.getValue(imageUploadHandler$)
+      console.log('theUploadHandler', theUploadHandler)
       return mergeRegister(
         editor?.registerCommand<InsertImagePayload>(
           INSERT_IMAGE_COMMAND,
@@ -286,7 +287,11 @@ export const imagePlugin = realmPlugin<{
       [addImportVisitor$]: [MdastImageVisitor, MdastHtmlImageVisitor, MdastJsxImageVisitor],
       [addLexicalNode$]: ImageNode,
       [addExportVisitor$]: LexicalImageVisitor,
-      [addComposerChild$]: params?.ImageDialog || ImageDialog
+      [addComposerChild$]: params?.ImageDialog || ImageDialog,
+      [imageUploadHandler$]: params?.imageUploadHandler || null,
+      [imageAutocompleteSuggestions$]: params?.imageAutocompleteSuggestions || [],
+      [disableImageResize$]: Boolean(params?.disableImageResize),
+      [imagePreviewHandler$]: params?.imagePreviewHandler || null
     })
   },
 
