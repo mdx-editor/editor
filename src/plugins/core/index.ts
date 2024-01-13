@@ -26,7 +26,6 @@ import {
   LexicalNode,
   ParagraphNode,
   RangeSelection,
-  RootNode,
   SELECTION_CHANGE_COMMAND,
   TextFormatType,
   TextNode,
@@ -40,6 +39,7 @@ import { mdxMd } from 'micromark-extension-mdx-md'
 import React from 'react'
 import { LexicalConvertOptions, exportMarkdownFromLexical } from '../../exportMarkdownFromLexical'
 import {
+  ImportPoint,
   MarkdownParseError,
   MarkdownParseOptions,
   MdastImportVisitor,
@@ -314,23 +314,18 @@ export const insertMarkdown$ = Signal<string>((r) => {
     editor?.update(() => {
       const selection = $getSelection()
       if (selection !== null) {
-        const rootNodes: LexicalNode[] = []
-        // The shadow root is not the actual editor RootNode, it's more like a placeholder root
-        // that will be used to import markdown content because 'tryImportingMarkdown' utility
-        // will import and convert markdown content to Mdast tree first and then convert to lexical nodes,
-        // during which process we need a root lexical node to host all children nodes
-        // while we're visiting the Mdast tree nodes.
-        const shadowRoot = {
+        const importPoint = {
+          children: [] as LexicalNode[],
           append(node: LexicalNode) {
-            rootNodes.push(node)
+            this.children.push(node)
           },
           getType() {
             return selection?.getNodes()[0].getType()
           }
         }
 
-        tryImportingMarkdown(r, shadowRoot as RootNode, markdownToInsert)
-        $insertNodes(rootNodes)
+        tryImportingMarkdown(r, importPoint, markdownToInsert)
+        $insertNodes(importPoint.children)
       }
 
       if (!inFocus) {
@@ -569,7 +564,7 @@ export const createActiveEditorSubscription$ = Appender(activeEditorSubscription
   ])
 })
 
-function tryImportingMarkdown(r: Realm, node: RootNode, markdownValue: string) {
+function tryImportingMarkdown(r: Realm, node: ImportPoint, markdownValue: string) {
   try {
     ////////////////////////
     // Import initial value
