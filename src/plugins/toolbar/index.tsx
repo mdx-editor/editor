@@ -27,5 +27,8 @@ export const toolbarPlugin = realmPlugin<{ toolbarContents: () => React.ReactNod
         return <Root readOnly={readOnly}>{toolbarContents()}</Root>
       }
     })
+  },
+  update(realm, params) {
+    realm.pub(toolbarContents$, params?.toolbarContents ?? DEFAULT_TOOLBAR_CONTENTS)
   }
 })

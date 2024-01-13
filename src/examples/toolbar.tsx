@@ -79,43 +79,49 @@ export const CustomTheming = () => {
 }
 
 export const ConditionalToolbar = () => {
+  const [outsideState, setOutsideState] = React.useState('foo')
   return (
-    <MDXEditor
-      markdown={'hello world'}
-      plugins={[
-        toolbarPlugin({
-          toolbarContents: () => (
-            <>
-              <DiffSourceToggleWrapper>
-                <UndoRedo />
-                <BoldItalicUnderlineToggles />
-                <ListsToggle />
-                <Separator />
-                <BlockTypeSelect />
-                <CreateLink />
-                <InsertImage />
-                <Separator />
-              </DiffSourceToggleWrapper>
-            </>
-          )
-        }),
-        listsPlugin(),
-        quotePlugin(),
-        headingsPlugin(),
-        linkPlugin(),
-        linkDialogPlugin(),
-        imagePlugin(),
-        tablePlugin(),
-        thematicBreakPlugin(),
-        frontmatterPlugin(),
-        // codeBlockPlugin({ defaultCodeBlockLanguage: 'txt' }),
-        // sandpackPlugin({ sandpackConfig: virtuosoSampleSandpackConfig }),
-        // codeMirrorPlugin({ codeBlockLanguages: { js: 'JavaScript', css: 'CSS', txt: 'text' } }),
-        directivesPlugin({ directiveDescriptors: [YoutubeDirectiveDescriptor, AdmonitionDirectiveDescriptor] }),
-        diffSourcePlugin({ viewMode: 'rich-text', diffMarkdown: 'boo' }),
-        markdownShortcutPlugin()
-      ]}
-    />
+    <>
+      <button onClick={() => setOutsideState('bar')}>Toggle outside state</button>
+      {outsideState}
+      <MDXEditor
+        markdown={'hello world'}
+        plugins={[
+          toolbarPlugin({
+            toolbarContents: () => (
+              <>
+                <DiffSourceToggleWrapper>
+                  {outsideState}
+                  <UndoRedo />
+                  <BoldItalicUnderlineToggles />
+                  <ListsToggle />
+                  <Separator />
+                  <BlockTypeSelect />
+                  <CreateLink />
+                  <InsertImage />
+                  <Separator />
+                </DiffSourceToggleWrapper>
+              </>
+            )
+          }),
+          listsPlugin(),
+          quotePlugin(),
+          headingsPlugin(),
+          linkPlugin(),
+          linkDialogPlugin(),
+          imagePlugin(),
+          tablePlugin(),
+          thematicBreakPlugin(),
+          frontmatterPlugin(),
+          // codeBlockPlugin({ defaultCodeBlockLanguage: 'txt' }),
+          // sandpackPlugin({ sandpackConfig: virtuosoSampleSandpackConfig }),
+          // codeMirrorPlugin({ codeBlockLanguages: { js: 'JavaScript', css: 'CSS', txt: 'text' } }),
+          directivesPlugin({ directiveDescriptors: [YoutubeDirectiveDescriptor, AdmonitionDirectiveDescriptor] }),
+          diffSourcePlugin({ viewMode: 'rich-text', diffMarkdown: 'boo' }),
+          markdownShortcutPlugin()
+        ]}
+      />
+    </>
   )
 }
 
