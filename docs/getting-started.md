@@ -16,27 +16,18 @@ To use MDXEditor in your project, install the `@mdxeditor/editor` NPM package in
 npm install --save @mdxeditor/editor
 ```
 
-## Importing the component
+Afterwards, you can import the React component and use it in your project. You need to include the CSS file as well, either as an import in React or in your project stylesheet. Follow the instructions below for your framework of choice.
 
-Note: the package is tree-shakeable, which means that your bundle will only include the parts you use.
-
-Following are the specifics below for the most popular React frameworks.
-
-## A note on style dependencies
-> [!TIP]
-> MDXEditor has a CSS style file dependency, used to provide rendering support for the various formatting options available (bold, italic, underline, superscript, subscript, etc.).  Without the use of 
-> ```tsx
-> import '@mdxeditor/editor/style.css'
-> ```
-> (which is listed in most examples) you may find unexpected behavior present (i.e. unable to merge styles, unable to see formats for underline/subscript/crossout).  If you're experiencing this kind of issue, a missing
-> style file reference is the most likely culprit. =) 
-
+```tsx
+import { MDXEditor } from '@mdxeditor/editor'
+import '@mdxeditor/editor/style.css'
+```
 
 ### Next.js (App router)
 
-MDXEditor does not support server rendering, so we need to ensure that the editor component is rendered only on the client. Given its purpose, it makes little to no sense to do server processing anyway. To do so, we can use the `dynamic` function from Next.js. This will ensure that the component is only loaded on the client.
+MDXEditor does not support server rendering, so we need to ensure that the editor component is rendered only on client-side. To do so, we can use the [`dynamic` utility](https://nextjs.org/docs/pages/building-your-application/optimizing/lazy-loading) with `{ssr: false}`. 
 
-**NOTE:** Make sure all plugins are initialized client-side only, too. Using some plugins will cause hydration errors if imported during SSR.
+**NOTE:** Make sure that the editor plugins are initialized client-side only, too. Using some plugins will cause hydration errors if imported during SSR.
 
 ```tsx
 'use client'
