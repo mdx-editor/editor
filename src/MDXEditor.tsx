@@ -14,7 +14,8 @@ import {
   viewMode$,
   markdown$,
   setMarkdown$,
-  rootEditor$
+  rootEditor$,
+  insertMarkdown$
 } from './plugins/core'
 import { RealmPlugin, RealmWithPlugins } from './RealmWithPlugins'
 import { useCellValues, usePublisher, useRealm } from '@mdxeditor/gurx'
@@ -122,6 +123,11 @@ export interface MDXEditorMethods {
   setMarkdown: (value: string) => void
 
   /**
+   * Inserts markdown at the current cursor position. Use the focus if necessary.
+   */
+  insertMarkdown: (value: string) => void
+
+  /**
    * Sets focus on input
    */
   focus: (callbackFn?: (() => void) | undefined, opts?: { defaultSelection?: 'rootStart' | 'rootEnd'; preventScroll?: boolean }) => void
@@ -181,6 +187,9 @@ const Methods: React.FC<{ mdxRef: React.ForwardedRef<MDXEditorMethods> }> = ({ m
         },
         setMarkdown: (markdown) => {
           realm.pub(setMarkdown$, markdown)
+        },
+        insertMarkdown: (markdown) => {
+          realm.pub(insertMarkdown$, markdown)
         },
         focus: (callbackFn?: (() => void) | undefined, opts?: { defaultSelection?: 'rootStart' | 'rootEnd'; preventScroll?: boolean }) => {
           realm.getValue(rootEditor$)?.focus(callbackFn, opts)

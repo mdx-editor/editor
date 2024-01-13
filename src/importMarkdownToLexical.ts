@@ -74,12 +74,17 @@ function isParent(node: unknown): node is Mdast.Parent {
   return (node as { children?: any[] }).children instanceof Array
 }
 
+export interface ImportPoint {
+  append(node: LexicalNode): void
+  getType(): string
+}
+
 /**
  * The options of the tree import utility. Not meant to be used directly.
  * @internal
  */
 export interface MdastTreeImportOptions {
-  root: LexicalRootNode
+  root: ImportPoint
   visitors: MdastImportVisitor<Mdast.RootContent>[]
   mdastRoot: Mdast.Root
 }
@@ -204,5 +209,5 @@ export function importMdastTreeToLexical({ root, mdastRoot, visitors }: MdastTre
     })
   }
 
-  visit(mdastRoot, root, null)
+  visit(mdastRoot, root as unknown as LexicalNode, null)
 }
