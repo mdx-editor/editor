@@ -165,10 +165,11 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
     setHighlightedCoordinates([colIndex, rowIndex])
   }, [])
 
+  // remove tool cols in readOnly mode
   return (
     <table className={styles.tableEditor} onMouseOver={onTableMouseOver} onMouseLeave={() => setHighlightedCoordinates([-1, -1])}>
       <colgroup>
-        <col />
+        {readOnly ? null : <col />}
 
         {Array.from({ length: mdastNode.children[0].children.length }, (_, colIndex) => {
           const align = mdastNode.align || []
@@ -176,7 +177,8 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
           const className = AlignToTailwindClassMap[currentColumnAlign]
           return <col key={colIndex} className={className} />
         })}
-        <col />
+
+        {readOnly ? null : <col />}
       </colgroup>
 
       {readOnly || (
