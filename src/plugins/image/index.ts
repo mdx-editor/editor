@@ -161,7 +161,6 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
 
     r.pub(createActiveEditorSubscription$, (editor) => {
       const theUploadHandler = r.getValue(imageUploadHandler$)
-      console.log('theUploadHandler', theUploadHandler)
       return mergeRegister(
         editor?.registerCommand<InsertImagePayload>(
           INSERT_IMAGE_COMMAND,

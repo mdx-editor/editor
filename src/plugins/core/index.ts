@@ -827,7 +827,12 @@ export const corePlugin = realmPlugin<{
         LexicalGenericHTMLVisitor
       ],
 
-      [addComposerChild$]: SharedHistoryPlugin
+      [addComposerChild$]: SharedHistoryPlugin,
+      [contentEditableClassName$]: params?.contentEditableClassName,
+      [toMarkdownOptions$]: params?.toMarkdownOptions,
+      [autoFocus$]: params?.autoFocus,
+      [placeholder$]: params?.placeholder,
+      [readOnly$]: params?.readOnly
     })
 
     // Use the JSX extension to parse HTML

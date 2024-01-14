@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { ElementNode, LexicalNode, RootNode as LexicalRootNode } from 'lexical'
+import { ElementNode, LexicalNode } from 'lexical'
 import * as Mdast from 'mdast'
 import { fromMarkdown, type Options } from 'mdast-util-from-markdown'
 import { toMarkdown } from 'mdast-util-to-markdown'
