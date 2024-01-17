@@ -8,7 +8,7 @@ position: 0.8
 
 The markdown shortcuts plugin enables typing shortcuts (similar to Notion, recently ported to Google Docs) that initiate the corresponding markdown blocks.
 
-Notice that you will need the corresponding plugins for the markdown blocks to be rendered correctly.
+Notice that you will need the corresponding plugins for the markdown blocks listed before `markdownShortcutPlugin()` to enable support.
 
 ```tsx
 <MDXEditor markdown="hello world" plugins={[headingsPlugin(), listsPlugin(), linkPlugin(), quotePlugin(), markdownShortcutPlugin()]} />
