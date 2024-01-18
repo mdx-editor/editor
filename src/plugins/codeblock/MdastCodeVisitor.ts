@@ -3,7 +3,13 @@ import { $createCodeBlockNode } from './CodeBlockNode'
 import { MdastImportVisitor } from '../../importMarkdownToLexical'
 
 export const MdastCodeVisitor: MdastImportVisitor<Mdast.Code> = {
-  testNode: 'code',
+  testNode: (node, { codeBlockEditorDescriptors }) => {
+    if (node.type === 'code') {
+      const descriptor = codeBlockEditorDescriptors.find((descriptor) => descriptor.match(node.lang, node.meta))
+      return descriptor !== undefined
+    }
+    return false
+  },
   visitNode({ mdastNode, actions }) {
     actions.addAndStepInto(
       $createCodeBlockNode({

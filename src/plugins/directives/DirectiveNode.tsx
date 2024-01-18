@@ -3,9 +3,9 @@ import type { EditorConfig, LexicalEditor, LexicalNode, NodeKey, SerializedLexic
 import { DecoratorNode } from 'lexical'
 import { Directives } from 'mdast-util-directive'
 import { NestedEditorsContext } from '../core/NestedLexicalEditor'
-import { directiveDescriptors$ } from '.'
 import { VoidEmitter, voidEmitter } from '../../utils/voidEmitter'
 import { useCellValues } from '@mdxeditor/gurx'
+import { directiveDescriptors$ } from '../core'
 
 /**
  * A serialized representation of an {@link DirectiveNode}.

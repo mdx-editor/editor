@@ -1,6 +1,6 @@
 import { SandpackProvider } from '@codesandbox/sandpack-react'
 import React from 'react'
-import { appendCodeBlockEditorDescriptor$, insertCodeBlock$ } from '../codeblock'
+import { CodeBlockEditorDescriptor, appendCodeBlockEditorDescriptor$, insertCodeBlock$ } from '../codeblock'
 import { SandpackEditor } from './SandpackEditor'
 import { Cell, Signal, map, useCellValue, withLatestFrom } from '@mdxeditor/gurx'
 import { realmPlugin } from '../../RealmWithPlugins'
@@ -137,25 +137,32 @@ export const insertSandpack$ = Signal<string>((r) => {
  * @group Sandpack
  */
 export const sandpackPlugin = realmPlugin<{ sandpackConfig: SandpackConfig }>({
-  init(realm) {
-    realm.pub(appendCodeBlockEditorDescriptor$, {
-      match(_language, meta) {
-        return meta?.startsWith('live')
-      },
-      priority: 1,
-      Editor(props) {
-        const config = useCellValue(sandpackConfig$)
-
-        const preset = config.presets.find((preset) => preset.meta === props.meta)
-        if (!preset) {
-          throw new Error(`No sandpack preset found with ${props.meta}`)
-        }
-
-        return <SandpackEditor {...props} preset={preset} />
-      }
+  init(realm, params) {
+    realm.pubIn({
+      [sandpackConfig$]: params?.sandpackConfig,
+      [appendCodeBlockEditorDescriptor$]: sandpackCodeBlockDescriptor()
     })
   },
   update(realm, params) {
     realm.pub(sandpackConfig$, params?.sandpackConfig)
   }
 })
+
+function sandpackCodeBlockDescriptor(): CodeBlockEditorDescriptor {
+  return {
+    match(_language, meta) {
+      return Boolean(meta?.startsWith('live'))
+    },
+    Editor(props) {
+      const config = useCellValue(sandpackConfig$)
+
+      const preset = config.presets.find((preset) => preset.meta === props.meta)
+      if (!preset) {
+        throw new Error(`No sandpack preset found with ${props.meta}`)
+      }
+
+      return <SandpackEditor {...props} preset={preset} />
+    },
+    priority: 1
+  }
+}

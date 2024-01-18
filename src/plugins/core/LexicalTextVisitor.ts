@@ -4,7 +4,7 @@ import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from '../../FormatConstants
 import { LexicalExportVisitor } from '../../exportMarkdownFromLexical'
 import { type MdxJsxTextElement } from 'mdast-util-mdx-jsx'
 
-export function isMdastText(mdastNode: Mdast.Content): mdastNode is Mdast.Text {
+export function isMdastText(mdastNode: Mdast.Nodes): mdastNode is Mdast.Text {
   return mdastNode.type === 'text'
 }
 
@@ -27,7 +27,7 @@ export const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text> = {
     return false
   },
 
-  join<T extends Mdast.Content>(prevNode: T, currentNode: T) {
+  join<T extends Mdast.Nodes>(prevNode: T, currentNode: T) {
     if (isMdastText(prevNode) && isMdastText(currentNode)) {
       return {
         type: 'text',

@@ -1,9 +1,9 @@
-import React from 'react'
-import { DecoratorNode, EditorConfig, LexicalEditor, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
-import { CodeBlockEditorProps, codeBlockEditorDescriptors$ } from '.'
-import { voidEmitter } from '../../utils/voidEmitter'
-import { NESTED_EDITOR_UPDATED_COMMAND } from '../core'
 import { useCellValue } from '@mdxeditor/gurx'
+import { DecoratorNode, EditorConfig, LexicalEditor, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
+import React from 'react'
+import { CodeBlockEditorProps } from '.'
+import { voidEmitter } from '../../utils/voidEmitter'
+import { NESTED_EDITOR_UPDATED_COMMAND, codeBlockEditorDescriptors$ } from '../core'
 
 /**
  * The options necessary to construct a new code block node.

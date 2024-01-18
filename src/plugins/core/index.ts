@@ -64,6 +64,9 @@ import { MdastParagraphVisitor } from './MdastParagraphVisitor'
 import { MdastRootVisitor } from './MdastRootVisitor'
 import { MdastTextVisitor } from './MdastTextVisitor'
 import { SharedHistoryPlugin } from './SharedHistoryPlugin'
+import { DirectiveDescriptor } from '../directives'
+import { CodeBlockEditorDescriptor } from '../codeblock'
+import { Directives } from 'mdast-util-directive'
 export * from './MdastHTMLNode'
 export * from './GenericHTMLNode'
 export * from './Icon'
@@ -232,8 +235,21 @@ export const toMarkdownOptions$ = Cell<NonNullable<LexicalConvertOptions['toMark
 // the JSX plugin will fill in these
 /** @internal */
 export const jsxIsAvailable$ = Cell(false)
+
 /** @internal */
 export const jsxComponentDescriptors$ = Cell<JsxComponentDescriptor[]>([])
+
+/**
+ * Contains the currently registered Markdown directive descriptors.
+ * @group Directive
+ */
+export const directiveDescriptors$ = Cell<DirectiveDescriptor<Directives>[]>([])
+
+/**
+ * Contains the currently registered code block descriptors.
+ * @group Code Block
+ */
+export const codeBlockEditorDescriptors$ = Cell<CodeBlockEditorDescriptor[]>([])
 
 /**
  * A reference to a DOM element. used for the various popups, dialogs, and tooltips
@@ -574,7 +590,10 @@ function tryImportingMarkdown(r: Realm, node: ImportPoint, markdownValue: string
       visitors: r.getValue(importVisitors$),
       mdastExtensions: r.getValue(mdastExtensions$),
       markdown: markdownValue,
-      syntaxExtensions: r.getValue(syntaxExtensions$)
+      syntaxExtensions: r.getValue(syntaxExtensions$),
+      jsxComponentDescriptors: r.getValue(jsxComponentDescriptors$),
+      directiveDescriptors: r.getValue(directiveDescriptors$),
+      codeBlockEditorDescriptors: r.getValue(codeBlockEditorDescriptors$)
     })
     r.pub(markdownProcessingError$, null)
   } catch (e) {

@@ -62,7 +62,7 @@ export function MissingPlugins() {
   )
 }
 
-const CatchAllVisitor: MdastImportVisitor<Mdast.Content> = {
+const CatchAllVisitor: MdastImportVisitor<Mdast.Nodes> = {
   testNode: () => true,
   visitNode: ({ mdastNode, actions }) => {
     console.warn('catch all', { mdastNode })

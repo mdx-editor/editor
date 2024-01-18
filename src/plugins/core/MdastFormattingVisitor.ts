@@ -18,15 +18,15 @@ interface JsxUnderlineNode extends MdxJsxTextElement {
   name: 'u'
 }
 
-function isOpeningUnderlineNode(node: Mdast.Content): node is OpeningHTMLUnderlineNode {
+function isOpeningUnderlineNode(node: Mdast.Nodes): node is OpeningHTMLUnderlineNode {
   return node.type === 'html' && node.value === '<u>'
 }
 
-function isClosingUnderlineNode(node: Mdast.Content): node is ClosingHTMLUnderlineNode {
+function isClosingUnderlineNode(node: Mdast.Nodes): node is ClosingHTMLUnderlineNode {
   return node.type === 'html' && node.value === '</u>'
 }
 
-function isJsxUnderlineNode(node: Mdast.Content): node is JsxUnderlineNode {
+function isJsxUnderlineNode(node: Mdast.Nodes): node is JsxUnderlineNode {
   return node.type === 'mdxJsxTextElement' && node.name === 'u'
 }
 
@@ -35,19 +35,19 @@ export const MdastFormattingVisitor: MdastImportVisitor<Mdast.Emphasis | Mdast.S
     return (
       mdastNode.type === 'emphasis' ||
       mdastNode.type === 'strong' ||
-      isJsxUnderlineNode(mdastNode as Mdast.Content) ||
-      isOpeningUnderlineNode(mdastNode as Mdast.Content) ||
-      isClosingUnderlineNode(mdastNode as Mdast.Content)
+      isJsxUnderlineNode(mdastNode) ||
+      isOpeningUnderlineNode(mdastNode) ||
+      isClosingUnderlineNode(mdastNode)
     )
   },
 
   visitNode({ mdastNode, lexicalParent, actions, mdastParent }) {
     if (isOpeningUnderlineNode(mdastNode)) {
-      actions.addFormatting(IS_UNDERLINE, mdastParent as Mdast.Content)
+      actions.removeFormatting(IS_UNDERLINE, mdastParent as Mdast.Parent)
       return
     }
     if (isClosingUnderlineNode(mdastNode)) {
-      actions.removeFormatting(IS_UNDERLINE, mdastParent as Mdast.Content)
+      actions.removeFormatting(IS_UNDERLINE, mdastParent as Mdast.Parent)
       return
     }
     if (mdastNode.type === 'emphasis') {

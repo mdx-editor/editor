@@ -1,6 +1,14 @@
 import { CodeBlockVisitor } from './CodeBlockVisitor'
 import { MdastCodeVisitor } from './MdastCodeVisitor'
-import { Appender, addActivePlugin$, addExportVisitor$, addImportVisitor$, addLexicalNode$, insertDecoratorNode$ } from '../core'
+import {
+  Appender,
+  addActivePlugin$,
+  addExportVisitor$,
+  addImportVisitor$,
+  addLexicalNode$,
+  codeBlockEditorDescriptors$,
+  insertDecoratorNode$
+} from '../core'
 import { $createCodeBlockNode, CodeBlockNode, CreateCodeBlockNodeOptions } from './CodeBlockNode'
 import { VoidEmitter } from '../../utils/voidEmitter'
 import { Cell, Signal, map, withLatestFrom } from '@mdxeditor/gurx'
@@ -54,18 +62,12 @@ export interface CodeBlockEditorDescriptor {
    * @param language - The language of the code block.
    * @param meta - The meta of the code block.
    */
-  match: (language: string, meta: string) => boolean
+  match: (language: string | null | undefined, meta: string | null | undefined) => boolean
   /**
    * The React component to be used. See {@link CodeBlockEditorProps} for the props passed to the component.
    */
   Editor: React.ComponentType<CodeBlockEditorProps>
 }
-
-/**
- * Contains the currently registered code block descriptors.
- * @group Code Block
- */
-export const codeBlockEditorDescriptors$ = Cell<CodeBlockEditorDescriptor[]>([])
 
 /**
  * Contains the default language to use when creating a new code block if no language is passed.

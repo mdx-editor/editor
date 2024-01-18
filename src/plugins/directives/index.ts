@@ -6,9 +6,10 @@ import {
   addMdastExtension$,
   addSyntaxExtension$,
   addToMarkdownExtension$,
+  directiveDescriptors$,
   insertDecoratorNode$
 } from '../core'
-import { Cell, Signal, map } from '@mdxeditor/gurx'
+import { Signal, map } from '@mdxeditor/gurx'
 import { LexicalEditor } from 'lexical'
 import { Directives, directiveFromMarkdown, directiveToMarkdown } from 'mdast-util-directive'
 import { directive } from 'micromark-extension-directive'
@@ -74,12 +75,6 @@ export interface DirectiveEditorProps<T extends Directives = Directives> {
 }
 
 /**
- * Contains the currently registered directive descriptors.
- * @group Directive
- */
-export const directiveDescriptors$ = Cell<DirectiveDescriptor<any>[]>([])
-
-/**
  * A signal that inserts a new directive node with the published payload.
  * @group Directive
  */
@@ -110,6 +105,7 @@ export const directivesPlugin = realmPlugin<{
   directiveDescriptors: DirectiveDescriptor<any>[]
 }>({
   update: (realm, params) => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     realm.pub(directiveDescriptors$, params?.directiveDescriptors || [])
   },
 

@@ -13,11 +13,11 @@ interface ClosingHTMLCodeNode extends Mdast.HTML {
   value: '</code>'
 }
 
-function isOpeningCodeNode(node: Mdast.Content | Mdast.Root): node is OpeningHTMLCodeNode {
+function isOpeningCodeNode(node: Mdast.Nodes): node is OpeningHTMLCodeNode {
   return node.type === 'html' && node.value === '<code>'
 }
 
-function isClosingCodeNode(node: Mdast.Content | Mdast.Root): node is ClosingHTMLCodeNode {
+function isClosingCodeNode(node: Mdast.Nodes): node is ClosingHTMLCodeNode {
   return node.type === 'html' && node.value === '</code>'
 }
 
@@ -27,11 +27,11 @@ export const MdastInlineCodeVisitor: MdastImportVisitor<Mdast.InlineCode> = {
   },
   visitNode({ mdastNode, actions, mdastParent }) {
     if (isOpeningCodeNode(mdastNode)) {
-      actions.addFormatting(IS_CODE, mdastParent as Mdast.Content)
+      actions.addFormatting(IS_CODE, mdastParent)
       return
     }
     if (isClosingCodeNode(mdastNode)) {
-      actions.removeFormatting(IS_CODE, mdastParent as Mdast.Content)
+      actions.removeFormatting(IS_CODE, mdastParent)
       return
     }
     actions.addAndStepInto($createTextNode(mdastNode.value).setFormat(IS_CODE))

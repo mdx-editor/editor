@@ -7,7 +7,7 @@ import { isMdastJsxNode } from '.'
 export const LexicalJsxVisitor: LexicalExportVisitor<LexicalJsxNode, MdxJsxFlowElement | MdxJsxTextElement> = {
   testLexicalNode: $isLexicalJsxNode,
   visitLexicalNode({ actions, mdastParent, lexicalNode }) {
-    function traverseNestedJsxNodes(node: Mdast.Content | Mdast.Parent) {
+    function traverseNestedJsxNodes(node: Mdast.Nodes) {
       if ('children' in node && node.children instanceof Array) {
         node.children.forEach((child: Mdast.Nodes) => {
           if (isMdastJsxNode(child)) {

@@ -31,6 +31,8 @@ import { isPartOftheEditorUI } from '../../utils/isPartOftheEditorUI'
 import { uuidv4 } from '../../utils/uuid4'
 import {
   NESTED_EDITOR_UPDATED_COMMAND,
+  codeBlockEditorDescriptors$,
+  directiveDescriptors$,
   editorRootElementRef$,
   exportVisitors$,
   iconComponentFor$,
@@ -307,11 +309,22 @@ const Cell: React.FC<Omit<CellProps, 'focus'>> = ({ align, ...props }) => {
 }
 
 const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, lexicalTable, contents, colIndex, rowIndex }) => {
-  const [importVisitors, exportVisitors, usedLexicalNodes, jsxComponentDescriptors, jsxIsAvailable, rootEditor] = useCellValues(
+  const [
+    importVisitors,
+    exportVisitors,
+    usedLexicalNodes,
+    jsxComponentDescriptors,
+    directiveDescriptors,
+    codeBlockEditorDescriptors,
+    jsxIsAvailable,
+    rootEditor
+  ] = useCellValues(
     importVisitors$,
     exportVisitors$,
     usedLexicalNodes$,
     jsxComponentDescriptors$,
+    directiveDescriptors$,
+    codeBlockEditorDescriptors$,
     jsxIsAvailable$,
     rootEditor$
   )
@@ -326,7 +339,10 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
       importMdastTreeToLexical({
         root: $getRoot(),
         mdastRoot: { type: 'root', children: [{ type: 'paragraph', children: contents }] },
-        visitors: importVisitors
+        visitors: importVisitors,
+        jsxComponentDescriptors,
+        directiveDescriptors,
+        codeBlockEditorDescriptors
       })
     })
 

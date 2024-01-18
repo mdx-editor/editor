@@ -5,6 +5,18 @@ import { fromMarkdown, type Options } from 'mdast-util-from-markdown'
 import { toMarkdown } from 'mdast-util-to-markdown'
 import { ParseOptions } from 'micromark-util-types'
 import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from './FormatConstants'
+import { JsxComponentDescriptor } from './plugins/jsx'
+import { DirectiveDescriptor } from './plugins/directives'
+import { CodeBlockEditorDescriptor } from './plugins/codeblock'
+
+/**
+ * The registered descriptors for composite nodes (jsx, directives, code blocks).
+ */
+export interface Descriptors {
+  jsxComponentDescriptors: JsxComponentDescriptor[]
+  directiveDescriptors: DirectiveDescriptor[]
+  codeBlockEditorDescriptors: CodeBlockEditorDescriptor[]
+}
 
 /** @internal */
 export type MdastExtensions = Options['mdastExtensions']
@@ -18,8 +30,9 @@ export interface MdastImportVisitor<UN extends Mdast.Nodes> {
   /**
    * The test function that determines if this visitor should be used for the given node.
    * As a convenience, you can also pass a string here, which will be compared to the node's type.
+   * @param options - the registered descriptors for composite nodes (jsx, directives, code blocks).
    */
-  testNode: ((mdastNode: Mdast.Nodes) => boolean) | string
+  testNode: ((mdastNode: Mdast.Nodes, options: Descriptors) => boolean) | string
   visitNode(params: {
     /**
      * The node that is currently being visited.
@@ -51,13 +64,13 @@ export interface MdastImportVisitor<UN extends Mdast.Nodes> {
        * Adds formatting as a context for the current node and its children.
        * This is necessary due to mdast treating formatting as a node, while lexical considering it an attribute of a node.
        */
-      addFormatting(format: typeof IS_BOLD | typeof IS_ITALIC | typeof IS_UNDERLINE | typeof IS_CODE, node?: Mdast.RootContent): void
+      addFormatting(format: typeof IS_BOLD | typeof IS_ITALIC | typeof IS_UNDERLINE | typeof IS_CODE, node?: Mdast.Parent | null): void
 
       /**
        * Removes formatting as a context for the current node and its children.
        * This is necessary due to mdast treating formatting as a node, while lexical considering it an attribute of a node.
        */
-      removeFormatting(format: typeof IS_BOLD | typeof IS_ITALIC | typeof IS_UNDERLINE | typeof IS_CODE, node?: Mdast.RootContent): void
+      removeFormatting(format: typeof IS_BOLD | typeof IS_ITALIC | typeof IS_UNDERLINE | typeof IS_CODE, node?: Mdast.Parent | null): void
       /**
        * Access the current formatting context.
        */
@@ -83,7 +96,7 @@ export interface ImportPoint {
  * The options of the tree import utility. Not meant to be used directly.
  * @internal
  */
-export interface MdastTreeImportOptions {
+export interface MdastTreeImportOptions extends Descriptors {
   root: ImportPoint
   visitors: MdastImportVisitor<Mdast.RootContent>[]
   mdastRoot: Mdast.Root
@@ -132,7 +145,14 @@ export class UnrecognizedMarkdownConstructError extends Error {
 }
 
 /** @internal */
-export function importMarkdownToLexical({ root, markdown, visitors, syntaxExtensions, mdastExtensions }: MarkdownParseOptions): void {
+export function importMarkdownToLexical({
+  root,
+  markdown,
+  visitors,
+  syntaxExtensions,
+  mdastExtensions,
+  ...descriptors
+}: MarkdownParseOptions): void {
   let mdastRoot: Mdast.Root
   try {
     mdastRoot = fromMarkdown(markdown, {
@@ -156,12 +176,12 @@ export function importMarkdownToLexical({ root, markdown, visitors, syntaxExtens
     mdastRoot.children.push({ type: 'paragraph', children: [] })
   }
 
-  importMdastTreeToLexical({ root, mdastRoot, visitors })
+  importMdastTreeToLexical({ root, mdastRoot, visitors, ...descriptors })
 }
 
 /** @internal */
-export function importMdastTreeToLexical({ root, mdastRoot, visitors }: MdastTreeImportOptions): void {
-  const formattingMap = new WeakMap<object, number>()
+export function importMdastTreeToLexical({ root, mdastRoot, visitors, ...descriptors }: MdastTreeImportOptions): void {
+  const formattingMap = new WeakMap<Mdast.Parent, number>()
 
   visitors = visitors.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0))
 
@@ -177,10 +197,19 @@ export function importMdastTreeToLexical({ root, mdastRoot, visitors }: MdastTre
       if (typeof visitor.testNode === 'string') {
         return visitor.testNode === mdastNode.type
       }
-      return visitor.testNode(mdastNode)
+      return visitor.testNode(mdastNode, descriptors)
     })
     if (!visitor) {
-      throw new UnrecognizedMarkdownConstructError(`Unsupported markdown syntax: ${toMarkdown(mdastNode)}`)
+      try {
+        throw new UnrecognizedMarkdownConstructError(`Unsupported markdown syntax: ${toMarkdown(mdastNode)}`)
+      } catch (e) {
+        throw new UnrecognizedMarkdownConstructError(
+          `Parsing of the following markdown structure failed: ${JSON.stringify({
+            type: mdastNode.type,
+            name: 'name' in mdastNode ? mdastNode.name : 'N/A'
+          })}`
+        )
+      }
     }
 
     visitor.visitNode({
@@ -196,11 +225,25 @@ export function importMdastTreeToLexical({ root, mdastRoot, visitors }: MdastTre
             visitChildren(mdastNode, lexicalNode)
           }
         },
-        addFormatting(format, node = mdastNode as any) {
-          formattingMap.set(node, format | (formattingMap.get(mdastParent!) ?? 0))
+        addFormatting(format, node) {
+          if (!node) {
+            if (isParent(mdastNode)) {
+              node = mdastNode
+            }
+          }
+          if (node) {
+            formattingMap.set(node, format | (formattingMap.get(mdastParent!) ?? 0))
+          }
         },
-        removeFormatting(format, node = mdastNode as any) {
-          formattingMap.set(node, format ^ (formattingMap.get(mdastParent!) ?? 0))
+        removeFormatting(format, node) {
+          if (!node) {
+            if (isParent(mdastNode)) {
+              node = mdastNode
+            }
+          }
+          if (node) {
+            formattingMap.set(node, format ^ (formattingMap.get(mdastParent!) ?? 0))
+          }
         },
         getParentFormatting() {
           return formattingMap.get(mdastParent!) ?? 0

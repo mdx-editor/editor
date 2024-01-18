@@ -1,6 +1,6 @@
 import { realmPlugin } from '../../RealmWithPlugins'
 import { Cell, Signal, map } from '@mdxeditor/gurx'
-import { appendCodeBlockEditorDescriptor$, insertCodeBlock$ } from '../codeblock'
+import { CodeBlockEditorDescriptor, appendCodeBlockEditorDescriptor$, insertCodeBlock$ } from '../codeblock'
 import { CodeMirrorEditor } from './CodeMirrorEditor'
 
 /**
@@ -36,7 +36,7 @@ export const insertCodeMirror$ = Signal<{ language: string; code: string }>((r) 
 })
 
 /**
- * A plugin that adds lets users editor code blocks with CodeMirror.
+ * A plugin that adds lets users edit code blocks with CodeMirror.
  * @group CodeMirror
  */
 export const codeMirrorPlugin = realmPlugin<{ codeBlockLanguages: Record<string, string> }>({
@@ -45,12 +45,19 @@ export const codeMirrorPlugin = realmPlugin<{ codeBlockLanguages: Record<string,
   },
 
   init(r, params) {
-    r.pub(appendCodeBlockEditorDescriptor$, {
-      match(language, meta) {
-        return Boolean(params?.codeBlockLanguages.hasOwnProperty(language)) && meta === ''
-      },
-      priority: 1,
-      Editor: CodeMirrorEditor
+    r.pubIn({
+      [codeBlockLanguages$]: params?.codeBlockLanguages,
+      [appendCodeBlockEditorDescriptor$]: buildCodeBlockDescriptor(params?.codeBlockLanguages || {})
     })
   }
 })
+
+function buildCodeBlockDescriptor(codeBlockLanguages: Record<string, string>): CodeBlockEditorDescriptor {
+  return {
+    match(language, meta) {
+      return Boolean(codeBlockLanguages.hasOwnProperty(language || '')) && !Boolean(meta)
+    },
+    priority: 1,
+    Editor: CodeMirrorEditor
+  }
+}
