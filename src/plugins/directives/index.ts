@@ -109,8 +109,9 @@ export const directivesPlugin = realmPlugin<{
     realm.pub(directiveDescriptors$, params?.directiveDescriptors || [])
   },
 
-  init: (realm) => {
+  init: (realm, params) => {
     realm.pubIn({
+      [directiveDescriptors$]: params?.directiveDescriptors || [],
       // import
       [addMdastExtension$]: directiveFromMarkdown(),
       [addSyntaxExtension$]: directive(),
