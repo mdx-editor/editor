@@ -12,7 +12,7 @@ The markdown format can be complex due to its loose nature. You may integrate th
 
 The editor component uses the [MDAST library](https://github.com/syntax-tree/mdast-util-from-markdown) to parse the markdown content. Although it's quite forgiving, certain content can cause the parsing to fail, in which case the editor will remain empty. To obtain more information about the error, you can pass a callback to the `onError` prop - the callback will receive a payload that includes the error message and the source markdown that triggered it.
 
-### Parse errors caused by HTML-like formatting (e.g. HTML comments, or links surrounded by angle brackets)
+### Parse errors caused by HTML-like formatting (e.g. links surrounded by angle brackets) or JSX expression syntax
 
 To handle common basic HTML formatting (e.g. `u` tags), the default parsing includes the [mdast-util-mdx-jsx extension](https://github.com/syntax-tree/mdast-util-mdx-jsx). In some cases, this can cause the parsing to fail. You can disable this extension by setting the `suppressHtmlProcessing` prop to `true`, but you will lose the ability to use HTML-like formatting in your markdown.
 

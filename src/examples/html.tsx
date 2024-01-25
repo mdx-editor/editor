@@ -20,6 +20,11 @@ import { useCellValues } from '@mdxeditor/gurx'
 const markdownWithSpan = `
   # Hello World
 
+foo
+  <!-- comment -->
+
+bar
+
   A paragraph with <span style="color: red" class="some">some red text <span style="color: blue">with some blue nesting.</span> in here.</span> in it.
 `
 export function HTag() {

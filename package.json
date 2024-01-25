@@ -80,6 +80,8 @@
     "micromark-extension-mdx-jsx": "^3.0.0",
     "micromark-extension-mdx-md": "^2.0.0",
     "micromark-extension-mdxjs": "^3.0.0",
+    "micromark-factory-space": "^2.0.0",
+    "micromark-util-symbol": "^2.0.0",
     "react-hook-form": "^7.44.2",
     "unidiff": "^1.0.2"
   },

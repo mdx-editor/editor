@@ -67,6 +67,7 @@ import { SharedHistoryPlugin } from './SharedHistoryPlugin'
 import { DirectiveDescriptor } from '../directives'
 import { CodeBlockEditorDescriptor } from '../codeblock'
 import { Directives } from 'mdast-util-directive'
+import { comment, commentFromMarkdown } from '../../mdastUtilHtmlComment'
 export * from './MdastHTMLNode'
 export * from './GenericHTMLNode'
 export * from './Icon'
@@ -858,8 +859,8 @@ export const corePlugin = realmPlugin<{
     // Use the JSX extension to parse HTML
     if (!params?.suppressHtmlProcessing) {
       r.pubIn({
-        [addMdastExtension$]: mdxJsxFromMarkdown(),
-        [addSyntaxExtension$]: [mdxJsx(), mdxMd()],
+        [addMdastExtension$]: [mdxJsxFromMarkdown(), commentFromMarkdown({ ast: false })],
+        [addSyntaxExtension$]: [mdxJsx(), mdxMd(), comment],
         [addToMarkdownExtension$]: mdxJsxToMarkdown(),
         [addImportVisitor$]: MdastHTMLVisitor
       })
