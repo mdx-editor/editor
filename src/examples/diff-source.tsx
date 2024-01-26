@@ -1,5 +1,5 @@
 import React from 'react'
-import { MDXEditor, MDXEditorMethods, diffSourcePlugin } from '../'
+import { DiffSourceToggleWrapper, MDXEditor, MDXEditorMethods, UndoRedo, diffSourcePlugin, toolbarPlugin } from '../'
 import { useRef } from 'react'
 
 export function GetMarkdownInSourceMode() {
@@ -20,16 +20,35 @@ export function GetMarkdownInSourceMode() {
 export function ChangeDiffMakrkdown() {
   const ref = useRef<MDXEditorMethods>(null)
   const [diffMarkdown, setDiffMarkdown] = React.useState('foo')
+  const [markdown] = React.useState('Hello world')
+  console.log(`rendering`, markdown)
   return (
     <div className="App">
       <button onClick={() => setDiffMarkdown('bar')}>Change Diff Markdown</button>
       <MDXEditor
         ref={ref}
         onChange={(md) => console.log('change', md)}
-        markdown="Hello world"
-        plugins={[diffSourcePlugin({ viewMode: 'diff', diffMarkdown })]}
+        markdown={markdown}
+        plugins={[
+          diffSourcePlugin({ diffMarkdown }),
+          toolbarPlugin({
+            toolbarContents: () => (
+              <DiffSourceToggleWrapper>
+                <UndoRedo />
+              </DiffSourceToggleWrapper>
+            )
+          })
+        ]}
       />
       <button onClick={() => console.log(ref.current?.getMarkdown())}>Get Markdown</button>
+      <button
+        onClick={() => {
+          setDiffMarkdown('q')
+          ref.current?.setMarkdown('moo')
+        }}
+      >
+        Set Markdown to moo
+      </button>
     </div>
   )
 }
