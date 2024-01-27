@@ -18,7 +18,8 @@ import {
   onWindowChange$,
   removeLink$,
   switchFromPreviewToLinkEdit$,
-  updateLink$
+  updateLink$,
+  onClickLinkCallback$
 } from '.'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 
@@ -164,15 +165,24 @@ export const LinkDialog: React.FC = () => {
 
           {linkDialogState.type === 'preview' && (
             <>
-              <a
-                className={styles.linkDialogPreviewAnchor}
-                href={linkDialogState.url}
-                {...(urlIsExternal ? { target: '_blank', rel: 'noreferrer' } : {})}
-                title={urlIsExternal ? `Open ${linkDialogState.url} in new window` : linkDialogState.url}
-              >
-                <span>{linkDialogState.url}</span>
-                {urlIsExternal && iconComponentFor('open_in_new')}
-              </a>
+              {onClickLinkCallback$ !== null && (
+                <a className={styles.linkDialogPreviewAnchor} href="javascript:;" onClick={onClickLinkCallback$}>
+                  <span>{linkDialogState.url}</span>
+                  {urlIsExternal && iconComponentFor('open_in_new')}
+                </a>
+              )}
+              {onClickLinkCallback$ === null && (
+                <a
+                  className={styles.linkDialogPreviewAnchor}
+                  href={linkDialogState.url}
+                  {...(urlIsExternal ? { target: '_blank', rel: 'noreferrer' } : {})}
+                  title={urlIsExternal ? `Open ${linkDialogState.url} in new window` : linkDialogState.url}
+                >
+                  <span>{linkDialogState.url}</span>
+                  {urlIsExternal && iconComponentFor('open_in_new')}
+                </a>
+              )}
+
               <ActionButton onClick={() => switchFromPreviewToLinkEdit()} title="Edit link URL" aria-label="Edit link URL">
                 {iconComponentFor('edit')}
               </ActionButton>
