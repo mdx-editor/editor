@@ -318,17 +318,27 @@ export const openLinkEditDialog$ = Action((r) => {
 /** @internal */
 export const linkAutocompleteSuggestions$ = Cell<string[]>([])
 
+export type ClickLinkCallback = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => void
+
+/** @internal */
+export let onClickLinkCallback$: ClickLinkCallback | null = null
+
 /**
  * @group Link Dialog
  */
 export const linkDialogPlugin = realmPlugin<{
   LinkDialog?: () => JSX.Element
   linkAutocompleteSuggestions?: string[]
+  onClickLinkCallback?: ClickLinkCallback
 }>({
   init(r, params) {
     r.pub(addComposerChild$, params?.LinkDialog || LinkDialog)
+    if (params?.onClickLinkCallback) {
+      onClickLinkCallback$ = params?.onClickLinkCallback
+    }
   },
   update(r, params = {}) {
     r.pub(linkAutocompleteSuggestions$, params.linkAutocompleteSuggestions || [])
   }
 })
+
