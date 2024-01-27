@@ -214,6 +214,24 @@ export const linkDialogState$ = Cell<InactiveLinkDialog | PreviewLinkDialog | Ed
 
   r.link(
     r.pipe(
+      clickLink$,
+      withLatestFrom(linkDialogState$, activeEditor$),
+      map(([, state, editor]) => {
+        if (onClickLinkCallback$) {
+          const stateAct = state as PreviewLinkDialog
+          onClickLinkCallback$(stateAct.url)
+        }
+
+        return {
+          type: 'inactive' as const
+        } as InactiveLinkDialog
+      })
+    ),
+    linkDialogState$
+  )
+
+  r.link(
+    r.pipe(
       r.combine(currentSelection$, onWindowChange$),
       withLatestFrom(activeEditor$, linkDialogState$),
       map(([[selection], activeEditor]) => {
@@ -250,6 +268,11 @@ export const updateLink$ = Signal<{ url: string; title: string }>()
  * @group Link Dialog
  */
 export const cancelLinkEdit$ = Action()
+/**
+ * A signal that click on the current link.
+ * @group Link Dialog
+ */
+export const clickLink$ = Action()
 /**
  * A signal that confirms the updated values of the current link.
  * @group Link Dialog
@@ -318,7 +341,7 @@ export const openLinkEditDialog$ = Action((r) => {
 /** @internal */
 export const linkAutocompleteSuggestions$ = Cell<string[]>([])
 
-export type ClickLinkCallback = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => void
+export type ClickLinkCallback = (url: string) => void
 
 /** @internal */
 export let onClickLinkCallback$: ClickLinkCallback | null = null
@@ -341,4 +364,3 @@ export const linkDialogPlugin = realmPlugin<{
     r.pub(linkAutocompleteSuggestions$, params.linkAutocompleteSuggestions || [])
   }
 })
-
