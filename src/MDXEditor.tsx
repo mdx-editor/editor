@@ -64,7 +64,7 @@ const RichTextEditor: React.FC = () => {
       {topAreaChildren.map((Child, index) => (
         <Child key={index} />
       ))}
-      <RenderRecurisveWrappers wrappers={editorWrappers}>
+      <RenderRecursiveWrappers wrappers={editorWrappers}>
         <div className={classNames(styles.rootContentEditableWrapper)}>
           <RichTextPlugin
             contentEditable={<ContentEditable className={classNames(styles.contentEditable, contentEditableClassName)} />}
@@ -76,7 +76,7 @@ const RichTextEditor: React.FC = () => {
             ErrorBoundary={LexicalErrorBoundary}
           ></RichTextPlugin>
         </div>
-      </RenderRecurisveWrappers>
+      </RenderRecursiveWrappers>
       {composerChildren.map((Child, index) => (
         <Child key={index} />
       ))}
@@ -133,7 +133,7 @@ export interface MDXEditorMethods {
   focus: (callbackFn?: (() => void) | undefined, opts?: { defaultSelection?: 'rootStart' | 'rootEnd'; preventScroll?: boolean }) => void
 }
 
-const RenderRecurisveWrappers: React.FC<{ wrappers: React.ComponentType<{ children: React.ReactNode }>[]; children: React.ReactNode }> = ({
+const RenderRecursiveWrappers: React.FC<{ wrappers: React.ComponentType<{ children: React.ReactNode }>[]; children: React.ReactNode }> = ({
   wrappers,
   children
 }) => {
@@ -143,7 +143,7 @@ const RenderRecurisveWrappers: React.FC<{ wrappers: React.ComponentType<{ childr
   const Wrapper = wrappers[0]
   return (
     <Wrapper>
-      <RenderRecurisveWrappers wrappers={wrappers.slice(1)}>{children}</RenderRecurisveWrappers>
+      <RenderRecursiveWrappers wrappers={wrappers.slice(1)}>{children}</RenderRecursiveWrappers>
     </Wrapper>
   )
 }
