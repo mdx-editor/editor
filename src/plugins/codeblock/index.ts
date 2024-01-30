@@ -13,6 +13,7 @@ import { $createCodeBlockNode, CodeBlockNode, CreateCodeBlockNodeOptions } from 
 import { VoidEmitter } from '../../utils/voidEmitter'
 import { Cell, Signal, map, withLatestFrom } from '@mdxeditor/gurx'
 import { realmPlugin } from '../../RealmWithPlugins'
+import { SandpackThemeProp } from '@codesandbox/sandpack-react/types'
 export * from './CodeBlockNode'
 
 export type { CodeBlockEditorContextValue, CreateCodeBlockNodeOptions } from './CodeBlockNode'
@@ -44,6 +45,11 @@ export interface CodeBlockEditorProps {
    * Note: you don't need to unsubscribe, the emiter has a single subscription model.
    */
   focusEmitter: VoidEmitter
+
+  /**
+   * The theme CodeMirrorEditor used.
+   */
+  theme: SandpackThemeProp
 }
 
 /**
@@ -74,6 +80,15 @@ export interface CodeBlockEditorDescriptor {
  * @group Code Block
  */
 export const defaultCodeBlockLanguage$ = Cell<string>('')
+
+/**
+ * The theme CodeMirrorEditor used.
+ * It can be "light" | "dark" | "auto",
+ * or the theme in "@codesandbox/sandpack-themes" package,
+ * or you can also custom one,
+ * learn more https://sandpack.codesandbox.io/docs/getting-started/themes#custom-theme
+ */
+export const theme$ = Cell<SandpackThemeProp>('auto')
 
 /**
  * A signal that inserts a new code block into the editor with the published options.
@@ -113,9 +128,14 @@ export const codeBlockPlugin = realmPlugin<{
    * The default language to use when creating a new code block if no language is passed.
    */
   defaultCodeBlockLanguage?: string
+  /**
+   * The theme of CodeMirrorEditor
+   */
+  theme?: SandpackThemeProp
 }>({
   update(realm, params) {
     realm.pub(defaultCodeBlockLanguage$, params?.defaultCodeBlockLanguage || '')
+    realm.pub(theme$, params?.theme || 'auto')
   },
 
   init(realm, params) {
