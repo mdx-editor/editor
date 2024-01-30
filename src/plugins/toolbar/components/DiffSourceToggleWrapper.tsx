@@ -1,4 +1,4 @@
-import { iconComponentFor$, viewMode$ } from '../../core'
+import { iconComponentFor$, ViewMode, viewMode$ } from '../../core'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 import React from 'react'
 import styles from '../../../styles/ui.module.css'
@@ -20,9 +20,28 @@ import { SingleChoiceToggleGroup } from '.././primitives/toolbar'
  *
  * @group Toolbar Components
  */
-export const DiffSourceToggleWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const DiffSourceToggleWrapper: React.FC<{ children: React.ReactNode; options?: ViewMode[] }> = ({
+  children,
+  options = ['rich-text', 'diff', 'source']
+}) => {
   const [viewMode, iconComponentFor] = useCellValues(viewMode$, iconComponentFor$)
   const changeViewMode = usePublisher(viewMode$)
+
+  const toggleGroupItems: {
+    title: string
+    contents: React.ReactNode
+    value: ViewMode
+  }[] = []
+
+  if (options.includes('rich-text')) {
+    toggleGroupItems.push({ title: 'Rich text', contents: iconComponentFor('rich_text'), value: 'rich-text' })
+  }
+  if (options.includes('diff')) {
+    toggleGroupItems.push({ title: 'Diff mode', contents: iconComponentFor('difference'), value: 'diff' })
+  }
+  if (options.includes('source')) {
+    toggleGroupItems.push({ title: 'Source', contents: iconComponentFor('markdown'), value: 'source' })
+  }
 
   return (
     <>
@@ -38,11 +57,7 @@ export const DiffSourceToggleWrapper: React.FC<{ children: React.ReactNode }> = 
         <SingleChoiceToggleGroup
           className={styles.diffSourceToggle}
           value={viewMode}
-          items={[
-            { title: 'Rich text', contents: iconComponentFor('rich_text'), value: 'rich-text' },
-            { title: 'Diff mode', contents: iconComponentFor('difference'), value: 'diff' },
-            { title: 'Source', contents: iconComponentFor('markdown'), value: 'source' }
-          ]}
+          items={toggleGroupItems}
           onChange={(value) => changeViewMode(value || 'rich-text')}
         />
       </div>
