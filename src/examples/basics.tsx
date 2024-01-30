@@ -1,6 +1,7 @@
 import React from 'react'
 import {
   CodeBlockEditorDescriptor,
+  CodeMirrorEditor,
   DiffSourceToggleWrapper,
   GenericJsxEditor,
   InsertFrontmatter,
@@ -8,6 +9,7 @@ import {
   MDXEditor,
   MDXEditorMethods,
   UndoRedo,
+  VoidEmitter,
   codeBlockPlugin,
   codeMirrorPlugin,
   diffSourcePlugin,
@@ -15,6 +17,7 @@ import {
   headingsPlugin,
   imagePlugin,
   jsxPlugin,
+  linkDialogPlugin,
   linkPlugin,
   listsPlugin,
   markdownShortcutPlugin,
@@ -178,6 +181,31 @@ export function Link() {
   return <MDXEditor markdown={'some [hello](https://google.com) link'} plugins={[linkPlugin()]} />
 }
 
+export function LinkDialog() {
+  return (
+    <MDXEditor
+      markdown={'some [hello](https://google.com) link, and you can see a dialog after you click the link.'}
+      plugins={[linkPlugin(), linkDialogPlugin()]}
+    />
+  )
+}
+
+export function LinkDialogWithCallback() {
+  return (
+    <MDXEditor
+      markdown={'some [hello](https://google.com) link, and you can see an alert after you click the link in the dialog.'}
+      plugins={[
+        linkPlugin(),
+        linkDialogPlugin({
+          onClickLinkCallback: (url) => {
+            alert(`You clicked the url: ${url}`)
+          }
+        })
+      ]}
+    />
+  )
+}
+
 export function Images() {
   // eslint-disable-next-line @typescript-eslint/require-await
   return (
@@ -218,7 +246,29 @@ const PlainTextCodeEditorDescriptor: CodeBlockEditorDescriptor = {
   }
 }
 
-export function CodeBlock() {
+const PlainTextCodeEditorDescriptorUsingCM: CodeBlockEditorDescriptor = {
+  match: (language, meta) => {
+    return true
+  },
+  priority: 0,
+  Editor: (props) => {
+    const voidEmitter: VoidEmitter = {
+      subscribe: () => {
+        console.log(`voidEmitter subscribe`)
+      }
+    }
+
+    return CodeMirrorEditor({
+      language: props.language || 'text',
+      meta: 'RANDOM_STRING',
+      nodeKey: 'RANDOM_STRING',
+      code: props.code,
+      focusEmitter: voidEmitter
+    })
+  }
+}
+
+export function CodeBlockWithAutoTheme() {
   return (
     <MDXEditor
       onChange={console.log}
@@ -232,6 +282,34 @@ export function CodeBlock() {
   )
 }
 
+export function CodeBlockWithDarkTheme() {
+  return (
+    <MDXEditor
+      onChange={console.log}
+      markdown={codeBlocksMarkdown}
+      plugins={[
+        codeBlockPlugin({ codeBlockEditorDescriptors: [PlainTextCodeEditorDescriptor] }),
+        sandpackPlugin({ sandpackConfig: virtuosoSampleSandpackConfig }),
+        codeMirrorPlugin({ codeBlockLanguages: { js: 'JavaScript', css: 'CSS' }, theme: 'dark' })
+      ]}
+    />
+  )
+}
+
+export function CodeBlockWithLightTheme() {
+  return (
+    <MDXEditor
+      onChange={console.log}
+      markdown={codeBlocksMarkdown}
+      plugins={[
+        codeBlockPlugin({ codeBlockEditorDescriptors: [PlainTextCodeEditorDescriptor] }),
+        sandpackPlugin({ sandpackConfig: virtuosoSampleSandpackConfig }),
+        codeMirrorPlugin({ codeBlockLanguages: { js: 'JavaScript', css: 'CSS' }, theme: 'light' })
+      ]}
+    />
+  )
+}
+
 export function CustomCodeBlockEditor() {
   return (
     <MDXEditor
@@ -239,6 +317,20 @@ export function CustomCodeBlockEditor() {
       markdown={codeBlocksMarkdown}
       plugins={[
         codeBlockPlugin({ codeBlockEditorDescriptors: [PlainTextCodeEditorDescriptor] }),
+        diffSourcePlugin(),
+        toolbarPlugin({ toolbarContents: () => <DiffSourceToggleWrapper>-</DiffSourceToggleWrapper> })
+      ]}
+    />
+  )
+}
+
+export function CustomCodeBlockEditorUsingCM() {
+  return (
+    <MDXEditor
+      onChange={console.log}
+      markdown={codeBlocksMarkdown}
+      plugins={[
+        codeBlockPlugin({ codeBlockEditorDescriptors: [PlainTextCodeEditorDescriptorUsingCM] }),
         diffSourcePlugin(),
         toolbarPlugin({ toolbarContents: () => <DiffSourceToggleWrapper>-</DiffSourceToggleWrapper> })
       ]}
