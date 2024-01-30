@@ -18,7 +18,8 @@ import {
   onWindowChange$,
   removeLink$,
   switchFromPreviewToLinkEdit$,
-  updateLink$
+  updateLink$,
+  onClickLinkCallback$
 } from '.'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 
@@ -97,13 +98,15 @@ export function LinkEditForm({ url, title, onSubmit, onCancel, linkAutocompleteS
 
 /** @internal */
 export const LinkDialog: React.FC = () => {
-  const [editorRootElementRef, activeEditor, iconComponentFor, linkDialogState, linkAutocompleteSuggestions] = useCellValues(
-    editorRootElementRef$,
-    activeEditor$,
-    iconComponentFor$,
-    linkDialogState$,
-    linkAutocompleteSuggestions$
-  )
+  const [editorRootElementRef, activeEditor, iconComponentFor, linkDialogState, linkAutocompleteSuggestions, onClickLinkCallback] =
+    useCellValues(
+      editorRootElementRef$,
+      activeEditor$,
+      iconComponentFor$,
+      linkDialogState$,
+      linkAutocompleteSuggestions$,
+      onClickLinkCallback$
+    )
   const publishWindowChange = usePublisher(onWindowChange$)
   const updateLink = usePublisher(updateLink$)
   const cancelLinkEdit = usePublisher(cancelLinkEdit$)
@@ -168,11 +171,18 @@ export const LinkDialog: React.FC = () => {
                 className={styles.linkDialogPreviewAnchor}
                 href={linkDialogState.url}
                 {...(urlIsExternal ? { target: '_blank', rel: 'noreferrer' } : {})}
+                onClick={(e) => {
+                  if (onClickLinkCallback !== null) {
+                    e.preventDefault()
+                    onClickLinkCallback(linkDialogState.url)
+                  }
+                }}
                 title={urlIsExternal ? `Open ${linkDialogState.url} in new window` : linkDialogState.url}
               >
                 <span>{linkDialogState.url}</span>
                 {urlIsExternal && iconComponentFor('open_in_new')}
               </a>
+
               <ActionButton onClick={() => switchFromPreviewToLinkEdit()} title="Edit link URL" aria-label="Edit link URL">
                 {iconComponentFor('edit')}
               </ActionButton>
