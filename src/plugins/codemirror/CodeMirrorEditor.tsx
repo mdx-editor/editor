@@ -5,11 +5,12 @@ import { CodeBlockEditorProps } from '../codeblock'
 import { useCodeBlockEditorContext } from '../codeblock/CodeBlockNode'
 import { readOnly$ } from '../core'
 import { useCodeMirrorRef } from '../sandpack/useCodeMirrorRef'
-import { useCellValue } from '@mdxeditor/gurx'
+import { useCellValues } from '@mdxeditor/gurx'
+import { codeMirrorTheme$ } from '.'
 
-export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter, theme }: CodeBlockEditorProps) => {
+export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: CodeBlockEditorProps) => {
   const codeMirrorRef = useCodeMirrorRef(nodeKey, 'codeblock', 'jsx', focusEmitter)
-  const readOnly = useCellValue(readOnly$)
+  const [readOnly, theme] = useCellValues(readOnly$, codeMirrorTheme$)
   const { setCode } = useCodeBlockEditorContext()
 
   React.useEffect(() => {

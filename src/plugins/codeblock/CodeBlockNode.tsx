@@ -1,7 +1,7 @@
 import { useCellValue } from '@mdxeditor/gurx'
 import { DecoratorNode, EditorConfig, LexicalEditor, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
 import React from 'react'
-import { CodeBlockEditorProps, theme$ } from '.'
+import { CodeBlockEditorProps } from '.'
 import { voidEmitter } from '../../utils/voidEmitter'
 import { NESTED_EDITOR_UPDATED_COMMAND, codeBlockEditorDescriptors$ } from '../core'
 
@@ -127,7 +127,6 @@ export class CodeBlockNode extends DecoratorNode<JSX.Element> {
         codeBlockNode={this}
         nodeKey={this.getKey()}
         focusEmitter={this.__focusEmitter}
-        theme={'auto'}
       />
     )
   }
@@ -231,7 +230,6 @@ const CodeBlockEditorContainer: React.FC<
   const Editor = descriptor.Editor
 
   const { codeBlockNode: _, parentEditor: __, ...restProps } = props
-  restProps.theme = useCellValue(theme$)
 
   return (
     <CodeBlockEditorContextProvider parentEditor={props.parentEditor} lexicalNode={props.codeBlockNode}>
