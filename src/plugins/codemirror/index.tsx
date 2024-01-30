@@ -2,6 +2,7 @@ import { realmPlugin } from '../../RealmWithPlugins'
 import { Cell, Signal, map } from '@mdxeditor/gurx'
 import { CodeBlockEditorDescriptor, appendCodeBlockEditorDescriptor$, insertCodeBlock$ } from '../codeblock'
 import { CodeMirrorEditor } from './CodeMirrorEditor'
+import { SandpackThemeProp } from '@codesandbox/sandpack-react/types'
 
 /**
  * The codemirror code block languages.
@@ -36,17 +37,36 @@ export const insertCodeMirror$ = Signal<{ language: string; code: string }>((r) 
 })
 
 /**
+ * The theme CodeMirrorEditor used.
+ * It can be "light" | "dark" | "auto",
+ * or the theme in "@codesandbox/sandpack-themes" package,
+ * or you can also custom one,
+ * learn more https://sandpack.codesandbox.io/docs/getting-started/themes#custom-theme
+ */
+export const codeMirrorTheme$ = Cell<SandpackThemeProp>('auto')
+
+/**
  * A plugin that adds lets users edit code blocks with CodeMirror.
  * @group CodeMirror
  */
-export const codeMirrorPlugin = realmPlugin<{ codeBlockLanguages: Record<string, string> }>({
+export const codeMirrorPlugin = realmPlugin<{
+  codeBlockLanguages: Record<string, string>
+  /**
+   * The theme of CodeMirrorEditor
+   */
+  theme?: SandpackThemeProp
+}>({
   update(r, params) {
-    r.pub(codeBlockLanguages$, params?.codeBlockLanguages)
+    r.pubIn({
+      [codeBlockLanguages$]: params?.codeBlockLanguages,
+      [codeMirrorTheme$]: params?.theme || 'auto'
+    })
   },
 
   init(r, params) {
     r.pubIn({
       [codeBlockLanguages$]: params?.codeBlockLanguages,
+      [codeMirrorTheme$]: params?.theme || 'auto',
       [appendCodeBlockEditorDescriptor$]: buildCodeBlockDescriptor(params?.codeBlockLanguages || {})
     })
   }

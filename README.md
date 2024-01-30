@@ -10,6 +10,7 @@ The component supports the core markdown syntax and certain extensions, includin
 
 ```jsx
 import {MDXEditor, headingsPlugin} from '@mdxeditor/editor';
+import '@mdxeditor/editor/style.css';
 
 export default function App() {
   return <MDXEditor markdown={'# Hello World'} plugins={[headingsPlugin()]} />;
@@ -21,7 +22,11 @@ The best place to get started using the component is the [documentation](https:/
 
 ## Help and support
 
-Should you encounter any issues, please [create an issue](https://github.com/mdx-editor/editor/issues), but check if there's something similar already open first.
+If you find a bug, check if something similar is not reported already in the [issues](https://github.com/mdx-editor/editor/issues). If not, [create a new issue](https://github.com/mdx-editor/editor/issues/new?assignees=&labels=bug&projects=&template=1.bug.md&title=%5BBUG%5D).
+
+If you're integrating the component in your commercial project and need dedicated assistance with your issues in exchange of sponsorship, [contact me over email](mailto:petyo@mdxeditor.dev).
+
+If you want to discuss ideas [join the Discord server](https://discord.gg/4q7U2Hc) or start a discussion in the [Discussions](https://github.com/mdx-editor/editor/discussions) section.
 
 ## License
 
