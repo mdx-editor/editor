@@ -327,8 +327,17 @@ export const onClickLinkCallback$ = Cell<ClickLinkCallback | null>(null)
  * @group Link Dialog
  */
 export const linkDialogPlugin = realmPlugin<{
+  /**
+   * If passed, the link dialog will be rendered using this component instead of the default one.
+   */
   LinkDialog?: () => JSX.Element
+  /**
+   * If passed, the link input field will autocomplete using the published suggestions.
+   */
   linkAutocompleteSuggestions?: string[]
+  /**
+   * If set, clicking on the link in the preview popup will call this callback instead of opening the link.
+   */
   onClickLinkCallback?: ClickLinkCallback
 }>({
   init(r, params) {
