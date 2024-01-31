@@ -181,31 +181,6 @@ export function Link() {
   return <MDXEditor markdown={'some [hello](https://google.com) link'} plugins={[linkPlugin()]} />
 }
 
-export function LinkDialog() {
-  return (
-    <MDXEditor
-      markdown={'some [hello](https://google.com) link, and you can see a dialog after you click the link.'}
-      plugins={[linkPlugin(), linkDialogPlugin()]}
-    />
-  )
-}
-
-export function LinkDialogWithCallback() {
-  return (
-    <MDXEditor
-      markdown={'some [hello](https://google.com) link, and you can see an alert after you click the link in the dialog.'}
-      plugins={[
-        linkPlugin(),
-        linkDialogPlugin({
-          onClickLinkCallback: (url) => {
-            alert(`You clicked the url: ${url}`)
-          }
-        })
-      ]}
-    />
-  )
-}
-
 export function Images() {
   // eslint-disable-next-line @typescript-eslint/require-await
   return (

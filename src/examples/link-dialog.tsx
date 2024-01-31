@@ -23,6 +23,22 @@ export function Basics() {
   )
 }
 
+export function WithCallback() {
+  return (
+    <MDXEditor
+      markdown={'Hello world [link](https://google.com/), and you can see an alert after you click the link in the dialog.'}
+      plugins={[
+        linkPlugin(),
+        linkDialogPlugin({
+          onClickLinkCallback: (url) => {
+            alert(`You clicked the url: ${url}`)
+          }
+        })
+      ]}
+    />
+  )
+}
+
 export function WithNestedEditors() {
   return (
     <MDXEditor
