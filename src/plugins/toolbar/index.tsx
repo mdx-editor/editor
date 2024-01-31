@@ -15,17 +15,24 @@ const DEFAULT_TOOLBAR_CONTENTS = () => {
 }
 
 /**
+ * Max height to limit select element in toolbar.
+ * If set , the select element will be scrollable if it's height over this limit.
+ */
+export const selectMaxHeight$ = Cell<number | string>(0)
+
+/**
  * A plugin that adds a toolbar to the editor.
  * @group Toolbar
  */
-export const toolbarPlugin = realmPlugin<{ toolbarContents: () => React.ReactNode }>({
+export const toolbarPlugin = realmPlugin<{ toolbarContents: () => React.ReactNode; selectMaxHeight?: number | string }>({
   init(realm, params) {
     realm.pubIn({
       [toolbarContents$]: params?.toolbarContents ?? DEFAULT_TOOLBAR_CONTENTS,
       [addTopAreaChild$]: () => {
         const [toolbarContents, readOnly] = useCellValues(toolbarContents$, readOnly$)
         return <Root readOnly={readOnly}>{toolbarContents()}</Root>
-      }
+      },
+      [selectMaxHeight$]: params?.selectMaxHeight
     })
   },
   update(realm, params) {

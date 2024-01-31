@@ -5,6 +5,7 @@ import styles from '../../../styles/ui.module.css'
 import { TooltipWrap } from './TooltipWrap'
 import { editorRootElementRef$, iconComponentFor$, readOnly$ } from '../../core'
 import { useCellValue, useCellValues } from '@mdxeditor/gurx'
+import { selectMaxHeight$ } from '..'
 
 /**
  * @internal
@@ -47,10 +48,12 @@ export const SelectContent: React.FC<{ children: React.ReactNode; className?: st
   className = styles.selectContainer
 }) => {
   const editorRootElementRef = useCellValue(editorRootElementRef$)
+  const selectMaxHeight = useCellValue(selectMaxHeight$)
+  const style = selectMaxHeight ? { height: selectMaxHeight, overflow: 'scroll' } : {}
 
   return (
     <RadixSelect.Portal container={editorRootElementRef?.current}>
-      <RadixSelect.Content className={className} onCloseAutoFocus={(e) => e.preventDefault()} position="popper">
+      <RadixSelect.Content className={className} onCloseAutoFocus={(e) => e.preventDefault()} position="popper" style={style}>
         <RadixSelect.Viewport data-editor-dropdown={true}>{children}</RadixSelect.Viewport>
       </RadixSelect.Content>
     </RadixSelect.Portal>

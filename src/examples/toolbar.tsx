@@ -157,3 +157,32 @@ export const SimpleToolbar = () => {
     />
   )
 }
+
+export const SelectHeightLimited = () => {
+  return (
+    <MDXEditor
+      markdown={kitchenSinkMarkdown}
+      plugins={[
+        toolbarPlugin({
+          selectMaxHeight: '50px',
+          toolbarContents: () => <KitchenSinkToolbar />
+        }),
+        listsPlugin(),
+        quotePlugin(),
+        headingsPlugin({ allowedHeadingLevels: [1, 2, 3] }),
+        linkPlugin(),
+        linkDialogPlugin(),
+        imagePlugin({ imageAutocompleteSuggestions: ['https://via.placeholder.com/150', 'https://via.placeholder.com/150'] }),
+        tablePlugin(),
+        thematicBreakPlugin(),
+        frontmatterPlugin(),
+        codeBlockPlugin({ defaultCodeBlockLanguage: 'txt' }),
+        sandpackPlugin({ sandpackConfig: virtuosoSampleSandpackConfig }),
+        codeMirrorPlugin({ codeBlockLanguages: { js: 'JavaScript', css: 'CSS', txt: 'text', tsx: 'TypeScript' } }),
+        directivesPlugin({ directiveDescriptors: [YoutubeDirectiveDescriptor, AdmonitionDirectiveDescriptor] }),
+        diffSourcePlugin({ viewMode: 'rich-text', diffMarkdown: 'boo', codeMirrorExtensions: [basicDark] }),
+        markdownShortcutPlugin()
+      ]}
+    />
+  )
+}
