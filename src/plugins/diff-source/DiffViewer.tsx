@@ -77,5 +77,5 @@ export const DiffViewer: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onUpdate, cmExtensions])
 
-  return <div ref={elRef} />
+  return <div ref={elRef} className="mdxeditor-diff-editor" />
 }

@@ -55,5 +55,5 @@ export const SourceEditor = () => {
     [markdown, readOnly, updateMarkdown, cmExtensions, triggerOnBlur]
   )
 
-  return <div ref={ref} className="cm-sourceView" />
+  return <div ref={ref} className="cm-sourceView mdxeditor-source-editor" />
 }

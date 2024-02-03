@@ -65,7 +65,7 @@ const RichTextEditor: React.FC = () => {
         <Child key={index} />
       ))}
       <RenderRecursiveWrappers wrappers={editorWrappers}>
-        <div className={classNames(styles.rootContentEditableWrapper)}>
+        <div className={(classNames(styles.rootContentEditableWrapper), 'mdxeditor-root-contenteditable')}>
           <RichTextPlugin
             contentEditable={<ContentEditable className={classNames(styles.contentEditable, contentEditableClassName)} />}
             placeholder={
@@ -154,16 +154,12 @@ const EditorRootElement: React.FC<{ children: React.ReactNode; className?: strin
 
   React.useEffect(() => {
     const popupContainer = document.createElement('div')
-    popupContainer.classList.add(styles.editorRoot)
-    popupContainer.classList.add(styles.popupContainer)
-    if (className) {
-      className
-        .trim()
-        .split(' ')
-        .forEach((c) => {
-          popupContainer.classList.add(c)
-        })
-    }
+    popupContainer.classList.add(
+      'mdxeditor-popup-container',
+      styles.editorRoot,
+      styles.popupContainer,
+      ...(className ?? '').trim().split(' ').filter(Boolean)
+    )
     document.body.appendChild(popupContainer)
     editorRootElementRef.current = popupContainer
     setEditorRootElementRef(editorRootElementRef)
@@ -171,7 +167,7 @@ const EditorRootElement: React.FC<{ children: React.ReactNode; className?: strin
       popupContainer.remove()
     }
   }, [className, editorRootElementRef, setEditorRootElementRef])
-  return <div className={classNames(styles.editorRoot, styles.editorWrapper, className, 'mdxeditor')}>{children}</div>
+  return <div className={classNames('mdxeditor', styles.editorRoot, styles.editorWrapper, className)}>{children}</div>
 }
 
 const Methods: React.FC<{ mdxRef: React.ForwardedRef<MDXEditorMethods> }> = ({ mdxRef }) => {

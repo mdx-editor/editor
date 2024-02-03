@@ -9,14 +9,16 @@ export const DiffSourceWrapper: React.FC<{ children: React.ReactNode }> = ({ chi
   const [error, viewMode] = useCellValues(markdownProcessingError$, viewMode$)
   // keep the RTE always mounted, otherwise the state is lost
   return (
-    <div>
+    <div className="mdxeditor-diff-source-wrapper">
       {error ? (
         <div className={styles.markdownParseError}>
           <p>{error.error}.</p>
           <p>You can fix the errors in source mode and switch to rich text mode when you are ready.</p>
         </div>
       ) : null}
-      <div style={{ display: viewMode === 'rich-text' && error == null ? 'block' : 'none' }}>{children}</div>
+      <div className="mdxeditor-rich-text-editor" style={{ display: viewMode === 'rich-text' && error == null ? 'block' : 'none' }}>
+        {children}
+      </div>
       {viewMode === 'diff' ? <DiffViewer /> : null}
       {viewMode === 'source' ? <SourceEditor /> : null}
     </div>

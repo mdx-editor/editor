@@ -6,6 +6,20 @@ position: 0.999
 
 # Theming
 
+## Styling the editor elements
+
+The structural styling of the component is done through CSS module class names, which have auto-generated suffixes that can change between versions. The key DOM elements of the component have "public" CSS classes that you can safely target with your own CSS. 
+
+- `mdxeditor` - Set at the root element of the editor and the container for the pop-ups/tooltips.
+- `mdxeditor-popup-container` assigned to the popup container. Use this if you're using MDXEditor with a framework like MUI and you need to override the z-index of the popups.
+- `mdxeditor-toolbar` - The toolbar container.
+- `mdxeditor-root-contenteditable` - The root `contentEditable` element, managed by Lexical.
+- `mdxeditor-diff-source-wrapper` - If you're using the `diffSourcePlugin`, it injects an element around the editor so that you can toggle between the rich text and source / diff mode. This CSS class is assigned to that wrapper.
+- `mdxeditor-rich-text-editor`, `mdxeditor-source-editor`, `mdxeditor-diff-editor` - If you're using the `diffSourcePlugin`, these classes are assigned to the rich text, source and diff editor root elements, respectively.
+- `mdxeditor-select-content` - assigned to the Radix UI `Select.Content` component - useful if you want to style the select dropdowns, for example to limit their size on smaller viewports.
+
+## Customizing the editor colors
+
 The editor UI (toolbar, dialogs, etc) colors and fonts are defined as CSS variables attached to the editor root element.
 The color variables follow the [Radix semantic aliasing](https://www.radix-ui.com/colors/docs/overview/aliasing#semantic-aliases) convention.
 
