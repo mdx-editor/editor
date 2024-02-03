@@ -50,6 +50,7 @@ export * from './plugins/link'
 export * from './plugins/image'
 export * from './plugins/frontmatter'
 export * from './plugins/quote'
+export * from './plugins/maxlength'
 
 // JSX
 export * from './plugins/jsx'
