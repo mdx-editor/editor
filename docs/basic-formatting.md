@@ -6,7 +6,7 @@ position: 0.1
 
 # Basic Formatting
 
-In its bare form, MDXEditor supports only the most basic formatting - **bold**, \_italic, underline, and `inline code``. It's enough to write a simple text, but not much more. Several plugins allow the users to create a document structure and apply semantic formatting.
+In its bare form, MDXEditor supports only the most basic formatting - **bold**, _italic_, <u>underline</u>, and `inline code`. It's enough to write a simple text, but not much more. Several plugins allow the users to create a document structure and apply semantic formatting.
 
 ## Headings
 
@@ -21,7 +21,7 @@ import { MDXEditor, headingsPlugin } from '@mdxeditor/editor'
 
 ## Quotes
 
-The Quote plugin enables the usage of quotes that translate to `blockquote`` in HTML.
+The Quote plugin enables the usage of quotes that translate to `blockquote` in HTML.
 
 ```tsx
 
