@@ -392,8 +392,10 @@ export function exportMarkdownFromLexical({
   jsxComponentDescriptors,
   jsxIsAvailable
 }: ExportMarkdownFromLexicalOptions): string {
-  return toMarkdown(exportLexicalTreeToMdast({ root, visitors, jsxComponentDescriptors, jsxIsAvailable }), {
-    extensions: toMarkdownExtensions,
-    ...toMarkdownOptions
-  })
+  return (
+    toMarkdown(exportLexicalTreeToMdast({ root, visitors, jsxComponentDescriptors, jsxIsAvailable }), {
+      extensions: toMarkdownExtensions,
+      ...toMarkdownOptions
+    }) + '\n'
+  )
 }
