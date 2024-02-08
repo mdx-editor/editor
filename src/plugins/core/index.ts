@@ -4,7 +4,7 @@ import { createEmptyHistoryState } from '@lexical/react/LexicalHistoryPlugin.js'
 import { $isHeadingNode, HeadingTagType } from '@lexical/rich-text'
 import { $setBlocksType } from '@lexical/selection'
 import { $findMatchingParent, $insertNodeToNearestRoot, $wrapNodeInElement } from '@lexical/utils'
-import { Cell, NodeRef, Realm, Signal, filter, scan, withLatestFrom } from '@mdxeditor/gurx'
+import { Cell, NodeRef, Realm, Signal, filter, map, scan, withLatestFrom } from '@mdxeditor/gurx'
 import {
   $createParagraphNode,
   $getRoot,
@@ -215,6 +215,18 @@ const markdownSignal$ = Signal<string>((r) => {
   r.link(initialMarkdown$, markdown$)
 })
 
+const mutableMarkdownSignal$ = Signal<string>((r) => {
+  r.link(
+    r.pipe(
+      markdownSignal$,
+      withLatestFrom(muteChange$),
+      filter(([, muted]) => !muted),
+      map(([value]) => value)
+    ),
+    mutableMarkdownSignal$
+  )
+})
+
 // import configuration
 /** @internal */
 export const importVisitors$ = Cell<MdastImportVisitor<Mdast.Nodes>[]>([])
@@ -294,6 +306,7 @@ export const addExportVisitor$ = Appender(exportVisitors$)
  */
 export const addToMarkdownExtension$ = Appender(toMarkdownExtensions$)
 
+export const muteChange$ = Cell(false)
 /**
  * Sets a new markdown value for the editor, replacing the current one.
  * @group Core
@@ -308,16 +321,22 @@ export const setMarkdown$ = Signal<string>((r) => {
       })
     ),
     ([theNewMarkdownValue, , editor, inFocus]) => {
-      editor?.update(() => {
-        $getRoot().clear()
-        tryImportingMarkdown(r, $getRoot(), theNewMarkdownValue)
+      r.pub(muteChange$, true)
+      editor?.update(
+        () => {
+          $getRoot().clear()
+          tryImportingMarkdown(r, $getRoot(), theNewMarkdownValue)
 
-        if (!inFocus) {
-          $setSelection(null)
-        } else {
-          editor.focus()
+          if (!inFocus) {
+            $setSelection(null)
+          } else {
+            editor.focus()
+          }
+        },
+        {
+          onUpdate: () => r.pub(muteChange$, false)
         }
-      })
+      )
     }
   )
 })
@@ -876,7 +895,7 @@ export const corePlugin = realmPlugin<{
       [readOnly$]: params?.readOnly
     })
 
-    realm.singletonSub(markdownSignal$, params?.onChange)
+    realm.singletonSub(mutableMarkdownSignal$, params?.onChange)
     realm.singletonSub(onBlur$, params?.onBlur)
     realm.singletonSub(markdownErrorSignal$, params?.onError)
   }
