@@ -300,7 +300,7 @@ export const ConditionalContents: React.FC<{
     return option ? (isConditionalContentsOption(option) ? option.contents() : option.fallback()) : null
   }, [options, editorInFocus])
 
-  return <div style={{ display: 'flex' }}>{contents}</div>
+  return <div className={styles.toolbarConditionalContents}>{contents}</div>
 }
 
 /**

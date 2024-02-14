@@ -268,6 +268,12 @@
   font-size: var(--text-sm);
 }
 
+.toolbarConditionalContents {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
 .toolbarButtonDropdownContainer {
   border-top-right-radius: var(--radius-base);
 
@@ -938,6 +944,7 @@
 .diffSourceToggle {
   border-radius: var(--radius-medium);
   display: flex;
+  flex-wrap: wrap;
 
   .toolbarToggleItem {
     padding: 0;

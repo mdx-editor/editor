@@ -71,21 +71,15 @@ export const KitchenSinkToolbar: React.FC = () => {
                 <Separator />
                 <InsertCodeBlock />
                 <InsertSandpack />
-
+                <Separator />
                 <ConditionalContents
                   options={[
                     {
                       when: (editorInFocus) => !whenInAdmonition(editorInFocus),
-                      contents: () => (
-                        <>
-                          <Separator />
-                          <InsertAdmonition />
-                        </>
-                      )
+                      contents: () => <InsertAdmonition />
                     }
                   ]}
                 />
-
                 <Separator />
                 <InsertFrontmatter />
               </>
