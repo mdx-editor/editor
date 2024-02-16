@@ -1171,3 +1171,34 @@ form.multiFieldForm {
   position: relative;
   z-index: 1;
 }
+
+.inputSizer {
+  display: inline-grid;
+  vertical-align: baseline;
+  align-items: center;
+  position: relative;
+  
+  &::after,
+  & input {
+    width: auto;
+    min-width: 1rem;
+    grid-area: 1 / 2;
+    font: inherit;
+    margin: 0;
+    padding: 0 2px;
+    resize: none;
+    background: none;
+    appearance: none;
+    border: none;
+    color: inherit;
+  }
+  
+  span {
+    padding: 0.25em;
+  }
+  
+  &::after {
+    content: attr(data-value);
+    white-space: pre-wrap;
+  }
+}

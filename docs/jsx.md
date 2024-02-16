@@ -8,6 +8,8 @@ position: 0.815
 
 The JSX plugin allows you to process and associate custom editors with the JSX components in your markdown source - a capability enabled by [MDX](https://mdxjs.com/). The package includes a generic editor component, but you can also create your custom editors. The next example includes three JSX descriptors and an example of a custom editor that uses the `NestedLexicalEditor` component to edit the markdown contents of a JSX component.
 
+The JSX syntax also supports `{}` as a way to embed JavaScript expressions in your markdown. Out of the box, the plugin will enable a simple inline editor for the expressions, too.
+
 ```tsx
 const jsxComponentDescriptors: JsxComponentDescriptor[] = [
   {

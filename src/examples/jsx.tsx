@@ -117,3 +117,15 @@ export const Html = () => {
     </div>
   )
 }
+
+export const JsxExpression = () => {
+  return (
+    <div>
+      <MDXEditor
+        onChange={(e) => console.log(e)}
+        markdown={`Hello {1+1} after the expression`}
+        plugins={[headingsPlugin(), jsxPlugin({ jsxComponentDescriptors: [] })]}
+      />
+    </div>
+  )
+}
