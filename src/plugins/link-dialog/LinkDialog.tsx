@@ -19,7 +19,8 @@ import {
   removeLink$,
   switchFromPreviewToLinkEdit$,
   updateLink$,
-  onClickLinkCallback$
+  onClickLinkCallback$,
+  clickLink$
 } from '.'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 
@@ -112,6 +113,7 @@ export const LinkDialog: React.FC = () => {
   const cancelLinkEdit = usePublisher(cancelLinkEdit$)
   const switchFromPreviewToLinkEdit = usePublisher(switchFromPreviewToLinkEdit$)
   const removeLink = usePublisher(removeLink$)
+  const clickLink = usePublisher(clickLink$)
 
   React.useEffect(() => {
     const update = () => {
@@ -174,7 +176,8 @@ export const LinkDialog: React.FC = () => {
                 onClick={(e) => {
                   if (onClickLinkCallback !== null) {
                     e.preventDefault()
-                    onClickLinkCallback(linkDialogState.url)
+                    clickLink()
+                    onClickLinkCallback(linkDialogState.url)                    
                   }
                 }}
                 title={urlIsExternal ? `Open ${linkDialogState.url} in new window` : linkDialogState.url}

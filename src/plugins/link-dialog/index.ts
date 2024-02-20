@@ -212,6 +212,20 @@ export const linkDialogState$ = Cell<InactiveLinkDialog | PreviewLinkDialog | Ed
     linkDialogState$
   )
 
+
+  r.link(
+    r.pipe(
+      clickLink$,
+      withLatestFrom(linkDialogState$, activeEditor$),
+      map(([, state, editor]) => {
+        return {
+          type: 'inactive' as const
+        } as InactiveLinkDialog
+      })
+    ),
+    linkDialogState$
+  )
+
   r.link(
     r.pipe(
       r.combine(currentSelection$, onWindowChange$),
@@ -250,6 +264,11 @@ export const updateLink$ = Signal<{ url: string; title: string }>()
  * @group Link Dialog
  */
 export const cancelLinkEdit$ = Action()
+/**
+ * A signal that click on the current link.
+ * @group Link Dialog
+ */
+export const clickLink$ = Action()
 /**
  * A signal that confirms the updated values of the current link.
  * @group Link Dialog
