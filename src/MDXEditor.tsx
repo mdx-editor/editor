@@ -1,4 +1,6 @@
+import { useCellValues, usePublisher, useRealm } from '@mdxeditor/gurx'
 import React from 'react'
+import { RealmPlugin, RealmWithPlugins } from './RealmWithPlugins'
 import {
   composerChildren$,
   contentEditableClassName$,
@@ -6,32 +8,32 @@ import {
   editorRootElementRef$,
   editorWrappers$,
   initialRootEditorState$,
+  insertMarkdown$,
+  markdown$,
+  markdownSourceEditorValue$,
   placeholder$,
   readOnly$,
+  rootEditor$,
+  setMarkdown$,
   topAreaChildren$,
   usedLexicalNodes$,
-  markdownSourceEditorValue$,
-  viewMode$,
-  markdown$,
-  setMarkdown$,
-  rootEditor$,
-  insertMarkdown$
+  viewMode$
 } from './plugins/core'
-import { RealmPlugin, RealmWithPlugins } from './RealmWithPlugins'
-import { useCellValues, usePublisher, useRealm } from '@mdxeditor/gurx'
 
-import { lexicalTheme } from './styles/lexicalTheme'
 import { LexicalComposer } from '@lexical/react/LexicalComposer.js'
-import styles from './styles/ui.module.css'
-import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin.js'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable.js'
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary.js'
+import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin.js'
 import classNames from 'classnames'
 import { ToMarkdownOptions } from './exportMarkdownFromLexical'
-import { noop } from './utils/fp'
 import { IconKey } from './plugins/core/Icon'
+import { lexicalTheme } from './styles/lexicalTheme'
+import styles from './styles/ui.module.css'
+import { noop } from './utils/fp'
 
-const LexicalProvider: React.FC<{ children: JSX.Element | string | (JSX.Element | string)[] }> = ({ children }) => {
+const LexicalProvider: React.FC<{
+  children: JSX.Element | string | (JSX.Element | string)[]
+}> = ({ children }) => {
   const [initialRootEditorState, nodes, readOnly] = useCellValues(initialRootEditorState$, usedLexicalNodes$, readOnly$)
   return (
     <LexicalComposer
@@ -74,7 +76,7 @@ const RichTextEditor: React.FC = () => {
               </div>
             }
             ErrorBoundary={LexicalErrorBoundary}
-          ></RichTextPlugin>
+          />
         </div>
       </RenderRecursiveWrappers>
       {composerChildren.map((Child, index) => (
@@ -91,7 +93,7 @@ const DEFAULT_MARKDOWN_OPTIONS: ToMarkdownOptions = {
 const DefaultIcon = React.lazy(() => import('./plugins/core/Icon'))
 
 const IconFallback = () => {
-  return <svg width="24" height="24" viewBox="0 0 24 24" fill="none"></svg>
+  return <svg width="24" height="24" viewBox="0 0 24 24" fill="none" />
 }
 const defaultIconComponentFor = (name: IconKey) => {
   return (
@@ -130,13 +132,19 @@ export interface MDXEditorMethods {
   /**
    * Sets focus on input
    */
-  focus: (callbackFn?: (() => void) | undefined, opts?: { defaultSelection?: 'rootStart' | 'rootEnd'; preventScroll?: boolean }) => void
+  focus: (
+    callbackFn?: (() => void) | undefined,
+    opts?: {
+      defaultSelection?: 'rootStart' | 'rootEnd'
+      preventScroll?: boolean
+    }
+  ) => void
 }
 
-const RenderRecursiveWrappers: React.FC<{ wrappers: React.ComponentType<{ children: React.ReactNode }>[]; children: React.ReactNode }> = ({
-  wrappers,
-  children
-}) => {
+const RenderRecursiveWrappers: React.FC<{
+  wrappers: React.ComponentType<{ children: React.ReactNode }>[]
+  children: React.ReactNode
+}> = ({ wrappers, children }) => {
   if (wrappers.length === 0) {
     return <>{children}</>
   }
@@ -148,7 +156,10 @@ const RenderRecursiveWrappers: React.FC<{ wrappers: React.ComponentType<{ childr
   )
 }
 
-const EditorRootElement: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className }) => {
+const EditorRootElement: React.FC<{
+  children: React.ReactNode
+  className?: string
+}> = ({ children, className }) => {
   const editorRootElementRef = React.useRef<HTMLDivElement | null>(null)
   const setEditorRootElementRef = usePublisher(editorRootElementRef$)
 
@@ -190,7 +201,13 @@ const Methods: React.FC<{ mdxRef: React.ForwardedRef<MDXEditorMethods> }> = ({ m
         insertMarkdown: (markdown) => {
           realm.pub(insertMarkdown$, markdown)
         },
-        focus: (callbackFn?: (() => void) | undefined, opts?: { defaultSelection?: 'rootStart' | 'rootEnd'; preventScroll?: boolean }) => {
+        focus: (
+          callbackFn?: (() => void) | undefined,
+          opts?: {
+            defaultSelection?: 'rootStart' | 'rootEnd'
+            preventScroll?: boolean
+          }
+        ) => {
           realm.getValue(rootEditor$)?.focus(callbackFn, opts)
         }
       }

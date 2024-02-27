@@ -340,9 +340,6 @@ function fixWrappingWhitespace(node: Mdast.Parent | Mdast.RootContent, parentCha
   }
 }
 
-/**
- * @internal
- */
 export type ToMarkdownExtension = NonNullable<ToMarkdownOptions['extensions']>[number]
 
 /**
