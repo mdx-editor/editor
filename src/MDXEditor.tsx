@@ -283,7 +283,7 @@ export interface MDXEditorProps {
    */
   suppressHtmlProcessing?: boolean
   /**
-   *
+   * Override the default english strings used across the editor.
    */
   i18n?: MDXEditorI18nPartial
 }
