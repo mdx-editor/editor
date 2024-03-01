@@ -11,35 +11,52 @@ const slovenianLocale = {
       selectBlockTypeTooltip: 'Izberi vrsto bloka',
       placeholder: 'Vrsta bloka'
     },
+
     blockTypes: {
       paragraph: 'Odstavek',
-      quote: 'Citat',
-      heading: 'Naslov'
+      heading: 'Naslov',
+      quote: 'Citat'
     },
+
     undo: 'Razveljavi',
-    redo: 'Uveljavi',
+    redo: 'Ponovno uveljavi',
 
     bold: 'Krepko',
-    italic: 'Ležeče',
+    removeBold: 'Odstrani krepko',
+    italic: 'Poševno',
+    removeItalic: 'Odstrani poševno',
     underline: 'Podčrtano',
+    removeUnderline: 'Odstrani podčrtano',
     strikethrough: 'Prečrtano',
+    removeStrikethrough: 'Odstrani prečrtano',
 
-    bulletedList: 'Označen seznam',
+    inlineCode: 'Oblika v vrstici',
+
+    bulletedList: 'Seznam s pikami',
+    removeBulletedList: 'Odstrani seznam s pikami',
     numberedList: 'Oštevilčen seznam',
+    removeNumberedList: 'Odstrani oštevilčen seznam',
     checkList: 'Seznam s kljukicami',
+    removeCheckList: 'Odstrani seznam s kljukicami',
 
-    link: 'Povezava',
-    image: 'Slika',
-    table: 'Tabela',
+    link: 'Ustvari povezavo',
+    image: 'Vstavi sliko',
+    table: 'Vstavi tabelo',
 
-    codeBlock: 'Koda',
-    admonition: 'Opozorilo',
-    frontmatter: 'Meta podatki',
-    thematicBreak: 'Tematski prelom',
+    codeBlock: 'Vstavi blok kode',
+    sandpack: 'Vstavi Sandpack',
+    admonition: 'Vstavi opozorilo',
+    frontmatter: 'Vstavi predmaterijo',
+    thematicBreak: 'Vstavi tematski prelom',
 
-    richText: 'Obogaten tekst',
-    diffMode: 'Način razlik',
-    source: 'Izvorna koda'
+    richText: 'Obogateni besedilni način',
+    diffMode: 'Način razlike',
+    source: 'Vir'
+  },
+
+  codeBlock: {
+    language: 'Jezik bloka kode',
+    text: 'besedilo'
   },
 
   createLink: {
@@ -48,19 +65,27 @@ const slovenianLocale = {
   },
 
   uploadImage: {
-    uploadInstructions: 'Povleci datoteke sem ali klikni za nalaganje',
-    addViaUrlInstructions: 'Dodaj preko URL',
+    uploadInstructions: 'Naloži sliko iz svoje naprave',
+    addViaUrlInstructions: 'Ali dodaj sliko prek URL-ja:',
     alt: 'Alternativno besedilo',
     title: 'Naslov'
   },
 
-  codeBlock: {
-    language: 'Jezik',
-    text: 'Koda'
+  editor: {
+    placeholder: 'Začnite tipkati svojo vsebino tukaj'
   },
 
-  editor: {
-    placeholder: 'Začni tipkati ...'
+  admonitions: {
+    note: 'Opomba',
+    tip: 'Namig',
+    danger: 'Nevarnost',
+    info: 'Informacija',
+    caution: 'Previdnost'
+  },
+
+  dialogControls: {
+    save: 'Shrani',
+    cancel: 'Prekliči'
   }
 } as MDXEditorI18nPartial
 

@@ -17,14 +17,22 @@ const defaultEnglishI18n: MDXEditorI18n = {
     redo: 'Redo',
 
     bold: 'Bold',
+    removeBold: 'Remove bold',
     italic: 'Italic',
+    removeItalic: 'Remove italic',
     underline: 'Underline',
+    removeUnderline: 'Remove underline',
     strikethrough: 'Strikethrough',
+    removeStrikethrough: 'Remove strikethrough',
+
     inlineCode: 'Inline code format',
 
     bulletedList: 'Bulleted list',
+    removeBulletedList: 'Remove bulleted list',
     numberedList: 'Numbered list',
+    removeNumberedList: 'Remove numbered list',
     checkList: 'Check list',
+    removeCheckList: 'Remove check list',
 
     link: 'Create link',
     image: 'Insert image',

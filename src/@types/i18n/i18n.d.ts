@@ -1,9 +1,3 @@
-type DeepPartial<T> = T extends object
-  ? {
-      [P in keyof T]?: DeepPartial<T[P]>
-    }
-  : T
-
 type BaseMDXEditorI18n = {
   toolbar: {
     blockTypeSelect: {
@@ -21,14 +15,21 @@ type BaseMDXEditorI18n = {
     redo: string
 
     bold: string
+    removeBold: string
     italic: string
+    removeItalic: string
     underline: string
+    removeUnderline: string
     strikethrough: string
+    removeStrikethrough: string
     inlineCode: string
 
     bulletedList: string
+    removeBulletedList: string
     numberedList: string
+    removeNumberedList: string
     checkList: string
+    removeCheckList: string
 
     link: string
     image: string
@@ -80,5 +81,17 @@ type BaseMDXEditorI18n = {
   }
 }
 
-export type MDXEditorI18nPartial = DeepPartial<BaseMDXEditorI18n>
 export type MDXEditorI18n = BaseMDXEditorI18n
+
+/**
+ * Take the complete i18n object and make all its properties optional, including all nested objects.
+ * This allows for partial i18n objects to be passed to the I18nProvider, without the need
+ * to provide a translation for every single string.
+ */
+type DeepPartial<T> = T extends object
+  ? {
+      [P in keyof T]?: DeepPartial<T[P]>
+    }
+  : T
+
+export type MDXEditorI18nPartial = DeepPartial<BaseMDXEditorI18n>
