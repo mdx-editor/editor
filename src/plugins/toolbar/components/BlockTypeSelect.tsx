@@ -1,3 +1,4 @@
+import { useI18n } from '@/i18n/I18nProvider'
 import { $createHeadingNode, $createQuoteNode } from '@lexical/rich-text'
 import { useCellValue, usePublisher } from '@mdxeditor/gurx'
 import { $createParagraphNode } from 'lexical'
@@ -17,20 +18,21 @@ export const BlockTypeSelect = () => {
   const activePlugins = useCellValue(activePlugins$)
   const hasQuote = activePlugins.includes('quote')
   const hasHeadings = activePlugins.includes('headings')
+  const i18n = useI18n()
 
   if (!hasQuote && !hasHeadings) {
     return null
   }
-  const items: { label: string | JSX.Element; value: BlockType }[] = [{ label: 'Paragraph', value: 'paragraph' }]
+  const items: { label: string | JSX.Element; value: BlockType }[] = [{ label: i18n.toolbar.blockTypes.paragraph, value: 'paragraph' }]
 
   if (hasQuote) {
-    items.push({ label: 'Quote', value: 'quote' })
+    items.push({ label: i18n.toolbar.blockTypes.quote, value: 'quote' })
   }
 
   if (hasHeadings) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const allowedHeadingLevels = useCellValue(allowedHeadingLevels$)
-    items.push(...allowedHeadingLevels.map((n) => ({ label: `Heading ${n}`, value: `h${n}` }) as const))
+    items.push(...allowedHeadingLevels.map((n) => ({ label: `${i18n.toolbar.blockTypes.heading} ${n}`, value: `h${n}` }) as const))
   }
 
   return (

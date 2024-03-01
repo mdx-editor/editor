@@ -35,37 +35,37 @@ export * from '@mdxeditor/gurx'
 export * from './MDXEditor'
 
 // import/export
-export * from './importMarkdownToLexical'
 export * from './exportMarkdownFromLexical'
+export * from './importMarkdownToLexical'
 
 // core so that you can build your own plugins
 export * from './plugins/core'
 
 // basics
-export * from './plugins/headings'
-export * from './plugins/thematic-break'
-export * from './plugins/lists'
-export * from './plugins/table'
-export * from './plugins/link'
-export * from './plugins/image'
 export * from './plugins/frontmatter'
-export * from './plugins/quote'
+export * from './plugins/headings'
+export * from './plugins/image'
+export * from './plugins/link'
+export * from './plugins/lists'
 export * from './plugins/maxlength'
+export * from './plugins/quote'
+export * from './plugins/table'
+export * from './plugins/thematic-break'
 
 // JSX
-export * from './plugins/jsx'
 export * from './jsx-editors/GenericJsxEditor'
+export * from './plugins/jsx'
 
 // code blocks
-export * from './plugins/sandpack'
+export * from './plugins/codeblock'
 export * from './plugins/codemirror'
 export * from './plugins/codemirror/CodeMirrorEditor'
-export * from './plugins/codeblock'
+export * from './plugins/sandpack'
 
 // directives
-export * from './plugins/directives'
 export * from './directive-editors/AdmonitionDirectiveDescriptor'
 export * from './directive-editors/GenericDirectiveEditor'
+export * from './plugins/directives'
 
 // UI
 export * from './plugins/link-dialog'
@@ -90,16 +90,16 @@ export * from './plugins/toolbar/components/InsertImage'
 export * from './plugins/toolbar/components/InsertSandpack'
 export * from './plugins/toolbar/components/InsertTable'
 export * from './plugins/toolbar/components/InsertThematicBreak'
+export * from './plugins/toolbar/components/KitchenSinkToolbar'
 export * from './plugins/toolbar/components/ListsToggle'
 export * from './plugins/toolbar/components/ShowSandpackInfo'
 export * from './plugins/toolbar/components/UndoRedo'
-export * from './plugins/toolbar/components/KitchenSinkToolbar'
 
 // Build your own toolbar items
-export * from './plugins/toolbar/primitives/toolbar'
 export * from './plugins/toolbar/primitives/DialogButton'
 export * from './plugins/toolbar/primitives/TooltipWrap'
 export * from './plugins/toolbar/primitives/select'
+export * from './plugins/toolbar/primitives/toolbar'
 
 // Build your own editor
 export * from './plugins/core/NestedLexicalEditor'
@@ -115,3 +115,6 @@ export * from './utils/uuid4'
 export * from './utils/voidEmitter'
 
 export * from './RealmWithPlugins'
+
+// i18n
+export { useI18n } from './i18n/I18nProvider'

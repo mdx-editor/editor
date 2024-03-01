@@ -25,9 +25,9 @@ import { ContentEditable } from '@lexical/react/LexicalContentEditable.js'
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary.js'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin.js'
 import classNames from 'classnames'
-import { MDXEditorI18n } from './@types/i18n/i18n'
+import { MDXEditorI18nPartial } from './@types/i18n/i18n'
 import { ToMarkdownOptions } from './exportMarkdownFromLexical'
-import I18nProvider from './i18n/I18nProvider'
+import { I18nProvider } from './i18n/I18nProvider'
 import { IconKey } from './plugins/core/Icon'
 import { lexicalTheme } from './styles/lexicalTheme'
 import styles from './styles/ui.module.css'
@@ -285,7 +285,7 @@ export interface MDXEditorProps {
   /**
    *
    */
-  i18n?: MDXEditorI18n
+  i18n?: MDXEditorI18nPartial
 }
 
 /**

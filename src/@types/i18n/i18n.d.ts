@@ -1,6 +1,8 @@
-type RecursivePartial<T> = {
-  [P in keyof T]?: RecursivePartial<T[P]>
-}
+type DeepPartial<T> = T extends object
+  ? {
+      [P in keyof T]?: DeepPartial<T[P]>
+    }
+  : T
 
 type BaseMDXEditorI18n = {
   toolbar: {
@@ -78,4 +80,5 @@ type BaseMDXEditorI18n = {
   }
 }
 
-export type MDXEditorI18n = RecursivePartial<BaseMDXEditorI18n>
+export type MDXEditorI18nPartial = DeepPartial<BaseMDXEditorI18n>
+export type MDXEditorI18n = BaseMDXEditorI18n
