@@ -50,9 +50,9 @@ export const DiffSourceToggleWrapper: React.FC<{ children: React.ReactNode; opti
       {viewMode === 'rich-text' ? (
         children
       ) : viewMode === 'diff' ? (
-        <span className={styles.toolbarTitleMode}>Diff mode</span>
+        <span className={styles.toolbarTitleMode}>{i18n.toolbar.diffMode}</span>
       ) : (
-        <span className={styles.toolbarTitleMode}>Source mode</span>
+        <span className={styles.toolbarTitleMode}>{i18n.toolbar.sourceMode}</span>
       )}
 
       <div style={{ marginLeft: 'auto', pointerEvents: 'auto', opacity: 1 }}>

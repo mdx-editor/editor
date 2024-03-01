@@ -13,6 +13,9 @@ interface I18nContext {
 
 const I18nContext = createContext<I18nContext | null>(null)
 
+// TODO: Document how to use the hook in custom plugins
+// Will it even work at this point?
+
 export function I18nProvider({ children, i18n }: I18nContextProps) {
   // Takes the default english localizations and overlays any partial i18n supplied via props
   const finalI18n = {
@@ -20,11 +23,7 @@ export function I18nProvider({ children, i18n }: I18nContextProps) {
     ...i18n
   } as MDXEditorI18n
 
-  return (
-    <>
-      <I18nContext.Provider value={{ i18n: finalI18n }}>{children}</I18nContext.Provider>
-    </>
-  )
+  return <I18nContext.Provider value={{ i18n: finalI18n }}>{children}</I18nContext.Provider>
 }
 
 export function useI18n() {

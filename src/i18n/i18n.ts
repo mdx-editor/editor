@@ -48,7 +48,8 @@ const defaultEnglishI18n: MDXEditorI18n = {
 
     richText: 'Rich text',
     diffMode: 'Diff mode',
-    source: 'Source'
+    source: 'Source',
+    sourceMode: 'Source mode'
   },
 
   codeBlock: {

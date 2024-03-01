@@ -53,7 +53,8 @@ const slovenianLocale: MDXEditorI18n = {
 
     richText: 'Obogateni besedilni način',
     diffMode: 'Način razlike',
-    source: 'Vir'
+    source: 'Vir',
+    sourceMode: 'Virni način'
   },
 
   codeBlock: {

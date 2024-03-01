@@ -46,6 +46,7 @@ type BaseMDXEditorI18n = {
     richText: string
     diffMode: string
     source: string
+    sourceMode: string
   }
 
   createLink: {
