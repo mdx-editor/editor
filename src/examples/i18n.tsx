@@ -2,7 +2,7 @@ import { MDXEditorI18n } from '@/@types/i18n/i18n'
 import React from 'react'
 import { MDXEditor } from '..'
 import { ALL_PLUGINS } from './_boilerplate'
-import kitchenSinkMarkdown from './assets/kitchen-sink.md?raw'
+import i18nExampleMarkdown from './assets/i18n.md?raw'
 import './dark-editor.css'
 
 const slovenianLocale: MDXEditorI18n = {
@@ -120,9 +120,9 @@ const slovenianLocale: MDXEditorI18n = {
 }
 
 export const EnglishLocale = () => {
-  return <MDXEditor markdown={kitchenSinkMarkdown} plugins={ALL_PLUGINS} />
+  return <MDXEditor markdown={i18nExampleMarkdown} plugins={ALL_PLUGINS} />
 }
 
 export const SlovenianLocale = () => {
-  return <MDXEditor markdown={kitchenSinkMarkdown} plugins={ALL_PLUGINS} i18n={slovenianLocale} />
+  return <MDXEditor markdown={i18nExampleMarkdown} plugins={ALL_PLUGINS} i18n={slovenianLocale} />
 }
