@@ -132,7 +132,12 @@ type BaseMDXEditorI18n = {
   }
 }
 
-export type MDXEditorI18n = BaseMDXEditorI18n
+type CustomI18nExtension = {
+  // Allow for custom plugins to add their own translations
+  [key: string]: string | Object
+}
+
+export type MDXEditorI18n = BaseMDXEditorI18n & CustomI18nExtension
 
 /**
  * Take the complete i18n object and make all its properties optional, including all nested objects.
