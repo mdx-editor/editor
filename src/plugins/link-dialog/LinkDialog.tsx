@@ -191,7 +191,7 @@ export const LinkDialog: React.FC = () => {
                     onClickLinkCallback(linkDialogState.url)
                   }
                 }}
-                title={urlIsExternal ? i18n.linkPreview.open.replace('$0', linkDialogState.url) : linkDialogState.url}
+                title={urlIsExternal ? i18n.linkPreview.open.replace('$url', linkDialogState.url) : linkDialogState.url}
               >
                 <span>{linkDialogState.url}</span>
                 {urlIsExternal && iconComponentFor('open_in_new')}

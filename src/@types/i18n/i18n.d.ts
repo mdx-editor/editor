@@ -50,6 +50,9 @@ type BaseMDXEditorI18n = {
 
   createLink: {
     url: string
+    urlPlaceholder: string
+    saveTooltip: string
+    cancelTooltip: string
     title: string
   }
 
@@ -63,6 +66,7 @@ type BaseMDXEditorI18n = {
   }
 
   linkPreview: {
+    // If this string contains a "$url" placeholder, it will be replaced with the actual URL.
     open: string
     edit: string
     copyToClipboard: string

@@ -71,7 +71,7 @@ const slovenianLocale: MDXEditorI18n = {
   },
 
   linkPreview: {
-    open: 'Odpri $0 v novem oknu',
+    open: 'Odpri $url v novem oknu',
     edit: 'Uredi povezavo',
     copyToClipboard: 'Kopiraj povezavo',
     copied: 'Kopirano!',

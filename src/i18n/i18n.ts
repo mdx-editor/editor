@@ -66,7 +66,7 @@ const defaultEnglishI18n: MDXEditorI18n = {
   },
 
   linkPreview: {
-    open: 'Open $0 in new tab',
+    open: 'Open $url in new tab',
     copyToClipboard: 'Copy to clipboard',
     copied: 'Copied!',
     edit: 'Edit link',
