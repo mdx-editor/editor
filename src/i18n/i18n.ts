@@ -65,6 +65,25 @@ const defaultEnglishI18n: MDXEditorI18n = {
     cancelTooltip: 'Cancel'
   },
 
+  table: {
+    insertRowAbove: 'Insert a row above this one',
+    insertRowBelow: 'Insert a row below this one',
+    deleteRow: 'Delete this row',
+
+    insertColumnLeft: 'Insert a column to the left',
+    insertColumnRight: 'Insert a column to the right',
+    deleteColumn: 'Delete this column',
+
+    textAlignment: 'Text alignment',
+    alignLeft: 'Align left',
+    alignCenter: 'Align center',
+    alignRight: 'Align right',
+
+    deleteTable: 'Delete table',
+    columnMenu: 'Column menu',
+    rowMenu: 'Row menu'
+  },
+
   linkPreview: {
     open: 'Open $url in new tab',
     copyToClipboard: 'Copy to clipboard',

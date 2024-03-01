@@ -21,7 +21,6 @@ import { exportLexicalTreeToMdast } from '../../exportMarkdownFromLexical'
 import { importMdastTreeToLexical } from '../../importMarkdownToLexical'
 import { lexicalTheme } from '../../styles/lexicalTheme'
 import { TableNode } from './TableNode'
-
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin.js'
 import { mergeRegister } from '@lexical/utils'
 import * as RadixToolbar from '@radix-ui/react-toolbar'
@@ -59,6 +58,7 @@ export interface TableEditorProps {
 }
 
 export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEditor, lexicalTable }) => {
+  const i18n = useI18n()
   const [activeCell, setActiveCell] = React.useState<[number, number] | null>(null)
   const [iconComponentFor, readOnly] = useCellValues(iconComponentFor$, readOnly$)
   const getCellKey = React.useMemo(() => {
@@ -191,7 +191,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
               <button
                 className={styles.iconButton}
                 type="button"
-                title="Delete table"
+                title={i18n.table.deleteTable}
                 onClick={(e) => {
                   e.preventDefault()
                   parentEditor.update(() => {
@@ -491,7 +491,7 @@ const ColumnEditor: React.FC<ColumnEditorProps> = ({
       <RadixPopover.PopoverTrigger
         className={styles.tableColumnEditorTrigger}
         data-active={highlightedCoordinates[0] === colIndex + 1}
-        title="Column menu"
+        title={i18n.table.columnMenu}
       >
         {iconComponentFor('more_horiz')}
       </RadixPopover.PopoverTrigger>
@@ -579,7 +579,11 @@ const RowEditor: React.FC<RowEditorProps> = ({
 
   return (
     <RadixPopover.Root>
-      <RadixPopover.PopoverTrigger className={styles.tableColumnEditorTrigger} data-active={highlightedCoordinates[1] === rowIndex}>
+      <RadixPopover.PopoverTrigger
+        className={styles.tableColumnEditorTrigger}
+        data-active={highlightedCoordinates[1] === rowIndex}
+        title={i18n.table.rowMenu}
+      >
         {iconComponentFor('more_horiz')}
       </RadixPopover.PopoverTrigger>
       <RadixPopover.Portal container={editorRootElementRef?.current}>

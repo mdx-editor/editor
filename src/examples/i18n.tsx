@@ -99,7 +99,11 @@ const slovenianLocale: MDXEditorI18n = {
     textAlignment: 'Poravnava besedila',
     alignLeft: 'Poravnaj levo',
     alignCenter: 'Poravnaj na sredino',
-    alignRight: 'Poravnaj desno'
+    alignRight: 'Poravnaj desno',
+
+    deleteTable: 'Izbriši tabelo',
+    columnMenu: 'Meni stolpca',
+    rowMenu: 'Meni vrstice'
   },
 
   editor: {

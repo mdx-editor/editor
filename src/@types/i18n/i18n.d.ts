@@ -78,6 +78,10 @@ type BaseMDXEditorI18n = {
     alignLeft: string
     alignCenter: string
     alignRight: string
+
+    deleteTable: string
+    columnMenu: string
+    rowMenu: string
   }
 
   linkPreview: {
