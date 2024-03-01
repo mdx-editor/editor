@@ -6,7 +6,7 @@ import { NestedLexicalEditor, useNestedEditorContext } from '../plugins/core/Nes
 import { DirectiveDescriptor } from '../plugins/directives'
 
 /** @internal */
-export const ADMONITION_TYPES = ['note', 'tip', 'danger', 'info', 'caution', 'ass'] as const
+export const ADMONITION_TYPES = ['note', 'tip', 'danger', 'info', 'caution'] as const
 /** @internal */
 export type AdmonitionKind = (typeof ADMONITION_TYPES)[number]
 
