@@ -44,6 +44,7 @@ import {
   usedLexicalNodes$
 } from '../core'
 import { useCellValues } from '@mdxeditor/gurx'
+import { useI18n } from '@/i18n/I18nProvider'
 
 const AlignToTailwindClassMap = {
   center: styles.centeredCell,
@@ -455,6 +456,7 @@ const ColumnEditor: React.FC<ColumnEditorProps> = ({
   colIndex,
   setActiveCellWithBoundaries
 }) => {
+  const i18n = useI18n()
   const [editorRootElementRef, iconComponentFor] = useCellValues(editorRootElementRef$, iconComponentFor$)
 
   const insertColumnAt = React.useCallback(
@@ -508,26 +510,26 @@ const ColumnEditor: React.FC<ColumnEditorProps> = ({
               }}
               value={align || 'left'}
               type="single"
-              aria-label="Text alignment"
+              aria-label={i18n.table.textAlignment}
             >
-              <RadixToolbar.ToggleItem value="left" title="Align left">
+              <RadixToolbar.ToggleItem value="left" title={i18n.table.alignLeft}>
                 {iconComponentFor('format_align_left')}
               </RadixToolbar.ToggleItem>
-              <RadixToolbar.ToggleItem value="center" title="Align center">
+              <RadixToolbar.ToggleItem value="center" title={i18n.table.alignCenter}>
                 {iconComponentFor('format_align_center')}
               </RadixToolbar.ToggleItem>
-              <RadixToolbar.ToggleItem value="right" title="Align right">
+              <RadixToolbar.ToggleItem value="right" title={i18n.table.alignRight}>
                 {iconComponentFor('format_align_right')}
               </RadixToolbar.ToggleItem>
             </RadixToolbar.ToggleGroup>
             <RadixToolbar.Separator />
-            <RadixToolbar.Button onClick={insertColumnAt.bind(null, colIndex)} title="Insert a column to the left of this one">
+            <RadixToolbar.Button onClick={insertColumnAt.bind(null, colIndex)} title={i18n.table.insertColumnLeft}>
               {iconComponentFor('insert_col_left')}
             </RadixToolbar.Button>
-            <RadixToolbar.Button onClick={insertColumnAt.bind(null, colIndex + 1)} title="Insert a column to the right of this one">
+            <RadixToolbar.Button onClick={insertColumnAt.bind(null, colIndex + 1)} title={i18n.table.insertColumnRight}>
               {iconComponentFor('insert_col_right')}
             </RadixToolbar.Button>
-            <RadixToolbar.Button onClick={deleteColumnAt.bind(null, colIndex)} title="Delete this column">
+            <RadixToolbar.Button onClick={deleteColumnAt.bind(null, colIndex)} title={i18n.table.deleteColumn}>
               {iconComponentFor('delete_small')}
             </RadixToolbar.Button>
           </RadixToolbar.Root>
@@ -552,6 +554,8 @@ const RowEditor: React.FC<RowEditorProps> = ({
   rowIndex,
   setActiveCellWithBoundaries
 }) => {
+  const i18n = useI18n()
+
   const [editorRootElementRef, iconComponentFor] = useCellValues(editorRootElementRef$, iconComponentFor$)
 
   const insertRowAt = React.useCallback(
@@ -586,13 +590,13 @@ const RowEditor: React.FC<RowEditorProps> = ({
           side="bottom"
         >
           <RadixToolbar.Root className={styles.tableColumnEditorToolbar}>
-            <RadixToolbar.Button onClick={insertRowAt.bind(null, rowIndex)} title="Insert a row above this one">
+            <RadixToolbar.Button onClick={insertRowAt.bind(null, rowIndex)} title={i18n.table.insertRowAbove}>
               {iconComponentFor('insert_row_above')}
             </RadixToolbar.Button>
-            <RadixToolbar.Button onClick={insertRowAt.bind(null, rowIndex + 1)} title="Insert a row below this one">
+            <RadixToolbar.Button onClick={insertRowAt.bind(null, rowIndex + 1)} title={i18n.table.insertRowBelow}>
               {iconComponentFor('insert_row_below')}
             </RadixToolbar.Button>
-            <RadixToolbar.Button onClick={deleteRowAt.bind(null, rowIndex)} title="Delete this row">
+            <RadixToolbar.Button onClick={deleteRowAt.bind(null, rowIndex)} title={i18n.table.deleteRow}>
               {iconComponentFor('delete_small')}
             </RadixToolbar.Button>
           </RadixToolbar.Root>

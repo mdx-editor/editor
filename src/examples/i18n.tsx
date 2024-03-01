@@ -87,6 +87,21 @@ const slovenianLocale: MDXEditorI18n = {
     editImage: 'Uredi sliko'
   },
 
+  table: {
+    insertRowAbove: 'Vstavi vrstico nad to',
+    insertRowBelow: 'Vstavi vrstico pod to',
+    deleteRow: 'Izbriši to vrstico',
+
+    insertColumnLeft: 'Vstavi stolpec levo od tega',
+    insertColumnRight: 'Vstavi stolpec desno od tega',
+    deleteColumn: 'Izbriši ta stolpec',
+
+    textAlignment: 'Poravnava besedila',
+    alignLeft: 'Poravnaj levo',
+    alignCenter: 'Poravnaj na sredino',
+    alignRight: 'Poravnaj desno'
+  },
+
   editor: {
     placeholder: 'Začnite tipkati svojo vsebino tukaj'
   },

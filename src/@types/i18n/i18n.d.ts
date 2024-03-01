@@ -65,6 +65,21 @@ type BaseMDXEditorI18n = {
     autocompletePlaceholder: string
   }
 
+  table: {
+    insertRowAbove: string
+    insertRowBelow: string
+    deleteRow: string
+
+    insertColumnLeft: string
+    insertColumnRight: string
+    deleteColumn: string
+
+    textAlignment: string
+    alignLeft: string
+    alignCenter: string
+    alignRight: string
+  }
+
   linkPreview: {
     // If this string contains a "$url" placeholder, it will be replaced with the actual URL.
     open: string
