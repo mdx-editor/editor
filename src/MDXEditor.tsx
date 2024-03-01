@@ -30,6 +30,7 @@ import { IconKey } from './plugins/core/Icon'
 import { lexicalTheme } from './styles/lexicalTheme'
 import styles from './styles/ui.module.css'
 import { noop } from './utils/fp'
+import { MDXEditorI18n } from './i18n'
 
 const LexicalProvider: React.FC<{
   children: JSX.Element | string | (JSX.Element | string)[]
@@ -280,6 +281,10 @@ export interface MDXEditorProps {
    * Set to false if you want to suppress the processing of HTML tags.
    */
   suppressHtmlProcessing?: boolean
+  /**
+   *
+   */
+  i18n?: MDXEditorI18n
 }
 
 /**
