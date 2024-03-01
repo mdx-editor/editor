@@ -40,6 +40,8 @@ interface LinkFormFields {
 }
 
 export function LinkEditForm({ url, title, onSubmit, onCancel, linkAutocompleteSuggestions }: LinkEditFormProps) {
+  const i18n = useI18n()
+
   const {
     register,
     handleSubmit,
@@ -67,7 +69,7 @@ export function LinkEditForm({ url, title, onSubmit, onCancel, linkAutocompleteS
       className={classNames(styles.multiFieldForm, styles.linkDialogEditForm)}
     >
       <div className={styles.formField}>
-        <label htmlFor="link-url">URL</label>
+        <label htmlFor="link-url">{i18n.createLink.url}</label>
         <DownshiftAutoComplete
           register={register}
           initialInputValue={url}
@@ -75,22 +77,32 @@ export function LinkEditForm({ url, title, onSubmit, onCancel, linkAutocompleteS
           suggestions={linkAutocompleteSuggestions}
           setValue={setValue}
           control={control}
-          placeholder="Select or paste an URL"
+          placeholder={i18n.createLink.urlPlaceholder}
           autofocus
         />
       </div>
 
       <div className={styles.formField}>
-        <label htmlFor="link-title">Title</label>
+        <label htmlFor="link-title">{i18n.createLink.title}</label>
         <input id="link-title" className={styles.textInput} size={40} {...register('title')} />
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--spacing-2)' }}>
-        <button type="submit" title="Set URL" aria-label="Set URL" className={classNames(styles.primaryButton)}>
-          Save
+        <button
+          type="submit"
+          title={i18n.createLink.saveTooltip}
+          aria-label={i18n.createLink.title}
+          className={classNames(styles.primaryButton)}
+        >
+          {i18n.dialogControls.save}
         </button>
-        <button type="reset" title="Cancel change" aria-label="Cancel change" className={classNames(styles.secondaryButton)}>
-          Cancel
+        <button
+          type="reset"
+          title={i18n.createLink.cancelTooltip}
+          aria-label={i18n.createLink.title}
+          className={classNames(styles.secondaryButton)}
+        >
+          {i18n.dialogControls.cancel}
         </button>
       </div>
     </form>

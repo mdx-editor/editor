@@ -25,7 +25,7 @@ export const ChangeCodeMirrorLanguage = () => {
   }
   return (
     <div className={styles.selectWithLabel}>
-      <label>Code block language:</label>
+      <label>{i18n.codeBlock.language}</label>
       <Select
         value={currentLanguage}
         onChange={(language) => {

@@ -59,7 +59,10 @@ const defaultEnglishI18n: MDXEditorI18n = {
 
   createLink: {
     url: 'URL',
-    title: 'Title'
+    title: 'Title',
+    urlPlaceholder: 'Enter URL',
+    saveTooltip: 'Save',
+    cancelTooltip: 'Cancel'
   },
 
   linkPreview: {

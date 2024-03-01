@@ -1,4 +1,4 @@
-import { MDXEditorI18n, MDXEditorI18nPartial } from '@/@types/i18n/i18n'
+import { MDXEditorI18n } from '@/@types/i18n/i18n'
 import React from 'react'
 import { MDXEditor } from '..'
 import { ALL_PLUGINS } from './_boilerplate'
@@ -64,6 +64,9 @@ const slovenianLocale: MDXEditorI18n = {
 
   createLink: {
     url: 'URL',
+    urlPlaceholder: 'Vnesi URL',
+    saveTooltip: 'Shrani povezavo',
+    cancelTooltip: 'Prekliči povezavo',
     title: 'Naslov'
   },
 
