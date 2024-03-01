@@ -38,7 +38,8 @@ type BaseMDXEditorI18n = {
     codeBlock: string
     sandpack: string
     admonition: string
-    frontmatter: string
+    insertFrontmatter: string
+    editFrontmatter: string
     thematicBreak: string
 
     richText: string
@@ -56,11 +57,17 @@ type BaseMDXEditorI18n = {
     addViaUrlInstructions: string
     alt: string
     title: string
+    editImage: string
   }
 
   codeBlock: {
+    selectLanguage: string
     language: string
     text: string
+  }
+
+  sandpack: {
+    deleteCodeBlock: string
   }
 
   editor: {

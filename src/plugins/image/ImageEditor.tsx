@@ -2,9 +2,11 @@ import React from 'react'
 
 import type { BaseSelection, LexicalEditor } from 'lexical'
 
+import { useI18n } from '@/i18n/I18nProvider'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext.js'
 import { useLexicalNodeSelection } from '@lexical/react/useLexicalNodeSelection.js'
 import { mergeRegister } from '@lexical/utils'
+import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 import classNames from 'classnames'
 import {
   $getNodeByKey,
@@ -25,7 +27,6 @@ import styles from '../../styles/ui.module.css'
 import { iconComponentFor$, readOnly$ } from '../core'
 import { $isImageNode } from './ImageNode'
 import ImageResizer from './ImageResizer'
-import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 
 export interface ImageEditorProps {
   nodeKey: string
@@ -84,6 +85,8 @@ function LazyImage({
 }
 
 export function ImageEditor({ src, title, alt, nodeKey, width, height }: ImageEditorProps): JSX.Element | null {
+  const i18n = useI18n()
+
   const [disableImageResize, imagePreviewHandler, iconComponentFor, readOnly] = useCellValues(
     disableImageResize$,
     imagePreviewHandler$,
@@ -269,7 +272,7 @@ export function ImageEditor({ src, title, alt, nodeKey, width, height }: ImageEd
         <button
           type="button"
           className={classNames(styles.iconButton, styles.editImageButton)}
-          title="Edit image"
+          title={i18n.uploadImage.editImage}
           disabled={readOnly}
           onClick={() => {
             openEditImageDialog({

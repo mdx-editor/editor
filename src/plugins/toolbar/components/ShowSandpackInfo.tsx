@@ -1,10 +1,11 @@
+import { useI18n } from '@/i18n/I18nProvider'
+import { useCellValues } from '@mdxeditor/gurx'
 import React from 'react'
 import styles from '../../../styles/ui.module.css'
 import { CodeBlockNode } from '../../codeblock/CodeBlockNode'
 import { activeEditor$, editorInFocus$, iconComponentFor$ } from '../../core'
 import { sandpackConfig$ } from '../../sandpack'
 import { ButtonWithTooltip } from '.././primitives/toolbar'
-import { useCellValues } from '@mdxeditor/gurx'
 
 /**
  * A component that displays the focused live code block's name.
@@ -13,6 +14,7 @@ import { useCellValues } from '@mdxeditor/gurx'
  * @group Toolbar Components
  */
 export const ShowSandpackInfo = () => {
+  const i18n = useI18n()
   const [editorInFocus, theEditor, iconComponentFor, sandpackConfig] = useCellValues(
     editorInFocus$,
     activeEditor$,
@@ -26,7 +28,7 @@ export const ShowSandpackInfo = () => {
   return (
     <div className={styles.selectWithLabel}>
       <ButtonWithTooltip
-        title="Delete this code block"
+        title={i18n.sandpack.deleteCodeBlock}
         onClick={() => {
           theEditor?.update(() => {
             if (sandpackNode.getNextSibling()) {

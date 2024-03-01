@@ -1,7 +1,8 @@
-import { applyFormat$, currentFormat$, iconComponentFor$ } from '../../core'
+import { useI18n } from '@/i18n/I18nProvider'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 import React from 'react'
 import { IS_BOLD, IS_ITALIC, IS_UNDERLINE } from '../../../FormatConstants'
+import { applyFormat$, currentFormat$, iconComponentFor$ } from '../../core'
 import { MultipleChoiceToggleGroup } from '.././primitives/toolbar'
 
 /**
@@ -12,13 +13,15 @@ export const BoldItalicUnderlineToggles: React.FC = () => {
   const [currentFormat, iconComponentFor] = useCellValues(currentFormat$, iconComponentFor$)
   const applyFormat = usePublisher(applyFormat$)
 
+  const i18n = useI18n()
+
   const boldIsOn = (currentFormat & IS_BOLD) !== 0
   const italicIsOn = (currentFormat & IS_ITALIC) !== 0
   const underlineIsOn = (currentFormat & IS_UNDERLINE) !== 0
 
-  const boldTitle = boldIsOn ? 'Remove bold' : 'Bold'
-  const italicTitle = italicIsOn ? 'Remove italic' : 'Italic'
-  const underlineTitle = underlineIsOn ? 'Remove underline' : 'Underline'
+  const boldTitle = boldIsOn ? i18n.toolbar.removeBold : i18n.toolbar.bold
+  const italicTitle = italicIsOn ? i18n.toolbar.removeItalic : i18n.toolbar.italic
+  const underlineTitle = underlineIsOn ? i18n.toolbar.removeUnderline : i18n.toolbar.underline
 
   return (
     <MultipleChoiceToggleGroup

@@ -68,12 +68,15 @@ const slovenianLocale = {
     uploadInstructions: 'Naloži sliko iz svoje naprave',
     addViaUrlInstructions: 'Ali dodaj sliko prek URL-ja:',
     alt: 'Alternativno besedilo',
-    title: 'Naslov'
+    title: 'Naslov',
+    editImage: 'Uredi sliko'
   },
 
   editor: {
     placeholder: 'Začnite tipkati svojo vsebino tukaj'
   },
+
+  sandpa
 
   admonitions: {
     note: 'Opomba',

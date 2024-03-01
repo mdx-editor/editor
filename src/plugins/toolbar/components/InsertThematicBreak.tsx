@@ -1,8 +1,9 @@
+import { useI18n } from '@/i18n/I18nProvider'
+import { useCellValue, usePublisher } from '@mdxeditor/gurx'
 import React from 'react'
+import { iconComponentFor$ } from '../../core'
 import { insertThematicBreak$ } from '../../thematic-break'
 import { ButtonWithTooltip } from '.././primitives/toolbar'
-import { useCellValue, usePublisher } from '@mdxeditor/gurx'
-import { iconComponentFor$ } from '../../core'
 
 /**
  * A toolbar button that allows the user to insert a thematic break (rendered as an HR HTML element).
@@ -10,10 +11,11 @@ import { iconComponentFor$ } from '../../core'
  * @group Toolbar Components
  */
 export const InsertThematicBreak: React.FC = () => {
+  const i18n = useI18n()
   const insertThematicBreak = usePublisher(insertThematicBreak$)
   const iconComponentFor = useCellValue(iconComponentFor$)
   return (
-    <ButtonWithTooltip title="Insert thematic break" onClick={() => insertThematicBreak()}>
+    <ButtonWithTooltip title={i18n.toolbar.thematicBreak} onClick={() => insertThematicBreak()}>
       {iconComponentFor('horizontal_rule')}
     </ButtonWithTooltip>
   )

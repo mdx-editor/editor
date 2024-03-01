@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+import { ContainerDirective } from 'mdast-util-directive'
 import React from 'react'
 import { NestedLexicalEditor, useNestedEditorContext } from '../plugins/core/NestedLexicalEditor'
 import { DirectiveDescriptor } from '../plugins/directives'
-import { ContainerDirective } from 'mdast-util-directive'
 
 /** @internal */
-export const ADMONITION_TYPES = ['note', 'tip', 'danger', 'info', 'caution'] as const
+export const ADMONITION_TYPES = ['note', 'tip', 'danger', 'info', 'caution', 'ass'] as const
 /** @internal */
 export type AdmonitionKind = (typeof ADMONITION_TYPES)[number]
 

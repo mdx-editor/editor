@@ -1,8 +1,9 @@
-import React from 'react'
-import { ButtonWithTooltip } from '.././primitives/toolbar'
-import { insertCodeBlock$ } from '../../codeblock/'
+import { useI18n } from '@/i18n/I18nProvider'
 import { useCellValue, usePublisher } from '@mdxeditor/gurx'
+import React from 'react'
+import { insertCodeBlock$ } from '../../codeblock/'
 import { iconComponentFor$ } from '../../core'
+import { ButtonWithTooltip } from '.././primitives/toolbar'
 
 /**
  * A toolbar button that allows the user to insert a fenced code block.
@@ -12,11 +13,12 @@ import { iconComponentFor$ } from '../../core'
  * @group Toolbar Components
  */
 export const InsertCodeBlock: React.FC = () => {
+  const i18n = useI18n()
   const insertCodeBlock = usePublisher(insertCodeBlock$)
   const iconComponentFor = useCellValue(iconComponentFor$)
   return (
     <ButtonWithTooltip
-      title="Insert code block"
+      title={i18n.toolbar.codeBlock}
       onClick={() => {
         insertCodeBlock({})
       }}

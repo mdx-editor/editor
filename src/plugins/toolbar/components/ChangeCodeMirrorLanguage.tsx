@@ -1,3 +1,4 @@
+import { useI18n } from '@/i18n/I18nProvider'
 import { useCellValues } from '@mdxeditor/gurx'
 import React from 'react'
 import styles from '../../../styles/ui.module.css'
@@ -14,6 +15,7 @@ const EMPTY_VALUE = '__EMPTY_VALUE__'
  * @group Toolbar Components
  */
 export const ChangeCodeMirrorLanguage = () => {
+  const i18n = useI18n()
   const [editorInFocus, theEditor, codeBlockLanguages] = useCellValues(editorInFocus$, activeEditor$, codeBlockLanguages$)
   const codeBlockNode = editorInFocus!.rootNode as CodeBlockNode
 
@@ -36,8 +38,8 @@ export const ChangeCodeMirrorLanguage = () => {
             })
           })
         }}
-        triggerTitle="Select code block language"
-        placeholder="Code block language"
+        triggerTitle={i18n.codeBlock.selectLanguage}
+        placeholder={i18n.codeBlock.language}
         items={Object.entries(codeBlockLanguages).map(([value, label]) => ({ value: value ? value : EMPTY_VALUE, label }))}
       />
     </div>

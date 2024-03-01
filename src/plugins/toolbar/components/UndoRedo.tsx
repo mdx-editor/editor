@@ -1,3 +1,4 @@
+import { useI18n } from '@/i18n/I18nProvider'
 import { mergeRegister } from '@lexical/utils'
 import { useCellValues } from '@mdxeditor/gurx'
 import { CAN_REDO_COMMAND, CAN_UNDO_COMMAND, COMMAND_PRIORITY_CRITICAL, REDO_COMMAND, UNDO_COMMAND } from 'lexical'
@@ -11,6 +12,8 @@ import { MultipleChoiceToggleGroup } from '.././primitives/toolbar'
  * @group Toolbar Components
  */
 export const UndoRedo: React.FC = () => {
+  const i18n = useI18n()
+
   const [iconComponentFor, activeEditor] = useCellValues(iconComponentFor$, activeEditor$)
   const [canUndo, setCanUndo] = React.useState(false)
   const [canRedo, setCanRedo] = React.useState(false)
@@ -38,18 +41,21 @@ export const UndoRedo: React.FC = () => {
     }
   }, [activeEditor])
 
+  const undoLabel = i18n.toolbar.undo
+  const redoLabel = i18n.toolbar.redo
+
   return (
     <MultipleChoiceToggleGroup
       items={[
         {
-          title: IS_APPLE ? 'Undo (⌘Z)' : 'Undo (Ctrl+Z)',
+          title: IS_APPLE ? `${undoLabel} (⌘Z)` : `${undoLabel} (Ctrl+Z)`,
           disabled: !canUndo,
           contents: iconComponentFor('undo'),
           active: false,
           onChange: () => activeEditor?.dispatchCommand(UNDO_COMMAND, undefined)
         },
         {
-          title: IS_APPLE ? 'Redo (⌘Y)' : 'Redo (Ctrl+Y)',
+          title: IS_APPLE ? `${redoLabel} (⌘Y)` : `${redoLabel} (Ctrl+Y)`,
           disabled: !canRedo,
           contents: iconComponentFor('redo'),
           active: false,

@@ -1,10 +1,11 @@
-import React from 'react'
-import { openNewImageDialog$ } from '../../image'
+import { useI18n } from '@/i18n/I18nProvider'
+import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 import * as RadixToolbar from '@radix-ui/react-toolbar'
+import React from 'react'
 import styles from '../../../styles/ui.module.css'
 import { iconComponentFor$, readOnly$ } from '../../core/index'
+import { openNewImageDialog$ } from '../../image'
 import { TooltipWrap } from '../primitives/TooltipWrap'
-import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 
 /**
  * A toolbar button that allows the user to insert an image from an URL.
@@ -12,12 +13,13 @@ import { useCellValues, usePublisher } from '@mdxeditor/gurx'
  * @group Toolbar Components
  */
 export const InsertImage = React.forwardRef<HTMLButtonElement, Record<string, never>>((_, forwardedRef) => {
+  const i18n = useI18n()
   const openNewImageDialog = usePublisher(openNewImageDialog$)
   const [readOnly, iconComponentFor] = useCellValues(readOnly$, iconComponentFor$)
 
   return (
     <RadixToolbar.Button className={styles.toolbarButton} ref={forwardedRef} disabled={readOnly} onClick={() => openNewImageDialog()}>
-      <TooltipWrap title="Insert image">{iconComponentFor('add_photo')}</TooltipWrap>
+      <TooltipWrap title={i18n.toolbar.image}> {iconComponentFor('add_photo')}</TooltipWrap>
     </RadixToolbar.Button>
   )
 })

@@ -41,7 +41,9 @@ const defaultEnglishI18n: MDXEditorI18n = {
     codeBlock: 'Insert code block',
     sandpack: 'Insert Sandpack',
     admonition: 'Insert admonition',
-    frontmatter: 'Insert frontmatter',
+    insertFrontmatter: 'Insert frontmatter',
+    editFrontmatter: 'Edit frontmatter',
+
     thematicBreak: 'Insert thematic break',
 
     richText: 'Rich text',
@@ -50,6 +52,7 @@ const defaultEnglishI18n: MDXEditorI18n = {
   },
 
   codeBlock: {
+    selectLanguage: 'Select code block language',
     language: 'Code block language',
     text: 'text'
   },
@@ -63,12 +66,17 @@ const defaultEnglishI18n: MDXEditorI18n = {
     uploadInstructions: 'Upload an image from your device',
     addViaUrlInstructions: 'Or add an image from an URL:',
     alt: 'Alt',
-    title: 'Title'
+    title: 'Title',
+    editImage: 'Edit image'
   },
 
   editor: {
     placeholder: 'Start typing your content here'
   },
+
+  sandpack: {
+    deleteCodeBlock: 'Delete this code block',
+  }
 
   admonitions: {
     note: 'Note',
