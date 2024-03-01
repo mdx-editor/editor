@@ -7,6 +7,7 @@ import { frontmatterDialogOpen$, removeFrontmatter$ } from '.'
 import styles from '../../styles/ui.module.css'
 import { editorRootElementRef$, iconComponentFor$, readOnly$ } from '../core'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
+import { useI18n } from '@/i18n/I18nProvider'
 
 type YamlConfig = { key: string; value: string }[]
 
@@ -16,6 +17,7 @@ export interface FrontmatterEditorProps {
 }
 
 export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) => {
+  const i18n = useI18n()
   const [readOnly, editorRootElementRef, iconComponentFor, frontmatterDialogOpen] = useCellValues(
     readOnly$,
     editorRootElementRef$,
@@ -70,7 +72,7 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
         <Dialog.Portal container={editorRootElementRef?.current}>
           <Dialog.Overlay className={styles.dialogOverlay} />
           <Dialog.Content className={styles.largeDialogContent} data-editor-type="frontmatter">
-            <Dialog.Title className={styles.dialogTitle}>Edit document frontmatter</Dialog.Title>
+            <Dialog.Title className={styles.dialogTitle}>{i18n.frontmatterEditor.title}</Dialog.Title>
             <form
               onSubmit={(e) => {
                 void handleSubmit(onSubmit)(e)
@@ -89,8 +91,8 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
                 </colgroup>
                 <thead>
                   <tr>
-                    <th>Key</th>
-                    <th>Value</th>
+                    <th>{i18n.frontmatterEditor.key}</th>
+                    <th>{i18n.frontmatterEditor.value}</th>
                     <th></th>
                   </tr>
                 </thead>
@@ -124,7 +126,7 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
                           append({ key: '', value: '' })
                         }}
                       >
-                        Add entry
+                        {i18n.frontmatterEditor.addEntry}
                       </button>
                     </td>
                   </tr>
@@ -132,15 +134,15 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
               </table>
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--spacing-2)' }}>
                 <button type="submit" className={styles.primaryButton}>
-                  Save
+                  {i18n.dialogControls.save}
                 </button>
                 <button type="reset" className={styles.secondaryButton}>
-                  Cancel
+                  {i18n.dialogControls.cancel}
                 </button>
               </div>
             </form>
             <Dialog.Close asChild>
-              <button className={styles.dialogCloseButton} aria-label="Close">
+              <button className={styles.dialogCloseButton} aria-label={i18n.dialogControls.cancel}>
                 {iconComponentFor('close')}
               </button>
             </Dialog.Close>

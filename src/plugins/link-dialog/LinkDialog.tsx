@@ -22,6 +22,7 @@ import {
   onClickLinkCallback$
 } from '.'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
+import { useI18n } from '@/i18n/I18nProvider'
 
 export const OPEN_LINK_DIALOG: LexicalCommand<undefined> = createCommand()
 
@@ -98,6 +99,7 @@ export function LinkEditForm({ url, title, onSubmit, onCancel, linkAutocompleteS
 
 /** @internal */
 export const LinkDialog: React.FC = () => {
+  const i18n = useI18n()
   const [editorRootElementRef, activeEditor, iconComponentFor, linkDialogState, linkAutocompleteSuggestions, onClickLinkCallback] =
     useCellValues(
       editorRootElementRef$,
@@ -177,21 +179,22 @@ export const LinkDialog: React.FC = () => {
                     onClickLinkCallback(linkDialogState.url)
                   }
                 }}
-                title={urlIsExternal ? `Open ${linkDialogState.url} in new window` : linkDialogState.url}
+                title={urlIsExternal ? i18n.linkPreview.open.replace('$0', linkDialogState.url) : linkDialogState.url}
               >
                 <span>{linkDialogState.url}</span>
                 {urlIsExternal && iconComponentFor('open_in_new')}
               </a>
 
-              <ActionButton onClick={() => switchFromPreviewToLinkEdit()} title="Edit link URL" aria-label="Edit link URL">
+              <ActionButton onClick={() => switchFromPreviewToLinkEdit()} title={i18n.linkPreview.edit} aria-label={i18n.linkPreview.edit}>
                 {iconComponentFor('edit')}
               </ActionButton>
+
               <Tooltip.Provider>
                 <Tooltip.Root open={copyUrlTooltipOpen}>
                   <Tooltip.Trigger asChild>
                     <ActionButton
-                      title="Copy to clipboard"
-                      aria-label="Copy link URL"
+                      title={i18n.linkPreview.copyToClipboard}
+                      aria-label={i18n.linkPreview.copyToClipboard}
                       onClick={() => {
                         void window.navigator.clipboard.writeText(linkDialogState.url).then(() => {
                           setCopyUrlTooltipOpen(true)
@@ -204,14 +207,14 @@ export const LinkDialog: React.FC = () => {
                   </Tooltip.Trigger>
                   <Tooltip.Portal container={editorRootElementRef?.current}>
                     <Tooltip.Content className={classNames(styles.tooltipContent)} sideOffset={5}>
-                      Copied!
+                      {i18n.linkPreview.copied}
                       <Tooltip.Arrow />
                     </Tooltip.Content>
                   </Tooltip.Portal>
                 </Tooltip.Root>
               </Tooltip.Provider>
 
-              <ActionButton title="Remove link" aria-label="Remove link" onClick={() => removeLink()}>
+              <ActionButton title={i18n.linkPreview.remove} aria-label={i18n.linkPreview.remove} onClick={() => removeLink()}>
                 {iconComponentFor('link_off')}
               </ActionButton>
             </>

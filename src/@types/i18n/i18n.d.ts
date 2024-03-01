@@ -23,6 +23,7 @@ type BaseMDXEditorI18n = {
     strikethrough: string
     removeStrikethrough: string
     inlineCode: string
+    removeInlineCode: string
 
     bulletedList: string
     removeBulletedList: string
@@ -58,6 +59,15 @@ type BaseMDXEditorI18n = {
     alt: string
     title: string
     editImage: string
+    autocompletePlaceholder: string
+  }
+
+  linkPreview: {
+    open: string
+    edit: string
+    copyToClipboard: string
+    copied: string
+    remove: string
   }
 
   codeBlock: {
@@ -74,12 +84,22 @@ type BaseMDXEditorI18n = {
     placeholder: string
   }
 
+  frontmatterEditor: {
+    title: string
+    key: string
+    value: string
+    addEntry: string
+  }
+
   admonitions: {
     note: string
     tip: string
     danger: string
     info: string
     caution: string
+
+    changeType: string
+    placeholder: string
   }
 
   dialogControls: {

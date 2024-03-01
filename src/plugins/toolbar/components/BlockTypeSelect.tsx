@@ -55,8 +55,8 @@ export const BlockTypeSelect = () => {
             }
         }
       }}
-      triggerTitle="Select block type"
-      placeholder="Block type"
+      triggerTitle={i18n.toolbar.blockTypeSelect.selectBlockTypeTooltip}
+      placeholder={i18n.toolbar.blockTypeSelect.placeholder}
       items={items}
     />
   )

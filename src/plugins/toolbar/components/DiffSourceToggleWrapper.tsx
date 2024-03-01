@@ -3,6 +3,7 @@ import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 import React from 'react'
 import styles from '../../../styles/ui.module.css'
 import { SingleChoiceToggleGroup } from '.././primitives/toolbar'
+import { useI18n } from '@/i18n/I18nProvider'
 
 /**
  * A wrapper element for the toolbar contents that lets the user toggle between rich text, diff and source mode.
@@ -24,6 +25,7 @@ export const DiffSourceToggleWrapper: React.FC<{ children: React.ReactNode; opti
   children,
   options = ['rich-text', 'diff', 'source']
 }) => {
+  const i18n = useI18n()
   const [viewMode, iconComponentFor] = useCellValues(viewMode$, iconComponentFor$)
   const changeViewMode = usePublisher(viewMode$)
 
@@ -34,13 +36,13 @@ export const DiffSourceToggleWrapper: React.FC<{ children: React.ReactNode; opti
   }[] = []
 
   if (options.includes('rich-text')) {
-    toggleGroupItems.push({ title: 'Rich text', contents: iconComponentFor('rich_text'), value: 'rich-text' })
+    toggleGroupItems.push({ title: i18n.toolbar.richText, contents: iconComponentFor('rich_text'), value: 'rich-text' })
   }
   if (options.includes('diff')) {
-    toggleGroupItems.push({ title: 'Diff mode', contents: iconComponentFor('difference'), value: 'diff' })
+    toggleGroupItems.push({ title: i18n.toolbar.diffMode, contents: iconComponentFor('difference'), value: 'diff' })
   }
   if (options.includes('source')) {
-    toggleGroupItems.push({ title: 'Source', contents: iconComponentFor('markdown'), value: 'source' })
+    toggleGroupItems.push({ title: i18n.toolbar.source, contents: iconComponentFor('markdown'), value: 'source' })
   }
 
   return (

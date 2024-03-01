@@ -14,12 +14,19 @@ import { ButtonOrDropdownButton } from '.././primitives/toolbar'
  */
 export const InsertAdmonition = () => {
   const i18n = useI18n()
+
+  const ADMONITION_LABELS_MAP: Record<(typeof ADMONITION_TYPES)[number], string> = {
+    note: i18n.admonitions.note,
+    tip: i18n.admonitions.tip,
+    danger: i18n.admonitions.danger,
+    info: i18n.admonitions.info,
+    caution: i18n.admonitions.caution
+  } as const
+
   const insertDirective = usePublisher(insertDirective$)
   const iconComponentFor = useCellValue(iconComponentFor$)
-  const items = React.useMemo(
-    () => ADMONITION_TYPES.map((type) => ({ value: type, label: type.replace(/^./, (l) => l.toUpperCase()) })),
-    []
-  )
+
+  const items = React.useMemo(() => ADMONITION_TYPES.map((type) => ({ label: ADMONITION_LABELS_MAP[type], value: type })), [])
 
   return (
     <ButtonOrDropdownButton

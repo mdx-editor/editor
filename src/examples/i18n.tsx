@@ -1,11 +1,11 @@
-import { MDXEditorI18nPartial } from '@/@types/i18n/i18n'
+import { MDXEditorI18n, MDXEditorI18nPartial } from '@/@types/i18n/i18n'
 import React from 'react'
 import { MDXEditor } from '..'
 import { ALL_PLUGINS } from './_boilerplate'
 import kitchenSinkMarkdown from './assets/kitchen-sink.md?raw'
 import './dark-editor.css'
 
-const slovenianLocale = {
+const slovenianLocale: MDXEditorI18n = {
   toolbar: {
     blockTypeSelect: {
       selectBlockTypeTooltip: 'Izberi vrsto bloka',
@@ -31,6 +31,7 @@ const slovenianLocale = {
     removeStrikethrough: 'Odstrani prečrtano',
 
     inlineCode: 'Oblika v vrstici',
+    removeInlineCode: 'Odstrani obliko v vrstici',
 
     bulletedList: 'Seznam s pikami',
     removeBulletedList: 'Odstrani seznam s pikami',
@@ -46,7 +47,8 @@ const slovenianLocale = {
     codeBlock: 'Vstavi blok kode',
     sandpack: 'Vstavi Sandpack',
     admonition: 'Vstavi opozorilo',
-    frontmatter: 'Vstavi predmaterijo',
+    insertFrontmatter: 'Vstavi predmaterijo',
+    editFrontmatter: 'Uredi predmaterijo',
     thematicBreak: 'Vstavi tematski prelom',
 
     richText: 'Obogateni besedilni način',
@@ -55,6 +57,7 @@ const slovenianLocale = {
   },
 
   codeBlock: {
+    selectLanguage: 'Izberi jezik bloka kode',
     language: 'Jezik bloka kode',
     text: 'besedilo'
   },
@@ -64,9 +67,18 @@ const slovenianLocale = {
     title: 'Naslov'
   },
 
+  linkPreview: {
+    open: 'Odpri $0 v novem oknu',
+    edit: 'Uredi povezavo',
+    copyToClipboard: 'Kopiraj povezavo',
+    copied: 'Kopirano!',
+    remove: 'Odstrani povezavo'
+  },
+
   uploadImage: {
     uploadInstructions: 'Naloži sliko iz svoje naprave',
     addViaUrlInstructions: 'Ali dodaj sliko prek URL-ja:',
+    autocompletePlaceholder: 'Izberi ali prilepi povezavo slike',
     alt: 'Alternativno besedilo',
     title: 'Naslov',
     editImage: 'Uredi sliko'
@@ -76,21 +88,33 @@ const slovenianLocale = {
     placeholder: 'Začnite tipkati svojo vsebino tukaj'
   },
 
-  sandpa
+  sandpack: {
+    deleteCodeBlock: 'Izbriši blok kode'
+  },
+
+  frontmatterEditor: {
+    title: 'Uredi predmaterijo',
+    key: 'Ključ',
+    value: 'Vrednost',
+    addEntry: 'Dodaj vnos'
+  },
 
   admonitions: {
     note: 'Opomba',
     tip: 'Namig',
     danger: 'Nevarnost',
     info: 'Informacija',
-    caution: 'Previdnost'
+    caution: 'Previdnost',
+
+    changeType: 'Spremeni vrsto opozorila',
+    placeholder: 'Vrsta opozorila'
   },
 
   dialogControls: {
     save: 'Shrani',
     cancel: 'Prekliči'
   }
-} as MDXEditorI18nPartial
+}
 
 export const EnglishLocale = () => {
   return <MDXEditor markdown={kitchenSinkMarkdown} plugins={ALL_PLUGINS} />

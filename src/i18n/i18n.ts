@@ -24,8 +24,8 @@ const defaultEnglishI18n: MDXEditorI18n = {
     removeUnderline: 'Remove underline',
     strikethrough: 'Strikethrough',
     removeStrikethrough: 'Remove strikethrough',
-
     inlineCode: 'Inline code format',
+    removeInlineCode: 'Remove inline code format',
 
     bulletedList: 'Bulleted list',
     removeBulletedList: 'Remove bulleted list',
@@ -62,9 +62,18 @@ const defaultEnglishI18n: MDXEditorI18n = {
     title: 'Title'
   },
 
+  linkPreview: {
+    open: 'Open $0 in new tab',
+    copyToClipboard: 'Copy to clipboard',
+    copied: 'Copied!',
+    edit: 'Edit link',
+    remove: 'Remove link'
+  },
+
   uploadImage: {
     uploadInstructions: 'Upload an image from your device',
     addViaUrlInstructions: 'Or add an image from an URL:',
+    autocompletePlaceholder: 'Select or paste an image src',
     alt: 'Alt',
     title: 'Title',
     editImage: 'Edit image'
@@ -75,15 +84,25 @@ const defaultEnglishI18n: MDXEditorI18n = {
   },
 
   sandpack: {
-    deleteCodeBlock: 'Delete this code block',
-  }
+    deleteCodeBlock: 'Delete this code block'
+  },
+
+  frontmatterEditor: {
+    title: 'Edit document frontmatter',
+    key: 'Key',
+    value: 'Value',
+    addEntry: 'Add entry'
+  },
 
   admonitions: {
     note: 'Note',
     tip: 'Tip',
     danger: 'Danger',
     info: 'Info',
-    caution: 'Caution'
+    caution: 'Caution',
+
+    changeType: 'Select admonition type',
+    placeholder: 'Admonition type'
   },
 
   dialogControls: {

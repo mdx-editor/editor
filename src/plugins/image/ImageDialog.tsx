@@ -7,6 +7,7 @@ import { editorRootElementRef$ } from '../core/index'
 import { closeImageDialog$, imageAutocompleteSuggestions$, imageDialogState$, saveImage$ } from './index'
 import { DownshiftAutoComplete } from '../core/ui/DownshiftAutoComplete'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
+import { useI18n } from '@/i18n/I18nProvider'
 
 interface ImageFormFields {
   src: string
@@ -16,6 +17,7 @@ interface ImageFormFields {
 }
 
 export const ImageDialog: React.FC = () => {
+  const i18n = useI18n()
   const [imageAutocompleteSuggestions, state, editorRootElementRef] = useCellValues(
     imageAutocompleteSuggestions$,
     imageDialogState$,
@@ -57,12 +59,12 @@ export const ImageDialog: React.FC = () => {
             className={styles.multiFieldForm}
           >
             <div className={styles.formField}>
-              <label htmlFor="file">Upload an image from your device:</label>
+              <label htmlFor="file">{i18n.uploadImage.uploadInstructions}</label>
               <input type="file" {...register('file')} />
             </div>
 
             <div className={styles.formField}>
-              <label htmlFor="src">Or add an image from an URL:</label>
+              <label htmlFor="src">{i18n.uploadImage.addViaUrlInstructions}</label>
               <DownshiftAutoComplete
                 register={register}
                 initialInputValue={state.type === 'editing' ? state.initialValues.src || '' : ''}
@@ -70,27 +72,37 @@ export const ImageDialog: React.FC = () => {
                 suggestions={imageAutocompleteSuggestions}
                 setValue={setValue}
                 control={control}
-                placeholder="Select or paste an image src"
+                placeholder={i18n.uploadImage.autocompletePlaceholder}
               />
             </div>
 
             <div className={styles.formField}>
-              <label htmlFor="alt">Alt:</label>
+              <label htmlFor="alt">{i18n.uploadImage.alt}</label>
               <input type="text" {...register('altText')} className={styles.textInput} />
             </div>
 
             <div className={styles.formField}>
-              <label htmlFor="title">Title:</label>
+              <label htmlFor="title">{i18n.uploadImage.title}</label>
               <input type="text" {...register('title')} className={styles.textInput} />
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--spacing-2)' }}>
-              <button type="submit" title="Save" aria-label="Save" className={classNames(styles.primaryButton)}>
-                Save
+              <button
+                type="submit"
+                title={i18n.uploadImage.title}
+                aria-label={i18n.uploadImage.title}
+                className={classNames(styles.primaryButton)}
+              >
+                {i18n.dialogControls.save}
               </button>
               <Dialog.Close asChild>
-                <button type="reset" title="Cancel" aria-label="Cancel" className={classNames(styles.secondaryButton)}>
-                  Cancel
+                <button
+                  type="reset"
+                  title={i18n.dialogControls.cancel}
+                  aria-label={i18n.dialogControls.cancel}
+                  className={classNames(styles.secondaryButton)}
+                >
+                  {i18n.dialogControls.cancel}
                 </button>
               </Dialog.Close>
             </div>
