@@ -1,10 +1,10 @@
-import { MDXEditorI18n } from '@/@types/i18n/i18n'
 import React from 'react'
-import { MDXEditor } from '..'
+import { MDXEditor, MDXEditorI18n } from '..'
 import { ALL_PLUGINS } from './_boilerplate'
 import i18nExampleMarkdown from './assets/i18n.md?raw'
 import './dark-editor.css'
 
+// Quick and rough translations, purely for demonstration purposes
 const slovenianLocale: MDXEditorI18n = {
   toolbar: {
     blockTypeSelect: {
@@ -137,10 +137,6 @@ const slovenianLocale: MDXEditorI18n = {
     save: 'Shrani',
     cancel: 'Prekliči'
   }
-}
-
-export const EnglishLocale = () => {
-  return <MDXEditor markdown={i18nExampleMarkdown} plugins={ALL_PLUGINS} />
 }
 
 export const SlovenianLocale = () => {
