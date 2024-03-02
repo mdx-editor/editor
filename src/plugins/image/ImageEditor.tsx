@@ -2,7 +2,7 @@ import React from 'react'
 
 import type { BaseSelection, LexicalEditor } from 'lexical'
 
-import { useI18n } from '@/i18n/I18nProvider'
+import { useI18n } from '@/plugins/core/i18n'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext.js'
 import { useLexicalNodeSelection } from '@lexical/react/useLexicalNodeSelection.js'
 import { mergeRegister } from '@lexical/utils'

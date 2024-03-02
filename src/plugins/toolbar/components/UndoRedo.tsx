@@ -1,4 +1,4 @@
-import { useI18n } from '@/i18n/I18nProvider'
+import { useI18n } from '@/plugins/core/i18n'
 import { mergeRegister } from '@lexical/utils'
 import { useCellValues } from '@mdxeditor/gurx'
 import { CAN_REDO_COMMAND, CAN_UNDO_COMMAND, COMMAND_PRIORITY_CRITICAL, REDO_COMMAND, UNDO_COMMAND } from 'lexical'

@@ -22,7 +22,7 @@ import {
   onClickLinkCallback$
 } from '.'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
-import { useI18n } from '@/i18n/I18nProvider'
+import { useI18n } from '@/plugins/core/i18n'
 
 export const OPEN_LINK_DIALOG: LexicalCommand<undefined> = createCommand()
 

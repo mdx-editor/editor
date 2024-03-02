@@ -43,7 +43,7 @@ import {
   usedLexicalNodes$
 } from '../core'
 import { useCellValues } from '@mdxeditor/gurx'
-import { useI18n } from '@/i18n/I18nProvider'
+import { useI18n } from '@/plugins/core/i18n'
 
 const AlignToTailwindClassMap = {
   center: styles.centeredCell,

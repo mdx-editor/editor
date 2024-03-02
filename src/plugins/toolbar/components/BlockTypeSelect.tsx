@@ -1,4 +1,4 @@
-import { useI18n } from '@/i18n/I18nProvider'
+import { useI18n } from '@/plugins/core/i18n'
 import { $createHeadingNode, $createQuoteNode } from '@lexical/rich-text'
 import { useCellValue, usePublisher } from '@mdxeditor/gurx'
 import { $createParagraphNode } from 'lexical'

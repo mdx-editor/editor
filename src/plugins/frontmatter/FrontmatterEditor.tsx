@@ -7,7 +7,7 @@ import { frontmatterDialogOpen$, removeFrontmatter$ } from '.'
 import styles from '../../styles/ui.module.css'
 import { editorRootElementRef$, iconComponentFor$, readOnly$ } from '../core'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
-import { useI18n } from '@/i18n/I18nProvider'
+import { useI18n } from '@/plugins/core/i18n'
 
 type YamlConfig = { key: string; value: string }[]
 

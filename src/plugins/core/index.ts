@@ -68,6 +68,7 @@ import { DirectiveDescriptor } from '../directives'
 import { CodeBlockEditorDescriptor } from '../codeblock'
 import { Directives } from 'mdast-util-directive'
 import { comment, commentFromMarkdown } from '../../mdastUtilHtmlComment'
+import { MDXEditorI18n, MDXEditorI18nPartial, defaultEnglishI18n } from './i18n'
 export * from './MdastHTMLNode'
 export * from './GenericHTMLNode'
 export * from './Icon'
@@ -829,6 +830,12 @@ export const activePlugins$ = Cell<string[]>([])
  */
 export const addActivePlugin$ = Appender(activePlugins$)
 
+/**
+ * The i18n dictionary for the editor.
+ * @group Core
+ */
+export const i18n$ = Cell<MDXEditorI18n>(defaultEnglishI18n)
+
 /** @internal */
 export const corePlugin = realmPlugin<{
   initialMarkdown: string
@@ -842,6 +849,7 @@ export const corePlugin = realmPlugin<{
   readOnly: boolean
   iconComponentFor: (name: IconKey) => React.ReactElement
   suppressHtmlProcessing?: boolean
+  i18n?: MDXEditorI18nPartial
 }>({
   init(r, params) {
     r.register(createRootEditorSubscription$)
@@ -872,7 +880,8 @@ export const corePlugin = realmPlugin<{
       [toMarkdownOptions$]: params?.toMarkdownOptions,
       [autoFocus$]: params?.autoFocus,
       [placeholder$]: params?.placeholder,
-      [readOnly$]: params?.readOnly
+      [readOnly$]: params?.readOnly,
+      [i18n$]: { ...defaultEnglishI18n, ...params?.i18n }
     })
 
     // Use the JSX extension to parse HTML

@@ -1,4 +1,4 @@
-import { useI18n } from '@/i18n/I18nProvider'
+import { useI18n } from '@/plugins/core/i18n'
 import { useCellValues } from '@mdxeditor/gurx'
 import React from 'react'
 import styles from '../../../styles/ui.module.css'

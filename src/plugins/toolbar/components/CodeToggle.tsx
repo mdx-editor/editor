@@ -3,7 +3,7 @@ import { IS_CODE } from '../../../FormatConstants'
 import { applyFormat$, currentFormat$, iconComponentFor$ } from '../../core'
 import { MultipleChoiceToggleGroup } from '.././primitives/toolbar'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
-import { useI18n } from '@/i18n/I18nProvider'
+import { useI18n } from '@/plugins/core/i18n'
 
 /**
  * A toolbar component that lets the user toggle code formatting.

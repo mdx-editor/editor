@@ -40,6 +40,7 @@ export * from './importMarkdownToLexical'
 
 // core so that you can build your own plugins
 export * from './plugins/core'
+export * from './plugins/core/i18n'
 
 // basics
 export * from './plugins/frontmatter'
@@ -115,6 +116,3 @@ export * from './utils/uuid4'
 export * from './utils/voidEmitter'
 
 export * from './RealmWithPlugins'
-
-// i18n
-export { useI18n } from './i18n/I18nProvider'

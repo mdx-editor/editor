@@ -25,13 +25,12 @@ import { ContentEditable } from '@lexical/react/LexicalContentEditable.js'
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary.js'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin.js'
 import classNames from 'classnames'
-import { MDXEditorI18nPartial } from './@types/i18n/i18n'
 import { ToMarkdownOptions } from './exportMarkdownFromLexical'
-import { I18nProvider } from './i18n/I18nProvider'
 import { IconKey } from './plugins/core/Icon'
 import { lexicalTheme } from './styles/lexicalTheme'
 import styles from './styles/ui.module.css'
 import { noop } from './utils/fp'
+import { MDXEditorI18nPartial } from './plugins/core/i18n'
 
 const LexicalProvider: React.FC<{
   children: JSX.Element | string | (JSX.Element | string)[]
@@ -307,19 +306,18 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>((pro
           readOnly: Boolean(props.readOnly),
           iconComponentFor: props.iconComponentFor ?? defaultIconComponentFor,
           suppressHtmlProcessing: props.suppressHtmlProcessing ?? false,
-          onError: props.onError ?? noop
+          onError: props.onError ?? noop,
+          i18n: props.i18n
         }),
         ...(props.plugins || [])
       ]}
     >
-      <I18nProvider i18n={props.i18n}>
-        <EditorRootElement className={props.className}>
-          <LexicalProvider>
-            <RichTextEditor />
-          </LexicalProvider>
-        </EditorRootElement>
-        <Methods mdxRef={ref} />
-      </I18nProvider>
+      <EditorRootElement className={props.className}>
+        <LexicalProvider>
+          <RichTextEditor />
+        </LexicalProvider>
+      </EditorRootElement>
+      <Methods mdxRef={ref} />
     </RealmWithPlugins>
   )
 })

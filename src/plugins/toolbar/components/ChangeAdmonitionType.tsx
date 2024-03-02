@@ -5,7 +5,7 @@ import { Select } from '.././primitives/select'
 import { DirectiveNode } from '../../directives/DirectiveNode'
 import { ADMONITION_TYPES } from '../../../directive-editors/AdmonitionDirectiveDescriptor'
 import { useCellValues } from '@mdxeditor/gurx'
-import { useI18n } from '@/i18n/I18nProvider'
+import { useI18n } from '@/plugins/core/i18n'
 
 /**
  * A component that allows the user to change the admonition type of the current selection.

@@ -7,7 +7,7 @@ import { editorRootElementRef$ } from '../core/index'
 import { closeImageDialog$, imageAutocompleteSuggestions$, imageDialogState$, saveImage$ } from './index'
 import { DownshiftAutoComplete } from '../core/ui/DownshiftAutoComplete'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
-import { useI18n } from '@/i18n/I18nProvider'
+import { useI18n } from '@/plugins/core/i18n'
 
 interface ImageFormFields {
   src: string
