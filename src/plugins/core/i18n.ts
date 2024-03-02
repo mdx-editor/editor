@@ -1,7 +1,7 @@
 import { useCellValue } from '@mdxeditor/gurx'
 import { i18n$ } from './index'
 
-export type BaseMDXEditorI18n = {
+export interface MDXEditorI18n {
   toolbar: {
     blockTypeSelect: {
       selectBlockTypeTooltip: string
@@ -89,8 +89,7 @@ export type BaseMDXEditorI18n = {
   }
 
   linkPreview: {
-    // If this string contains a "$url" placeholder, it will be replaced with the actual URL.
-    open: string
+    open: string // If this string contains a "$url" placeholder, it will be replaced with the actual URL.
     edit: string
     copyToClipboard: string
     copied: string
@@ -135,16 +134,9 @@ export type BaseMDXEditorI18n = {
   }
 }
 
-type CustomI18nExtension = {
-  // Allow for custom plugins to add their own translations
-  [key: string]: string | object
-}
-
-export type MDXEditorI18n = BaseMDXEditorI18n & CustomI18nExtension
-
 /**
  * Take the complete i18n object and make all its properties optional, including all nested objects.
- * This allows for partial i18n objects to be passed to the I18nProvider, without the need
+ * This allows for a partial i18n object to be passed into the editor without the need
  * to provide a translation for every single string.
  */
 type DeepPartial<T> = T extends object
@@ -153,7 +145,7 @@ type DeepPartial<T> = T extends object
     }
   : T
 
-export type MDXEditorI18nPartial = DeepPartial<BaseMDXEditorI18n>
+export interface MDXEditorI18nPartial extends DeepPartial<MDXEditorI18n> {}
 
 export const defaultEnglishI18n: MDXEditorI18n = {
   toolbar: {
