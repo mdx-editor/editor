@@ -129,3 +129,71 @@ export const JsxExpression = () => {
     </div>
   )
 }
+
+export const JsxFragment = () => {
+  return (
+    <div>
+      <MDXEditor
+        onChange={(e) => console.log(e)}
+        markdown={`# Fragment
+        <></>
+
+        # Nested fragment
+        <BlockNode><><BlockNode /><BlockNode /></></BlockNode>`}
+        plugins={[headingsPlugin(), jsxPlugin({ jsxComponentDescriptors })]}
+      />
+    </div>
+  )
+}
+
+const componentWithExpressionAttribute: JsxComponentDescriptor[] = [
+  {
+    name: 'BlockNode',
+    kind: 'flow',
+    source: './external',
+    props: [
+      {
+        name: 'onClick',
+        type: 'expression'
+      }
+    ],
+    Editor: GenericJsxEditor,
+    hasChildren: true
+  }
+]
+
+const InsertBlockNodeWithExpressionAttribute = () => {
+  const insertJsx = usePublisher(insertJsx$)
+  return (
+    <Button
+      onClick={() =>
+        insertJsx({
+          name: 'BlockNode',
+          kind: 'flow',
+          props: { onClick: { type: 'expression', value: '() => console.log' } },
+          children: [{ type: 'paragraph', children: [{ type: 'text', value: 'Hello, World!' }] }]
+        })
+      }
+    >
+      BlockNode
+    </Button>
+  )
+}
+
+export const ExpressionAttributes = () => {
+  return (
+    <div>
+      <MDXEditor
+        onChange={(e) => console.log(e)}
+        markdown={`<BlockNode>
+        Hello, World!
+        </BlockNode>`}
+        plugins={[
+          headingsPlugin(),
+          jsxPlugin({ jsxComponentDescriptors: componentWithExpressionAttribute }),
+          toolbarPlugin({ toolbarContents: InsertBlockNodeWithExpressionAttribute })
+        ]}
+      />
+    </div>
+  )
+}

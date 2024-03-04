@@ -66,7 +66,7 @@ const jsxComponentDescriptors: JsxComponentDescriptor[] = [
     source: './external',
     props: [
       { name: 'foo', type: 'string' },
-      { name: 'bar', type: 'string' }
+      { name: 'bar', type: 'expression' }
     ],
     hasChildren: true,
     Editor: GenericJsxEditor
@@ -105,7 +105,7 @@ export function Headings() {
   return <MDXEditor markdown="# hello world" plugins={[headingsPlugin()]} />
 }
 
-const breakMarkdown = `hello 
+const breakMarkdown = `hello
 
 ----------------
 

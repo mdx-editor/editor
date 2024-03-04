@@ -23,6 +23,7 @@ import { realmPlugin } from '../../RealmWithPlugins'
 import { MdastMdxTextExpressionVisitor } from './MdastMdxTextExpressionVisitor'
 import { LexicalMdxTextExpressionNode } from './LexicalMdxTextExpressionNode'
 import { LexicalMdxTextExpressionVisitor } from './LexicalMdxTextExpressionVisitor'
+import { GenericJsxEditor } from '../../jsx-editors/GenericJsxEditor'
 
 /**
  * An MDX JSX MDAST node.
@@ -42,7 +43,7 @@ export interface JsxPropertyDescriptor {
   /**
    * The type of the property
    */
-  type: 'string' | 'number'
+  type: 'string' | 'number' | 'expression'
   /**
    * Wether the property is required
    */
@@ -55,9 +56,10 @@ export interface JsxPropertyDescriptor {
  */
 export interface JsxComponentDescriptor {
   /**
-   * The tag name
+   * The tag name. For example: 'div', 'span', 'MyComponent'.
+   * Note: For fragments, use null.
    */
-  name: string
+  name: string | null
   /**
    * Wether the component is a flow or text component (inline or block)
    */
@@ -105,13 +107,34 @@ export function isMdastJsxNode(node: Mdast.Nodes): node is MdastJsx {
   return node.type === 'mdxJsxFlowElement' || node.type === 'mdxJsxTextElement'
 }
 
-function toMdastJsxAttributes(attributes: Record<string, string>): MdastJsx['attributes'] {
-  return Object.entries(attributes).map(([name, value]) => ({
-    type: 'mdxJsxAttribute',
-    name,
-    value
-  }))
+type ExpressionValue = { type: 'expression'; value: string }
+
+const isExpressionValue = (value: string | ExpressionValue): value is ExpressionValue => {
+  if (
+    typeof value === 'object' &&
+    value !== null &&
+    'type' in value &&
+    value.type === 'expression' &&
+    'value' in value &&
+    typeof value.value === 'string'
+  ) {
+    return true
+  }
+
+  return false
 }
+
+type JsxProperties = Record<string, string | ExpressionValue>
+
+const toMdastJsxAttributes = (attributes: JsxProperties) =>
+  Object.entries(attributes).map(
+    ([name, value]) =>
+      ({
+        type: 'mdxJsxAttribute',
+        name,
+        value: isExpressionValue(value) ? { type: 'mdxJsxAttributeValueExpression', value: value.value } : value
+      }) satisfies MdastJsx['attributes'][number]
+  )
 
 /**
  * A signal that inserts a new JSX node with the published payload.
@@ -121,13 +144,13 @@ export const insertJsx$ = Signal<
   | {
       kind: 'text'
       name: string
-      props: Record<string, string>
+      props: JsxProperties
       children?: MdxJsxTextElement['children']
     }
   | {
       kind: 'flow'
       name: string
-      props: Record<string, string>
+      props: JsxProperties
       children?: MdxJsxFlowElement['children']
     }
 >((r) => {
@@ -160,16 +183,42 @@ export const insertJsx$ = Signal<
   )
 })
 
-/**
- * a plugin that adds support for JSX elements (MDX).
- * @group JSX
- */
-export const jsxPlugin = realmPlugin<{
+type JsxPluginParams = {
   /**
    * A set of descriptors that document the JSX elements used in the document.
    */
   jsxComponentDescriptors: JsxComponentDescriptor[]
-}>({
+  /**
+   * Wether or not to allow default React fragments <></> processing in MDX.
+   */
+  allowFragment?: boolean
+}
+
+const fragmentDescriptor = {
+  name: null,
+  kind: 'flow',
+  props: [],
+  hasChildren: true,
+  Editor: GenericJsxEditor
+} satisfies JsxComponentDescriptor
+
+const getDescriptors = (params?: JsxPluginParams) => {
+  if (params) {
+    if (params.allowFragment ?? true) {
+      return [fragmentDescriptor, ...params.jsxComponentDescriptors]
+    }
+
+    return params.jsxComponentDescriptors
+  }
+
+  return [fragmentDescriptor]
+}
+
+/**
+ * a plugin that adds support for JSX elements (MDX).
+ * @group JSX
+ */
+export const jsxPlugin = realmPlugin<JsxPluginParams>({
   init: (realm, params) => {
     realm.pubIn({
       // import
@@ -182,11 +231,11 @@ export const jsxPlugin = realmPlugin<{
       [addLexicalNode$]: [LexicalJsxNode, LexicalMdxTextExpressionNode],
       [addExportVisitor$]: [LexicalJsxVisitor, LexicalMdxTextExpressionVisitor],
       [addToMarkdownExtension$]: mdxToMarkdown(),
-      [jsxComponentDescriptors$]: params?.jsxComponentDescriptors || []
+      [jsxComponentDescriptors$]: getDescriptors(params)
     })
   },
 
   update(realm, params) {
-    realm.pub(jsxComponentDescriptors$, params?.jsxComponentDescriptors || [])
+    realm.pub(jsxComponentDescriptors$, getDescriptors(params))
   }
 })
