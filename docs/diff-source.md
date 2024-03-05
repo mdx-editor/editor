@@ -27,3 +27,40 @@ It's an useful integration if you're building something for power users that are
   ]}
 />
 ```
+
+## Read-Only Diff mode
+
+You can enable the read-only mode for the diff viewer in two ways:
+
+1. Use the `readOnly` flag on the `MDXEditor` - this makes the entire editor read-only, including both the source and rich-text modes.
+2. Use the `readOnlyDiff` flag on the `diffSourcePlugin` - this makes only the diff mode read-only.
+
+For example, the code below will display the differences but prevent code editing in diff view:
+
+```tsx
+<MDXEditor
+  markdown={'hello world'}
+  plugins={[
+    diffSourcePlugin({
+      diffMarkdown: 'An older version',
+      viewMode: 'diff',
+      readOnlyDiff: true
+    })
+  ]}
+/>
+```
+
+And this code will prevent any code changes in any mode:
+
+```tsx
+<MDXEditor
+  markdown={'hello world'}
+  readOnly={true}
+  plugins={[
+    diffSourcePlugin({
+      diffMarkdown: 'An older version',
+      viewMode: 'diff'
+    })
+  ]}
+/>
+```
