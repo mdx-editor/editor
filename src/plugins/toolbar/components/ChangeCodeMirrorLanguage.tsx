@@ -3,7 +3,7 @@ import React from 'react'
 import styles from '../../../styles/ui.module.css'
 import { CodeBlockNode } from '../../codeblock/CodeBlockNode'
 import { codeBlockLanguages$ } from '../../codemirror'
-import { activeEditor$, editorInFocus$ } from '../../core'
+import { activeEditor$, editorInFocus$, useTranslation } from '../../core'
 import { Select } from '.././primitives/select'
 
 const EMPTY_VALUE = '__EMPTY_VALUE__'
@@ -16,6 +16,7 @@ const EMPTY_VALUE = '__EMPTY_VALUE__'
 export const ChangeCodeMirrorLanguage = () => {
   const [editorInFocus, theEditor, codeBlockLanguages] = useCellValues(editorInFocus$, activeEditor$, codeBlockLanguages$)
   const codeBlockNode = editorInFocus!.rootNode as CodeBlockNode
+  const t = useTranslation()
 
   let currentLanguage = codeBlockNode.getLanguage()
   if (currentLanguage === '') {
@@ -23,7 +24,7 @@ export const ChangeCodeMirrorLanguage = () => {
   }
   return (
     <div className={styles.selectWithLabel}>
-      <label>Code block language:</label>
+      <label>{t('codeBlock.language', 'Code block language')}</label>
       <Select
         value={currentLanguage}
         onChange={(language) => {
@@ -36,8 +37,8 @@ export const ChangeCodeMirrorLanguage = () => {
             })
           })
         }}
-        triggerTitle="Select code block language"
-        placeholder="Code block language"
+        triggerTitle={t('codeBlock.selectLanguage', 'Select code block language')}
+        placeholder={t('codeBlock.language', 'Code block language')}
         items={Object.entries(codeBlockLanguages).map(([value, label]) => ({ value: value ? value : EMPTY_VALUE, label }))}
       />
     </div>

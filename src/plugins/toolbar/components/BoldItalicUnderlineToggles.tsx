@@ -1,4 +1,4 @@
-import { applyFormat$, currentFormat$, iconComponentFor$ } from '../../core'
+import { applyFormat$, currentFormat$, iconComponentFor$, useTranslation } from '../../core'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 import React from 'react'
 import { IS_BOLD, IS_ITALIC, IS_UNDERLINE } from '../../../FormatConstants'
@@ -11,14 +11,15 @@ import { MultipleChoiceToggleGroup } from '.././primitives/toolbar'
 export const BoldItalicUnderlineToggles: React.FC = () => {
   const [currentFormat, iconComponentFor] = useCellValues(currentFormat$, iconComponentFor$)
   const applyFormat = usePublisher(applyFormat$)
+  const t = useTranslation()
 
   const boldIsOn = (currentFormat & IS_BOLD) !== 0
   const italicIsOn = (currentFormat & IS_ITALIC) !== 0
   const underlineIsOn = (currentFormat & IS_UNDERLINE) !== 0
 
-  const boldTitle = boldIsOn ? 'Remove bold' : 'Bold'
-  const italicTitle = italicIsOn ? 'Remove italic' : 'Italic'
-  const underlineTitle = underlineIsOn ? 'Remove underline' : 'Underline'
+  const boldTitle = boldIsOn ? t('toolbar.removeBold', 'Remove bold') : t('toolbar.bold', 'Bold')
+  const italicTitle = italicIsOn ? t('toolbar.removeItalic', 'Remove italic') : t('toolbar.italic', 'Italic')
+  const underlineTitle = underlineIsOn ? t('toolbar.underline', 'Remove underline') : t('toolbar.removeUnderline', 'Underline')
 
   return (
     <MultipleChoiceToggleGroup

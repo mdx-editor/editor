@@ -3,7 +3,8 @@ import { ButtonOrDropdownButton } from '.././primitives/toolbar'
 import { insertDirective$ } from '../../directives'
 import { ADMONITION_TYPES } from '../../../directive-editors/AdmonitionDirectiveDescriptor'
 import { useCellValue, usePublisher } from '@mdxeditor/gurx'
-import { iconComponentFor$ } from '../../core'
+import { iconComponentFor$, useTranslation } from '../../core'
+import { admonitionLabelsMap } from './ChangeAdmonitionType'
 
 /**
  * A toolbar dropdown button that allows the user to insert admonitions.
@@ -14,14 +15,16 @@ import { iconComponentFor$ } from '../../core'
 export const InsertAdmonition = () => {
   const insertDirective = usePublisher(insertDirective$)
   const iconComponentFor = useCellValue(iconComponentFor$)
-  const items = React.useMemo(
-    () => ADMONITION_TYPES.map((type) => ({ value: type, label: type.replace(/^./, (l) => l.toUpperCase()) })),
-    []
-  )
+  const t = useTranslation()
+
+  const items = React.useMemo(() => {
+    const labels = admonitionLabelsMap(t)
+    return ADMONITION_TYPES.map((type) => ({ value: type, label: labels[type] }))
+  }, [t])
 
   return (
     <ButtonOrDropdownButton
-      title="Insert admonition"
+      title={t('toolbar.admonition', 'Insert Admonition')}
       onChoose={(admonitionName) => {
         insertDirective({
           type: 'containerDirective',

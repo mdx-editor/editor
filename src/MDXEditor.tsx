@@ -2,6 +2,7 @@ import { useCellValues, usePublisher, useRealm } from '@mdxeditor/gurx'
 import React from 'react'
 import { RealmPlugin, RealmWithPlugins } from './RealmWithPlugins'
 import {
+  Translation,
   composerChildren$,
   contentEditableClassName$,
   corePlugin,
@@ -95,12 +96,22 @@ const DefaultIcon = React.lazy(() => import('./plugins/core/Icon'))
 const IconFallback = () => {
   return <svg width="24" height="24" viewBox="0 0 24 24" fill="none" />
 }
+
 const defaultIconComponentFor = (name: IconKey) => {
   return (
     <React.Suspense fallback={<IconFallback />}>
       <DefaultIcon name={name} />
     </React.Suspense>
   )
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function defaultTranslation(key: string, defaultValue: string, interpolations = {}) {
+  let value = defaultValue
+  for (const [k, v] of Object.entries(interpolations)) {
+    value = value.replaceAll(`{{${k}}}`, String(v))
+  }
+  return value
 }
 
 /**
@@ -280,6 +291,10 @@ export interface MDXEditorProps {
    * Set to false if you want to suppress the processing of HTML tags.
    */
   suppressHtmlProcessing?: boolean
+  /**
+   * Pass your own translation function if you want to localize the editor.
+   */
+  translation?: Translation
 }
 
 /**
@@ -301,7 +316,8 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>((pro
           readOnly: Boolean(props.readOnly),
           iconComponentFor: props.iconComponentFor ?? defaultIconComponentFor,
           suppressHtmlProcessing: props.suppressHtmlProcessing ?? false,
-          onError: props.onError ?? noop
+          onError: props.onError ?? noop,
+          translation: props.translation ?? defaultTranslation
         }),
         ...(props.plugins || [])
       ]}

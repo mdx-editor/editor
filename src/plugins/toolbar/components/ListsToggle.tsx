@@ -2,13 +2,7 @@ import React from 'react'
 import { applyListType$, currentListType$ } from '../../lists'
 import { SingleChoiceToggleGroup } from '.././primitives/toolbar'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
-import { iconComponentFor$ } from '../../core'
-
-const LIST_TITLE_MAP = {
-  bullet: 'Bulleted list',
-  number: 'Numbered list',
-  check: 'Check list'
-} as const
+import { iconComponentFor$, useTranslation } from '../../core'
 
 const ICON_NAME_MAP = {
   bullet: 'format_list_bulleted',
@@ -26,6 +20,14 @@ const ICON_NAME_MAP = {
 export const ListsToggle: React.FC<{ options?: Array<'bullet' | 'number' | 'check'> }> = ({ options = ['bullet', 'number', 'check'] }) => {
   const [currentListType, iconComponentFor] = useCellValues(currentListType$, iconComponentFor$)
   const applyListType = usePublisher(applyListType$)
+  const t = useTranslation()
+
+  const LIST_TITLE_MAP = {
+    bullet: t('toolbar.bulletedList', 'Bulleted list'),
+    number: t('toolbar.numberedList', 'Numbered list'),
+    check: t('toolbar.checkList', 'Check list')
+  } as const
+
   const items = options.map((type) => ({
     value: type,
     title: LIST_TITLE_MAP[type],

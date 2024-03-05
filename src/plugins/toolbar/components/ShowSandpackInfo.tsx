@@ -1,7 +1,7 @@
 import React from 'react'
 import styles from '../../../styles/ui.module.css'
 import { CodeBlockNode } from '../../codeblock/CodeBlockNode'
-import { activeEditor$, editorInFocus$, iconComponentFor$ } from '../../core'
+import { activeEditor$, editorInFocus$, iconComponentFor$, useTranslation } from '../../core'
 import { sandpackConfig$ } from '../../sandpack'
 import { ButtonWithTooltip } from '.././primitives/toolbar'
 import { useCellValues } from '@mdxeditor/gurx'
@@ -20,13 +20,14 @@ export const ShowSandpackInfo = () => {
     sandpackConfig$
   )
   const sandpackNode = editorInFocus!.rootNode as CodeBlockNode
+  const t = useTranslation()
 
   const preset = sandpackConfig.presets.find((preset) => preset.meta === sandpackNode.getMeta())!
 
   return (
     <div className={styles.selectWithLabel}>
       <ButtonWithTooltip
-        title="Delete this code block"
+        title={t('toolbar.deleteSandpack', 'Delete this code block')}
         onClick={() => {
           theEditor?.update(() => {
             if (sandpackNode.getNextSibling()) {

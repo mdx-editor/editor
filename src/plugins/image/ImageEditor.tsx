@@ -22,7 +22,7 @@ import {
 } from 'lexical'
 import { disableImageResize$, imagePreviewHandler$, openEditImageDialog$ } from '.'
 import styles from '../../styles/ui.module.css'
-import { iconComponentFor$, readOnly$ } from '../core'
+import { iconComponentFor$, readOnly$, useTranslation } from '../core'
 import { $isImageNode } from './ImageNode'
 import ImageResizer from './ImageResizer'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
@@ -101,6 +101,7 @@ export function ImageEditor({ src, title, alt, nodeKey, width, height }: ImageEd
   const [isResizing, setIsResizing] = React.useState<boolean>(false)
   const [imageSource, setImageSource] = React.useState<string | null>(null)
   const [initialImagePath, setInitialImagePath] = React.useState<string | null>(null)
+  const t = useTranslation()
 
   const onDelete = React.useCallback(
     (payload: KeyboardEvent) => {
@@ -269,7 +270,7 @@ export function ImageEditor({ src, title, alt, nodeKey, width, height }: ImageEd
         <button
           type="button"
           className={classNames(styles.iconButton, styles.editImageButton)}
-          title="Edit image"
+          title={t('imageEditor.editImage', 'Edit image')}
           disabled={readOnly}
           onClick={() => {
             openEditImageDialog({

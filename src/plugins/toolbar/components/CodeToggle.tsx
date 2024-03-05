@@ -1,6 +1,6 @@
 import React from 'react'
 import { IS_CODE } from '../../../FormatConstants'
-import { applyFormat$, currentFormat$, iconComponentFor$ } from '../../core'
+import { applyFormat$, currentFormat$, iconComponentFor$, useTranslation } from '../../core'
 import { MultipleChoiceToggleGroup } from '.././primitives/toolbar'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 
@@ -12,10 +12,11 @@ import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 export const CodeToggle: React.FC = () => {
   const [currentFormat, iconComponentFor] = useCellValues(currentFormat$, iconComponentFor$)
   const applyFormat = usePublisher(applyFormat$)
+  const t = useTranslation()
 
   const codeIsOn = (currentFormat & IS_CODE) !== 0
 
-  const title = codeIsOn ? 'Remove code format' : 'Inline code format'
+  const title = codeIsOn ? t('toolbar.removeInlineCode', 'Remove code format') : t('toolbar.inlineCode', 'Inline code format')
 
   return (
     <MultipleChoiceToggleGroup

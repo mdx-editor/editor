@@ -4,7 +4,7 @@ import { createEmptyHistoryState } from '@lexical/react/LexicalHistoryPlugin.js'
 import { $isHeadingNode, HeadingTagType } from '@lexical/rich-text'
 import { $setBlocksType } from '@lexical/selection'
 import { $findMatchingParent, $insertNodeToNearestRoot, $wrapNodeInElement } from '@lexical/utils'
-import { Cell, NodeRef, Realm, Signal, filter, map, scan, withLatestFrom } from '@mdxeditor/gurx'
+import { Cell, NodeRef, Realm, Signal, filter, map, scan, useCellValue, withLatestFrom } from '@mdxeditor/gurx'
 import {
   $createParagraphNode,
   $getRoot,
@@ -829,6 +829,12 @@ export const activePlugins$ = Cell<string[]>([])
  */
 export const addActivePlugin$ = Appender(activePlugins$)
 
+export type Translation = (key: string, defaultValue: string, interpolations?: Record<string, any>) => string
+
+export const translation$ = Cell<Translation>(() => {
+  throw new Error('No translation function provided')
+})
+
 /** @internal */
 export const corePlugin = realmPlugin<{
   initialMarkdown: string
@@ -842,6 +848,7 @@ export const corePlugin = realmPlugin<{
   readOnly: boolean
   iconComponentFor: (name: IconKey) => React.ReactElement
   suppressHtmlProcessing?: boolean
+  translation: Translation
 }>({
   init(r, params) {
     r.register(createRootEditorSubscription$)
@@ -872,7 +879,8 @@ export const corePlugin = realmPlugin<{
       [toMarkdownOptions$]: params?.toMarkdownOptions,
       [autoFocus$]: params?.autoFocus,
       [placeholder$]: params?.placeholder,
-      [readOnly$]: params?.readOnly
+      [readOnly$]: params?.readOnly,
+      [translation$]: params?.translation
     })
 
     // Use the JSX extension to parse HTML
@@ -900,3 +908,7 @@ export const corePlugin = realmPlugin<{
     realm.singletonSub(markdownErrorSignal$, params?.onError)
   }
 })
+
+export function useTranslation() {
+  return useCellValue(translation$)
+}

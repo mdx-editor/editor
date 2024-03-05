@@ -1,4 +1,4 @@
-import { iconComponentFor$, ViewMode, viewMode$ } from '../../core'
+import { iconComponentFor$, useTranslation, ViewMode, viewMode$ } from '../../core'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 import React from 'react'
 import styles from '../../../styles/ui.module.css'
@@ -26,6 +26,7 @@ export const DiffSourceToggleWrapper: React.FC<{ children: React.ReactNode; opti
 }) => {
   const [viewMode, iconComponentFor] = useCellValues(viewMode$, iconComponentFor$)
   const changeViewMode = usePublisher(viewMode$)
+  const t = useTranslation()
 
   const toggleGroupItems: {
     title: string
@@ -34,13 +35,13 @@ export const DiffSourceToggleWrapper: React.FC<{ children: React.ReactNode; opti
   }[] = []
 
   if (options.includes('rich-text')) {
-    toggleGroupItems.push({ title: 'Rich text', contents: iconComponentFor('rich_text'), value: 'rich-text' })
+    toggleGroupItems.push({ title: t('toolbar.richText', 'Rich text'), contents: iconComponentFor('rich_text'), value: 'rich-text' })
   }
   if (options.includes('diff')) {
-    toggleGroupItems.push({ title: 'Diff mode', contents: iconComponentFor('difference'), value: 'diff' })
+    toggleGroupItems.push({ title: t('toolbar.diffMode', 'Diff mode'), contents: iconComponentFor('difference'), value: 'diff' })
   }
   if (options.includes('source')) {
-    toggleGroupItems.push({ title: 'Source', contents: iconComponentFor('markdown'), value: 'source' })
+    toggleGroupItems.push({ title: t('toolbar.source', 'Source mode'), contents: iconComponentFor('markdown'), value: 'source' })
   }
 
   return (
@@ -48,9 +49,9 @@ export const DiffSourceToggleWrapper: React.FC<{ children: React.ReactNode; opti
       {viewMode === 'rich-text' ? (
         children
       ) : viewMode === 'diff' ? (
-        <span className={styles.toolbarTitleMode}>Diff mode</span>
+        <span className={styles.toolbarTitleMode}>{t('toolbar.diffMode', 'Diff mode')}</span>
       ) : (
-        <span className={styles.toolbarTitleMode}>Source mode</span>
+        <span className={styles.toolbarTitleMode}>{t('toolbar.source', 'Source mode')}</span>
       )}
 
       <div style={{ marginLeft: 'auto', pointerEvents: 'auto', opacity: 1 }}>

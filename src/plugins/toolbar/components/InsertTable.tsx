@@ -2,7 +2,7 @@ import { ButtonWithTooltip } from '.././primitives/toolbar'
 import React from 'react'
 import { insertTable$ } from '../../table'
 import { useCellValue, usePublisher } from '@mdxeditor/gurx'
-import { iconComponentFor$ } from '../../core'
+import { iconComponentFor$, useTranslation } from '../../core'
 
 /**
  * A toolbar button that allows the user to insert a table.
@@ -12,10 +12,11 @@ import { iconComponentFor$ } from '../../core'
 export const InsertTable: React.FC = () => {
   const iconComponentFor = useCellValue(iconComponentFor$)
   const insertTable = usePublisher(insertTable$)
+  const t = useTranslation()
 
   return (
     <ButtonWithTooltip
-      title="Insert table"
+      title={t('toolbar.table', 'Insert Table')}
       onClick={() => {
         insertTable({ rows: 3, columns: 3 })
       }}

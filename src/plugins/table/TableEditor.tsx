@@ -41,6 +41,7 @@ import {
   jsxIsAvailable$,
   readOnly$,
   rootEditor$,
+  useTranslation,
   usedLexicalNodes$
 } from '../core'
 import { useCellValues } from '@mdxeditor/gurx'
@@ -167,6 +168,8 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
     setHighlightedCoordinates([colIndex, rowIndex])
   }, [])
 
+  const t = useTranslation()
+
   // remove tool cols in readOnly mode
   return (
     <table className={styles.tableEditor} onMouseOver={onTableMouseOver} onMouseLeave={() => setHighlightedCoordinates([-1, -1])}>
@@ -190,7 +193,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
               <button
                 className={styles.iconButton}
                 type="button"
-                title="Delete table"
+                title={t('table.deleteTable', 'Delete table')}
                 onClick={(e) => {
                   e.preventDefault()
                   parentEditor.update(() => {
@@ -484,12 +487,14 @@ const ColumnEditor: React.FC<ColumnEditorProps> = ({
     },
     [parentEditor, lexicalTable]
   )
+
+  const t = useTranslation()
   return (
     <RadixPopover.Root>
       <RadixPopover.PopoverTrigger
         className={styles.tableColumnEditorTrigger}
         data-active={highlightedCoordinates[0] === colIndex + 1}
-        title="Column menu"
+        title={t('table.columnMenu', 'Column menu')}
       >
         {iconComponentFor('more_horiz')}
       </RadixPopover.PopoverTrigger>
@@ -508,26 +513,32 @@ const ColumnEditor: React.FC<ColumnEditorProps> = ({
               }}
               value={align || 'left'}
               type="single"
-              aria-label="Text alignment"
+              aria-label={t('table.textAlignment', 'Text alignment')}
             >
-              <RadixToolbar.ToggleItem value="left" title="Align left">
+              <RadixToolbar.ToggleItem value="left" title={t('table.alignLeft', 'Align left')}>
                 {iconComponentFor('format_align_left')}
               </RadixToolbar.ToggleItem>
-              <RadixToolbar.ToggleItem value="center" title="Align center">
+              <RadixToolbar.ToggleItem value="center" title={t('table.alignCenter', 'Align center')}>
                 {iconComponentFor('format_align_center')}
               </RadixToolbar.ToggleItem>
-              <RadixToolbar.ToggleItem value="right" title="Align right">
+              <RadixToolbar.ToggleItem value="right" title={t('table.alignRight', 'Align right')}>
                 {iconComponentFor('format_align_right')}
               </RadixToolbar.ToggleItem>
             </RadixToolbar.ToggleGroup>
             <RadixToolbar.Separator />
-            <RadixToolbar.Button onClick={insertColumnAt.bind(null, colIndex)} title="Insert a column to the left of this one">
+            <RadixToolbar.Button
+              onClick={insertColumnAt.bind(null, colIndex)}
+              title={t('table.insertColumnLeft', 'Insert a column to the left of this one')}
+            >
               {iconComponentFor('insert_col_left')}
             </RadixToolbar.Button>
-            <RadixToolbar.Button onClick={insertColumnAt.bind(null, colIndex + 1)} title="Insert a column to the right of this one">
+            <RadixToolbar.Button
+              onClick={insertColumnAt.bind(null, colIndex + 1)}
+              title={t('table.insertColumnRight', 'Insert a column to the right of this one')}
+            >
               {iconComponentFor('insert_col_right')}
             </RadixToolbar.Button>
-            <RadixToolbar.Button onClick={deleteColumnAt.bind(null, colIndex)} title="Delete this column">
+            <RadixToolbar.Button onClick={deleteColumnAt.bind(null, colIndex)} title={t('table.deleteColumn', 'Delete this column')}>
               {iconComponentFor('delete_small')}
             </RadixToolbar.Button>
           </RadixToolbar.Root>
@@ -573,9 +584,14 @@ const RowEditor: React.FC<RowEditorProps> = ({
     [parentEditor, lexicalTable]
   )
 
+  const t = useTranslation()
   return (
     <RadixPopover.Root>
-      <RadixPopover.PopoverTrigger className={styles.tableColumnEditorTrigger} data-active={highlightedCoordinates[1] === rowIndex}>
+      <RadixPopover.PopoverTrigger
+        className={styles.tableColumnEditorTrigger}
+        data-active={highlightedCoordinates[1] === rowIndex}
+        title={t('table.rowMenu', 'Row menu')}
+      >
         {iconComponentFor('more_horiz')}
       </RadixPopover.PopoverTrigger>
       <RadixPopover.Portal container={editorRootElementRef?.current}>
@@ -586,13 +602,19 @@ const RowEditor: React.FC<RowEditorProps> = ({
           side="bottom"
         >
           <RadixToolbar.Root className={styles.tableColumnEditorToolbar}>
-            <RadixToolbar.Button onClick={insertRowAt.bind(null, rowIndex)} title="Insert a row above this one">
+            <RadixToolbar.Button
+              onClick={insertRowAt.bind(null, rowIndex)}
+              title={t('table.insertRowAbove', 'Insert a row above this one')}
+            >
               {iconComponentFor('insert_row_above')}
             </RadixToolbar.Button>
-            <RadixToolbar.Button onClick={insertRowAt.bind(null, rowIndex + 1)} title="Insert a row below this one">
+            <RadixToolbar.Button
+              onClick={insertRowAt.bind(null, rowIndex + 1)}
+              title={t('table.insertRowBelow', 'Insert a row below this one')}
+            >
               {iconComponentFor('insert_row_below')}
             </RadixToolbar.Button>
-            <RadixToolbar.Button onClick={deleteRowAt.bind(null, rowIndex)} title="Delete this row">
+            <RadixToolbar.Button onClick={deleteRowAt.bind(null, rowIndex)} title={t('table.deleteRow', 'Delete this row')}>
               {iconComponentFor('delete_small')}
             </RadixToolbar.Button>
           </RadixToolbar.Root>
