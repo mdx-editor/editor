@@ -10,6 +10,9 @@ export const diffMarkdown$ = Cell('')
 /** @internal */
 export const cmExtensions$ = Cell<Extension[]>([])
 
+/** @internal */
+export const readOnlyDiff$ = Cell(false)
+
 /**
  * @group Diff/Source
  */
@@ -28,17 +31,23 @@ export const diffSourcePlugin = realmPlugin<{
    * Optional, additional CodeMirror extensions to load in the diff/source mode.
    */
   codeMirrorExtensions?: Extension[]
+  /**
+   * Set the diff editor to read-only.
+   * @default false
+   */
+  readOnlyDiff?: boolean
 }>({
   update: (r, params) => {
-    r.pub(diffMarkdown$, params?.diffMarkdown || '')
+    r.pub(diffMarkdown$, params?.diffMarkdown ?? '')
   },
 
   init(r, params) {
     r.pubIn({
-      [diffMarkdown$]: params?.diffMarkdown || '',
-      [cmExtensions$]: params?.codeMirrorExtensions || [],
+      [diffMarkdown$]: params?.diffMarkdown ?? '',
+      [cmExtensions$]: params?.codeMirrorExtensions ?? [],
       [addEditorWrapper$]: DiffSourceWrapper,
-      [viewMode$]: params?.viewMode || 'rich-text'
+      [readOnlyDiff$]: params?.readOnlyDiff ?? false,
+      [viewMode$]: params?.viewMode ?? 'rich-text'
     })
   }
 })

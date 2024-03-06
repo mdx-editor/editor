@@ -1,7 +1,7 @@
 import React from 'react'
 
-import { cmExtensions$, diffMarkdown$ } from '.'
-import { markdown$, markdownSourceEditorValue$, onBlur$ } from '../core'
+import { cmExtensions$, diffMarkdown$, readOnlyDiff$ } from '.'
+import { markdown$, markdownSourceEditorValue$, onBlur$, readOnly$ } from '../core'
 
 import { MergeView } from '@codemirror/merge'
 import { EditorState } from '@codemirror/state'
@@ -17,7 +17,7 @@ function setContent(view: EditorView | undefined, content: string) {
 
 export const DiffViewer: React.FC = () => {
   const realm = useRealm()
-  const [newMarkdown, oldMarkdown] = useCellValues(markdown$, diffMarkdown$)
+  const [newMarkdown, oldMarkdown, readOnly, readOnlyDiff] = useCellValues(markdown$, diffMarkdown$, readOnly$, readOnlyDiff$)
   const onUpdate = usePublisher(markdownSourceEditorValue$)
   const elRef = React.useRef<HTMLDivElement | null>(null)
   const cmMergeViewRef = React.useRef<MergeView | null>(null)
@@ -37,16 +37,27 @@ export const DiffViewer: React.FC = () => {
   }, [realm])
 
   React.useEffect(() => {
+    const isReadOnly = readOnly || readOnlyDiff
+
+    const revertParams = isReadOnly
+      ? ({
+          renderRevertControl: undefined,
+          revertControls: undefined
+        } as const)
+      : ({
+          renderRevertControl: () => {
+            const el = document.createElement('button')
+            el.classList.add('cm-merge-revert')
+            el.appendChild(document.createTextNode('\u2B95'))
+            return el
+          },
+          revertControls: 'a-to-b'
+        } as const)
+
     cmMergeViewRef.current = new MergeView({
-      renderRevertControl: () => {
-        const el = document.createElement('button')
-        el.classList.add('cm-merge-revert')
-        el.appendChild(document.createTextNode('\u2B95'))
-        return el
-      },
+      ...revertParams,
       parent: elRef.current!,
       orientation: 'a-b',
-      revertControls: 'a-to-b',
       gutter: true,
       a: {
         doc: oldMarkdown,
@@ -57,6 +68,7 @@ export const DiffViewer: React.FC = () => {
         extensions: [
           ...cmExtensions,
           ...COMMON_STATE_CONFIG_EXTENSIONS,
+          EditorState.readOnly.of(isReadOnly),
           EditorView.updateListener.of(({ state }) => {
             const md = state.doc.toString()
             onUpdate(md)
