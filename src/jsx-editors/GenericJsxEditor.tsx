@@ -1,11 +1,42 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { PhrasingContent } from 'mdast'
-import { MdxJsxAttribute, MdxJsxFlowElement, MdxJsxTextElement } from 'mdast-util-mdx-jsx'
+import {
+  MdxJsxAttribute,
+  MdxJsxAttributeValueExpression,
+  MdxJsxExpressionAttribute,
+  MdxJsxFlowElement,
+  MdxJsxTextElement
+} from 'mdast-util-mdx-jsx'
 import React from 'react'
 import { NestedLexicalEditor, useMdastNodeUpdater } from '../plugins/core/NestedLexicalEditor'
 import { PropertyPopover } from '../plugins/core/PropertyPopover'
 import styles from '../styles/ui.module.css'
 import { JsxEditorProps } from '../plugins/jsx'
+
+const isExpressionValue = (value: string | MdxJsxAttributeValueExpression | null | undefined): value is MdxJsxAttributeValueExpression => {
+  if (
+    typeof value === 'object' &&
+    value !== null &&
+    'type' in value &&
+    value.type === 'mdxJsxAttributeValueExpression' &&
+    'value' in value &&
+    typeof value.value === 'string'
+  ) {
+    return true
+  }
+
+  return false
+}
+
+const isStringValue = (value: string | MdxJsxAttributeValueExpression | null | undefined): value is string => typeof value === 'string'
+
+const isMdxJsxAttribute = (value: MdxJsxAttribute | MdxJsxExpressionAttribute): value is MdxJsxAttribute => {
+  if (value.type === 'mdxJsxAttribute' && typeof value.name === 'string') {
+    return true
+  }
+
+  return false
+}
 
 /**
  * A generic editor that can be used as an universal UI for any JSX element.
@@ -16,55 +47,69 @@ import { JsxEditorProps } from '../plugins/jsx'
 export const GenericJsxEditor: React.FC<JsxEditorProps> = ({ mdastNode, descriptor }) => {
   const updateMdastNode = useMdastNodeUpdater()
 
-  const properties = React.useMemo(() => {
-    return descriptor.props.reduce(
-      (acc, descriptor) => {
-        const attribute = mdastNode.attributes.find((attr) => (attr as MdxJsxAttribute).name === descriptor.name)
+  const properties = React.useMemo(
+    () =>
+      descriptor.props.reduce<Record<string, string>>((acc, { name }) => {
+        const attribute = mdastNode.attributes.find((attr) => (isMdxJsxAttribute(attr) ? attr.name === name : false))
+
         if (attribute) {
-          acc[descriptor.name] = attribute.value as string
-        } else {
-          acc[descriptor.name] = ''
+          if (isExpressionValue(attribute.value)) {
+            acc[name] = attribute.value.value
+            return acc
+          }
+
+          if (isStringValue(attribute.value)) {
+            acc[name] = attribute.value
+            return acc
+          }
         }
+
+        acc[name] = ''
         return acc
-      },
-      {} as Record<string, string>
-    )
-  }, [mdastNode, descriptor])
+      }, {}),
+    [mdastNode, descriptor]
+  )
 
   const onChange = React.useCallback(
     (values: Record<string, string>) => {
-      const newAttributes = mdastNode.attributes.slice()
-
-      Object.entries(values).forEach(([key, value]) => {
-        const attributeToUpdate = newAttributes.find((attr) => (attr as MdxJsxAttribute).name === key)
+      const updatedAttributes = Object.entries(values).reduce<typeof mdastNode.attributes>((acc, [name, value]) => {
         if (value === '') {
-          if (attributeToUpdate) {
-            newAttributes.splice(newAttributes.indexOf(attributeToUpdate), 1)
-          }
-        } else {
-          if (attributeToUpdate) {
-            attributeToUpdate.value = value
-          } else {
-            newAttributes.push({
-              type: 'mdxJsxAttribute',
-              name: key,
-              value: value
-            })
-          }
+          return acc
         }
-      })
-      updateMdastNode({ attributes: newAttributes })
+
+        const property = descriptor.props.find((prop) => prop.name === name)
+
+        if (property?.type === 'expression') {
+          acc.push({
+            type: 'mdxJsxAttribute',
+            name,
+            value: { type: 'mdxJsxAttributeValueExpression', value }
+          })
+          return acc
+        }
+
+        acc.push({
+          type: 'mdxJsxAttribute',
+          name,
+          value
+        })
+
+        return acc
+      }, [])
+
+      updateMdastNode({ attributes: updatedAttributes })
     },
-    [mdastNode, updateMdastNode]
+    [mdastNode, updateMdastNode, descriptor]
   )
+
+  const shouldRenderComponentName = descriptor.props.length == 0 && descriptor.hasChildren && descriptor.kind === 'flow'
 
   return (
     <div className={descriptor.kind === 'text' ? styles.inlineEditor : styles.blockEditor}>
-      {descriptor.props.length == 0 && descriptor.hasChildren && descriptor.kind === 'flow' ? (
-        <span className={styles.genericComponentName}>{mdastNode.name}</span>
-      ) : null}
+      {shouldRenderComponentName ? <span className={styles.genericComponentName}>{mdastNode.name ?? 'Fragment'}</span> : null}
 
-      {descriptor.props.length > 0 ? <PropertyPopover properties={properties} title={mdastNode.name || ''} onChange={onChange} /> : null}
+      {descriptor.props.length > 0 ? <PropertyPopover properties={properties} title={mdastNode.name ?? ''} onChange={onChange} /> : null}
+
       {descriptor.hasChildren ? (
         <NestedLexicalEditor<MdxJsxTextElement | MdxJsxFlowElement>
           block={descriptor.kind === 'flow'}

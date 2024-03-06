@@ -245,11 +245,16 @@ export const toMarkdownExtensions$ = Cell<NonNullable<LexicalConvertOptions['toM
 /** @internal */
 export const toMarkdownOptions$ = Cell<NonNullable<LexicalConvertOptions['toMarkdownOptions']>>({})
 
-// the JSX plugin will fill in these
-/** @internal */
+/**
+ * This JSX plugin will fill this value.
+ * @group JSX
+ */
 export const jsxIsAvailable$ = Cell(false)
 
-/** @internal */
+/**
+ * Contains the currently registered JSX component descriptors.
+ * @group JSX
+ */
 export const jsxComponentDescriptors$ = Cell<JsxComponentDescriptor[]>([])
 
 /**
