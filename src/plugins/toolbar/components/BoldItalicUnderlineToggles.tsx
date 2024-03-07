@@ -19,7 +19,7 @@ export const BoldItalicUnderlineToggles: React.FC = () => {
 
   const boldTitle = boldIsOn ? t('toolbar.removeBold', 'Remove bold') : t('toolbar.bold', 'Bold')
   const italicTitle = italicIsOn ? t('toolbar.removeItalic', 'Remove italic') : t('toolbar.italic', 'Italic')
-  const underlineTitle = underlineIsOn ? t('toolbar.underline', 'Remove underline') : t('toolbar.removeUnderline', 'Underline')
+  const underlineTitle = underlineIsOn ? t('toolbar.removeUnderline', 'Remove underline') : t('toolbar.underline', 'Underline')
 
   return (
     <MultipleChoiceToggleGroup
