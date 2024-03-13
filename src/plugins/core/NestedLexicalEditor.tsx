@@ -321,7 +321,7 @@ export const NestedLexicalEditor = function <T extends Mdast.RootContent>(props:
   return (
     <LexicalNestedComposer initialEditor={editor}>
       <RichTextPlugin
-        contentEditable={<ContentEditable {...contentEditableProps} className={classNames(styles.nestedEditor, contentEditableProps.className)} />}
+        contentEditable={<ContentEditable {...contentEditableProps} className={classNames(styles.nestedEditor, contentEditableProps?.className)} />}
         placeholder={null}
         ErrorBoundary={LexicalErrorBoundary}
       />
