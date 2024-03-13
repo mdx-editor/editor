@@ -34,6 +34,7 @@ import { ContentEditable } from '@lexical/react/LexicalContentEditable.js'
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary.js'
 import { LexicalNestedComposer } from '@lexical/react/LexicalNestedComposer.js'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin.js'
+import classNames from 'classnames'
 import { lexicalTheme } from '../../styles/lexicalTheme'
 import { exportLexicalTreeToMdast } from '../../exportMarkdownFromLexical'
 import { importMdastTreeToLexical } from '../../importMarkdownToLexical'
@@ -320,7 +321,7 @@ export const NestedLexicalEditor = function <T extends Mdast.RootContent>(props:
   return (
     <LexicalNestedComposer initialEditor={editor}>
       <RichTextPlugin
-        contentEditable={<ContentEditable {...contentEditableProps} className={styles.nestedEditor} />}
+        contentEditable={<ContentEditable {...contentEditableProps} className={classNames(styles.nestedEditor, contentEditableProps.className)} />}
         placeholder={null}
         ErrorBoundary={LexicalErrorBoundary}
       />
