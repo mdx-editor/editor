@@ -25,7 +25,10 @@ export const HtmlImage: Story<{ readOnly: boolean }> = ({ readOnly }) => {
         markdown={markdownWithHtmlImages}
         readOnly={readOnly}
         plugins={[
-          imagePlugin({ imageUploadHandler: async () => Promise.resolve('https://picsum.photos/200/300') }),
+          imagePlugin({
+            imageUploadHandler: async () => Promise.resolve('https://picsum.photos/200/300'),
+            disableImageSettingsButton: true
+          }),
           diffSourcePlugin(),
           toolbarPlugin({ toolbarContents: () => <DiffSourceToggleWrapper>:)</DiffSourceToggleWrapper> })
         ]}

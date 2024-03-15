@@ -264,6 +264,8 @@ export const closeImageDialog$ = Action((r) => {
   r.link(r.pipe(closeImageDialog$, mapTo({ type: 'inactive' })), imageDialogState$)
 })
 
+export const disableImageSettingsButton$ = Cell<boolean>(false)
+
 /**
  * Saves the data from the image dialog
  * @group Image
@@ -278,6 +280,7 @@ export const imagePlugin = realmPlugin<{
   imageUploadHandler?: ImageUploadHandler
   imageAutocompleteSuggestions?: string[]
   disableImageResize?: boolean
+  disableImageSettingsButton?: boolean
   imagePreviewHandler?: ImagePreviewHandler
   ImageDialog?: (() => JSX.Element) | React.FC
 }>({
@@ -290,6 +293,7 @@ export const imagePlugin = realmPlugin<{
       [imageUploadHandler$]: params?.imageUploadHandler || null,
       [imageAutocompleteSuggestions$]: params?.imageAutocompleteSuggestions || [],
       [disableImageResize$]: Boolean(params?.disableImageResize),
+      [disableImageSettingsButton$]: Boolean(params?.disableImageSettingsButton),
       [imagePreviewHandler$]: params?.imagePreviewHandler || null
     })
   },
