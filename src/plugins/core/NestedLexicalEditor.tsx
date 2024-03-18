@@ -44,6 +44,7 @@ import { mergeRegister } from '@lexical/utils'
 import { VoidEmitter } from '../../utils/voidEmitter'
 import { isPartOftheEditorUI } from '../../utils/isPartOftheEditorUI'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
+import { DirectiveNode } from '../directives'
 
 /**
  * The value of the {@link NestedEditorsContext} React context.
@@ -107,9 +108,8 @@ export function useMdastNodeUpdater<T extends Mdast.RootContent>() {
     parentEditor.update(
       () => {
         $addUpdateTag('history-push')
-        const currentNode = $getNodeByKey(lexicalNode.getKey())
+        const currentNode = $getNodeByKey(lexicalNode.getKey()) as typeof lexicalNode
         if (currentNode) {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-call
           currentNode.setMdastNode({ ...mdastNode, ...node })
         }
       },

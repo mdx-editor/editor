@@ -754,10 +754,12 @@ export const insertDecoratorNode$ = Signal<() => DecoratorNode<unknown>>((r) => 
                 } else {
                   $insertNodeToNearestRoot(node)
                 }
-                if ('select' in node && typeof node.select === 'function') {
-                  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-                  setTimeout(() => node.select())
-                }
+                setTimeout(() => {
+                  if ('select' in node && typeof node.select === 'function') {
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+                    node.select()
+                  }
+                })
               })
 
               setTimeout(() => {

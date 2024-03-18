@@ -20,7 +20,6 @@ export type SerializedDirectiveNode = Spread<
   SerializedLexicalNode
 >
 
-let GENERATION = 0
 /**
  * A lexical node that represents an image. Use {@link "$createDirectiveNode"} to construct one.
  * @group Directive
@@ -52,7 +51,6 @@ export class DirectiveNode extends DecoratorNode<React.JSX.Element> {
   constructor(mdastNode: Directives, key?: NodeKey) {
     super(key)
     this.__mdastNode = mdastNode
-    this.generation = GENERATION++
   }
 
   /**
