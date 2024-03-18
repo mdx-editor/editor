@@ -66,6 +66,10 @@
     background: transparent;
   }
 
+  & .cm-tooltip-autocomplete {
+    background: var(--baseBgSubtle);
+  }
+
 
   hr[data-lexical-decorator=true].selected {
     outline: 2px solid highlight;
