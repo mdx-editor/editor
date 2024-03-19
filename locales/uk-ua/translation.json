@@ -1,0 +1,102 @@
+{
+    "frontmatterEditor": {
+      "title": "Редагувати документ frontmatter",
+      "key": "Ключ",
+      "value": "Значення",
+      "addEntry": "Додати запис"
+    },
+    "dialogControls": {
+      "save": "Зберегти",
+      "cancel": "Скасувати"
+    },
+    "uploadImage": {
+      "uploadInstructions": "Завантажте зображення з вашого пристрою:",
+      "addViaUrlInstructions": "Або додайте зображення з URL посилання:",
+      "autoCompletePlaceholder": "Виберіть або вставте джерело зображення",
+      "alt": "Альтернативна назва:",
+      "title": "Назва:"
+    },
+    "imageEditor": {
+      "editImage": "Редагувати зображення"
+    },
+    "createLink": {
+      "url": "URL",
+      "urlPlaceholder": "Виберіть або вставте URL",
+      "title": "Назва",
+      "saveTooltip": "Установити URL",
+      "cancelTooltip": "Скасувати зміну"
+    },
+    "linkPreview": {
+      "open": "Відкрити {{url}} у новому вікні",
+      "edit": "Редагувати URL посилання",
+      "copyToClipboard": "Скопіювати в буфер обміну",
+      "copied": "Скопійовано!",
+      "remove": "Видалити посилання"
+    },
+    "table": {
+      "deleteTable": "Видалити таблицю",
+      "columnMenu": "Меню стовпців",
+      "textAlignment": "Вирівнювання тексту",
+      "alignLeft": "Вирівняти за лівим краєм",
+      "alignCenter": "Вирівняти за центром",
+      "alignRight": "Вирівняти за правим краєм",
+      "insertColumnLeft": "Вставити стовпець ліворуч від цього",
+      "insertColumnRight": "Вставити стовпець праворуч від цього",
+      "deleteColumn": "Видалити цей стовпець",
+      "rowMenu": "Меню рядків",
+      "insertRowAbove": "Вставити рядок вище за цей",
+      "insertRowBelow": "Вставити рядок нижче за цей",
+      "deleteRow": "Видалити цей рядок"
+    },
+    "toolbar": {
+      "blockTypes": {
+        "paragraph": "Абзац",
+        "quote": "Цитата",
+        "heading": "Заголовок {{level}}"
+      },
+      "blockTypeSelect": {
+        "selectBlockTypeTooltip": "Виберіть тип блоку",
+        "placeholder": "Тип блоку"
+      },
+      "removeBold": "Прибрати жирний шрифт",
+      "bold": "Жирний шрифт",
+      "removeItalic": "Видалити курсив",
+      "italic": "Курсив",
+      "underline": "Прибрати підкреслення",
+      "removeUnderline": "Підкреслення",
+      "removeInlineCode": "Remove code format",
+      "inlineCode": "Формат вбудованого коду",
+      "link": "Створити посилання",
+      "richText": "Розщирений текст",
+      "diffMode": "Режим різниці",
+      "source": "Режим вихідних даних",
+      "admonition": "Вставити застереженння",
+      "codeBlock": "Вставити блок коду",
+      "editFrontmatter": "Редагувати frontmatter",
+      "insertFrontmatter": "Вставити frontmatter",
+      "image": "Вставити зображення",
+      "insertSandpack": "Вставити Sandpack",
+      "table": "Вставити таблицю",
+      "thematicBreak": "Вставити тематичний розрив",
+      "bulletedList": "Маркований список",
+      "numberedList": "Нумерований список",
+      "checkList": "Контрольний список",
+      "deleteSandpack": "Видалити цей блок коду",
+      "undo": "Скасувати {{shortcut}}",
+      "redo": "Повторити скасоване {{shortcut}}"
+    },
+    "admonitions": {
+      "note": "Примітка",
+      "tip": "Підказка",
+      "danger": "Небезпека",
+      "info": "Інформація",
+      "caution": "Попередження",
+      "changeType": "Виберіть тип застежерення",
+      "placeholder": "Тип застежерення"
+    },
+    "codeBlock": {
+      "language": "Мова кодового блоку",
+      "selectLanguage": "Виберіть мову кодового блоку"
+    }
+  }
+  
