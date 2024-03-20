@@ -20,9 +20,9 @@ import { MdastMdxJsxElementVisitor } from './MdastMdxJsxElementVisitor'
 import * as Mdast from 'mdast'
 import { Signal, map } from '@mdxeditor/gurx'
 import { realmPlugin } from '../../RealmWithPlugins'
-import { MdastMdxTextExpressionVisitor } from './MdastMdxTextExpressionVisitor'
-import { LexicalMdxTextExpressionNode } from './LexicalMdxTextExpressionNode'
-import { LexicalMdxTextExpressionVisitor } from './LexicalMdxTextExpressionVisitor'
+import { MdastMdxExpressionVisitor } from './MdastMdxExpressionVisitor'
+import { LexicalMdxExpressionNode } from './LexicalMdxExpressionNode'
+import { LexicalMdxExpressionVisitor } from './LexicalMdxExpressionVisitor'
 import { GenericJsxEditor } from '../../jsx-editors/GenericJsxEditor'
 
 /**
@@ -225,11 +225,11 @@ export const jsxPlugin = realmPlugin<JsxPluginParams>({
       [jsxIsAvailable$]: true,
       [addMdastExtension$]: mdxFromMarkdown(),
       [addSyntaxExtension$]: mdxjs(),
-      [addImportVisitor$]: [MdastMdxJsxElementVisitor, MdastMdxJsEsmVisitor, MdastMdxTextExpressionVisitor],
+      [addImportVisitor$]: [MdastMdxJsxElementVisitor, MdastMdxJsEsmVisitor, MdastMdxExpressionVisitor],
 
       // export
-      [addLexicalNode$]: [LexicalJsxNode, LexicalMdxTextExpressionNode],
-      [addExportVisitor$]: [LexicalJsxVisitor, LexicalMdxTextExpressionVisitor],
+      [addLexicalNode$]: [LexicalJsxNode, LexicalMdxExpressionNode],
+      [addExportVisitor$]: [LexicalJsxVisitor, LexicalMdxExpressionVisitor],
       [addToMarkdownExtension$]: mdxToMarkdown(),
       [jsxComponentDescriptors$]: getDescriptors(params)
     })

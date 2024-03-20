@@ -10,17 +10,25 @@ import {
   SerializedLexicalNode,
   Spread
 } from 'lexical'
+import { MdxFlowExpression, MdxTextExpression } from 'mdast-util-mdx'
 
 import lexicalThemeStyles from '../../styles/lexical-theme.module.css'
 import styles from '../../styles/ui.module.css'
 
 /**
+ * The type of MDX expression.
+ * @internal
+ */
+type MdxExpressionType = MdxTextExpression['type'] | MdxFlowExpression['type']
+
+/**
  * A serialized representation of a {@link GenericHTMLNode}.
  * @group HTML
  */
-export type SerializedLexicalMdxTextExpressionNode = Spread<
+export type SerializedLexicalMdxExpressionNode = Spread<
   {
-    type: 'mdx-text-expression'
+    type: 'mdx-expression'
+    mdastType: MdxExpressionType
     value: string
     version: 1
   },
@@ -32,37 +40,45 @@ export type SerializedLexicalMdxTextExpressionNode = Spread<
  * The generic HTML node is used as a "fallback" for HTML elements that are not explicitly supported by the editor.
  * @group HTML
  */
-export class LexicalMdxTextExpressionNode extends DecoratorNode<JSX.Element> {
+export class LexicalMdxExpressionNode extends DecoratorNode<JSX.Element> {
   /** @internal */
   __value: string
 
   /** @internal */
+  __mdastType: MdxExpressionType
+
+  /** @internal */
   static getType(): string {
-    return 'mdx-text-expression'
+    return 'mdx-expression'
   }
 
   /** @internal */
-  static clone(node: LexicalMdxTextExpressionNode): LexicalMdxTextExpressionNode {
-    return new LexicalMdxTextExpressionNode(node.__value, node.__key)
+  static clone(node: LexicalMdxExpressionNode): LexicalMdxExpressionNode {
+    return new LexicalMdxExpressionNode(node.__value, node.__mdastType, node.__key)
   }
 
   /**
    * Constructs a new {@link GenericHTMLNode} with the specified MDAST HTML node as the object to edit.
    */
-  constructor(value: string, key?: NodeKey) {
+  constructor(value: string, mdastType: MdxExpressionType, key?: NodeKey) {
     super(key)
     this.__value = value
+    this.__mdastType = mdastType
   }
 
   getValue(): string {
     return this.__value
   }
 
+  getMdastType(): MdxExpressionType {
+    return this.__mdastType
+  }
+
   // View
 
   createDOM(): HTMLElement {
     const element = document.createElement('span')
-    element.classList.add(lexicalThemeStyles.mdxTextExpression)
+    element.classList.add(lexicalThemeStyles.mdxExpression)
     return element
   }
 
@@ -98,15 +114,16 @@ export class LexicalMdxTextExpressionNode extends DecoratorNode<JSX.Element> {
     }
   }
 
-  static importJSON(serializedNode: SerializedLexicalMdxTextExpressionNode): LexicalMdxTextExpressionNode {
-    return $createLexicalMdxTextExpressionNode(serializedNode.value)
+  static importJSON(serializedNode: SerializedLexicalMdxExpressionNode): LexicalMdxExpressionNode {
+    return $createLexicalMdxExpressionNode(serializedNode.value, serializedNode.mdastType)
   }
 
-  exportJSON(): SerializedLexicalMdxTextExpressionNode {
+  exportJSON(): SerializedLexicalMdxExpressionNode {
     return {
       ...super.exportJSON(),
       value: this.getValue(),
-      type: 'mdx-text-expression',
+      mdastType: this.getMdastType(),
+      type: 'mdx-expression',
       version: 1
     }
   }
@@ -178,14 +195,14 @@ export class LexicalMdxTextExpressionNode extends DecoratorNode<JSX.Element> {
  * Creates a new {@link GenericHTMLNode} with the specified MDAST HTML node as the object to edit.
  * @group HTML
  */
-export function $createLexicalMdxTextExpressionNode(value: string): LexicalMdxTextExpressionNode {
-  return $applyNodeReplacement(new LexicalMdxTextExpressionNode(value))
+export function $createLexicalMdxExpressionNode(value: string, type: MdxExpressionType): LexicalMdxExpressionNode {
+  return $applyNodeReplacement(new LexicalMdxExpressionNode(value, type))
 }
 
 /**
  * Determines if the specified node is a {@link GenericHTMLNode}.
  * @group HTML
  */
-export function $isLexicalMdxTextExpressionNode(node: LexicalNode | null | undefined): node is LexicalMdxTextExpressionNode {
-  return node instanceof LexicalMdxTextExpressionNode
+export function $isLexicalMdxExpressionNode(node: LexicalNode | null | undefined): node is LexicalMdxExpressionNode {
+  return node instanceof LexicalMdxExpressionNode
 }

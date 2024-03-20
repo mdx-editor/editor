@@ -123,7 +123,7 @@ export const JsxExpression = () => {
     <div>
       <MDXEditor
         onChange={(e) => console.log(e)}
-        markdown={`Hello {1+1} after the expression`}
+        markdown={`Hello {1+1} after the expression \n\n{2+2}\n`}
         plugins={[headingsPlugin(), jsxPlugin({ jsxComponentDescriptors: [] })]}
       />
     </div>
