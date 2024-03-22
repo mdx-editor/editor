@@ -116,11 +116,10 @@ MDXEditor "just works" in Vite, assuming that you use a recent version of it.
 Here's a minimal example for App.tsx:
 
 ```tsx
-import '@mdxeditor/editor/style.css'
+import { MDXEditor } from '@mdxeditor/editor'
+import { headingsPlugin } from '@mdxeditor/editor'
 
-// importing the editor and the plugin from their full paths
-import { MDXEditor } from '@mdxeditor/editor/MDXEditor'
-import { headingsPlugin } from '@mdxeditor/editor/plugins/headings'
+import '@mdxeditor/editor/style.css'
 
 function App() {
   return <MDXEditor markdown="# Hello world" plugins={[headingsPlugin()]} />
