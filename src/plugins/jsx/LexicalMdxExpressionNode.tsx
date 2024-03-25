@@ -153,7 +153,7 @@ export class LexicalMdxExpressionNode extends DecoratorNode<JSX.Element> {
   }
 
   isInline(): boolean {
-    return true
+    return this.__mdastType === 'mdxTextExpression'
   }
 
   decorate(editor: LexicalEditor) {
