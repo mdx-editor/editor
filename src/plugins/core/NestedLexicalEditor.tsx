@@ -44,7 +44,6 @@ import { mergeRegister } from '@lexical/utils'
 import { VoidEmitter } from '../../utils/voidEmitter'
 import { isPartOftheEditorUI } from '../../utils/isPartOftheEditorUI'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
-import { DirectiveNode } from '../directives'
 
 /**
  * The value of the {@link NestedEditorsContext} React context.
@@ -321,7 +320,9 @@ export const NestedLexicalEditor = function <T extends Mdast.RootContent>(props:
   return (
     <LexicalNestedComposer initialEditor={editor}>
       <RichTextPlugin
-        contentEditable={<ContentEditable {...contentEditableProps} className={classNames(styles.nestedEditor, contentEditableProps?.className)} />}
+        contentEditable={
+          <ContentEditable {...contentEditableProps} className={classNames(styles.nestedEditor, contentEditableProps?.className)} />
+        }
         placeholder={null}
         ErrorBoundary={LexicalErrorBoundary}
       />

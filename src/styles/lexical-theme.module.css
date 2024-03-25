@@ -185,7 +185,7 @@
   --admonitionBg: var(--admonitionNoteBg);
 }
 
-.mdxTextExpression {
+.mdxExpression {
   font-family: var(--font-mono);
   font-size: 84%;
   color: var(--accentText);
