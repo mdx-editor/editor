@@ -148,10 +148,10 @@ export const linkDialogState$ = Cell<InactiveLinkDialog | PreviewLinkDialog | Ed
   )
 
   r.sub(r.pipe(updateLink$, withLatestFrom(activeEditor$, linkDialogState$, currentSelection$)), ([payload, editor, state, selection]) => {
-    const url = payload.url.trim()
-    const title = payload.title.trim()
+    const url = payload.url?.trim() ?? ''
+    const title = payload.title?.trim() ?? ''
 
-    if (url.trim() !== '') {
+    if (url !== '') {
       if (selection?.isCollapsed()) {
         const linkContent = title || url
         editor?.update(
