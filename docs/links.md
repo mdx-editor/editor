@@ -13,10 +13,10 @@ MDXEditor supports markdown links through the links plugin. An additional popove
 To enable the markdown link import, pass the `linkPlugin` to the plugins property of the MDXEditor component.
 
 ```tsx
-import { linkPlugin } from '@mdxeditor/editor/plugins/link'
+import { linkPlugin } from '@mdxeditor/editor/plugins/link';
 // ...
 
-;<MDXEditor markdown="Hello [world](https://virtuoso.dev/)" plugins={[linkPlugin()]} />
+<MDXEditor markdown="Hello [world](https://virtuoso.dev/)" plugins={[linkPlugin()]} />
 ```
 
 ## The link dialog plugin
