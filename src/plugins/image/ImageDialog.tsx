@@ -59,7 +59,7 @@ export const ImageDialog: React.FC = () => {
           >
             <div className={styles.formField}>
               <label htmlFor="file">{t('uploadImage.uploadInstructions', 'Upload an image from your device:')}</label>
-              <input type="file" {...register('file')} />
+              <input type="file" accept="image/*" {...register('file')} />
             </div>
 
             <div className={styles.formField}>

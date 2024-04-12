@@ -22,7 +22,7 @@
     "lint": "eslint src --ext .ts,.tsx",
     "test": "vitest",
     "semantic-release": "semantic-release",
-    "image-upload-backend": "node ./src/stories/file-backend.js"
+    "image-upload-backend": "node ./src/examples/file-backend.js"
   },
   "files": [
     "dist"
