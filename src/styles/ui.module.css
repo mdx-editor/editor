@@ -672,7 +672,8 @@
     text-align: right;
   }
 
-  &>tbody>tr>td:not(.toolCell) {
+  &>tbody>tr>td:not(.toolCell),
+  &>tbody>tr>th:not(.toolCell):not(:last-of-type) {
     border: 1px solid var(--baseBgActive);
     padding: var(--spacing-1) var(--spacing-2);
     white-space: normal;

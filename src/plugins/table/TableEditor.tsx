@@ -16,7 +16,7 @@ import {
   createEditor
 } from 'lexical'
 import * as Mdast from 'mdast'
-import React from 'react'
+import React, { ElementType, ReactNode } from 'react'
 import { exportLexicalTreeToMdast } from '../../exportMarkdownFromLexical'
 import { importMdastTreeToLexical } from '../../importMarkdownToLexical'
 import { lexicalTheme } from '../../styles/lexicalTheme'
@@ -45,6 +45,19 @@ import {
   usedLexicalNodes$
 } from '../core'
 import { useCellValues } from '@mdxeditor/gurx'
+
+/**
+ * Returns the element type for the cell based on the rowIndex
+ *
+ * If the rowIndex is 0, it returns 'th' for the header cell
+ * Otherwise, it returns 'td' for the data cell
+ */
+const getCellType = (rowIndex: number): ElementType => {
+  if (rowIndex === 0) {
+    return 'th'
+  }
+  return 'td'
+}
 
 const AlignToTailwindClassMap = {
   center: styles.centeredCell,
@@ -228,12 +241,13 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
 
       <tbody>
         {mdastNode.children.map((row, rowIndex) => {
+          const CellElement = getCellType(rowIndex)
           return (
             <tr key={rowIndex}>
               {readOnly || (
-                <td className={styles.toolCell} data-tool-cell={true}>
+                <CellElement className={styles.toolCell} data-tool-cell={true}>
                   <RowEditor {...{ setActiveCellWithBoundaries, parentEditor, rowIndex, highlightedCoordinates, lexicalTable }} />
-                </td>
+                </CellElement>
               )}
               {row.children.map((mdastCell, colIndex) => {
                 return (
@@ -298,8 +312,11 @@ const Cell: React.FC<Omit<CellProps, 'focus'>> = ({ align, ...props }) => {
   const isActive = Boolean(activeCell && activeCell[0] === props.colIndex && activeCell[1] === props.rowIndex)
 
   const className = AlignToTailwindClassMap[align || 'left']
+
+  const CellElement = getCellType(props.rowIndex)
+
   return (
-    <td
+    <CellElement
       className={className}
       data-active={isActive}
       onClick={() => {
@@ -307,7 +324,7 @@ const Cell: React.FC<Omit<CellProps, 'focus'>> = ({ align, ...props }) => {
       }}
     >
       <CellEditor {...props} focus={isActive} />
-    </td>
+    </CellElement>
   )
 }
 
