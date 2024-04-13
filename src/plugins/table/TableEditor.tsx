@@ -16,7 +16,7 @@ import {
   createEditor
 } from 'lexical'
 import * as Mdast from 'mdast'
-import React, { ElementType, ReactNode } from 'react'
+import React, { ElementType } from 'react'
 import { exportLexicalTreeToMdast } from '../../exportMarkdownFromLexical'
 import { importMdastTreeToLexical } from '../../importMarkdownToLexical'
 import { lexicalTheme } from '../../styles/lexicalTheme'
