@@ -12,7 +12,7 @@ import {
 } from 'lexical'
 import { IS_APPLE } from '../../utils/detectMac'
 import { getSelectedNode, getSelectionRectangle } from '../../utils/lexicalHelpers'
-import { activeEditor$, addComposerChild$, createActiveEditorSubscription$, currentSelection$ } from '../core'
+import { activeEditor$, addComposerChild$, createActiveEditorSubscription$, currentSelection$, readOnly$ } from '../core'
 import { LinkDialog } from './LinkDialog'
 import { Action, Cell, Signal, filter, map, withLatestFrom } from '@mdxeditor/gurx'
 import { realmPlugin } from '../../RealmWithPlugins'
@@ -106,7 +106,7 @@ export const linkDialogState$ = Cell<InactiveLinkDialog | PreviewLinkDialog | Ed
     return editor.registerCommand(
       KEY_MODIFIER_COMMAND,
       (event) => {
-        if (event.key === 'k' && (IS_APPLE ? event.metaKey : event.ctrlKey)) {
+        if (event.key === 'k' && (IS_APPLE ? event.metaKey : event.ctrlKey) && !r.getValue(readOnly$)) {
           const selection = $getSelection()
           // we open the dialog if there's an actual selection
           // or if the cursor is inside a link
@@ -215,9 +215,9 @@ export const linkDialogState$ = Cell<InactiveLinkDialog | PreviewLinkDialog | Ed
   r.link(
     r.pipe(
       r.combine(currentSelection$, onWindowChange$),
-      withLatestFrom(activeEditor$, linkDialogState$),
-      map(([[selection], activeEditor]) => {
-        if ($isRangeSelection(selection) && activeEditor) {
+      withLatestFrom(activeEditor$, linkDialogState$, readOnly$),
+      map(([[selection], activeEditor, readOnly]) => {
+        if ($isRangeSelection(selection) && activeEditor && !readOnly) {
           const node = getLinkNodeInSelection(selection)
 
           if (node) {
