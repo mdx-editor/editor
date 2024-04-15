@@ -1,4 +1,4 @@
-import { useCellValues, usePublisher, useRealm } from '@mdxeditor/gurx'
+import { useCellValue, useCellValues, usePublisher, useRealm } from '@mdxeditor/gurx'
 import React from 'react'
 import { RealmPlugin, RealmWithPlugins } from './RealmWithPlugins'
 import {
@@ -8,20 +8,16 @@ import {
   corePlugin,
   editorRootElementRef$,
   editorWrappers$,
-  initialRootEditorState$,
   insertMarkdown$,
   markdown$,
   markdownSourceEditorValue$,
   placeholder$,
-  readOnly$,
   rootEditor$,
   setMarkdown$,
   topAreaChildren$,
-  usedLexicalNodes$,
   viewMode$
 } from './plugins/core'
 
-import { LexicalComposer } from '@lexical/react/LexicalComposer.js'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable.js'
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary.js'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin.js'
@@ -31,27 +27,18 @@ import { IconKey } from './plugins/core/Icon'
 import { lexicalTheme } from './styles/lexicalTheme'
 import styles from './styles/ui.module.css'
 import { noop } from './utils/fp'
+import { createLexicalComposerContext, LexicalComposerContext, LexicalComposerContextType } from '@lexical/react/LexicalComposerContext'
+import { LexicalEditor } from 'lexical'
 
 const LexicalProvider: React.FC<{
   children: JSX.Element | string | (JSX.Element | string)[]
 }> = ({ children }) => {
-  const [initialRootEditorState, nodes, readOnly] = useCellValues(initialRootEditorState$, usedLexicalNodes$, readOnly$)
-  return (
-    <LexicalComposer
-      initialConfig={{
-        editable: !readOnly,
-        editorState: initialRootEditorState,
-        namespace: 'MDXEditor',
-        theme: lexicalTheme,
-        nodes: nodes,
-        onError: (error: Error) => {
-          throw error
-        }
-      }}
-    >
-      {children}
-    </LexicalComposer>
-  )
+  const rootEditor = useCellValue(rootEditor$)!
+  const composerContextValue = React.useMemo(() => {
+    return [rootEditor, createLexicalComposerContext(null, lexicalTheme)] as [LexicalEditor, LexicalComposerContextType]
+  }, [rootEditor])
+
+  return <LexicalComposerContext.Provider value={composerContextValue}>{children}</LexicalComposerContext.Provider>
 }
 
 const RichTextEditor: React.FC = () => {

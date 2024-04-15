@@ -1,5 +1,4 @@
 import { realmPlugin } from '../../RealmWithPlugins'
-import { InitialEditorStateType } from '@lexical/react/LexicalComposer.js'
 import { createEmptyHistoryState } from '@lexical/react/LexicalHistoryPlugin.js'
 import { $isHeadingNode, HeadingTagType } from '@lexical/rich-text'
 import { $setBlocksType } from '@lexical/selection'
@@ -29,7 +28,8 @@ import {
   SELECTION_CHANGE_COMMAND,
   TextFormatType,
   TextNode,
-  createCommand
+  createCommand,
+  createEditor
 } from 'lexical'
 import * as Mdast from 'mdast'
 
@@ -68,6 +68,7 @@ import { DirectiveDescriptor } from '../directives'
 import { CodeBlockEditorDescriptor } from '../codeblock'
 import { Directives } from 'mdast-util-directive'
 import { comment, commentFromMarkdown } from '../../mdastUtilHtmlComment'
+import { lexicalTheme } from '../../styles/lexicalTheme'
 export * from './MdastHTMLNode'
 export * from './GenericHTMLNode'
 export * from './Icon'
@@ -636,31 +637,6 @@ function tryImportingMarkdown(r: Realm, node: ImportPoint, markdownValue: string
   }
 }
 
-// gets bound to the root editor state getter
-/** @internal */
-export const initialRootEditorState$ = Cell<InitialEditorStateType | null>(null, (r) => {
-  r.pub(initialRootEditorState$, (theRootEditor) => {
-    r.pub(rootEditor$, theRootEditor)
-    r.pub(activeEditor$, theRootEditor)
-
-    tryImportingMarkdown(r, $getRoot(), r.getValue(initialMarkdown$))
-
-    const autoFocusValue = r.getValue(autoFocus$)
-    if (autoFocusValue) {
-      if (autoFocusValue === true) {
-        // Default 'on' state
-        setTimeout(() => theRootEditor.focus(noop, { defaultSelection: 'rootStart' }))
-        return
-      }
-      setTimeout(() =>
-        theRootEditor.focus(noop, {
-          defaultSelection: autoFocusValue.defaultSelection ?? 'rootStart'
-        })
-      )
-    }
-  })
-})
-
 /** @internal */
 export const composerChildren$ = Cell<React.ComponentType[]>([])
 
@@ -899,6 +875,42 @@ export const corePlugin = realmPlugin<{
         [addImportVisitor$]: MdastHTMLVisitor
       })
     }
+  },
+
+  postInit(r, params) {
+    const newEditor = createEditor({
+      editable: params?.readOnly !== true,
+      namespace: 'MDXEditor',
+      nodes: r.getValue(usedLexicalNodes$),
+      onError: (error) => {
+        throw error
+      },
+      theme: lexicalTheme
+    })
+
+    newEditor.update(() => {
+      const markdown = params?.initialMarkdown.trim()
+      if (markdown) {
+        tryImportingMarkdown(r, $getRoot(), markdown)
+      }
+
+      const autoFocusValue = params?.autoFocus
+      if (autoFocusValue) {
+        if (autoFocusValue === true) {
+          // Default 'on' state
+          setTimeout(() => newEditor.focus(noop, { defaultSelection: 'rootStart' }))
+          return
+        }
+        setTimeout(() =>
+          newEditor.focus(noop, {
+            defaultSelection: autoFocusValue.defaultSelection ?? 'rootStart'
+          })
+        )
+      }
+    })
+
+    r.pub(rootEditor$, newEditor)
+    r.pub(activeEditor$, newEditor)
   },
 
   update(realm, params) {

@@ -9,6 +9,7 @@ import { tap } from './utils/fp'
 export interface RealmPlugin {
   init?: (realm: Realm) => void
   update?: (realm: Realm) => void
+  postInit?: (realm: Realm) => void
 }
 
 /**
@@ -21,6 +22,11 @@ export function realmPlugin<Params>(plugin: {
    * Called when the MDXEditor component is mounted and the plugin is initialized.
    */
   init?: (realm: Realm, params?: Params) => void
+
+  /**
+   * Called after the MDXEditor component is mounted and all plugins are initialized.
+   */
+  postInit?: (realm: Realm, params?: Params) => void
   /**
    * Called on each re-render. Use this to update the realm with updated property values.
    */
@@ -29,6 +35,7 @@ export function realmPlugin<Params>(plugin: {
   return function (params?: Params) {
     return {
       init: (realm: Realm) => plugin.init?.(realm, params),
+      postInit: (realm: Realm) => plugin.postInit?.(realm, params),
       update: (realm: Realm) => plugin.update?.(realm, params)
     }
   }
@@ -40,6 +47,9 @@ export function RealmWithPlugins({ children, plugins }: { children: React.ReactN
     return tap(new Realm(), (r) => {
       for (const plugin of plugins) {
         plugin.init?.(r)
+      }
+      for (const plugin of plugins) {
+        plugin.postInit?.(r)
       }
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
