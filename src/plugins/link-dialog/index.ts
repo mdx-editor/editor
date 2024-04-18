@@ -217,7 +217,6 @@ export const linkDialogState$ = Cell<InactiveLinkDialog | PreviewLinkDialog | Ed
       r.combine(currentSelection$, onWindowChange$),
       withLatestFrom(activeEditor$, linkDialogState$, readOnly$),
       map(([[selection], activeEditor, _, readOnly]) => {
-        console.log({ readOnly })
         if ($isRangeSelection(selection) && activeEditor && !readOnly) {
           const node = getLinkNodeInSelection(selection)
 
