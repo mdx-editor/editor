@@ -168,33 +168,31 @@ const CodeBlockEditorContextProvider: React.FC<{
   lexicalNode: CodeBlockNode
   children: React.ReactNode
 }> = ({ parentEditor, lexicalNode, children }) => {
-  return (
-    <CodeBlockEditorContext.Provider
-      value={{
-        lexicalNode,
-        setCode: (code: string) => {
-          parentEditor.update(() => {
-            lexicalNode.setCode(code)
-            setTimeout(() => {
-              parentEditor.dispatchCommand(NESTED_EDITOR_UPDATED_COMMAND, undefined)
-            }, 0)
-          })
-        },
-        setLanguage: (language: string) => {
-          parentEditor.update(() => {
-            lexicalNode.setLanguage(language)
-          })
-        },
-        setMeta: (meta: string) => {
-          parentEditor.update(() => {
-            lexicalNode.setMeta(meta)
-          })
-        }
-      }}
-    >
-      {children}
-    </CodeBlockEditorContext.Provider>
-  )
+  const contextValue = React.useMemo(() => {
+    return {
+      lexicalNode,
+      setCode: (code: string) => {
+        parentEditor.update(() => {
+          lexicalNode.setCode(code)
+          setTimeout(() => {
+            parentEditor.dispatchCommand(NESTED_EDITOR_UPDATED_COMMAND, undefined)
+          }, 0)
+        })
+      },
+      setLanguage: (language: string) => {
+        parentEditor.update(() => {
+          lexicalNode.setLanguage(language)
+        })
+      },
+      setMeta: (meta: string) => {
+        parentEditor.update(() => {
+          lexicalNode.setMeta(meta)
+        })
+      }
+    }
+  }, [lexicalNode, parentEditor])
+
+  return <CodeBlockEditorContext.Provider value={contextValue}>{children}</CodeBlockEditorContext.Provider>
 }
 
 /**

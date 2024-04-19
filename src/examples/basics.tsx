@@ -29,6 +29,7 @@ import codeBlocksMarkdown from './assets/code-blocks.md?raw'
 import imageMarkdown from './assets/image.md?raw'
 import jsxMarkdown from './assets/jsx.md?raw'
 import tableMarkdown from './assets/table.md?raw'
+import { basicDark } from 'cm6-theme-basic-dark'
 
 import { virtuosoSampleSandpackConfig } from './_boilerplate'
 
@@ -226,7 +227,10 @@ export function CodeBlock() {
       plugins={[
         codeBlockPlugin({ codeBlockEditorDescriptors: [PlainTextCodeEditorDescriptor] }),
         sandpackPlugin({ sandpackConfig: virtuosoSampleSandpackConfig }),
-        codeMirrorPlugin({ codeBlockLanguages: { js: 'JavaScript', css: 'CSS' } })
+        codeMirrorPlugin({
+          codeBlockLanguages: { jsx: 'JavaScript (react)', js: 'JavaScript', css: 'CSS' }
+          // codeMirrorExtensions: [basicDark]
+        })
       ]}
     />
   )

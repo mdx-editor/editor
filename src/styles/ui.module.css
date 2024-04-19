@@ -361,8 +361,12 @@
   padding: var(--spacing-3);
 }
 
-.sandpackWrapper {
+.codeMirrorWrapper {
   margin-bottom: var(--spacing-5);
+  border: 1px solid var(--baseLine);
+  border-radius: var(--radius-medium);
+  overflow: hidden;
+  padding: 0.8rem;
 }
 
 .frontmatterWrapper {
@@ -1178,7 +1182,7 @@ form.multiFieldForm {
   vertical-align: baseline;
   align-items: center;
   position: relative;
-  
+
   &::after,
   & input {
     width: auto;
@@ -1193,11 +1197,11 @@ form.multiFieldForm {
     border: none;
     color: inherit;
   }
-  
+
   span {
     padding: 0.25em;
   }
-  
+
   &::after {
     content: attr(data-value);
     white-space: pre-wrap;

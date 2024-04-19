@@ -37,6 +37,7 @@
   "license": "MIT",
   "dependencies": {
     "@codemirror/lang-markdown": "^6.2.3",
+    "@codemirror/language-data": "^6.5.1",
     "@codemirror/merge": "^6.4.0",
     "@codemirror/state": "^6.4.0",
     "@codemirror/view": "^6.23.0",
