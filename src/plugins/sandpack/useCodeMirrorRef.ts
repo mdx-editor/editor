@@ -10,7 +10,7 @@ export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'san
   const activeEditor = useCellValue(activeEditor$)
   const setEditorInFocus = usePublisher(editorInFocus$)
   // const setActiveEditorType = usePublisher('activeEditorType')
-  const codeMirrorRef = React.useRef<CodeMirrorRef>(null)
+  const codeMirrorRef = React.useRef<CodeMirrorRef | null>(null)
   const { lexicalNode } = useCodeBlockEditorContext()
 
   // these flags escape the editor with arrows.
@@ -90,7 +90,7 @@ export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'san
     setTimeout(() => {
       codeMirror?.getCodemirror()?.contentDOM?.addEventListener('focus', onFocusHandler)
       codeMirror?.getCodemirror()?.contentDOM?.addEventListener('keydown', onKeyDownHandler)
-    }, 100)
+    }, 300)
 
     return () => {
       codeMirror?.getCodemirror()?.contentDOM.removeEventListener('focus', onFocusHandler)
