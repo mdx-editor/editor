@@ -504,6 +504,15 @@ export const createRootEditorSubscription$ = Appender(rootEditorSubscriptions$, 
         let theNewMarkdownValue!: string
 
         editorState.read(() => {
+          const lastChild = $getRoot().getLastChild()
+          if (lastChild instanceof DecoratorNode) {
+            rootEditor.update(
+              () => {
+                $getRoot().append($createParagraphNode())
+              },
+              { discrete: true }
+            )
+          }
           theNewMarkdownValue = exportMarkdownFromLexical({
             root: $getRoot(),
             visitors: r.getValue(exportVisitors$),
