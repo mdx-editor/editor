@@ -11,12 +11,16 @@ import { basicLight } from 'cm6-theme-basic-light'
 import { basicSetup } from 'codemirror'
 import { languages } from '@codemirror/language-data'
 import { useCodeMirrorRef } from '../sandpack/useCodeMirrorRef'
-import { codeMirrorExtensions$ } from '.'
+import { codeMirrorAutoLoadLanguageSupport$, codeMirrorExtensions$ } from '.'
 
 export const COMMON_STATE_CONFIG_EXTENSIONS: Extension[] = []
 
 export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: CodeBlockEditorProps) => {
-  const [readOnly, codeMirrorExtensions] = useCellValues(readOnly$, codeMirrorExtensions$)
+  const [readOnly, codeMirrorExtensions, autoLoadLanguageSupport] = useCellValues(
+    readOnly$,
+    codeMirrorExtensions$,
+    codeMirrorAutoLoadLanguageSupport$
+  )
 
   const codeMirrorRef = useCodeMirrorRef(nodeKey, 'codeblock', language, focusEmitter)
   const { setCode } = useCodeBlockEditorContext()
@@ -44,7 +48,7 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
       if (readOnly) {
         extensions.push(EditorState.readOnly.of(true))
       }
-      if (language !== '') {
+      if (language !== '' && autoLoadLanguageSupport) {
         const languageData = languages.find((l) => {
           return l.name === language || l.alias.includes(language) || l.extensions.includes(language)
         })
