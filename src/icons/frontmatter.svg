@@ -1,14 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-  <mask id="a" width="24" height="24" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:alpha">
-    <path d="M0 0h24v24H0z"/>
-  </mask>
-  <g mask="url(#a)">
-    <path d="M5 7h4v2H5z"/>
-    <path d="M5 7h4v2H5zm0 7h4v2H5z"/>
-    <path d="M5 14h4v2H5zm5-7h4v2h-4z"/>
-    <path d="M10 7h4v2h-4zm0 7h4v2h-4z"/>
-    <path d="M10 14h4v2h-4zm5-7h4v2h-4z"/>
-    <path d="M15 7h4v2h-4zm0 7h4v2h-4z"/>
-    <path d="M15 14h4v2h-4z"/>
-  </g>
+  
+  <path d="M5 7h4v2H5z"/>
+  <path d="M5 7h4v2H5zm0 7h4v2H5z"/>
+  <path d="M5 14h4v2H5zm5-7h4v2h-4z"/>
+  <path d="M10 7h4v2h-4zm0 7h4v2h-4z"/>
+  <path d="M10 14h4v2h-4zm5-7h4v2h-4z"/>
+  <path d="M15 7h4v2h-4zm0 7h4v2h-4z"/>
+  <path d="M15 14h4v2h-4z"/>
 </svg>

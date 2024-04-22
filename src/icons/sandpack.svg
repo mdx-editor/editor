@@ -1,8 +1,4 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-  <mask id="a" width="24" height="24" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:alpha">
-    <path d="M0 0h24v24H0z"/>
-  </mask>
-  <g mask="url(#a)">
-    <path d="m5 15.95 6 3.475v-6.85L5 9.1v6.85Zm8 3.475 6-3.475V9.1l-6 3.475v6.85Zm-6.925-12L12 10.85l5.925-3.425L12 4 6.075 7.425ZM3 17.125V6.875L12 1.7l9 5.175v10.25L12 22.3l-9-5.175Z"/>
-  </g>
+  
+  <path d="m5 15.95 6 3.475v-6.85L5 9.1v6.85Zm8 3.475 6-3.475V9.1l-6 3.475v6.85Zm-6.925-12L12 10.85l5.925-3.425L12 4 6.075 7.425ZM3 17.125V6.875L12 1.7l9 5.175v10.25L12 22.3l-9-5.175Z"/>
 </svg>
