@@ -2,7 +2,7 @@ import { realmPlugin } from '../../RealmWithPlugins'
 import { Cell, Signal, map } from '@mdxeditor/gurx'
 import { CodeBlockEditorDescriptor, appendCodeBlockEditorDescriptor$, insertCodeBlock$ } from '../codeblock'
 import { CodeMirrorEditor } from './CodeMirrorEditor'
-import { SandpackThemeProp } from '@codesandbox/sandpack-react/types'
+import { Extension } from '@codemirror/state'
 
 /**
  * The codemirror code block languages.
@@ -37,13 +37,17 @@ export const insertCodeMirror$ = Signal<{ language: string; code: string }>((r) 
 })
 
 /**
- * The theme CodeMirrorEditor used.
- * It can be "light" | "dark" | "auto",
- * or the theme in "@codesandbox/sandpack-themes" package,
- * or you can also custom one,
- * learn more https://sandpack.codesandbox.io/docs/getting-started/themes#custom-theme
+ * The code mirror extensions for the coemirror code block editor.
+ * @group CodeMirror
  */
-export const codeMirrorTheme$ = Cell<SandpackThemeProp>('auto')
+export const codeMirrorExtensions$ = Cell<Extension[]>([])
+
+/**
+ * Whether or not to try to dynamically load the code block language support.
+ * Disable if you want to manually pass the supported languages.
+ * @group CodeMirror
+ */
+export const codeMirrorAutoLoadLanguageSupport$ = Cell<boolean>(true)
 
 /**
  * A plugin that adds lets users edit code blocks with CodeMirror.
@@ -52,22 +56,30 @@ export const codeMirrorTheme$ = Cell<SandpackThemeProp>('auto')
 export const codeMirrorPlugin = realmPlugin<{
   codeBlockLanguages: Record<string, string>
   /**
-   * The theme of CodeMirrorEditor
+   * Optional, additional CodeMirror extensions to load in the diff/source mode.
    */
-  theme?: SandpackThemeProp
+  codeMirrorExtensions?: Extension[]
+  /**
+   * Whether or not to try to dynamically load the code block language support.
+   * Disable if you want to manually pass the supported languages.
+   * @group CodeMirror
+   */
+  autoLoadLanguageSupport?: boolean
 }>({
   update(r, params) {
     r.pubIn({
       [codeBlockLanguages$]: params?.codeBlockLanguages,
-      [codeMirrorTheme$]: params?.theme || 'auto'
+      [codeMirrorExtensions$]: params?.codeMirrorExtensions || [],
+      [codeMirrorAutoLoadLanguageSupport$]: params?.autoLoadLanguageSupport ?? true
     })
   },
 
   init(r, params) {
     r.pubIn({
       [codeBlockLanguages$]: params?.codeBlockLanguages,
-      [codeMirrorTheme$]: params?.theme || 'auto',
-      [appendCodeBlockEditorDescriptor$]: buildCodeBlockDescriptor(params?.codeBlockLanguages || {})
+      [codeMirrorExtensions$]: params?.codeMirrorExtensions || [],
+      [appendCodeBlockEditorDescriptor$]: buildCodeBlockDescriptor(params?.codeBlockLanguages || {}),
+      [codeMirrorAutoLoadLanguageSupport$]: params?.autoLoadLanguageSupport ?? true
     })
   }
 })

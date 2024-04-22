@@ -2,7 +2,7 @@ Blocks of code
 
 JavaScript:
 
-```js
+```jsx
 export default function App() {
   return <h1>Hello world from a markdown</h1>
 }
