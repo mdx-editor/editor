@@ -37,7 +37,7 @@ const mySignal$ = Signal<number>((r) => {
 })
 ```
 
-Following the approach above, you can access and interact with the built-in cells and signals that the package exports. As a convention, the Cells and Signals are suffixed with `$`. You would most likely need to interact with `rootEditor$` (the Lexical instance), `activeEditor$` (can be the root editor or one of the nested editors). Signals like `createRootEditorSubscription$` and `createActiveEditorSubscription$` let you [hook](https://lexical.dev/docs/concepts/commands#editorregistercommand) up to the Lexical editor commands](https://lexical.dev/docs/concepts/commands#editorregistercommand).
+Following the approach above, you can access and interact with the built-in cells and signals that the package exports. As a convention, the Cells and Signals are suffixed with `$`. You would most likely need to interact with `rootEditor$` (the Lexical instance), `activeEditor$` (can be the root editor or one of the nested editors). Signals like `createRootEditorSubscription$` and `createActiveEditorSubscription$` let you [hook](https://lexical.dev/docs/concepts/commands#editorregistercommand) up to the [Lexical editor commands](https://lexical.dev/docs/concepts/commands#editorregistercommand).
 
 Some of the plugins expose signals that let you insert certain node types into the editor. For example, the `codeBlockPlugin` has an `insertCodeBlockNode$` that can be used to insert a code block into the editor.
 
