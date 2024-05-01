@@ -1,6 +1,17 @@
 import React from 'react'
-import { DiffSourceToggleWrapper, InsertImage, MDXEditor, diffSourcePlugin, imagePlugin, jsxPlugin, toolbarPlugin } from '../'
+import {
+  DiffSourceToggleWrapper,
+  InsertImage,
+  MDXEditor,
+  diffSourcePlugin,
+  imagePlugin,
+  insertImage$,
+  jsxPlugin,
+  toolbarPlugin,
+  usePublisher
+} from '../'
 import { Story } from '@ladle/react'
+import { expressImageUploadHandler } from './_boilerplate'
 
 const markdownWithHtmlImages = `
 Hello world
@@ -17,6 +28,89 @@ some more
 
 some
 `
+
+export const ImageWithBackend: Story<{ readOnly: boolean }> = () => {
+  return (
+    <>
+      <MDXEditor
+        markdown=""
+        plugins={[
+          imagePlugin({
+            imageUploadHandler: expressImageUploadHandler
+          }),
+          diffSourcePlugin(),
+          toolbarPlugin({
+            toolbarContents: () => (
+              <DiffSourceToggleWrapper>
+                <InsertImage />
+              </DiffSourceToggleWrapper>
+            )
+          })
+        ]}
+        onChange={console.log}
+      />
+    </>
+  )
+}
+
+function InsertCustomImage() {
+  const insertImage = usePublisher(insertImage$)
+  return (
+    <>
+      <button
+        onClick={() => {
+          insertImage({
+            src: 'https://picsum.photos/200/300',
+            altText: 'placeholder'
+          })
+        }}
+      >
+        Insert Image
+      </button>
+
+      <button
+        onClick={() => {
+          void urlToObject('http://localhost:61000/uploads/image-1714546302250-916818288.png', 'image.png').then((file) => {
+            insertImage({ file, altText: 'placeholder' })
+          })
+        }}
+      >
+        Insert Image as File
+      </button>
+    </>
+  )
+}
+
+const urlToObject = async (url: string, name: string) => {
+  const response = await fetch(url)
+  const blob = await response.blob()
+  const file = new File([blob], name, { type: blob.type })
+  return file
+}
+
+export const InsertImageSignal: Story<{ readOnly: boolean }> = () => {
+  return (
+    <>
+      <MDXEditor
+        markdown=""
+        plugins={[
+          imagePlugin({
+            imageUploadHandler: expressImageUploadHandler
+          }),
+          diffSourcePlugin(),
+          toolbarPlugin({
+            toolbarContents: () => (
+              <DiffSourceToggleWrapper>
+                <InsertCustomImage />
+              </DiffSourceToggleWrapper>
+            )
+          })
+        ]}
+        onChange={console.log}
+      />
+    </>
+  )
+}
 
 export const HtmlImage: Story<{ readOnly: boolean }> = ({ readOnly }) => {
   return (

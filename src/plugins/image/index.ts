@@ -48,13 +48,27 @@ export type ImageUploadHandler = ((image: File) => Promise<string>) | null
  */
 export type ImagePreviewHandler = ((imageSource: string) => Promise<string>) | null
 
+interface BaseImageParameters {
+  altText?: string
+  title?: string
+}
+
+interface FileImageParameters extends BaseImageParameters {
+  file: File
+}
+interface SrcImageParameters extends BaseImageParameters {
+  src: string
+}
 /**
  * @group Image
  */
-export interface InsertImageParameters {
+export type InsertImageParameters = FileImageParameters | SrcImageParameters
+
+/**
+ * @group Image
+ */
+export interface SaveImageParameters extends BaseImageParameters {
   src?: string
-  altText?: string
-  title?: string
   file: FileList
 }
 
@@ -81,14 +95,42 @@ export type NewImageDialogState = {
 export type EditingImageDialogState = {
   type: 'editing'
   nodeKey: string
-  initialValues: Omit<InsertImageParameters, 'file'>
+  initialValues: Omit<SaveImageParameters, 'file'>
 }
+
+const internalInsertImage$ = Signal<SrcImageParameters>((r) => {
+  r.sub(r.pipe(internalInsertImage$, withLatestFrom(activeEditor$)), ([values, theEditor]) => {
+    theEditor?.update(() => {
+      const imageNode = $createImageNode({ altText: values.altText ?? '', src: values.src, title: values.title ?? '' })
+      $insertNodes([imageNode])
+      if ($isRootOrShadowRoot(imageNode.getParentOrThrow())) {
+        $wrapNodeInElement(imageNode, $createParagraphNode).selectEnd()
+      }
+    })
+  })
+})
 
 /**
  * A signal that inserts a new image node with the published payload.
  * @group Image
  */
-export const insertImage$ = Signal<InsertImageParameters>()
+export const insertImage$ = Signal<InsertImageParameters>((r) => {
+  r.sub(r.pipe(insertImage$, withLatestFrom(imageUploadHandler$)), ([values, imageUploadHandler]) => {
+    const handler = (src: string) => {
+      r.pub(internalInsertImage$, { ...values, src })
+    }
+
+    if ('file' in values) {
+      imageUploadHandler?.(values.file)
+        .then(handler)
+        .catch((e) => {
+          throw e
+        })
+    } else {
+      handler(values.src)
+    }
+  })
+})
 /**
  * Holds the autocomplete suggestions for image sources.
  * @group Image
@@ -137,13 +179,7 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
                 r.pub(imageDialogState$, { type: 'inactive' })
               }
             : (src: string) => {
-                theEditor?.update(() => {
-                  const imageNode = $createImageNode({ altText: values.altText ?? '', src, title: values.title ?? '' })
-                  $insertNodes([imageNode])
-                  if ($isRootOrShadowRoot(imageNode.getParentOrThrow())) {
-                    $wrapNodeInElement(imageNode, $createParagraphNode).selectEnd()
-                  }
-                })
+                r.pub(internalInsertImage$, { ...values, src })
                 r.pub(imageDialogState$, { type: 'inactive' })
               }
 
@@ -270,7 +306,7 @@ export const disableImageSettingsButton$ = Cell<boolean>(false)
  * Saves the data from the image dialog
  * @group Image
  */
-export const saveImage$ = Signal<InsertImageParameters>()
+export const saveImage$ = Signal<SaveImageParameters>()
 
 /**
  * A plugin that adds support for images.
