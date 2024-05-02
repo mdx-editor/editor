@@ -20,8 +20,10 @@
     display: block;
   }
 
-  &:hover {
-    background-color: var(--baseBgHover);
+  @media (hover: hover) {
+    &:hover {
+      background-color: var(--baseBgHover);
+    }
   }
 
   &:active svg {
@@ -223,8 +225,10 @@
     display: block;
   }
 
-  &:hover {
-    background-color: var(--baseBgActive);
+  @media (hover: hover) {
+    &:hover {
+      background-color: var(--baseBgActive);
+    }
   }
 
   &:active svg {
@@ -451,8 +455,10 @@
   @mixin clear-form-element;
   color: var(--baseText);
 
-  &:hover {
-    color: var(--accentText);
+  @media (hover: hover) {
+    &:hover {
+      color: var(--accentText);
+    }
   }
 
   &:disabled,
@@ -659,9 +665,11 @@
   background-color: var(--accentSolid);
   color: var(--baseBase);
 
-  &:hover {
-    background-color: var(--accentSolidHover);
-    color: var(--baseBase);
+  @media (hover: hover) {
+    &:hover {
+      background-color: var(--accentSolidHover);
+      color: var(--baseBase);
+    }
   }
 }
 
@@ -703,17 +711,19 @@
     opacity: .15;
   }
 
-  &:hover {
+  @media (hover: hover) {
+    &:hover {
 
-    .tableColumnEditorTrigger,
-    .tableRowEditorTrigger,
-    .addRowButton,
-    .addColumnButton,
-    .iconButton {
-      opacity: 0.3;
+      .tableColumnEditorTrigger,
+      .tableRowEditorTrigger,
+      .addRowButton,
+      .addColumnButton,
+      .iconButton {
+        opacity: 0.3;
 
-      &:hover {
-        opacity: 1;
+        &:hover {
+          opacity: 1;
+        }
       }
     }
   }
