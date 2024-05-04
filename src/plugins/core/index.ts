@@ -898,10 +898,8 @@ export const corePlugin = realmPlugin<{
     })
 
     newEditor.update(() => {
-      const markdown = params?.initialMarkdown.trim()
-      if (markdown) {
-        tryImportingMarkdown(r, $getRoot(), markdown)
-      }
+      const markdown = params?.initialMarkdown.trim() ?? ''
+      tryImportingMarkdown(r, $getRoot(), markdown)
 
       const autoFocusValue = params?.autoFocus
       if (autoFocusValue) {

@@ -45,6 +45,16 @@ export function Bare() {
   )
 }
 
+export function FocusEmpty() {
+  const ref = React.useRef<MDXEditorMethods>(null)
+  return (
+    <>
+      <button onClick={() => ref.current?.focus()}>Focus</button>
+      <MDXEditor ref={ref} markdown="" placeholder="Hello..." onChange={console.log} />
+    </>
+  )
+}
+
 export function Placeholder() {
   return (
     <>
