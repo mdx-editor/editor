@@ -20,7 +20,7 @@
     "dev": "LADLE=true ladle dev",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext .ts,.tsx",
-    "test": "vitest",
+    "test": "NODE_ENV=development vitest",
     "semantic-release": "semantic-release",
     "image-upload-backend": "node ./src/examples/file-backend.js"
   },
