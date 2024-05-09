@@ -1,4 +1,4 @@
-import { $isLinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link'
+import { $createLinkNode, $isLinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link'
 import {
   $createTextNode,
   $getSelection,
@@ -157,16 +157,17 @@ export const linkDialogState$ = Cell<InactiveLinkDialog | PreviewLinkDialog | Ed
         editor?.update(
           () => {
             if (!getLinkNodeInSelection(selection)) {
-              const node = $createTextNode(linkContent)
+              const node = $createLinkNode(url, { title })
+              node.append($createTextNode(linkContent))
               $insertNodes([node])
               node.select()
             }
           },
           { discrete: true }
         )
+      } else {
+        editor?.dispatchCommand(TOGGLE_LINK_COMMAND, { url, title })
       }
-
-      editor?.dispatchCommand(TOGGLE_LINK_COMMAND, { url, title })
 
       r.pub(linkDialogState$, {
         type: 'preview',
