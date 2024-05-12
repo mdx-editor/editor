@@ -378,9 +378,13 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
           visitors: exportVisitors,
           jsxIsAvailable
         })
-        parentEditor.update(() => {
-          lexicalTable.updateCellContents(colIndex, rowIndex, (mdast.children[0] as Mdast.Paragraph).children)
-        })
+        parentEditor.update(
+          () => {
+            lexicalTable.updateCellContents(colIndex, rowIndex, (mdast.children[0] as Mdast.Paragraph).children)
+          },
+          { discrete: true }
+        )
+        parentEditor.dispatchCommand(NESTED_EDITOR_UPDATED_COMMAND, undefined)
       })
 
       setActiveCell(nextCell)
