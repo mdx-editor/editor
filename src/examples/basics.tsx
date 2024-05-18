@@ -45,6 +45,26 @@ export function Bare() {
   )
 }
 
+export function Code() {
+  const ref = React.useRef<MDXEditorMethods>(null)
+  return (
+    <>
+      <MDXEditor
+        autoFocus={true}
+        ref={ref}
+        markdown={`
+backticks
+**\`hello\` world**
+
+tag
+**<code>hello</code> world**
+`}
+        onChange={console.log}
+      />
+    </>
+  )
+}
+
 export function FocusEmpty() {
   const ref = React.useRef<MDXEditorMethods>(null)
   return (

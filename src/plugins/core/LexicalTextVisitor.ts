@@ -50,13 +50,6 @@ export const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text> = {
     const format = lexicalNode.getFormat() ?? 0
     const style = lexicalNode.getStyle()
 
-    if (format & IS_CODE) {
-      actions.addAndStepInto('inlineCode', {
-        value: textContent
-      })
-      return
-    }
-
     let localParentNode = mdastParent
 
     if (style) {
@@ -110,6 +103,14 @@ export const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text> = {
         children: [],
         attributes: []
       }) as Mdast.Parent
+    }
+
+    if (format & IS_CODE) {
+      actions.appendToParent(localParentNode, {
+        type: 'inlineCode',
+        value: textContent
+      })
+      return
     }
 
     actions.appendToParent(localParentNode, {

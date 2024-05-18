@@ -57,9 +57,8 @@ import { LexicalParagraphVisitor } from './LexicalParagraphVisitor'
 import { LexicalRootVisitor } from './LexicalRootVisitor'
 import { LexicalTextVisitor } from './LexicalTextVisitor'
 import { MdastBreakVisitor } from './MdastBreakVisitor'
-import { MdastFormattingVisitor } from './MdastFormattingVisitor'
+import { formattingVisitors } from './MdastFormattingVisitor'
 import { MdastHTMLVisitor } from './MdastHTMLVisitor'
-import { MdastInlineCodeVisitor } from './MdastInlineCodeVisitor'
 import { MdastParagraphVisitor } from './MdastParagraphVisitor'
 import { MdastRootVisitor } from './MdastRootVisitor'
 import { MdastTextVisitor } from './MdastTextVisitor'
@@ -849,14 +848,7 @@ export const corePlugin = realmPlugin<{
     r.pubIn({
       [initialMarkdown$]: params?.initialMarkdown.trim(),
       [iconComponentFor$]: params?.iconComponentFor,
-      [addImportVisitor$]: [
-        MdastRootVisitor,
-        MdastParagraphVisitor,
-        MdastTextVisitor,
-        MdastFormattingVisitor,
-        MdastInlineCodeVisitor,
-        MdastBreakVisitor
-      ],
+      [addImportVisitor$]: [MdastRootVisitor, MdastParagraphVisitor, MdastTextVisitor, MdastBreakVisitor, ...formattingVisitors],
       [addLexicalNode$]: [ParagraphNode, TextNode, GenericHTMLNode],
       [addExportVisitor$]: [
         LexicalRootVisitor,

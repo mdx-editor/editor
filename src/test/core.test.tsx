@@ -49,4 +49,7 @@ describe('markdown import export', () => {
   it('works with code', () => {
     testIdenticalMarkdown('`Hello` World')
   })
+  it('works with code in strong', () => {
+    testIdenticalMarkdown('**`Hello` World**')
+  })
 })
