@@ -149,7 +149,7 @@ export const SingleChoiceToggleGroup = <T extends string>({
     contents: React.ReactNode
   }[]
   onChange: (value: T | '') => void
-  value: T
+  value: T | ''
   className?: string
 }) => {
   return (

@@ -1,12 +1,8 @@
 {
   "$schema": "https://typedoc.org/schema.json",
-  "entryPoints": [
-    "./src/index.ts",
-  ],
+  "entryPoints": ["./src/index.ts"],
   "out": "docs/api",
-  "plugin": [
-    "typedoc-plugin-markdown"
-  ],
+  "plugin": ["typedoc-plugin-markdown"],
   "watch": false,
   "excludeExternals": true,
   "excludePrivate": true,
@@ -15,6 +11,9 @@
   "categorizeByGroup": true,
   "disableSources": true,
   "cleanOutputDir": true,
+  "hidePageHeader": true,
+  "propertiesFormat": "table",
+  "parametersFormat": "table",
   "navigation": {
     "includeGroups": true,
     "includeCategories": true
@@ -24,7 +23,6 @@
     "invalidLink": true,
     "notDocumented": false
   },
-  "allReflectionsHaveOwnDocument": true,
   "hideBreadcrumbs": true,
   "groupOrder": [
     "MDXEditor",

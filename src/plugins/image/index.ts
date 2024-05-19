@@ -53,10 +53,17 @@ interface BaseImageParameters {
   title?: string
 }
 
-interface FileImageParameters extends BaseImageParameters {
+/**
+ * @group Image
+ */
+export interface FileImageParameters extends BaseImageParameters {
   file: File
 }
-interface SrcImageParameters extends BaseImageParameters {
+
+/**
+ * @group Image
+ */
+export interface SrcImageParameters extends BaseImageParameters {
   src: string
 }
 /**
