@@ -14,7 +14,12 @@ export const InsertThematicBreak: React.FC = () => {
   const iconComponentFor = useCellValue(iconComponentFor$)
   const t = useTranslation()
   return (
-    <ButtonWithTooltip title={t('toolbar.thematicBreak', 'Insert thematic break')} onClick={() => insertThematicBreak()}>
+    <ButtonWithTooltip
+      title={t('toolbar.thematicBreak', 'Insert thematic break')}
+      onClick={() => {
+        insertThematicBreak()
+      }}
+    >
       {iconComponentFor('horizontal_rule')}
     </ButtonWithTooltip>
   )

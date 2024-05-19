@@ -144,7 +144,7 @@ export const LinkDialog: React.FC = () => {
 
   const t = useTranslation()
 
-  const theRect = linkDialogState?.rectangle
+  const theRect = linkDialogState.rectangle
 
   const urlIsExternal = linkDialogState.type === 'preview' && linkDialogState.url.startsWith('http')
 
@@ -165,7 +165,9 @@ export const LinkDialog: React.FC = () => {
         <Popover.Content
           className={classNames(styles.linkDialogPopoverContent)}
           sideOffset={5}
-          onOpenAutoFocus={(e) => e.preventDefault()}
+          onOpenAutoFocus={(e) => {
+            e.preventDefault()
+          }}
           key={linkDialogState.linkNodeKey}
         >
           {linkDialogState.type === 'edit' && (
@@ -199,7 +201,9 @@ export const LinkDialog: React.FC = () => {
               </a>
 
               <ActionButton
-                onClick={() => switchFromPreviewToLinkEdit()}
+                onClick={() => {
+                  switchFromPreviewToLinkEdit()
+                }}
                 title={t('linkPreview.edit', 'Edit link URL')}
                 aria-label={t('linkPreview.edit', 'Edit link URL')}
               >
@@ -214,7 +218,9 @@ export const LinkDialog: React.FC = () => {
                       onClick={() => {
                         void window.navigator.clipboard.writeText(linkDialogState.url).then(() => {
                           setCopyUrlTooltipOpen(true)
-                          setTimeout(() => setCopyUrlTooltipOpen(false), 1000)
+                          setTimeout(() => {
+                            setCopyUrlTooltipOpen(false)
+                          }, 1000)
                         })
                       }}
                     >
@@ -233,7 +239,9 @@ export const LinkDialog: React.FC = () => {
               <ActionButton
                 title={t('linkPreview.remove', 'Remove link')}
                 aria-label={t('linkPreview.remove', 'Remove link')}
-                onClick={() => removeLink()}
+                onClick={() => {
+                  removeLink()
+                }}
               >
                 {iconComponentFor('link_off')}
               </ActionButton>

@@ -13,8 +13,8 @@ export function mergeStyleAttributes(style1: string, style2: string): string {
 }
 
 // Helper function to convert a style string to an object
-function styleToObject(style: string): { [key: string]: string } {
-  const styleObject: { [key: string]: string } = {}
+function styleToObject(style: string): Record<string, string> {
+  const styleObject: Record<string, string> = {}
   const stylePairs = style.split(';').filter((pair) => pair.trim() !== '')
 
   stylePairs.forEach((pair) => {
@@ -26,7 +26,7 @@ function styleToObject(style: string): { [key: string]: string } {
 }
 
 // Helper function to convert a style object to a string
-function objectToStyle(styleObject: { [key: string]: string }): string {
+function objectToStyle(styleObject: Record<string, string>): string {
   return Object.entries(styleObject)
     .map(([key, value]) => `${key}: ${value}`)
     .join('; ')

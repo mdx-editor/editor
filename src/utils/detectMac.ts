@@ -1,6 +1,5 @@
 /** @internal */
-export const CAN_USE_DOM: boolean =
-  typeof window !== 'undefined' && typeof window.document !== 'undefined' && typeof window.document.createElement !== 'undefined'
+export const CAN_USE_DOM: boolean = typeof window !== 'undefined' && typeof window.document.createElement !== 'undefined'
 
 /**
  * Used to detect if the current platform is Apple based, mostly for keyboard shortcuts.

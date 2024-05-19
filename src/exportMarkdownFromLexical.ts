@@ -184,6 +184,7 @@ export function exportLexicalTreeToMdast({
     })
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (unistRoot === null) {
     throw new Error('traversal ended with no root element')
   }
@@ -252,13 +253,13 @@ export function exportLexicalTreeToMdast({
 }
 
 function collapseNestedHtmlTags(node: Mdast.Nodes) {
-  if ('children' in node && node.children) {
+  if ('children' in node && node.children.length > 0) {
     if (isMdastHTMLNode(node) && node.children.length === 1) {
       const onlyChild = node.children[0]
       if (onlyChild.type === 'mdxJsxTextElement' && onlyChild.name === 'span') {
-        ;(onlyChild.attributes || []).forEach((attribute) => {
+        onlyChild.attributes.forEach((attribute) => {
           if (attribute.type === 'mdxJsxAttribute') {
-            const parentAttribute = node.attributes?.find((attr) => attr.type === 'mdxJsxAttribute' && attr.name === attribute.name)
+            const parentAttribute = node.attributes.find((attr) => attr.type === 'mdxJsxAttribute' && attr.name === attribute.name)
             if (parentAttribute) {
               if (attribute.name === 'className') {
                 const mergedClassesSet = new Set([
@@ -278,7 +279,9 @@ function collapseNestedHtmlTags(node: Mdast.Nodes) {
       }
     }
 
-    node.children.forEach((child) => collapseNestedHtmlTags(child))
+    node.children.forEach((child) => {
+      collapseNestedHtmlTags(child)
+    })
   }
 }
 
@@ -334,9 +337,11 @@ function fixWrappingWhitespace(node: Mdast.Parent | Mdast.RootContent, parentCha
       }
     }
   }
-  if ('children' in node && node.children) {
+  if ('children' in node && node.children.length > 0) {
     const nodeAsParent = node as Mdast.Parent
-    nodeAsParent.children.forEach((child) => fixWrappingWhitespace(child, [...parentChain, nodeAsParent]))
+    nodeAsParent.children.forEach((child) => {
+      fixWrappingWhitespace(child, [...parentChain, nodeAsParent])
+    })
   }
 }
 

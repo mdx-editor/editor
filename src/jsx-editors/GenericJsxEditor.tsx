@@ -14,14 +14,7 @@ import styles from '../styles/ui.module.css'
 import { JsxEditorProps } from '../plugins/jsx'
 
 const isExpressionValue = (value: string | MdxJsxAttributeValueExpression | null | undefined): value is MdxJsxAttributeValueExpression => {
-  if (
-    typeof value === 'object' &&
-    value !== null &&
-    'type' in value &&
-    value.type === 'mdxJsxAttributeValueExpression' &&
-    'value' in value &&
-    typeof value.value === 'string'
-  ) {
+  if (value !== null && typeof value === 'object' && 'type' in value && 'value' in value && typeof value.value === 'string') {
     return true
   }
 

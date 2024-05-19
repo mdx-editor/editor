@@ -50,15 +50,12 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
         setFrontmatterDialogOpen(false)
         return
       }
-      const yaml = yamlConfig.reduce(
-        (acc, { key, value }) => {
-          if (key && value) {
-            acc[key] = value
-          }
-          return acc
-        },
-        {} as Record<string, string>
-      )
+      const yaml = yamlConfig.reduce<Record<string, string>>((acc, { key, value }) => {
+        if (key && value) {
+          acc[key] = value
+        }
+        return acc
+      }, {})
       onChange(YamlParser.dump(yaml).trim())
       setFrontmatterDialogOpen(false)
     },
@@ -67,7 +64,12 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
 
   return (
     <>
-      <Dialog.Root open={frontmatterDialogOpen} onOpenChange={(open) => setFrontmatterDialogOpen(open)}>
+      <Dialog.Root
+        open={frontmatterDialogOpen}
+        onOpenChange={(open) => {
+          setFrontmatterDialogOpen(open)
+        }}
+      >
         <Dialog.Portal container={editorRootElementRef?.current}>
           <Dialog.Overlay className={styles.dialogOverlay} />
           <Dialog.Content className={styles.largeDialogContent} data-editor-type="frontmatter">
@@ -106,7 +108,14 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
                           <TableInput {...register(`yamlConfig.${index}.value`, { required: true })} readOnly={readOnly} />
                         </td>
                         <td>
-                          <button type="button" onClick={() => remove(index)} className={styles.iconButton} disabled={readOnly}>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              remove(index)
+                            }}
+                            className={styles.iconButton}
+                            disabled={readOnly}
+                          >
                             {iconComponentFor('delete_big')}
                           </button>
                         </td>

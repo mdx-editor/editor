@@ -40,6 +40,7 @@ const imageCache = new Set()
 
 function useSuspenseImage(src: string) {
   if (!imageCache.has(src)) {
+    // eslint-disable-next-line @typescript-eslint/no-throw-literal, @typescript-eslint/only-throw-error
     throw new Promise((resolve) => {
       const img = new Image()
       img.src = src
@@ -71,7 +72,7 @@ function LazyImage({
   useSuspenseImage(src)
   return (
     <img
-      className={className || undefined}
+      className={className ?? undefined}
       alt={alt}
       src={src}
       title={title}
@@ -160,7 +161,9 @@ export function ImageEditor({ src, title, alt, nodeKey, width, height }: ImageEd
         const updatedSrc = await imagePreviewHandler(src)
         setImageSource(updatedSrc)
       }
-      callPreviewHandler().catch(console.error)
+      callPreviewHandler().catch((e: unknown) => {
+        console.error(e)
+      })
     } else {
       setImageSource(src)
     }
@@ -260,8 +263,8 @@ export function ImageEditor({ src, title, alt, nodeKey, width, height }: ImageEd
               [styles.focusedImage]: isFocused
             })}
             src={imageSource}
-            title={title || ''}
-            alt={alt || ''}
+            title={title ?? ''}
+            alt={alt ?? ''}
             imageRef={imageRef}
           />
         </div>
@@ -279,8 +282,8 @@ export function ImageEditor({ src, title, alt, nodeKey, width, height }: ImageEd
                 nodeKey: nodeKey,
                 initialValues: {
                   src: !initialImagePath ? imageSource : initialImagePath,
-                  title: title || '',
-                  altText: alt || ''
+                  title: title ?? '',
+                  altText: alt ?? ''
                 }
               })
             }}

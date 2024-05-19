@@ -39,7 +39,7 @@ const CODE_TO_HEADING_LEVEL_MAP: Record<string, HEADING_LEVEL> = {
  * Holds the allowed heading levels.
  * @group Headings
  */
-export const allowedHeadingLevels$ = Cell<ReadonlyArray<HEADING_LEVEL>>(ALL_HEADING_LEVELS, (r) => {
+export const allowedHeadingLevels$ = Cell<readonly HEADING_LEVEL[]>(ALL_HEADING_LEVELS, (r) => {
   r.pub(createRootEditorSubscription$, (theRootEditor) => {
     return theRootEditor.registerCommand<KeyboardEvent>(
       KEY_DOWN_COMMAND,
@@ -77,7 +77,7 @@ export const headingsPlugin = realmPlugin<{
    * Allows you to limit the headings used in the editor. Affects the block type dropdown and the keyboard shortcuts.
    * @default [1, 2, 3, 4, 5, 6]
    */
-  allowedHeadingLevels?: ReadonlyArray<HEADING_LEVEL>
+  allowedHeadingLevels?: readonly HEADING_LEVEL[]
 }>({
   init(realm) {
     realm.pubIn({

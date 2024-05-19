@@ -25,10 +25,10 @@ export function commentFromMarkdown(_options: { ast?: boolean }): Partial<Config
     exit: {
       comment(token) {
         const text = this.resume()
-        if (_options?.ast) {
+        if (_options.ast) {
           this.enter(
             {
-              // @ts-expect-error: hush.
+              // @ts-expect-error: not typing this
               type: 'comment',
               value: '',
               commentValue: text.slice(0, -2)

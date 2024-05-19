@@ -3,7 +3,7 @@ export function isPartOftheEditorUI(element: HTMLElement | null, editorRoot: HTM
   if (element === null || element === editorRoot) {
     return false
   }
-  if (element.dataset['editorDialog'] !== undefined || element.dataset['toolbarItem'] !== undefined || element.dataset['editorDropdown']) {
+  if (element.dataset.editorDialog !== undefined || element.dataset.toolbarItem !== undefined || element.dataset.editorDropdown) {
     return true
   }
   return isPartOftheEditorUI(element.parentElement, editorRoot)

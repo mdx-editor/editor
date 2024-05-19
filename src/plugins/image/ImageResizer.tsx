@@ -81,6 +81,7 @@ export default function ImageResizer({
     if (editorRootElement !== null) {
       editorRootElement.style.setProperty('cursor', `${cursorDir}-resize`, 'important')
     }
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (document.body !== null) {
       document.body.style.setProperty('cursor', `${cursorDir}-resize`, 'important')
       userSelect.current.value = document.body.style.getPropertyValue('-webkit-user-select')
@@ -93,6 +94,7 @@ export default function ImageResizer({
     if (editorRootElement !== null) {
       editorRootElement.style.setProperty('cursor', 'text')
     }
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (document.body !== null) {
       document.body.style.setProperty('cursor', 'default')
       document.body.style.setProperty('-webkit-user-select', userSelect.current.value, userSelect.current.priority)

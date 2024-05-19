@@ -76,7 +76,7 @@ export interface SaveImageParameters extends BaseImageParameters {
  * The state of the image dialog when it is inactive.
  * @group Image
  */
-export type InactiveImageDialogState = {
+export interface InactiveImageDialogState {
   type: 'inactive'
 }
 
@@ -84,7 +84,7 @@ export type InactiveImageDialogState = {
  * The state of the image dialog when it is in new mode.
  * @group Image
  */
-export type NewImageDialogState = {
+export interface NewImageDialogState {
   type: 'new'
 }
 
@@ -92,7 +92,7 @@ export type NewImageDialogState = {
  * The state of the image dialog when it is in editing an existing node.
  * @group Image
  */
-export type EditingImageDialogState = {
+export interface EditingImageDialogState {
   type: 'editing'
   nodeKey: string
   initialValues: Omit<SaveImageParameters, 'file'>
@@ -123,7 +123,7 @@ export const insertImage$ = Signal<InsertImageParameters>((r) => {
     if ('file' in values) {
       imageUploadHandler?.(values.file)
         .then(handler)
-        .catch((e) => {
+        .catch((e: unknown) => {
           throw e
         })
     } else {
@@ -170,7 +170,7 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
             ? (src: string) => {
                 theEditor?.update(() => {
                   const { nodeKey } = dialogState
-                  const imageNode = $getNodeByKey(nodeKey) as ImageNode
+                  const imageNode = $getNodeByKey(nodeKey)! as ImageNode
 
                   imageNode.setTitle(values.title)
                   imageNode.setAltText(values.altText)
@@ -186,7 +186,7 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
         if (values.file.length > 0) {
           imageUploadHandler?.(values.file.item(0)!)
             .then(handler)
-            .catch((e) => {
+            .catch((e: unknown) => {
               throw e
             })
         } else if (values.src) {
@@ -198,7 +198,7 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
     r.pub(createActiveEditorSubscription$, (editor) => {
       const theUploadHandler = r.getValue(imageUploadHandler$)
       return mergeRegister(
-        editor?.registerCommand<InsertImagePayload>(
+        editor.registerCommand<InsertImagePayload>(
           INSERT_IMAGE_COMMAND,
           (payload) => {
             const imageNode = $createImageNode(payload)
@@ -211,14 +211,14 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
           },
           COMMAND_PRIORITY_EDITOR
         ),
-        editor?.registerCommand<DragEvent>(
+        editor.registerCommand<DragEvent>(
           DRAGSTART_COMMAND,
           (event) => {
             return onDragStart(event)
           },
           COMMAND_PRIORITY_HIGH
         ),
-        editor?.registerCommand<DragEvent>(
+        editor.registerCommand<DragEvent>(
           DRAGOVER_COMMAND,
           (event) => {
             return onDragover(event)
@@ -226,7 +226,7 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
           COMMAND_PRIORITY_LOW
         ),
 
-        editor?.registerCommand<DragEvent>(
+        editor.registerCommand<DragEvent>(
           DROP_COMMAND,
           (event) => {
             return onDrop(event, editor, r.getValue(imageUploadHandler$))
@@ -235,11 +235,11 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
         ),
         ...(theUploadHandler !== null
           ? [
-              editor?.registerCommand(
+              editor.registerCommand(
                 PASTE_COMMAND,
                 (event: ClipboardEvent) => {
-                  let cbPayload = Array.from(event.clipboardData?.items || [])
-                  cbPayload = cbPayload.filter((i) => /image/.test(i.type)) // Strip out the non-image bits
+                  let cbPayload = Array.from(event.clipboardData?.items ?? [])
+                  cbPayload = cbPayload.filter((i) => i.type.includes('image')) // Strip out the non-image bits
 
                   if (!cbPayload.length || cbPayload.length === 0) {
                     return false
@@ -256,7 +256,7 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
                         })
                       })
                     })
-                    .catch((e) => {
+                    .catch((e: unknown) => {
                       throw e
                     })
                   return true
@@ -325,21 +325,21 @@ export const imagePlugin = realmPlugin<{
       [addImportVisitor$]: [MdastImageVisitor, MdastHtmlImageVisitor, MdastJsxImageVisitor],
       [addLexicalNode$]: ImageNode,
       [addExportVisitor$]: LexicalImageVisitor,
-      [addComposerChild$]: params?.ImageDialog || ImageDialog,
-      [imageUploadHandler$]: params?.imageUploadHandler || null,
-      [imageAutocompleteSuggestions$]: params?.imageAutocompleteSuggestions || [],
+      [addComposerChild$]: params?.ImageDialog ?? ImageDialog,
+      [imageUploadHandler$]: params?.imageUploadHandler ?? null,
+      [imageAutocompleteSuggestions$]: params?.imageAutocompleteSuggestions ?? [],
       [disableImageResize$]: Boolean(params?.disableImageResize),
       [disableImageSettingsButton$]: Boolean(params?.disableImageSettingsButton),
-      [imagePreviewHandler$]: params?.imagePreviewHandler || null
+      [imagePreviewHandler$]: params?.imagePreviewHandler ?? null
     })
   },
 
   update(realm, params) {
     realm.pubIn({
-      [imageUploadHandler$]: params?.imageUploadHandler || null,
-      [imageAutocompleteSuggestions$]: params?.imageAutocompleteSuggestions || [],
+      [imageUploadHandler$]: params?.imageUploadHandler ?? null,
+      [imageAutocompleteSuggestions$]: params?.imageAutocompleteSuggestions ?? [],
       [disableImageResize$]: Boolean(params?.disableImageResize),
-      [imagePreviewHandler$]: params?.imagePreviewHandler || null
+      [imagePreviewHandler$]: params?.imagePreviewHandler ?? null
     })
   }
 })
@@ -347,7 +347,7 @@ export const imagePlugin = realmPlugin<{
 /** @internal */
 export type InsertImagePayload = Readonly<CreateImageNodeParameters>
 
-const getDOMSelection = (targetWindow: Window | null): Selection | null => (CAN_USE_DOM ? (targetWindow || window).getSelection() : null)
+const getDOMSelection = (targetWindow: Window | null): Selection | null => (CAN_USE_DOM ? (targetWindow ?? window).getSelection() : null)
 
 /**
  * @internal
@@ -387,8 +387,8 @@ function onDragStart(event: DragEvent): boolean {
 
 function onDragover(event: DragEvent): boolean {
   // test if the user is dragging a file from the explorer
-  let cbPayload = Array.from(event.dataTransfer?.items || [])
-  cbPayload = cbPayload.filter((i) => /image/.test(i.type)) // Strip out the non-image bits
+  let cbPayload = Array.from(event.dataTransfer?.items ?? [])
+  cbPayload = cbPayload.filter((i) => i.type.includes('image')) // Strip out the non-image bits
 
   if (cbPayload.length > 0) {
     event.preventDefault()
@@ -408,8 +408,8 @@ function onDragover(event: DragEvent): boolean {
 }
 
 function onDrop(event: DragEvent, editor: LexicalEditor, imageUploadHandler: ImageUploadHandler): boolean {
-  let cbPayload = Array.from(event.dataTransfer?.items || [])
-  cbPayload = cbPayload.filter((i) => /image/.test(i.type)) // Strip out the non-image bits
+  let cbPayload = Array.from(event.dataTransfer?.items ?? [])
+  cbPayload = cbPayload.filter((i) => i.type.includes('image')) // Strip out the non-image bits
 
   if (cbPayload.length > 0) {
     if (imageUploadHandler !== null) {
@@ -423,7 +423,7 @@ function onDrop(event: DragEvent, editor: LexicalEditor, imageUploadHandler: Ima
             })
           })
         })
-        .catch((e) => {
+        .catch((e: unknown) => {
           throw e
         })
 
@@ -497,10 +497,11 @@ function getDragSelection(event: DragEvent): Range | null | undefined {
   const targetWindow =
     target == null ? null : target.nodeType === 9 ? (target as Document).defaultView : (target as Element).ownerDocument.defaultView
   const domSelection = getDOMSelection(targetWindow)
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (document.caretRangeFromPoint) {
     range = document.caretRangeFromPoint(event.clientX, event.clientY)
   } else if (event.rangeParent && domSelection !== null) {
-    domSelection.collapse(event.rangeParent, event.rangeOffset || 0)
+    domSelection.collapse(event.rangeParent, event.rangeOffset ?? 0)
     range = domSelection.getRangeAt(0)
   } else {
     throw Error(`Cannot get the selection when dragging`)

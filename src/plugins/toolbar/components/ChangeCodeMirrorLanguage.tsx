@@ -31,7 +31,7 @@ export const ChangeCodeMirrorLanguage = () => {
           theEditor?.update(() => {
             codeBlockNode.setLanguage(language === EMPTY_VALUE ? '' : language)
             setTimeout(() => {
-              theEditor?.update(() => {
+              theEditor.update(() => {
                 codeBlockNode.getLatest().select()
               })
             })

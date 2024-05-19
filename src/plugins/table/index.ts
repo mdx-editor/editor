@@ -17,7 +17,7 @@ import { MdastTableVisitor } from './MdastTableVisitor'
 import { $createTableNode, TableNode } from './TableNode'
 export * from './TableNode'
 
-function seedTable(rows: number = 1, columns: number = 1): Mdast.Table {
+function seedTable(rows = 1, columns = 1): Mdast.Table {
   const table: Mdast.Table = {
     type: 'table',
     children: []

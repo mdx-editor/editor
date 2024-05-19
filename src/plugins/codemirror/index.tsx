@@ -69,7 +69,7 @@ export const codeMirrorPlugin = realmPlugin<{
   update(r, params) {
     r.pubIn({
       [codeBlockLanguages$]: params?.codeBlockLanguages,
-      [codeMirrorExtensions$]: params?.codeMirrorExtensions || [],
+      [codeMirrorExtensions$]: params?.codeMirrorExtensions ?? [],
       [codeMirrorAutoLoadLanguageSupport$]: params?.autoLoadLanguageSupport ?? true
     })
   },
@@ -77,8 +77,8 @@ export const codeMirrorPlugin = realmPlugin<{
   init(r, params) {
     r.pubIn({
       [codeBlockLanguages$]: params?.codeBlockLanguages,
-      [codeMirrorExtensions$]: params?.codeMirrorExtensions || [],
-      [appendCodeBlockEditorDescriptor$]: buildCodeBlockDescriptor(params?.codeBlockLanguages || {}),
+      [codeMirrorExtensions$]: params?.codeMirrorExtensions ?? [],
+      [appendCodeBlockEditorDescriptor$]: buildCodeBlockDescriptor(params?.codeBlockLanguages ?? {}),
       [codeMirrorAutoLoadLanguageSupport$]: params?.autoLoadLanguageSupport ?? true
     })
   }
@@ -87,7 +87,7 @@ export const codeMirrorPlugin = realmPlugin<{
 function buildCodeBlockDescriptor(codeBlockLanguages: Record<string, string>): CodeBlockEditorDescriptor {
   return {
     match(language, meta) {
-      return Boolean(codeBlockLanguages.hasOwnProperty(language || '')) && !Boolean(meta)
+      return Boolean(Object.hasOwn(codeBlockLanguages, language ?? '')) && !meta
     },
     priority: 1,
     Editor: CodeMirrorEditor

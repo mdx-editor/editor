@@ -8,11 +8,19 @@ export function GetMarkdownInSourceMode() {
     <div className="App">
       <MDXEditor
         ref={ref}
-        onChange={(md) => console.log('change', md)}
+        onChange={(md) => {
+          console.log('change', md)
+        }}
         markdown="Hello world"
         plugins={[diffSourcePlugin({ viewMode: 'source' })]}
       />
-      <button onClick={() => console.log(ref.current?.getMarkdown())}>Get Markdown</button>
+      <button
+        onClick={() => {
+          console.log(ref.current?.getMarkdown())
+        }}
+      >
+        Get Markdown
+      </button>
     </div>
   )
 }
@@ -24,10 +32,18 @@ export function ChangeDiffMarkdown() {
   console.log(`rendering`, markdown)
   return (
     <div className="App">
-      <button onClick={() => setDiffMarkdown('bar')}>Change Diff Markdown</button>
+      <button
+        onClick={() => {
+          setDiffMarkdown('bar')
+        }}
+      >
+        Change Diff Markdown
+      </button>
       <MDXEditor
         ref={ref}
-        onChange={(md) => console.log('change', md)}
+        onChange={(md) => {
+          console.log('change', md)
+        }}
         markdown={markdown}
         plugins={[
           diffSourcePlugin({ diffMarkdown }),
@@ -40,7 +56,13 @@ export function ChangeDiffMarkdown() {
           })
         ]}
       />
-      <button onClick={() => console.log(ref.current?.getMarkdown())}>Get Markdown</button>
+      <button
+        onClick={() => {
+          console.log(ref.current?.getMarkdown())
+        }}
+      >
+        Get Markdown
+      </button>
       <button
         onClick={() => {
           setDiffMarkdown('q')
@@ -75,7 +97,13 @@ export function ReadOnlyDiffMode() {
           })
         ]}
       />
-      <button onClick={() => console.log(ref.current?.getMarkdown())}>Get Markdown</button>
+      <button
+        onClick={() => {
+          console.log(ref.current?.getMarkdown())
+        }}
+      >
+        Get Markdown
+      </button>
     </div>
   )
 }

@@ -106,12 +106,12 @@ export const directivesPlugin = realmPlugin<{
 }>({
   update: (realm, params) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    realm.pub(directiveDescriptors$, params?.directiveDescriptors || [])
+    realm.pub(directiveDescriptors$, params?.directiveDescriptors ?? [])
   },
 
   init: (realm, params) => {
     realm.pubIn({
-      [directiveDescriptors$]: params?.directiveDescriptors || [],
+      [directiveDescriptors$]: params?.directiveDescriptors ?? [],
       // import
       [addMdastExtension$]: directiveFromMarkdown(),
       [addSyntaxExtension$]: directive(),

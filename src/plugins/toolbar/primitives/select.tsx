@@ -52,7 +52,9 @@ export const SelectContent: React.FC<{ children: React.ReactNode; className?: st
     <RadixSelect.Portal container={editorRootElementRef?.current}>
       <RadixSelect.Content
         className={classNames(className, 'mdxeditor-select-content')}
-        onCloseAutoFocus={(e) => e.preventDefault()}
+        onCloseAutoFocus={(e) => {
+          e.preventDefault()
+        }}
         position="popper"
       >
         <RadixSelect.Viewport data-editor-dropdown={true}>{children}</RadixSelect.Viewport>

@@ -44,7 +44,7 @@ export type MdxNodeType = MdastHTMLNode['type']
 export function isMdastHTMLNode(node: Mdast.Nodes): node is MdastHTMLNode {
   return (
     MDX_NODE_TYPES.includes(node.type as unknown as MdxNodeType) &&
-    (htmlTags as readonly string[]).includes((node as MdastHTMLNode).name?.toLowerCase() ?? '')
+    (htmlTags as readonly string[]).includes((node as MdastHTMLNode).name.toLowerCase())
   )
 }
 

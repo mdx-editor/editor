@@ -122,8 +122,8 @@ export const insertSandpack$ = Signal<string>((r) => {
         }
 
         return {
-          code: preset.initialSnippetContent || '',
-          language: preset.snippetLanguage || 'jsx',
+          code: preset.initialSnippetContent ?? '',
+          language: preset.snippetLanguage ?? 'jsx',
           meta: preset.meta
         }
       })

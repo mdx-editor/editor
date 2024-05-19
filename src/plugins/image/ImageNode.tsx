@@ -122,8 +122,8 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     this.__src = src
     this.__title = title
     this.__altText = altText
-    this.__width = width || 'inherit'
-    this.__height = height || 'inherit'
+    this.__width = width ?? 'inherit'
+    this.__height = height ?? 'inherit'
   }
 
   /** @internal */

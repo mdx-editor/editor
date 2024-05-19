@@ -70,11 +70,11 @@ export class FrontmatterNode extends DecoratorNode<JSX.Element> {
     return (
       <FrontmatterEditor
         yaml={this.getYaml()}
-        onChange={(yaml) =>
-          editor?.update(() => {
+        onChange={(yaml) => {
+          editor.update(() => {
             this.setYaml(yaml)
           })
-        }
+        }}
       />
     )
   }

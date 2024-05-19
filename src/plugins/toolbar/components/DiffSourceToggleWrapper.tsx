@@ -59,7 +59,9 @@ export const DiffSourceToggleWrapper: React.FC<{ children: React.ReactNode; opti
           className={styles.diffSourceToggle}
           value={viewMode}
           items={toggleGroupItems}
-          onChange={(value) => changeViewMode(value || 'rich-text')}
+          onChange={(value) => {
+            changeViewMode(value === '' ? 'rich-text' : value)
+          }}
         />
       </div>
     </>

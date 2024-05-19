@@ -51,9 +51,10 @@ export const BlockTypeSelect = () => {
           case 'paragraph':
             convertSelectionToNode(() => $createParagraphNode())
             break
+          case '':
+            break
           default:
-            if (blockType == '') {
-            } else if (blockType.startsWith('h')) {
+            if (blockType.startsWith('h')) {
               convertSelectionToNode(() => $createHeadingNode(blockType))
             } else {
               throw new Error(`Unknown block type: ${blockType}`)

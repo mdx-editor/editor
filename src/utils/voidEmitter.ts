@@ -5,7 +5,7 @@ import { noop } from './fp'
  * The construct is used so that the lexical nodes can focus their React component editors.
  * @group Utils
  */
-export type VoidEmitter = {
+export interface VoidEmitter {
   /**
    * Subscribes to the emitter event
    */

@@ -29,7 +29,11 @@ const MermaidCodeEditorDescriptor: CodeBlockEditorDescriptor = {
     const [code, setCode] = React.useState(props.code)
 
     return (
-      <div onKeyDown={(e) => e.nativeEvent.stopImmediatePropagation()}>
+      <div
+        onKeyDown={(e) => {
+          e.nativeEvent.stopImmediatePropagation()
+        }}
+      >
         <div style={{ display: 'flex' }}>
           <textarea
             style={{ flex: 1 }}

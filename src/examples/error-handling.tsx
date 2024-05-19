@@ -21,9 +21,13 @@ import { $createParagraphNode } from 'lexical'
 export function BuggyMarkdown() {
   return (
     <MDXEditor
-      onError={(msg) => console.warn(msg)}
+      onError={(msg) => {
+        console.warn(msg)
+      }}
       markdown={markdown}
-      onChange={(md) => console.log('change', { md })}
+      onChange={(md) => {
+        console.log('change', { md })
+      }}
       plugins={ALL_PLUGINS}
     />
   )
@@ -32,9 +36,13 @@ export function BuggyMarkdown() {
 export function MissingPlugins() {
   return (
     <MDXEditor
-      onError={(msg) => console.warn(msg)}
+      onError={(msg) => {
+        console.warn(msg)
+      }}
       markdown={`# Hello`}
-      onChange={(md) => console.log('change', { md })}
+      onChange={(md) => {
+        console.log('change', { md })
+      }}
       plugins={[
         toolbarPlugin({
           toolbarContents: () => (
@@ -80,9 +88,13 @@ const catchAllPlugin = realmPlugin({
 export function CatchAllPlugin() {
   return (
     <MDXEditor
-      onError={(msg) => console.warn(msg)}
+      onError={(msg) => {
+        console.warn(msg)
+      }}
       markdown={`# Hello`}
-      onChange={(md) => console.log('change', { md })}
+      onChange={(md) => {
+        console.log('change', { md })
+      }}
       plugins={[
         catchAllPlugin(),
         toolbarPlugin({

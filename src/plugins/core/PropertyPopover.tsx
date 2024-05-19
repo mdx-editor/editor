@@ -33,7 +33,12 @@ export const PropertyPopover: React.FC<{
   const { register, handleSubmit, reset } = useForm({ defaultValues: properties })
 
   return (
-    <RadixPopover.Root open={open} onOpenChange={(v) => setOpen(v)}>
+    <RadixPopover.Root
+      open={open}
+      onOpenChange={(v) => {
+        setOpen(v)
+      }}
+    >
       <RadixPopover.Trigger className={styles.iconButton}>
         <div>{iconComponentFor('settings')}</div>
       </RadixPopover.Trigger>

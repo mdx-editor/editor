@@ -32,7 +32,7 @@ import { HEADING_LEVEL, allowedHeadingLevels$ } from '../headings'
 export const markdownShortcutPlugin = realmPlugin({
   init(realm) {
     const pluginIds = realm.getValue(activePlugins$)
-    const allowedHeadingLevels: ReadonlyArray<HEADING_LEVEL> = pluginIds.includes('headings') ? realm.getValue(allowedHeadingLevels$) : []
+    const allowedHeadingLevels: readonly HEADING_LEVEL[] = pluginIds.includes('headings') ? realm.getValue(allowedHeadingLevels$) : []
     const transformers = pickTransformersForActivePlugins(pluginIds, allowedHeadingLevels)
     realm.pubIn({
       [addComposerChild$]: () => <MarkdownShortcutPlugin transformers={transformers} />,
@@ -41,7 +41,7 @@ export const markdownShortcutPlugin = realmPlugin({
   }
 })
 
-const createBlockNode = (createNode: (match: Array<string>) => ElementNode): ElementTransformer['replace'] => {
+const createBlockNode = (createNode: (match: string[]) => ElementNode): ElementTransformer['replace'] => {
   return (parentNode, children, match) => {
     const node = createNode(match)
     node.append(...children)
@@ -50,7 +50,7 @@ const createBlockNode = (createNode: (match: Array<string>) => ElementNode): Ele
   }
 }
 
-function pickTransformersForActivePlugins(pluginIds: string[], allowedHeadingLevels: ReadonlyArray<HEADING_LEVEL>) {
+function pickTransformersForActivePlugins(pluginIds: string[], allowedHeadingLevels: readonly HEADING_LEVEL[]) {
   const transformers: (ElementTransformer | TextFormatTransformer | TextMatchTransformer)[] = [
     BOLD_ITALIC_STAR,
     BOLD_ITALIC_UNDERSCORE,
@@ -105,9 +105,11 @@ function pickTransformersForActivePlugins(pluginIds: string[], allowedHeadingLev
       ...CODE,
       dependencies: [CodeBlockNode],
       replace: (parentNode, _children, match) => {
-        const codeBlockNode = $createCodeBlockNode({ code: '', language: match ? match[1] : '', meta: '' })
+        const codeBlockNode = $createCodeBlockNode({ code: '', language: match[1] ?? '', meta: '' })
         parentNode.replace(codeBlockNode)
-        setTimeout(() => codeBlockNode.select(), 80)
+        setTimeout(() => {
+          codeBlockNode.select()
+        }, 80)
       }
     }
     transformers.push(codeTransformerCopy)

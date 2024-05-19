@@ -96,7 +96,7 @@ const DialogForm: React.FC<{
   const { isOpen, getToggleButtonProps, getMenuProps, getInputProps, highlightedIndex, getItemProps, selectedItem } = useCombobox({
     initialInputValue: '',
     onInputValueChange({ inputValue }) {
-      inputValue = inputValue?.toLowerCase() || ''
+      inputValue = inputValue?.toLowerCase() ?? ''
       const matchingItems = []
       for (const suggestion of autocompleteSuggestions) {
         if (suggestion.toLowerCase().includes(inputValue)) {

@@ -20,7 +20,7 @@ export const LexicalImageVisitor: LexicalExportVisitor<ImageNode, Mdast.Image> =
       }
 
       if (lexicalNode.getTitle()) {
-        img.title = lexicalNode.getTitle() as string
+        img.title = lexicalNode.getTitle()!
       }
 
       actions.appendToParent(mdastParent, {

@@ -44,6 +44,8 @@ import { mergeRegister } from '@lexical/utils'
 import { VoidEmitter } from '../../utils/voidEmitter'
 import { isPartOftheEditorUI } from '../../utils/isPartOftheEditorUI'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
+import { DirectiveNode } from '../directives'
+import { LexicalJsxNode } from '../jsx/LexicalJsxNode'
 
 /**
  * The value of the {@link NestedEditorsContext} React context.
@@ -107,9 +109,9 @@ export function useMdastNodeUpdater<T extends Mdast.RootContent>() {
     parentEditor.update(
       () => {
         $addUpdateTag('history-push')
-        const currentNode = $getNodeByKey(lexicalNode.getKey()) as typeof lexicalNode
+        const currentNode = $getNodeByKey(lexicalNode.getKey()) as DirectiveNode | LexicalJsxNode | null
         if (currentNode) {
-          currentNode.setMdastNode({ ...mdastNode, ...node })
+          currentNode.setMdastNode({ ...mdastNode, ...node } as any)
         }
       },
       { discrete: true }
@@ -211,7 +213,7 @@ export const NestedLexicalEditor = function <T extends Mdast.RootContent>(props:
   })
 
   React.useEffect(() => {
-    focusEmitter?.subscribe(() => {
+    focusEmitter.subscribe(() => {
       editor.focus()
     })
   }, [editor, focusEmitter])

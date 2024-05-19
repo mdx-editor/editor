@@ -38,7 +38,9 @@ export const Example = () => {
         return i18next.t(key, defaultValue, interpolations) as string
       }}
       markdown={markdown}
-      onChange={(md) => console.log('change', { md })}
+      onChange={(md) => {
+        console.log('change', { md })
+      }}
       plugins={ALL_PLUGINS}
     />
   )

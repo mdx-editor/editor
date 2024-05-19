@@ -17,7 +17,14 @@ export const InsertImage = React.forwardRef<HTMLButtonElement, Record<string, ne
   const t = useTranslation()
 
   return (
-    <RadixToolbar.Button className={styles.toolbarButton} ref={forwardedRef} disabled={readOnly} onClick={() => openNewImageDialog()}>
+    <RadixToolbar.Button
+      className={styles.toolbarButton}
+      ref={forwardedRef}
+      disabled={readOnly}
+      onClick={() => {
+        openNewImageDialog()
+      }}
+    >
       <TooltipWrap title={t('toolbar.image', 'Insert image')}>{iconComponentFor('add_photo')}</TooltipWrap>
     </RadixToolbar.Button>
   )

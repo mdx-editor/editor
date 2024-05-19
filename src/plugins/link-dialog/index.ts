@@ -148,8 +148,8 @@ export const linkDialogState$ = Cell<InactiveLinkDialog | PreviewLinkDialog | Ed
   )
 
   r.sub(r.pipe(updateLink$, withLatestFrom(activeEditor$, linkDialogState$, currentSelection$)), ([payload, editor, state, selection]) => {
-    const url = payload.url?.trim() ?? ''
-    const title = payload.title?.trim() ?? ''
+    const url = payload.url.trim()
+    const title = payload.title.trim()
 
     if (url !== '') {
       if (selection?.isCollapsed()) {
@@ -286,16 +286,16 @@ export const openLinkEditDialog$ = Action((r) => {
     ),
     ([, selection, editor]) => {
       editor?.focus(() => {
-        editor?.getEditorState().read(() => {
+        editor.getEditorState().read(() => {
           const node = getLinkNodeInSelection(selection)
           const rectangle = getSelectionRectangle(editor)!
           if (node) {
             r.pub(linkDialogState$, {
               type: 'edit',
               initialUrl: node.getURL(),
-              initialTitle: node.getTitle() || '',
+              initialTitle: node.getTitle() ?? '',
               url: node.getURL(),
-              title: node.getTitle() || '',
+              title: node.getTitle() ?? '',
               linkNodeKey: node.getKey(),
               rectangle
             })
@@ -342,10 +342,10 @@ export const linkDialogPlugin = realmPlugin<{
   onClickLinkCallback?: ClickLinkCallback
 }>({
   init(r, params) {
-    r.pub(addComposerChild$, params?.LinkDialog || LinkDialog)
+    r.pub(addComposerChild$, params?.LinkDialog ?? LinkDialog)
     r.pub(onClickLinkCallback$, params?.onClickLinkCallback ?? null)
   },
   update(r, params = {}) {
-    r.pub(linkAutocompleteSuggestions$, params.linkAutocompleteSuggestions || [])
+    r.pub(linkAutocompleteSuggestions$, params.linkAutocompleteSuggestions ?? [])
   }
 })

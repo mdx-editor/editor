@@ -22,7 +22,9 @@ export const InsertFrontmatter: React.FC = () => {
       className={classNames({
         [styles.activeToolbarButton]: hasFrontmatter
       })}
-      onClick={() => insertFrontmatter()}
+      onClick={() => {
+        insertFrontmatter()
+      }}
     >
       {iconComponentFor('frontmatter')}
     </ButtonWithTooltip>

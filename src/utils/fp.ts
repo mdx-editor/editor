@@ -68,7 +68,7 @@ export function always<T>(value: T) {
  * joinProc does not pass arguments or collect return values.
  * @group Utils
  */
-export function joinProc(...procs: Array<() => unknown>) {
+export function joinProc(...procs: (() => unknown)[]) {
   return () => {
     procs.map(call)
   }
@@ -78,4 +78,6 @@ export function joinProc(...procs: Array<() => unknown>) {
  * an empty function
  * @group Utils
  */
-export function noop() {}
+export function noop() {
+  void 0
+}

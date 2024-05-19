@@ -28,7 +28,7 @@ export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'san
   const onKeyDownHandler = React.useCallback(
     (e: KeyboardEvent) => {
       if (e.key === 'ArrowDown') {
-        const state = codeMirrorRef?.current?.getCodemirror()?.state
+        const state = codeMirrorRef.current?.getCodemirror()?.state
         if (state) {
           const docLength = state.doc.length
           const selectionEnd = state.selection.ranges[0].to
@@ -43,7 +43,7 @@ export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'san
                 const node = $getNodeByKey(nodeKey)!
                 const nextSibling = node.getNextSibling()
                 if (nextSibling) {
-                  codeMirrorRef?.current?.getCodemirror()?.contentDOM.blur()
+                  codeMirrorRef.current?.getCodemirror()?.contentDOM.blur()
                   node.selectNext()
                 } else {
                   node.insertAfter($createParagraphNode())
@@ -54,7 +54,7 @@ export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'san
           }
         }
       } else if (e.key === 'ArrowUp') {
-        const state = codeMirrorRef?.current?.getCodemirror()?.state
+        const state = codeMirrorRef.current?.getCodemirror()?.state
         if (state) {
           const selectionStart = state.selection.ranges[0].from
 
@@ -68,7 +68,7 @@ export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'san
                 const node = $getNodeByKey(nodeKey)!
                 const previousSibling = node.getPreviousSibling()
                 if (previousSibling) {
-                  codeMirrorRef?.current?.getCodemirror()?.contentDOM.blur()
+                  codeMirrorRef.current?.getCodemirror()?.contentDOM.blur()
                   node.selectPrevious()
                 } else {
                   // TODO: insert a paragraph before the sandpack node
@@ -88,8 +88,8 @@ export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'san
   React.useEffect(() => {
     const codeMirror = codeMirrorRef.current
     setTimeout(() => {
-      codeMirror?.getCodemirror()?.contentDOM?.addEventListener('focus', onFocusHandler)
-      codeMirror?.getCodemirror()?.contentDOM?.addEventListener('keydown', onKeyDownHandler)
+      codeMirror?.getCodemirror()?.contentDOM.addEventListener('focus', onFocusHandler)
+      codeMirror?.getCodemirror()?.contentDOM.addEventListener('keydown', onKeyDownHandler)
     }, 300)
 
     return () => {
@@ -100,7 +100,7 @@ export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'san
 
   React.useEffect(() => {
     focusEmitter.subscribe(() => {
-      codeMirrorRef?.current?.getCodemirror()?.focus()
+      codeMirrorRef.current?.getCodemirror()?.focus()
       onFocusHandler()
     })
   }, [focusEmitter, codeMirrorRef, nodeKey, onFocusHandler])

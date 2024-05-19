@@ -9,7 +9,7 @@ const MAX_SUGGESTIONS = 20
 
 interface DownshiftAutoCompleteProps {
   suggestions: string[]
-  control: Control<any, any>
+  control: Control<any>
   setValue: UseFormSetValue<any>
   register: UseFormRegister<any>
   placeholder: string
@@ -44,7 +44,7 @@ export const DownshiftAutoCompleteWithSuggestions: React.FC<DownshiftAutoComplet
     initialInputValue,
     onInputValueChange({ inputValue = '' }) {
       setValue(inputName, inputValue)
-      inputValue = inputValue?.toLowerCase() || ''
+      inputValue = inputValue.toLowerCase() || ''
       const matchingItems = []
       for (const suggestion of suggestions) {
         if (suggestion.toLowerCase().includes(inputValue)) {

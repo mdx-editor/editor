@@ -94,7 +94,7 @@ export class TableNode extends DecoratorNode<JSX.Element> {
    */
   constructor(mdastNode?: Mdast.Table, key?: NodeKey) {
     super(key)
-    this.__mdastNode = mdastNode || { type: 'table', children: [] }
+    this.__mdastNode = mdastNode ?? { type: 'table', children: [] }
   }
 
   /** @internal */
@@ -197,7 +197,7 @@ export class TableNode extends DecoratorNode<JSX.Element> {
    * Pass `undefined` to remove the focus.
    */
   select(coords?: [colIndex: number, rowIndex: number]): void {
-    this.focusEmitter.publish(coords || [0, 0])
+    this.focusEmitter.publish(coords ?? [0, 0])
   }
 
   /** @internal */

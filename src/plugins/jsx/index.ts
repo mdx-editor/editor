@@ -107,17 +107,13 @@ export function isMdastJsxNode(node: Mdast.Nodes): node is MdastJsx {
   return node.type === 'mdxJsxFlowElement' || node.type === 'mdxJsxTextElement'
 }
 
-type ExpressionValue = { type: 'expression'; value: string }
+interface ExpressionValue {
+  type: 'expression'
+  value: string
+}
 
-const isExpressionValue = (value: string | ExpressionValue): value is ExpressionValue => {
-  if (
-    typeof value === 'object' &&
-    value !== null &&
-    'type' in value &&
-    value.type === 'expression' &&
-    'value' in value &&
-    typeof value.value === 'string'
-  ) {
+const isExpressionValue = (value: string | ExpressionValue | null): value is ExpressionValue => {
+  if (value !== null && typeof value === 'object' && 'type' in value && 'value' in value && typeof value.value === 'string') {
     return true
   }
 
@@ -183,7 +179,7 @@ export const insertJsx$ = Signal<
   )
 })
 
-type JsxPluginParams = {
+interface JsxPluginParams {
   /**
    * A set of descriptors that document the JSX elements used in the document.
    */

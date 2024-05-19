@@ -306,7 +306,7 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>((pro
           onError: props.onError ?? noop,
           translation: props.translation ?? defaultTranslation
         }),
-        ...(props.plugins || [])
+        ...(props.plugins ?? [])
       ]}
     >
       <EditorRootElement className={props.className}>

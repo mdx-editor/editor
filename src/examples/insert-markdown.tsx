@@ -169,7 +169,13 @@ export function InsertMarkdownToNestedEditor() {
   return (
     <>
       <button onClick={() => ref.current?.insertMarkdown(complexMarkdownContentToInsert)}>Insert new markdown</button>
-      <button onClick={() => console.log(ref.current?.getMarkdown())}>Get markdown</button>
+      <button
+        onClick={() => {
+          console.log(ref.current?.getMarkdown())
+        }}
+      >
+        Get markdown
+      </button>
 
       <MDXEditor
         ref={ref}

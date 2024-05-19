@@ -162,14 +162,14 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
   const [highlightedCoordinates, setHighlightedCoordinates] = React.useState<[number, number]>([-1, -1])
 
   const onTableMouseOver = React.useCallback((e: React.MouseEvent<HTMLTableElement>) => {
-    let tableCell = e.target as HTMLElement
+    let tableCell = e.target as HTMLElement | null
 
     while (tableCell && !['TH', 'TD'].includes(tableCell.tagName)) {
       if (tableCell === e.currentTarget) {
         return
       }
 
-      tableCell = tableCell.parentElement!
+      tableCell = tableCell.parentElement
     }
     if (tableCell === null) {
       return
@@ -185,13 +185,19 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
 
   // remove tool cols in readOnly mode
   return (
-    <table className={styles.tableEditor} onMouseOver={onTableMouseOver} onMouseLeave={() => setHighlightedCoordinates([-1, -1])}>
+    <table
+      className={styles.tableEditor}
+      onMouseOver={onTableMouseOver}
+      onMouseLeave={() => {
+        setHighlightedCoordinates([-1, -1])
+      }}
+    >
       <colgroup>
         {readOnly ? null : <col />}
 
         {Array.from({ length: mdastNode.children[0].children.length }, (_, colIndex) => {
-          const align = mdastNode.align || []
-          const currentColumnAlign = align[colIndex] || 'left'
+          const align = mdastNode.align ?? []
+          const currentColumnAlign = align[colIndex] ?? 'left'
           const className = AlignToTailwindClassMap[currentColumnAlign]
           return <col key={colIndex} className={className} />
         })}
@@ -228,7 +234,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
                       colIndex,
                       highlightedCoordinates,
                       lexicalTable,
-                      align: (mdastNode.align || [])[colIndex]
+                      align: (mdastNode.align ?? [])[colIndex]
                     }}
                   />
                 </th>
@@ -311,7 +317,7 @@ const Cell: React.FC<Omit<CellProps, 'focus'>> = ({ align, ...props }) => {
   const { activeCell, setActiveCell } = props
   const isActive = Boolean(activeCell && activeCell[0] === props.colIndex && activeCell[1] === props.rowIndex)
 
-  const className = AlignToTailwindClassMap[align || 'left']
+  const className = AlignToTailwindClassMap[align ?? 'left']
 
   const CellElement = getCellType(props.rowIndex)
 
@@ -451,7 +457,7 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
   }, [colIndex, editor, rootEditor, rowIndex, saveAndFocus, setActiveCell])
 
   React.useEffect(() => {
-    focus && editor?.focus()
+    focus && editor.focus()
   }, [focus, editor])
 
   return (
@@ -522,7 +528,9 @@ const ColumnEditor: React.FC<ColumnEditorProps> = ({
       <RadixPopover.Portal container={editorRootElementRef?.current}>
         <RadixPopover.PopoverContent
           className={classNames(styles.tableColumnEditorPopoverContent)}
-          onOpenAutoFocus={(e) => e.preventDefault()}
+          onOpenAutoFocus={(e) => {
+            e.preventDefault()
+          }}
           sideOffset={5}
           side="top"
         >
@@ -532,7 +540,7 @@ const ColumnEditor: React.FC<ColumnEditorProps> = ({
               onValueChange={(value) => {
                 setColumnAlign(colIndex, value as Mdast.AlignType)
               }}
-              value={align || 'left'}
+              value={align ?? 'left'}
               type="single"
               aria-label={t('table.textAlignment', 'Text alignment')}
             >
@@ -618,7 +626,9 @@ const RowEditor: React.FC<RowEditorProps> = ({
       <RadixPopover.Portal container={editorRootElementRef?.current}>
         <RadixPopover.PopoverContent
           className={classNames(styles.tableColumnEditorPopoverContent)}
-          onOpenAutoFocus={(e) => e.preventDefault()}
+          onOpenAutoFocus={(e) => {
+            e.preventDefault()
+          }}
           sideOffset={5}
           side="bottom"
         >

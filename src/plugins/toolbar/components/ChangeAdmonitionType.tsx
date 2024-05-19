@@ -34,7 +34,7 @@ export const ChangeAdmonitionType = () => {
         rootEditor?.update(() => {
           admonitionNode.setMdastNode({ ...admonitionNode.getMdastNode(), name: name })
           setTimeout(() => {
-            rootEditor?.update(() => {
+            rootEditor.update(() => {
               admonitionNode.getLatest().select()
             })
           }, 80)

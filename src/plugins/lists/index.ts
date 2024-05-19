@@ -146,7 +146,7 @@ function isIndentPermitted(maxDepth: number): boolean {
 
       // prevent multiple level indentation, markdown does not support it
       if (parent?.getChildren().length === 1) {
-        const grandParentListItem = parent?.getParent()
+        const grandParentListItem = parent.getParent()
         if ($isListItemNode(grandParentListItem) && grandParentListItem.getChildren().length === 1) {
           return false
         }

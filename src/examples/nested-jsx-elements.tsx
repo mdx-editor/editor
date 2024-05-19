@@ -59,13 +59,13 @@ const InsertCard = () => {
   return (
     <>
       <Button
-        onClick={() =>
+        onClick={() => {
           insertJsx({
             name: 'Card',
             kind: 'text',
             props: {}
           })
-        }
+        }}
       >
         Card
       </Button>
@@ -78,13 +78,13 @@ const InsertGrid = () => {
   return (
     <>
       <Button
-        onClick={() =>
+        onClick={() => {
           insertJsx({
             name: 'Grid',
             kind: 'flow',
             props: {}
           })
-        }
+        }}
       >
         Grid
       </Button>

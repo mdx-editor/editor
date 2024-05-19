@@ -66,7 +66,7 @@ export const ImageDialog: React.FC = () => {
               <label htmlFor="src">{t('uploadImage.addViaUrlInstructions', 'Or add an image from an URL:')}</label>
               <DownshiftAutoComplete
                 register={register}
-                initialInputValue={state.type === 'editing' ? state.initialValues.src || '' : ''}
+                initialInputValue={state.type === 'editing' ? state.initialValues.src ?? '' : ''}
                 inputName="src"
                 suggestions={imageAutocompleteSuggestions}
                 setValue={setValue}

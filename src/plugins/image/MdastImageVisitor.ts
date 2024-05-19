@@ -1,7 +1,7 @@
 import * as Mdast from 'mdast'
 import { MdastImportVisitor } from '../../importMarkdownToLexical'
 import { $createImageNode } from './ImageNode'
-import { MdxJsxTextElement, MdxJsxFlowElement, MdxJsxAttribute } from 'mdast-util-mdx'
+import { MdxJsxTextElement, MdxJsxFlowElement } from 'mdast-util-mdx'
 import { $createParagraphNode, RootNode } from 'lexical'
 
 export const MdastImageVisitor: MdastImportVisitor<Mdast.Image> = {
@@ -10,14 +10,14 @@ export const MdastImageVisitor: MdastImportVisitor<Mdast.Image> = {
     actions.addAndStepInto(
       $createImageNode({
         src: mdastNode.url,
-        altText: mdastNode.alt || '',
-        title: mdastNode.title || ''
+        altText: mdastNode.alt ?? '',
+        title: mdastNode.title ?? ''
       })
     )
   }
 }
 
-export const MdastHtmlImageVisitor: MdastImportVisitor<Mdast.HTML> = {
+export const MdastHtmlImageVisitor: MdastImportVisitor<Mdast.Html> = {
   testNode: (node) => {
     return node.type === 'html' && node.value.trim().startsWith('<img')
   },
@@ -55,7 +55,7 @@ export const MdastHtmlImageVisitor: MdastImportVisitor<Mdast.HTML> = {
 }
 
 function getAttributeValue(node: MdxJsxTextElement | MdxJsxFlowElement, attributeName: string) {
-  const attribute = node.attributes.find((a) => a.type === 'mdxJsxAttribute' && a.name === attributeName) as MdxJsxAttribute
+  const attribute = node.attributes.find((a) => a.type === 'mdxJsxAttribute' && a.name === attributeName)
   if (!attribute) {
     return undefined
   }
@@ -72,7 +72,7 @@ export const MdastJsxImageVisitor: MdastImportVisitor<MdxJsxTextElement | MdxJsx
       return
     }
 
-    const altText = getAttributeValue(mdastNode, 'alt') || ''
+    const altText = getAttributeValue(mdastNode, 'alt') ?? ''
     const title = getAttributeValue(mdastNode, 'title')
     const height = getAttributeValue(mdastNode, 'height')
     const width = getAttributeValue(mdastNode, 'width')

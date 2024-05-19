@@ -33,7 +33,7 @@ export const SandpackEditor = ({ nodeKey, code, focusEmitter, preset }: Sandpack
       theme={preset.sandpackTheme}
       files={{
         [preset.snippetFileName]: code,
-        ...Object.entries(preset.files || {}).reduce(
+        ...Object.entries(preset.files ?? {}).reduce(
           (acc, [filePath, fileContents]) => ({ ...acc, ...{ [filePath]: { code: fileContents, readOnly: true } } }),
           {}
         )

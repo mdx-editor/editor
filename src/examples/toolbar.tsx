@@ -85,7 +85,13 @@ export const ConditionalToolbar = () => {
   const [outsideState, setOutsideState] = React.useState('foo')
   return (
     <>
-      <button onClick={() => setOutsideState('bar')}>Toggle outside state</button>
+      <button
+        onClick={() => {
+          setOutsideState('bar')
+        }}
+      >
+        Toggle outside state
+      </button>
       {outsideState}
       <MDXEditor
         markdown={'hello world'}

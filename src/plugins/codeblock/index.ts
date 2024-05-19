@@ -115,13 +115,13 @@ export const codeBlockPlugin = realmPlugin<{
   defaultCodeBlockLanguage?: string
 }>({
   update(realm, params) {
-    realm.pub(defaultCodeBlockLanguage$, params?.defaultCodeBlockLanguage || '')
+    realm.pub(defaultCodeBlockLanguage$, params?.defaultCodeBlockLanguage ?? '')
   },
 
   init(realm, params) {
     realm.pubIn({
       [addActivePlugin$]: 'codeblock',
-      [codeBlockEditorDescriptors$]: params?.codeBlockEditorDescriptors || [],
+      [codeBlockEditorDescriptors$]: params?.codeBlockEditorDescriptors ?? [],
       [addImportVisitor$]: MdastCodeVisitor,
       [addLexicalNode$]: CodeBlockNode,
       [addExportVisitor$]: CodeBlockVisitor

@@ -17,7 +17,7 @@ const ICON_NAME_MAP = {
  * @group Toolbar Components
  * @param options - The list types that the user can toggle between. Defaults to `['bullet', 'number', 'check']`.
  */
-export const ListsToggle: React.FC<{ options?: Array<'bullet' | 'number' | 'check'> }> = ({ options = ['bullet', 'number', 'check'] }) => {
+export const ListsToggle: React.FC<{ options?: ('bullet' | 'number' | 'check')[] }> = ({ options = ['bullet', 'number', 'check'] }) => {
   const [currentListType, iconComponentFor] = useCellValues(currentListType$, iconComponentFor$)
   const applyListType = usePublisher(applyListType$)
   const t = useTranslation()

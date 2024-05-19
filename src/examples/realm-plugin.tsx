@@ -3,7 +3,9 @@ import { RealmWithPlugins, realmPlugin } from '../RealmWithPlugins'
 import { Cell, useCellValue } from '@mdxeditor/gurx'
 
 const cell$ = Cell('foo', (r) => {
-  r.sub(cell$, (v) => console.log(v))
+  r.sub(cell$, (v) => {
+    console.log(v)
+  })
 })
 
 const dumbPlugin = realmPlugin<string>({
@@ -28,7 +30,13 @@ export function Example() {
   const [prop, setProp] = React.useState('foo')
   return (
     <div>
-      <button onClick={() => setProp('bar')}>Change prop</button>
+      <button
+        onClick={() => {
+          setProp('bar')
+        }}
+      >
+        Change prop
+      </button>
       <RealmWithPlugins plugins={[dumbPlugin(prop)]}>
         <Child />
       </RealmWithPlugins>
