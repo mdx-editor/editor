@@ -1,82 +1,38 @@
 import * as Mdast from 'mdast'
 import { MdxJsxTextElement } from 'mdast-util-mdx'
-import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from '../../FormatConstants'
+import { FORMAT, IS_BOLD, IS_CODE, IS_ITALIC, IS_STRIKETHROUGH, IS_SUBSCRIPT, IS_SUPERSCRIPT, IS_UNDERLINE } from '../../FormatConstants'
 import { MdastImportVisitor } from '../../importMarkdownToLexical'
 import { $createTextNode } from 'lexical'
 
-interface OpeningHTMLUnderlineNode extends Mdast.Html {
-  type: 'html'
-  value: '<u>'
+function buildFormattingVisitors(tag: string, format: FORMAT): MdastImportVisitor<Mdast.RootContent>[] {
+  return [
+    {
+      testNode: (node) => node.type === 'mdxJsxTextElement' && node.name === tag,
+      visitNode({ actions, mdastNode, lexicalParent }) {
+        actions.addFormatting(format)
+        actions.visitChildren(mdastNode as MdxJsxTextElement, lexicalParent)
+      }
+    },
+    {
+      testNode: (node: Mdast.Nodes) => node.type === 'html' && node.value === `<${tag}>`,
+      visitNode({ actions, mdastParent }) {
+        actions.addFormatting(format, mdastParent)
+      }
+    },
+    {
+      testNode: (node: Mdast.Nodes) => node.type === 'html' && node.value === `</${tag}>`,
+      visitNode({ actions, mdastParent }) {
+        actions.removeFormatting(format, mdastParent)
+      }
+    }
+  ]
 }
 
-interface ClosingHTMLUnderlineNode extends Mdast.Html {
-  type: 'html'
-  value: '</u>'
-}
-
-interface JsxUnderlineNode extends MdxJsxTextElement {
-  type: 'mdxJsxTextElement'
-  name: 'u'
-}
-
-interface JsxCodeNode extends MdxJsxTextElement {
-  type: 'mdxJsxTextElement'
-  name: 'code'
-}
-
-interface OpeningHTMLCodeNode extends Mdast.Html {
-  type: 'html'
-  value: '<code>'
-}
-
-interface ClosingHTMLCodeNode extends Mdast.Html {
-  type: 'html'
-  value: '</code>'
-}
-
-function isOpeningUnderlineNode(node: Mdast.Nodes): node is OpeningHTMLUnderlineNode {
-  return node.type === 'html' && node.value === '<u>'
-}
-
-function isClosingUnderlineNode(node: Mdast.Nodes): node is ClosingHTMLUnderlineNode {
-  return node.type === 'html' && node.value === '</u>'
-}
-
-function isJsxUnderlineNode(node: Mdast.Nodes): node is JsxUnderlineNode {
-  return node.type === 'mdxJsxTextElement' && node.name === 'u'
-}
-
-function isJsxCodeNode(node: Mdast.Nodes): node is JsxCodeNode {
-  return node.type === 'mdxJsxTextElement' && node.name === 'code'
-}
-
-function isOpeningCodeNode(node: Mdast.Nodes): node is OpeningHTMLCodeNode {
-  return node.type === 'html' && node.value === '<code>'
-}
-
-function isClosingCodeNode(node: Mdast.Nodes): node is ClosingHTMLCodeNode {
-  return node.type === 'html' && node.value === '</code>'
-}
-
-const JsxCodeVisitor: MdastImportVisitor<JsxCodeNode> = {
-  testNode: isJsxCodeNode,
+const StrikeThroughVisitor: MdastImportVisitor<Mdast.Delete> = {
+  testNode: 'delete',
   visitNode({ mdastNode, actions, lexicalParent }) {
-    actions.addFormatting(IS_CODE)
+    actions.addFormatting(IS_STRIKETHROUGH)
     actions.visitChildren(mdastNode, lexicalParent)
-  }
-}
-
-const OpeningCodeVisitor: MdastImportVisitor<OpeningHTMLCodeNode> = {
-  testNode: isOpeningCodeNode,
-  visitNode({ actions, mdastParent }) {
-    actions.addFormatting(IS_CODE, mdastParent)
-  }
-}
-
-const ClosingCodeVisitor: MdastImportVisitor<ClosingHTMLCodeNode> = {
-  testNode: isClosingCodeNode,
-  visitNode({ actions, mdastParent }) {
-    actions.removeFormatting(IS_CODE, mdastParent)
   }
 }
 
@@ -103,28 +59,6 @@ const MdStrongVisitor: MdastImportVisitor<Mdast.Strong> = {
   }
 }
 
-const JsxUnderlineVisitor: MdastImportVisitor<JsxUnderlineNode> = {
-  testNode: isJsxUnderlineNode,
-  visitNode({ mdastNode, actions, lexicalParent }) {
-    actions.addFormatting(IS_UNDERLINE)
-    actions.visitChildren(mdastNode, lexicalParent)
-  }
-}
-
-const OpeningUnderlineVisitor: MdastImportVisitor<OpeningHTMLUnderlineNode> = {
-  testNode: isOpeningUnderlineNode,
-  visitNode({ actions, mdastParent }) {
-    actions.addFormatting(IS_UNDERLINE, mdastParent)
-  }
-}
-
-const ClosingUnderlineVisitor: MdastImportVisitor<ClosingHTMLUnderlineNode> = {
-  testNode: isClosingUnderlineNode,
-  visitNode({ actions, mdastParent }) {
-    actions.removeFormatting(IS_UNDERLINE, mdastParent)
-  }
-}
-
 export const formattingVisitors = [
   // emphasis
   MdEmphasisVisitor,
@@ -133,13 +67,17 @@ export const formattingVisitors = [
   MdStrongVisitor,
 
   // underline
-  JsxUnderlineVisitor,
-  OpeningUnderlineVisitor,
-  ClosingUnderlineVisitor,
+  ...buildFormattingVisitors('u', IS_UNDERLINE),
 
   // code
-  JsxCodeVisitor,
-  OpeningCodeVisitor,
-  ClosingCodeVisitor,
-  MdCodeVisitor
+  ...buildFormattingVisitors('code', IS_CODE),
+  MdCodeVisitor,
+
+  // strikethrough
+  StrikeThroughVisitor,
+
+  // superscript
+  ...buildFormattingVisitors('sup', IS_SUPERSCRIPT),
+  // subscript
+  ...buildFormattingVisitors('sub', IS_SUBSCRIPT)
 ]

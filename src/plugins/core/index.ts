@@ -33,6 +33,9 @@ import {
 } from 'lexical'
 import * as Mdast from 'mdast'
 
+import { gfmStrikethrough } from 'micromark-extension-gfm-strikethrough'
+import { gfmStrikethroughFromMarkdown, gfmStrikethroughToMarkdown } from 'mdast-util-gfm-strikethrough'
+
 import { mdxJsxFromMarkdown, mdxJsxToMarkdown } from 'mdast-util-mdx-jsx'
 import { mdxJsx } from 'micromark-extension-mdx-jsx'
 import { mdxMd } from 'micromark-extension-mdx-md'
@@ -65,9 +68,9 @@ import { MdastTextVisitor } from './MdastTextVisitor'
 import { SharedHistoryPlugin } from './SharedHistoryPlugin'
 import { DirectiveDescriptor } from '../directives'
 import { CodeBlockEditorDescriptor } from '../codeblock'
-import { Directives } from 'mdast-util-directive'
 import { comment, commentFromMarkdown } from '../../mdastUtilHtmlComment'
 import { lexicalTheme } from '../../styles/lexicalTheme'
+import { FORMAT } from '../../FormatConstants'
 export * from './MdastHTMLNode'
 export * from './GenericHTMLNode'
 export * from './Icon'
@@ -77,7 +80,7 @@ export * from './Icon'
  * @group Core
  */
 export type EditorSubscription = (activeEditor: LexicalEditor) => () => void
-type Teardowns = (() => void)[]
+type Teardowns = ((() => void) | undefined)[]
 
 /**
  * The type of the block that the current selection is in.
@@ -95,7 +98,7 @@ export interface EditorInFocus {
 }
 
 /** @internal */
-export const NESTED_EDITOR_UPDATED_COMMAND = createCommand<void>('NESTED_EDITOR_UPDATED_COMMAND')
+export const NESTED_EDITOR_UPDATED_COMMAND = createCommand<undefined>('NESTED_EDITOR_UPDATED_COMMAND')
 
 /**
  * Holds a reference to the root Lexical editor instance.
@@ -141,7 +144,7 @@ export const inFocus$ = Cell(false)
  * Holds the current format of the selection.
  * @group Core
  */
-export const currentFormat$ = Cell(0)
+export const currentFormat$ = Cell(0 as FORMAT)
 
 /** @internal */
 export const markdownProcessingError$ = Cell<{ error: string; source: string } | null>(null)
@@ -261,7 +264,7 @@ export const jsxComponentDescriptors$ = Cell<JsxComponentDescriptor[]>([])
  * Contains the currently registered Markdown directive descriptors.
  * @group Directive
  */
-export const directiveDescriptors$ = Cell<DirectiveDescriptor<Directives>[]>([])
+export const directiveDescriptors$ = Cell<DirectiveDescriptor[]>([])
 
 /**
  * Contains the currently registered code block descriptors.
@@ -339,7 +342,9 @@ export const setMarkdown$ = Signal<string>((r) => {
           }
         },
         {
-          onUpdate: () => r.pub(muteChange$, false)
+          onUpdate: () => {
+            r.pub(muteChange$, false)
+          }
         }
       )
     }
@@ -361,7 +366,7 @@ export const insertMarkdown$ = Signal<string>((r) => {
             this.children.push(node)
           },
           getType() {
-            return selection?.getNodes()[0].getType()
+            return selection.getNodes()[0].getType()
           }
         }
 
@@ -548,6 +553,7 @@ export const createRootEditorSubscription$ = Appender(rootEditorSubscriptions$, 
               shouldOverride = $isDecoratorNode($getRoot().getFirstChild()) || $isDecoratorNode($getRoot().getLastChild())
             })
 
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             if (shouldOverride) {
               event.preventDefault()
               event.stopImmediatePropagation()
@@ -725,31 +731,27 @@ export const insertDecoratorNode$ = Signal<() => DecoratorNode<unknown>>((r) => 
         theEditor.getEditorState().read(() => {
           const selection = $getSelection()
           if ($isRangeSelection(selection)) {
-            const focusNode = selection.focus.getNode()
-
-            if (focusNode !== null) {
-              theEditor.update(() => {
-                const node = nodeFactory()
-                if (node.isInline()) {
-                  $insertNodes([node])
-                  if ($isRootOrShadowRoot(node.getParentOrThrow())) {
-                    $wrapNodeInElement(node, $createParagraphNode).selectEnd()
-                  }
-                } else {
-                  $insertNodeToNearestRoot(node)
+            theEditor.update(() => {
+              const node = nodeFactory()
+              if (node.isInline()) {
+                $insertNodes([node])
+                if ($isRootOrShadowRoot(node.getParentOrThrow())) {
+                  $wrapNodeInElement(node, $createParagraphNode).selectEnd()
                 }
-                setTimeout(() => {
-                  if ('select' in node && typeof node.select === 'function') {
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-                    node.select()
-                  }
-                })
-              })
-
+              } else {
+                $insertNodeToNearestRoot(node)
+              }
               setTimeout(() => {
-                theEditor.dispatchCommand(NESTED_EDITOR_UPDATED_COMMAND, undefined)
+                if ('select' in node && typeof node.select === 'function') {
+                  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+                  node.select()
+                }
               })
-            }
+            })
+
+            setTimeout(() => {
+              theEditor.dispatchCommand(NESTED_EDITOR_UPDATED_COMMAND, undefined)
+            })
           }
         })
       },
@@ -864,7 +866,10 @@ export const corePlugin = realmPlugin<{
       [autoFocus$]: params?.autoFocus,
       [placeholder$]: params?.placeholder,
       [readOnly$]: params?.readOnly,
-      [translation$]: params?.translation
+      [translation$]: params?.translation,
+      [addMdastExtension$]: gfmStrikethroughFromMarkdown(),
+      [addSyntaxExtension$]: gfmStrikethrough(),
+      [addToMarkdownExtension$]: [mdxJsxToMarkdown(), gfmStrikethroughToMarkdown()]
     })
 
     // Use the JSX extension to parse HTML
@@ -872,7 +877,6 @@ export const corePlugin = realmPlugin<{
       r.pubIn({
         [addMdastExtension$]: [mdxJsxFromMarkdown(), commentFromMarkdown({ ast: false })],
         [addSyntaxExtension$]: [mdxJsx(), mdxMd(), comment],
-        [addToMarkdownExtension$]: mdxJsxToMarkdown(),
         [addImportVisitor$]: MdastHTMLVisitor
       })
     }
@@ -897,14 +901,16 @@ export const corePlugin = realmPlugin<{
       if (autoFocusValue) {
         if (autoFocusValue === true) {
           // Default 'on' state
-          setTimeout(() => newEditor.focus(noop, { defaultSelection: 'rootStart' }))
+          setTimeout(() => {
+            newEditor.focus(noop, { defaultSelection: 'rootStart' })
+          })
           return
         }
-        setTimeout(() =>
+        setTimeout(() => {
           newEditor.focus(noop, {
             defaultSelection: autoFocusValue.defaultSelection ?? 'rootStart'
           })
-        )
+        })
       }
     })
 

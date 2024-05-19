@@ -1,6 +1,6 @@
 import { $isTextNode, TextNode } from 'lexical'
 import * as Mdast from 'mdast'
-import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from '../../FormatConstants'
+import { IS_BOLD, IS_CODE, IS_ITALIC, IS_STRIKETHROUGH, IS_SUBSCRIPT, IS_SUPERSCRIPT, IS_UNDERLINE } from '../../FormatConstants'
 import { LexicalExportVisitor } from '../../exportMarkdownFromLexical'
 import { type MdxJsxTextElement } from 'mdast-util-mdx-jsx'
 
@@ -8,9 +8,9 @@ export function isMdastText(mdastNode: Mdast.Nodes): mdastNode is Mdast.Text {
   return mdastNode.type === 'text'
 }
 
-const JOINABLE_TAGS = ['u', 'span']
+const JOINABLE_TAGS = ['u', 'span', 'sub', 'sup']
 
-export const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text> = {
+export const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text | Mdast.Html | MdxJsxTextElement> = {
   shouldJoin: (prevNode, currentNode) => {
     if (['text', 'emphasis', 'strong'].includes(prevNode.type)) {
       return prevNode.type === currentNode.type
@@ -18,8 +18,9 @@ export const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text> = {
 
     if (
       prevNode.type === 'mdxJsxTextElement' &&
-      (currentNode as unknown as MdxJsxTextElement).type === 'mdxJsxTextElement' &&
-      JOINABLE_TAGS.includes((currentNode as unknown as MdxJsxTextElement).name as string)
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      currentNode.type === 'mdxJsxTextElement' &&
+      JOINABLE_TAGS.includes((currentNode as unknown as MdxJsxTextElement).name!)
     ) {
       const currentMdxNode: MdxJsxTextElement = currentNode as unknown as MdxJsxTextElement
       return prevNode.name === currentMdxNode.name && JSON.stringify(prevNode.attributes) === JSON.stringify(currentMdxNode.attributes)
@@ -47,7 +48,7 @@ export const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text> = {
     const prevFormat = $isTextNode(previousSibling) ? previousSibling.getFormat() : 0
     const textContent = lexicalNode.getTextContent()
     // if the node is only whitespace, ignore the format.
-    const format = lexicalNode.getFormat() ?? 0
+    const format = lexicalNode.getFormat()
     const style = lexicalNode.getStyle()
 
     let localParentNode = mdastParent
@@ -73,6 +74,7 @@ export const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text> = {
         children: []
       }) as Mdast.Parent
     }
+
     if (prevFormat & format & IS_UNDERLINE) {
       localParentNode = actions.appendToParent(localParentNode, {
         type: 'mdxJsxTextElement',
@@ -82,6 +84,32 @@ export const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text> = {
       }) as Mdast.Parent
     }
 
+    if (prevFormat & format & IS_STRIKETHROUGH) {
+      localParentNode = actions.appendToParent(localParentNode, {
+        type: 'delete',
+        children: []
+      }) as Mdast.Parent
+    }
+
+    if (prevFormat & format & IS_SUPERSCRIPT) {
+      localParentNode = actions.appendToParent(localParentNode, {
+        type: 'mdxJsxTextElement',
+        name: 'sup',
+        children: [],
+        attributes: []
+      }) as Mdast.Parent
+    }
+
+    if (prevFormat & format & IS_SUBSCRIPT) {
+      localParentNode = actions.appendToParent(localParentNode, {
+        type: 'mdxJsxTextElement',
+        name: 'sub',
+        children: [],
+        attributes: []
+      }) as Mdast.Parent
+    }
+
+    // repeat the same sequence as above for formatting introduced with this node
     if (format & IS_ITALIC && !(prevFormat & IS_ITALIC)) {
       localParentNode = actions.appendToParent(localParentNode, {
         type: 'emphasis',
@@ -100,6 +128,31 @@ export const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text> = {
       localParentNode = actions.appendToParent(localParentNode, {
         type: 'mdxJsxTextElement',
         name: 'u',
+        children: [],
+        attributes: []
+      }) as Mdast.Parent
+    }
+
+    if (format & IS_STRIKETHROUGH && !(prevFormat & IS_STRIKETHROUGH)) {
+      localParentNode = actions.appendToParent(localParentNode, {
+        type: 'delete',
+        children: []
+      }) as Mdast.Parent
+    }
+
+    if (format & IS_SUPERSCRIPT && !(prevFormat & IS_SUPERSCRIPT)) {
+      localParentNode = actions.appendToParent(localParentNode, {
+        type: 'mdxJsxTextElement',
+        name: 'sup',
+        children: [],
+        attributes: []
+      }) as Mdast.Parent
+    }
+
+    if (format & IS_SUBSCRIPT && !(prevFormat & IS_SUBSCRIPT)) {
+      localParentNode = actions.appendToParent(localParentNode, {
+        type: 'mdxJsxTextElement',
+        name: 'sub',
         children: [],
         attributes: []
       }) as Mdast.Parent

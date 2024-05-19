@@ -43,6 +43,9 @@ import rich_text from '@/icons/rich_text.svg?react'
 import settings from '@/icons/settings.svg?react'
 import table from '@/icons/table.svg?react'
 import undo from '@/icons/undo.svg?react'
+import strikeThrough from '@/icons/strikethrough_s.svg?react'
+import superscript from '@/icons/superscript.svg?react'
+import subscript from '@/icons/subscript.svg?react'
 
 /**
  * A type that represents the possible icon names that can be used with the {@link iconComponentFor$} cell.
@@ -90,6 +93,9 @@ export type IconKey =
   | 'redo'
   | 'rich_text'
   | 'settings'
+  | 'strikeThrough'
+  | 'subscript'
+  | 'superscript'
   | 'table'
   | 'undo'
 
@@ -135,6 +141,9 @@ const IconMap: Record<IconKey, React.FC> = {
   redo,
   rich_text,
   settings,
+  strikeThrough,
+  subscript,
+  superscript,
   table,
   undo
 }

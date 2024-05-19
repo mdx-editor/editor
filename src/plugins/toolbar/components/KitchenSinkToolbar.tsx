@@ -4,7 +4,7 @@ import { EditorInFocus } from '../../core'
 import type { DirectiveNode } from '../../directives/DirectiveNode'
 import { ConditionalContents, Separator } from '../primitives/toolbar'
 import { BlockTypeSelect } from './BlockTypeSelect'
-import { BoldItalicUnderlineToggles } from './BoldItalicUnderlineToggles'
+import { BoldItalicUnderlineToggles, StrikeThroughSupSubToggles } from './BoldItalicUnderlineToggles'
 import { ChangeAdmonitionType } from './ChangeAdmonitionType'
 import { ChangeCodeMirrorLanguage } from './ChangeCodeMirrorLanguage'
 import { CodeToggle } from './CodeToggle'
@@ -50,6 +50,8 @@ export const KitchenSinkToolbar: React.FC = () => {
                 <Separator />
                 <BoldItalicUnderlineToggles />
                 <CodeToggle />
+                <Separator />
+                <StrikeThroughSupSubToggles />
                 <Separator />
                 <ListsToggle />
                 <Separator />

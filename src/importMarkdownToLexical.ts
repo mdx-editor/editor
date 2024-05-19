@@ -4,7 +4,7 @@ import * as Mdast from 'mdast'
 import { fromMarkdown, type Options } from 'mdast-util-from-markdown'
 import { toMarkdown } from 'mdast-util-to-markdown'
 import { ParseOptions } from 'micromark-util-types'
-import { IS_BOLD, IS_CODE, IS_ITALIC, IS_UNDERLINE } from './FormatConstants'
+import { FORMAT } from './FormatConstants'
 import { JsxComponentDescriptor } from './plugins/jsx'
 import { DirectiveDescriptor } from './plugins/directives'
 import { CodeBlockEditorDescriptor } from './plugins/codeblock'
@@ -64,13 +64,13 @@ export interface MdastImportVisitor<UN extends Mdast.Nodes> {
        * Adds formatting as a context for the current node and its children.
        * This is necessary due to mdast treating formatting as a node, while lexical considering it an attribute of a node.
        */
-      addFormatting(format: typeof IS_BOLD | typeof IS_ITALIC | typeof IS_UNDERLINE | typeof IS_CODE, node?: Mdast.Parent | null): void
+      addFormatting(format: FORMAT, node?: Mdast.Parent | null): void
 
       /**
        * Removes formatting as a context for the current node and its children.
        * This is necessary due to mdast treating formatting as a node, while lexical considering it an attribute of a node.
        */
-      removeFormatting(format: typeof IS_BOLD | typeof IS_ITALIC | typeof IS_UNDERLINE | typeof IS_CODE, node?: Mdast.Parent | null): void
+      removeFormatting(format: FORMAT, node?: Mdast.Parent | null): void
       /**
        * Access the current formatting context.
        */
@@ -189,7 +189,9 @@ export function importMdastTreeToLexical({ root, mdastRoot, visitors, ...descrip
     if (!isParent(mdastNode)) {
       throw new Error('Attempting to visit children of a non-parent')
     }
-    mdastNode.children.forEach((child) => visit(child, lexicalParent, mdastNode))
+    mdastNode.children.forEach((child) => {
+      visit(child, lexicalParent, mdastNode)
+    })
   }
 
   function visit(mdastNode: Mdast.RootContent | Mdast.Root, lexicalParent: LexicalNode, mdastParent: Mdast.Parent | null) {

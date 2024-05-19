@@ -39,7 +39,13 @@ export function Bare() {
   return (
     <>
       <button onClick={() => ref.current?.setMarkdown('new markdown')}>Set new markdown</button>
-      <button onClick={() => console.log(ref.current?.getMarkdown())}>Get markdown</button>
+      <button
+        onClick={() => {
+          console.log(ref.current?.getMarkdown())
+        }}
+      >
+        Get markdown
+      </button>
       <MDXEditor autoFocus={true} ref={ref} markdown={helloMarkdown} onChange={console.log} />
     </>
   )
@@ -58,6 +64,22 @@ backticks
 
 tag
 **<code>hello</code> world**
+`}
+        onChange={console.log}
+      />
+    </>
+  )
+}
+
+export function MoreFormatting() {
+  const ref = React.useRef<MDXEditorMethods>(null)
+  return (
+    <>
+      <MDXEditor
+        autoFocus={true}
+        ref={ref}
+        markdown={`
+~~scratch this~~ *and <sup>sup this</sup> and <sub>sub this</sub> all in italic*
 `}
         onChange={console.log}
       />
@@ -124,7 +146,13 @@ export function Jsx() {
   return (
     <>
       <button onClick={() => ref.current?.setMarkdown('new markdown')}>Set new markdown</button>
-      <button onClick={() => console.log(ref.current?.getMarkdown())}>Get markdown</button>
+      <button
+        onClick={() => {
+          console.log(ref.current?.getMarkdown())
+        }}
+      >
+        Get markdown
+      </button>
 
       <MDXEditor ref={ref} markdown={jsxMarkdown} onChange={console.log} plugins={[jsxPlugin({ jsxComponentDescriptors })]} />
     </>
@@ -241,8 +269,19 @@ const PlainTextCodeEditorDescriptor: CodeBlockEditorDescriptor = {
   Editor: (props) => {
     const cb = useCodeBlockEditorContext()
     return (
-      <div onKeyDown={(e) => e.nativeEvent.stopImmediatePropagation()}>
-        <textarea rows={3} cols={20} defaultValue={props.code} onChange={(e) => cb.setCode(e.target.value)} />
+      <div
+        onKeyDown={(e) => {
+          e.nativeEvent.stopImmediatePropagation()
+        }}
+      >
+        <textarea
+          rows={3}
+          cols={20}
+          defaultValue={props.code}
+          onChange={(e) => {
+            cb.setCode(e.target.value)
+          }}
+        />
       </div>
     )
   }
@@ -313,7 +352,13 @@ export function ConditionalRendering() {
 
   return (
     <div>
-      <button onClick={() => setIsOpen(!isOpen)}>Editor is {isOpen ? 'open' : 'closed'}</button>
+      <button
+        onClick={() => {
+          setIsOpen(!isOpen)
+        }}
+      >
+        Editor is {isOpen ? 'open' : 'closed'}
+      </button>
       {isOpen && (
         <MDXEditor
           markdown="# Hello world"

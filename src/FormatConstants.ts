@@ -8,3 +8,14 @@ export const IS_CODE = 0b10000 as const
 export const IS_SUBSCRIPT = 0b100000 as const
 export const IS_SUPERSCRIPT = 0b1000000 as const
 export const IS_HIGHLIGHT = 0b10000000 as const
+
+export type FORMAT =
+  | typeof DEFAULT_FORMAT
+  | typeof IS_BOLD
+  | typeof IS_ITALIC
+  | typeof IS_STRIKETHROUGH
+  | typeof IS_UNDERLINE
+  | typeof IS_CODE
+  | typeof IS_SUBSCRIPT
+  | typeof IS_SUPERSCRIPT
+  | typeof IS_HIGHLIGHT
