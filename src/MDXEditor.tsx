@@ -57,7 +57,9 @@ const RichTextEditor: React.FC = () => {
       <RenderRecursiveWrappers wrappers={editorWrappers}>
         <div className={classNames(styles.rootContentEditableWrapper, 'mdxeditor-root-contenteditable')}>
           <RichTextPlugin
-            contentEditable={<ContentEditable className={classNames(styles.contentEditable, contentEditableClassName)} />}
+            contentEditable={
+              <ContentEditable className={classNames(styles.contentEditable, contentEditableClassName)} ariaLabel="editable markdown" />
+            }
             placeholder={
               <div className={classNames(styles.contentEditable, styles.placeholder, contentEditableClassName)}>
                 <p>{placeholder}</p>

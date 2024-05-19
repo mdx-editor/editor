@@ -155,6 +155,7 @@ export const SingleChoiceToggleGroup = <T extends string>({
   return (
     <div className={styles.toolbarGroupOfGroups}>
       <RadixToolbar.ToggleGroup
+        aria-label="toggle group"
         type="single"
         className={classNames(styles.toolbarToggleSingleGroup, className)}
         onValueChange={onChange}
@@ -164,7 +165,7 @@ export const SingleChoiceToggleGroup = <T extends string>({
         }}
       >
         {items.map((item, index) => (
-          <ToolbarToggleItem key={index} value={item.value}>
+          <ToolbarToggleItem key={index} aria-label={item.title} value={item.value}>
             <TooltipWrap title={item.title}>{item.contents}</TooltipWrap>
           </ToolbarToggleItem>
         ))}
