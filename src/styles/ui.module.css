@@ -257,7 +257,9 @@
 
   &[data-disabled] {
     pointer-events: none;
-    color: var(--baseBorderHover);
+    & svg {
+      color: var(--baseBorderHover);
+    }
   }
 }
 
