@@ -23,12 +23,12 @@ import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary.js'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin.js'
 import classNames from 'classnames'
 import { ToMarkdownOptions } from './exportMarkdownFromLexical'
-import { IconKey } from './plugins/core/Icon'
 import { lexicalTheme } from './styles/lexicalTheme'
 import styles from './styles/ui.module.css'
 import { noop } from './utils/fp'
 import { createLexicalComposerContext, LexicalComposerContext, LexicalComposerContextType } from '@lexical/react/LexicalComposerContext'
 import { LexicalEditor } from 'lexical'
+import { IconKey, defaultSvgIcons } from './defaultSvgIcons'
 
 const LexicalProvider: React.FC<{
   children: JSX.Element | string | (JSX.Element | string)[]
@@ -80,18 +80,8 @@ const DEFAULT_MARKDOWN_OPTIONS: ToMarkdownOptions = {
   listItemIndent: 'one'
 }
 
-const DefaultIcon = React.lazy(() => import('./plugins/core/Icon'))
-
-const IconFallback = () => {
-  return <svg width="24" height="24" viewBox="0 0 24 24" fill="none" />
-}
-
 const defaultIconComponentFor = (name: IconKey) => {
-  return (
-    <React.Suspense fallback={<IconFallback />}>
-      <DefaultIcon name={name} />
-    </React.Suspense>
-  )
+  return defaultSvgIcons[name]
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

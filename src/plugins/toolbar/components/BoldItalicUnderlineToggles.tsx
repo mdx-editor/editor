@@ -1,21 +1,21 @@
-import { IconKey, applyFormat$, currentFormat$, iconComponentFor$, useTranslation } from '../../core'
+import { applyFormat$, currentFormat$, iconComponentFor$, useTranslation } from '../../core'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 import React from 'react'
 import { FORMAT, IS_BOLD, IS_ITALIC, IS_STRIKETHROUGH, IS_SUBSCRIPT, IS_SUPERSCRIPT, IS_UNDERLINE } from '../../../FormatConstants'
 import { ToggleSingleGroupWithItem } from '.././primitives/toolbar'
 import { TextFormatType } from 'lexical'
 import styles from '../../../styles/ui.module.css'
+import { IconKey } from '../../../defaultSvgIcons'
 
 interface FormatButtonProps {
   format: FORMAT
   addTitle: string
   removeTitle: string
   icon: IconKey
-  style?: React.CSSProperties
   formatName: TextFormatType
 }
 
-const FormatButton: React.FC<FormatButtonProps> = ({ format, addTitle, removeTitle, icon, style, formatName }) => {
+const FormatButton: React.FC<FormatButtonProps> = ({ format, addTitle, removeTitle, icon, formatName }) => {
   const [currentFormat, iconComponentFor] = useCellValues(currentFormat$, iconComponentFor$)
   const applyFormat = usePublisher(applyFormat$)
   const active = (currentFormat & format) !== 0
@@ -28,7 +28,7 @@ const FormatButton: React.FC<FormatButtonProps> = ({ format, addTitle, removeTit
         applyFormat(formatName)
       }}
     >
-      <div style={style}>{iconComponentFor(icon)}</div>
+      {iconComponentFor(icon)}
     </ToggleSingleGroupWithItem>
   )
 }
@@ -62,7 +62,6 @@ export const BoldItalicUnderlineToggles: React.FC = () => {
         removeTitle={t('toolbar.removeUnderline', 'Remove underline')}
         icon="format_underlined"
         formatName="underline"
-        style={{ transform: 'translateY(2px)' }}
       />
     </div>
   )

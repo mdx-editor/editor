@@ -53,7 +53,6 @@ import { controlOrMeta } from '../../utils/detectMac'
 import { noop } from '../../utils/fp'
 import type { JsxComponentDescriptor } from '../jsx'
 import { GenericHTMLNode } from './GenericHTMLNode'
-import { type IconKey } from './Icon'
 import { LexicalGenericHTMLVisitor } from './LexicalGenericHTMLNodeVisitor'
 import { LexicalLinebreakVisitor } from './LexicalLinebreakVisitor'
 import { LexicalParagraphVisitor } from './LexicalParagraphVisitor'
@@ -71,9 +70,9 @@ import { CodeBlockEditorDescriptor } from '../codeblock'
 import { comment, commentFromMarkdown } from '../../mdastUtilHtmlComment'
 import { lexicalTheme } from '../../styles/lexicalTheme'
 import { FORMAT } from '../../FormatConstants'
+import { IconKey } from '../../IconKey'
 export * from './MdastHTMLNode'
 export * from './GenericHTMLNode'
-export * from './Icon'
 
 /**
  * A function that subscribes to Lexical editor updates or events, and retursns an unsubscribe function.

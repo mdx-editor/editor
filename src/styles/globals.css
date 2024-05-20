@@ -8,7 +8,6 @@
 @import url('@radix-ui/colors/red.css');
 
 .mdxeditor {
-
   /** Code mirror */
   & .cm-editor {
     --sp-font-mono: var(--font-mono);
