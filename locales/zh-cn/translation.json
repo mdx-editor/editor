@@ -58,6 +58,7 @@
       "selectBlockTypeTooltip": "选择块类型",
       "placeholder": "块类型"
     },
+    "toggleGroup": "切换组",
     "removeBold": "移除粗体",
     "bold": "粗体",
     "removeItalic": "移除斜体",
@@ -97,5 +98,8 @@
   "codeBlock": {
     "language": "代码块语言",
     "selectLanguage": "选择代码块语言"
+  },
+  "contentArea":{
+    "editableMarkdown": "可编辑的 Markdown"
   }
 }

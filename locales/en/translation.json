@@ -58,6 +58,7 @@
       "selectBlockTypeTooltip": "Select block type",
       "placeholder": "Block type"
     },
+    "toggleGroup":"toggle group",
     "removeBold": "Remove bold",
     "bold": "Bold",
     "removeItalic": "Remove italic",
@@ -97,5 +98,8 @@
   "codeBlock": {
     "language": "Code block language",
     "selectLanguage": "Select code block language"
+  },
+  "contentArea":{
+    "editableMarkdown": "editable markdown"
   }
 }

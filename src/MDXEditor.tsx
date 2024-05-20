@@ -15,6 +15,7 @@ import {
   rootEditor$,
   setMarkdown$,
   topAreaChildren$,
+  useTranslation,
   viewMode$
 } from './plugins/core'
 
@@ -42,6 +43,7 @@ const LexicalProvider: React.FC<{
 }
 
 const RichTextEditor: React.FC = () => {
+  const t = useTranslation()
   const [contentEditableClassName, composerChildren, topAreaChildren, editorWrappers, placeholder] = useCellValues(
     contentEditableClassName$,
     composerChildren$,
@@ -57,7 +59,12 @@ const RichTextEditor: React.FC = () => {
       <RenderRecursiveWrappers wrappers={editorWrappers}>
         <div className={classNames(styles.rootContentEditableWrapper, 'mdxeditor-root-contenteditable')}>
           <RichTextPlugin
-            contentEditable={<ContentEditable className={classNames(styles.contentEditable, contentEditableClassName)} />}
+            contentEditable={
+              <ContentEditable
+                className={classNames(styles.contentEditable, contentEditableClassName)}
+                ariaLabel={t('contentArea.editableMarkdown', 'editable markdown')}
+              />
+            }
             placeholder={
               <div className={classNames(styles.contentEditable, styles.placeholder, contentEditableClassName)}>
                 <p>{placeholder}</p>

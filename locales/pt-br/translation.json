@@ -58,6 +58,7 @@
       "selectBlockTypeTooltip": "Selecione o tipo de bloco de texto",
       "placeholder": "Bloco de texto"
     },
+    "toggleGroup": "Grupo de alternância",
     "removeBold": "Remover negrito",
     "bold": "Negrito",
     "removeItalic": "Remover itálico",
@@ -97,5 +98,8 @@
   "codeBlock": {
     "language": "Linguagem do bloco de código",
     "selectLanguage": "Selecionar linguagem do bloco de código"
+  },
+  "contentArea":{
+    "editableMarkdown": "Markdown editável"
   }
 }

@@ -58,6 +58,7 @@
         "selectBlockTypeTooltip": "Виберіть тип блоку",
         "placeholder": "Тип блоку"
       },
+      "toggleGroup": "Група перемикачів",
       "removeBold": "Прибрати жирний шрифт",
       "bold": "Жирний шрифт",
       "removeItalic": "Видалити курсив",
@@ -97,6 +98,9 @@
     "codeBlock": {
       "language": "Мова блоку коду",
       "selectLanguage": "Виберіть мову блоку коду"
+    },
+    "contentArea":{
+      "editableMarkdown": "редагований маркдаун"
     }
   }
   
