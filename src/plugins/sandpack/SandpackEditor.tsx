@@ -1,11 +1,12 @@
+import { SandpackCodeEditor, SandpackLayout, SandpackPreview, SandpackProvider, useSandpack } from '@codesandbox/sandpack-react'
+import { useCellValue, useCellValues } from '@mdxeditor/gurx'
 import React from 'react'
 import { SandpackPreset } from '.'
+import styles from '../../styles/ui.module.css'
 import { CodeBlockEditorProps } from '../codeblock'
-import { useCodeMirrorRef } from './useCodeMirrorRef'
-import { SandpackCodeEditor, SandpackLayout, SandpackPreview, SandpackProvider, useSandpack } from '@codesandbox/sandpack-react'
 import { useCodeBlockEditorContext } from '../codeblock/CodeBlockNode'
-import { readOnly$ } from '../core'
-import { useCellValue } from '@mdxeditor/gurx'
+import { iconComponentFor$, readOnly$, useTranslation } from '../core'
+import { useCodeMirrorRef } from './useCodeMirrorRef'
 
 interface CodeUpdateEmitterProps {
   snippetFileName: string
@@ -24,29 +25,48 @@ export interface SandpackEditorProps extends CodeBlockEditorProps {
 
 export const SandpackEditor = ({ nodeKey, code, focusEmitter, preset }: SandpackEditorProps) => {
   const codeMirrorRef = useCodeMirrorRef(nodeKey, 'sandpack', 'jsx', focusEmitter)
-  const readOnly = useCellValue(readOnly$)
+  const [readOnly, iconComponentFor] = useCellValues(readOnly$, iconComponentFor$)
   const { setCode } = useCodeBlockEditorContext()
+  const { parentEditor, lexicalNode } = useCodeBlockEditorContext()
+  const t = useTranslation()
 
   return (
-    <SandpackProvider
-      template={preset.sandpackTemplate}
-      theme={preset.sandpackTheme}
-      files={{
-        [preset.snippetFileName]: code,
-        ...Object.entries(preset.files ?? {}).reduce(
-          (acc, [filePath, fileContents]) => ({ ...acc, ...{ [filePath]: { code: fileContents, readOnly: true } } }),
-          {}
-        )
-      }}
-      customSetup={{
-        dependencies: preset.dependencies
-      }}
-    >
-      <SandpackLayout>
-        <SandpackCodeEditor readOnly={readOnly} showLineNumbers showInlineErrors ref={codeMirrorRef} />
-        <SandpackPreview />
-      </SandpackLayout>
-      <CodeUpdateEmitter onChange={setCode} snippetFileName={preset.snippetFileName} />
-    </SandpackProvider>
+    <div className={styles.sandPackWrapper}>
+      <div className={styles.codeMirrorToolbar}>
+        <button
+          className={styles.iconButton}
+          type="button"
+          title={t('codeblock.delete', 'Delete code block')}
+          onClick={(e) => {
+            e.preventDefault()
+            parentEditor.update(() => {
+              lexicalNode.remove()
+            })
+          }}
+        >
+          {iconComponentFor('delete_small')}
+        </button>
+      </div>
+      <SandpackProvider
+        template={preset.sandpackTemplate}
+        theme={preset.sandpackTheme}
+        files={{
+          [preset.snippetFileName]: code,
+          ...Object.entries(preset.files ?? {}).reduce(
+            (acc, [filePath, fileContents]) => ({ ...acc, ...{ [filePath]: { code: fileContents, readOnly: true } } }),
+            {}
+          )
+        }}
+        customSetup={{
+          dependencies: preset.dependencies
+        }}
+      >
+        <SandpackLayout>
+          <SandpackCodeEditor readOnly={readOnly} showLineNumbers showInlineErrors ref={codeMirrorRef} />
+          <SandpackPreview />
+        </SandpackLayout>
+        <CodeUpdateEmitter onChange={setCode} snippetFileName={preset.snippetFileName} />
+      </SandpackProvider>
+    </div>
   )
 }

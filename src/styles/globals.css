@@ -15,6 +15,10 @@
     padding: var(--sp-space-4) 0;
   }
 
+  & .sp-editor .cm-editor {
+    padding-bottom: 0;
+  }
+
   & .cm-scroller {
     padding: 0 !important;
   }
@@ -24,8 +28,6 @@
   }
 
   & .sp-wrapper {
-    border: 1px solid var(--baseLine);
-    border-radius: var(--radius-medium);
     overflow: hidden;
   }
 
