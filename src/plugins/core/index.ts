@@ -871,6 +871,10 @@ export const corePlugin = realmPlugin<{
       [addToMarkdownExtension$]: [mdxJsxToMarkdown(), gfmStrikethroughToMarkdown()]
     })
 
+    r.singletonSub(markdownErrorSignal$, params?.onError)
+    r.singletonSub(mutableMarkdownSignal$, params?.onChange)
+    r.singletonSub(onBlur$, params?.onBlur)
+
     // Use the JSX extension to parse HTML
     if (!params?.suppressHtmlProcessing) {
       r.pubIn({
