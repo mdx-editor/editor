@@ -70,7 +70,7 @@ import { CodeBlockEditorDescriptor } from '../codeblock'
 import { comment, commentFromMarkdown } from '../../mdastUtilHtmlComment'
 import { lexicalTheme } from '../../styles/lexicalTheme'
 import { FORMAT } from '../../FormatConstants'
-import { IconKey } from '../../IconKey'
+import { IconKey } from '../../defaultSvgIcons'
 export * from './MdastHTMLNode'
 export * from './GenericHTMLNode'
 
