@@ -271,26 +271,41 @@ export function ImageEditor({ src, title, alt, nodeKey, width, height }: ImageEd
         {draggable && isFocused && !disableImageResize && (
           <ImageResizer editor={editor} imageRef={imageRef} onResizeStart={onResizeStart} onResizeEnd={onResizeEnd} />
         )}
-        {!disableImageSettingsButton && (
+        <div className={styles.editImageToolbar}>
           <button
+            className={styles.iconButton}
             type="button"
-            className={classNames(styles.iconButton, styles.editImageButton)}
-            title={t('imageEditor.editImage', 'Edit image')}
-            disabled={readOnly}
-            onClick={() => {
-              openEditImageDialog({
-                nodeKey: nodeKey,
-                initialValues: {
-                  src: !initialImagePath ? imageSource : initialImagePath,
-                  title: title ?? '',
-                  altText: alt ?? ''
-                }
+            title={t('image.delete', 'Delete image')}
+            onClick={(e) => {
+              e.preventDefault()
+              editor.update(() => {
+                $getNodeByKey(nodeKey)?.remove()
               })
             }}
           >
-            {iconComponentFor('settings')}
+            {iconComponentFor('delete_small')}
           </button>
-        )}
+          {!disableImageSettingsButton && (
+            <button
+              type="button"
+              className={classNames(styles.iconButton, styles.editImageButton)}
+              title={t('imageEditor.editImage', 'Edit image')}
+              disabled={readOnly}
+              onClick={() => {
+                openEditImageDialog({
+                  nodeKey: nodeKey,
+                  initialValues: {
+                    src: !initialImagePath ? imageSource : initialImagePath,
+                    title: title ?? '',
+                    altText: alt ?? ''
+                  }
+                })
+              }}
+            >
+              {iconComponentFor('settings')}
+            </button>
+          )}
+        </div>
       </div>
     </React.Suspense>
   ) : null

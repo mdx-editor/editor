@@ -1,25 +1,31 @@
+import { useCellValues } from '@mdxeditor/gurx'
 import React from 'react'
 import styles from '../../styles/ui.module.css'
 import { CodeBlockEditorProps } from '../codeblock'
 import { useCodeBlockEditorContext } from '../codeblock/CodeBlockNode'
-import { readOnly$ } from '../core'
-import { useCellValues } from '@mdxeditor/gurx'
+import { iconComponentFor$, readOnly$, useTranslation } from '../core'
 
+import { languages } from '@codemirror/language-data'
 import { EditorState, Extension } from '@codemirror/state'
 import { EditorView, lineNumbers } from '@codemirror/view'
 import { basicLight } from 'cm6-theme-basic-light'
 import { basicSetup } from 'codemirror'
-import { languages } from '@codemirror/language-data'
+import { codeBlockLanguages$, codeMirrorAutoLoadLanguageSupport$, codeMirrorExtensions$ } from '.'
 import { useCodeMirrorRef } from '../sandpack/useCodeMirrorRef'
-import { codeMirrorAutoLoadLanguageSupport$, codeMirrorExtensions$ } from '.'
+import { Select } from '../toolbar/primitives/select'
 
 export const COMMON_STATE_CONFIG_EXTENSIONS: Extension[] = []
+const EMPTY_VALUE = '__EMPTY_VALUE__'
 
 export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: CodeBlockEditorProps) => {
-  const [readOnly, codeMirrorExtensions, autoLoadLanguageSupport] = useCellValues(
+  const t = useTranslation()
+  const { parentEditor, lexicalNode } = useCodeBlockEditorContext()
+  const [readOnly, codeMirrorExtensions, autoLoadLanguageSupport, iconComponentFor, codeBlockLanguages] = useCellValues(
     readOnly$,
     codeMirrorExtensions$,
-    codeMirrorAutoLoadLanguageSupport$
+    codeMirrorAutoLoadLanguageSupport$,
+    iconComponentFor$,
+    codeBlockLanguages$
   )
 
   const codeMirrorRef = useCodeMirrorRef(nodeKey, 'codeblock', language, focusEmitter)
@@ -81,6 +87,37 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
         e.stopPropagation()
       }}
     >
+      <div className={styles.codeMirrorToolbar}>
+        <Select
+          value={language}
+          onChange={(language) => {
+            parentEditor.update(() => {
+              lexicalNode.setLanguage(language === EMPTY_VALUE ? '' : language)
+              setTimeout(() => {
+                parentEditor.update(() => {
+                  lexicalNode.getLatest().select()
+                })
+              })
+            })
+          }}
+          triggerTitle={t('codeBlock.selectLanguage', 'Select code block language')}
+          placeholder={t('codeBlock.inlineLanguage', 'Language')}
+          items={Object.entries(codeBlockLanguages).map(([value, label]) => ({ value: value ? value : EMPTY_VALUE, label }))}
+        />
+        <button
+          className={styles.iconButton}
+          type="button"
+          title={t('codeblock.delete', 'Delete code block')}
+          onClick={(e) => {
+            e.preventDefault()
+            parentEditor.update(() => {
+              lexicalNode.remove()
+            })
+          }}
+        >
+          {iconComponentFor('delete_small')}
+        </button>
+      </div>
       <div ref={elRef} />
     </div>
   )

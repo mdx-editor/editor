@@ -208,22 +208,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
       {readOnly || (
         <thead>
           <tr>
-            <th className={styles.tableToolsColumn} data-tool-cell={true}>
-              <button
-                className={styles.iconButton}
-                type="button"
-                title={t('table.deleteTable', 'Delete table')}
-                onClick={(e) => {
-                  e.preventDefault()
-                  parentEditor.update(() => {
-                    lexicalTable.selectNext()
-                    lexicalTable.remove()
-                  })
-                }}
-              >
-                {iconComponentFor('delete_small')}
-              </button>
-            </th>
+            <th className={styles.tableToolsColumn}></th>
             {Array.from({ length: mdastNode.children[0].children.length }, (_, colIndex) => {
               return (
                 <th key={colIndex} data-tool-cell={true}>
@@ -240,7 +225,23 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
                 </th>
               )
             })}
-            <th className={styles.tableToolsColumn}></th>
+
+            <th className={styles.tableToolsColumn} data-tool-cell={true}>
+              <button
+                className={styles.iconButton}
+                type="button"
+                title={t('table.deleteTable', 'Delete table')}
+                onClick={(e) => {
+                  e.preventDefault()
+                  parentEditor.update(() => {
+                    lexicalTable.selectNext()
+                    lexicalTable.remove()
+                  })
+                }}
+              >
+                {iconComponentFor('delete_small')}
+              </button>
+            </th>
           </tr>
         </thead>
       )}

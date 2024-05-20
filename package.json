@@ -22,7 +22,8 @@
     "lint": "eslint src --ext .ts,.tsx",
     "test": "NODE_ENV=development vitest",
     "semantic-release": "semantic-release",
-    "image-upload-backend": "node ./src/examples/file-backend.js"
+    "image-upload-backend": "node ./src/examples/file-backend.js",
+    "export-icons": "node ./scripts/export-figma-icons.mjs"
   },
   "files": [
     "dist"
@@ -116,6 +117,7 @@
     "@vitejs/plugin-react-swc": "^3.5.0",
     "autoprefixer": "^10.4.14",
     "cm6-theme-basic-dark": "^0.2.0",
+    "dotenv": "^16.4.5",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-html": "^7.1.0",
@@ -139,7 +141,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "semantic-release": "^21.0.5",
-    "svgo": "^3.0.2",
+    "svgo": "^3.3.2",
     "terser": "^5.26.0",
     "typedoc": "^0.25.13",
     "typedoc-plugin-markdown": "^4.0.2",

@@ -12,9 +12,22 @@
   filter: drop-shadow(0 2px 2px rgb(0 0 0 / 0.20));
 }
 
+@define-mixin nested-editor-toolbar {
+  position: absolute;
+  right: 0;
+  top: 0;
+  display: flex;
+  gap: var(--spacing-1);
+  padding: var(--spacing-1);
+  z-index: 1;
+  background-color: var(--baseBase);
+  border-bottom-left-radius: var(--radius-base);
+}
+
 @define-mixin icon-button {
   @mixin clear-form-element;
-  padding: var(--spacing-1_5);
+  padding: var(--spacing-1);
+  color: var(--baseTextContrast);
 
   & svg {
     display: block;
@@ -22,7 +35,7 @@
 
   @media (hover: hover) {
     &:hover {
-      background-color: var(--baseBgHover);
+      background-color: var(--baseBg);
     }
   }
 
@@ -32,7 +45,7 @@
 
   &[data-state=on],
   &:active {
-    background-color: var(--baseBgHover);
+    background-color: var(--baseBg);
     color: var(--baseTextContrast);
   }
 }
@@ -145,8 +158,7 @@
 }
 
 .toolbarRoot {
-  /* border: var(--spacing-px) solid var(--baseBorder); */
-  z-index: 1;
+  z-index: 2;
   display: flex;
   flex-direction: row;
   gap: var(--spacing-1);
@@ -164,6 +176,11 @@
     border-left: 1px solid var(--baseBorder);
     border-right: 1px solid var(--baseBase);
     height: var(--spacing-4);
+  }
+
+  & svg {
+    color: var(--baseTextContrast);
+    display: block;
   }
 }
 
@@ -219,11 +236,8 @@
 .toolbarToggleItem,
 .toolbarButton {
   @mixin clear-form-element;
-  padding: var(--spacing-1);
+  padding: var(--spacing-0_5);
 
-  & svg {
-    display: block;
-  }
 
   @media (hover: hover) {
     &:hover {
@@ -243,7 +257,9 @@
 
   &[data-disabled] {
     pointer-events: none;
-    color: var(--baseBorderHover);
+    & svg {
+      color: var(--baseBorderHover);
+    }
   }
 }
 
@@ -251,11 +267,17 @@
   border-radius: var(--radius-base);
 }
 
+.toolbarButton + .toolbarButton {
+  margin-left: var(--spacing-1);
+}
+
 .activeToolbarButton {
   color: var(--accentText);
 }
 
 .toolbarToggleSingleGroup {
+  display: flex;
+  align-items: center;
   white-space: nowrap;
 }
 
@@ -289,7 +311,8 @@
   color: inherit;
   align-items: center;
   width: var(--spacing-36);
-  padding: var(--spacing-1) var(--spacing-2);
+  padding: var(--spacing-0_5) var(--spacing-1);
+  padding-inline-start: var(--spacing-2);
   border-radius: var(--radius-medium);
   white-space: nowrap;
   flex-wrap: nowrap;
@@ -371,6 +394,19 @@
   border-radius: var(--radius-medium);
   overflow: hidden;
   padding: 0.8rem;
+  position: relative;
+}
+
+.sandPackWrapper {
+  margin-bottom: var(--spacing-5);
+  border: 1px solid var(--baseLine);
+  border-radius: var(--radius-medium);
+  overflow: hidden;
+  position: relative;
+}
+
+.codeMirrorToolbar {
+  @mixin nested-editor-toolbar;
 }
 
 .frontmatterWrapper {
@@ -457,7 +493,7 @@
 
   @media (hover: hover) {
     &:hover {
-      color: var(--accentText);
+      color: var(--baseTextContrast);
     }
   }
 
@@ -571,7 +607,7 @@
   border-radius: var(--radius-medium);
   border: 1px solid var(--baseBg);
   background-color: var(--basePageBg);
-  padding: var(--spacing-1) var(--spacing-2);
+  padding: var(--spacing-1) var(--spacing-1);
   font-size: var(--text-sm);
 }
 
@@ -615,16 +651,16 @@
 }
 
 .linkDialogPreviewAnchor {
-  margin-right: var(--spacing-3);
+  margin-right: var(--spacing-1);
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   color: var(--accentText);
   text-decoration: none;
 
-  & svg {
-    width: var(--spacing-5);
-    height: var(--spacing-5);
-    margin-left: var(--spacing-2);
+  @media (hover: hover) {
+    &:hover {
+      color: var(--accentSolidHover);
+    }
   }
 
   border: 1px solid transparent;
@@ -659,6 +695,7 @@
   @mixin icon-button;
   padding: var(--spacing-1) var(--spacing-1);
   border-radius: var(--radius-medium);
+  color: var(--baseTextContrast);
 }
 
 .primaryActionButton {
@@ -782,7 +819,7 @@
 }
 
 .tableToolsColumn {
-  width: 3rem;
+  width: 2rem;
 
   & button {
     margin: auto;
@@ -895,13 +932,11 @@
   cursor: -webkit-grab;
 }
 
-.editImageButton {
-  position: absolute;
-  right: var(--spacing-2);
-  top: var(--spacing-2);
-  background: var(--baseBase);
-  border-radius: var(--radius-full);
+.editImageToolbar {
+  @mixin nested-editor-toolbar;
+}
 
+.editImageButton {
   & svg {
     display: block;
   }
@@ -959,7 +994,7 @@
 
     &>span {
       display: block;
-      padding: var(--spacing-1) var(--spacing-2);
+      padding: var(--spacing-1) var(--spacing-1);
     }
   }
 }
@@ -1184,7 +1219,7 @@ form.multiFieldForm {
 
 .popupContainer {
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 .inputSizer {

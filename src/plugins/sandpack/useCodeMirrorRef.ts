@@ -80,6 +80,15 @@ export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'san
         }
       } else if (e.key === 'Enter') {
         e.stopPropagation()
+      } else if (e.key === 'Backspace' || e.key === 'Delete') {
+        const state = codeMirrorRef.current?.getCodemirror()?.state
+        const docLength = state?.doc.length
+        if (docLength === 0) {
+          activeEditor?.update(() => {
+            const node = $getNodeByKey(nodeKey)!
+            node.remove()
+          })
+        }
       }
     },
     [activeEditor, nodeKey]

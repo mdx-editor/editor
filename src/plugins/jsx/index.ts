@@ -107,7 +107,10 @@ export function isMdastJsxNode(node: Mdast.Nodes): node is MdastJsx {
   return node.type === 'mdxJsxFlowElement' || node.type === 'mdxJsxTextElement'
 }
 
-interface ExpressionValue {
+/**
+ * @group JSX
+ */
+export interface ExpressionValue {
   type: 'expression'
   value: string
 }
@@ -120,7 +123,7 @@ const isExpressionValue = (value: string | ExpressionValue | null): value is Exp
   return false
 }
 
-type JsxProperties = Record<string, string | ExpressionValue>
+export type JsxProperties = Record<string, string | ExpressionValue>
 
 const toMdastJsxAttributes = (attributes: JsxProperties) =>
   Object.entries(attributes).map(
@@ -179,7 +182,10 @@ export const insertJsx$ = Signal<
   )
 })
 
-interface JsxPluginParams {
+/**
+ * @group JSX
+ */
+export interface JsxPluginParams {
   /**
    * A set of descriptors that document the JSX elements used in the document.
    */

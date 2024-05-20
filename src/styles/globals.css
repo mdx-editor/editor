@@ -8,12 +8,15 @@
 @import url('@radix-ui/colors/red.css');
 
 .mdxeditor {
-
   /** Code mirror */
   & .cm-editor {
     --sp-font-mono: var(--font-mono);
     --sp-font-body: var(--font-body);
     padding: var(--sp-space-4) 0;
+  }
+
+  & .sp-editor .cm-editor {
+    padding-bottom: 0;
   }
 
   & .cm-scroller {
@@ -25,8 +28,6 @@
   }
 
   & .sp-wrapper {
-    border: 1px solid var(--baseLine);
-    border-radius: var(--radius-medium);
     overflow: hidden;
   }
 

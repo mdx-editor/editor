@@ -159,6 +159,10 @@ export interface CodeBlockEditorContextValue {
    * The Lexical node that's being edited.
    */
   lexicalNode: CodeBlockNode
+  /**
+   * The parent Lexical editor.
+   */
+  parentEditor: LexicalEditor
 }
 
 const CodeBlockEditorContext = React.createContext<CodeBlockEditorContextValue | null>(null)
@@ -171,6 +175,7 @@ const CodeBlockEditorContextProvider: React.FC<{
   const contextValue = React.useMemo(() => {
     return {
       lexicalNode,
+      parentEditor,
       setCode: (code: string) => {
         parentEditor.update(() => {
           lexicalNode.setCode(code)
