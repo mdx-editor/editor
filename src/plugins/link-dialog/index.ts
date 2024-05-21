@@ -148,19 +148,23 @@ export const linkDialogState$ = Cell<InactiveLinkDialog | PreviewLinkDialog | Ed
   )
 
   r.sub(r.pipe(updateLink$, withLatestFrom(activeEditor$, linkDialogState$, currentSelection$)), ([payload, editor, state, selection]) => {
-    const url = payload.url.trim()
-    const title = payload.title.trim()
+    const url = payload.url?.trim() ?? ''
+    const title = payload.title?.trim() ?? ''
 
     if (url !== '') {
       if (selection?.isCollapsed()) {
         const linkContent = title || url
         editor?.update(
           () => {
-            if (!getLinkNodeInSelection(selection)) {
+            const linkNode = getLinkNodeInSelection(selection)
+            if (!linkNode) {
               const node = $createLinkNode(url, { title })
               node.append($createTextNode(linkContent))
               $insertNodes([node])
               node.select()
+            } else {
+              linkNode.setURL(url)
+              linkNode.setTitle(title)
             }
           },
           { discrete: true }
@@ -245,7 +249,7 @@ export const linkDialogState$ = Cell<InactiveLinkDialog | PreviewLinkDialog | Ed
  * A signal that updates the current link with the published payload.
  * @group Link Dialog
  */
-export const updateLink$ = Signal<{ url: string; title: string }>()
+export const updateLink$ = Signal<{ url: string | undefined; title: string | undefined }>()
 /**
  * An action that cancel the edit of the current link.
  * @group Link Dialog
