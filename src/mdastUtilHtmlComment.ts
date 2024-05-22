@@ -1,8 +1,9 @@
 // typed version of https://github.com/slorber/remark-comment/blob/slorber/multiline-comment-bug/index.js
-import type { Config } from 'mdast-util-from-markdown/lib'
+//
+import type { Handle, Transform } from 'mdast-util-from-markdown'
 import { factorySpace } from 'micromark-factory-space'
 import { markdownLineEnding } from 'micromark-util-character'
-import { types, codes } from 'micromark-util-symbol'
+import { codes, types } from 'micromark-util-symbol'
 
 import type { Code, Extension, Tokenizer } from 'micromark-util-types'
 
@@ -12,6 +13,26 @@ declare module 'micromark-util-types' {
     commentEnd: 'commentEnd'
     data: 'data'
   }
+}
+
+// https://github.com/syntax-tree/mdast-util-from-markdown/blob/main/dev/index.d.ts
+interface Config {
+  /**
+   *   Token types where line endings are used.
+   */
+  canContainEols: string[]
+  /**
+   *   Opening handles.
+   */
+  enter: Record<string, Handle>
+  /**
+   *   Closing handles.
+   */
+  exit: Record<string, Handle>
+  /**
+   *   Tree transforms.
+   */
+  transforms: Transform[]
 }
 
 export function commentFromMarkdown(_options: { ast?: boolean }): Partial<Config> {
