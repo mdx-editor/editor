@@ -5,7 +5,7 @@ import React from 'react'
 import styles from '../../../styles/ui.module.css'
 import { TooltipWrap } from './TooltipWrap'
 import { SelectButtonTrigger, SelectContent, SelectItem } from './select'
-import { EditorInFocus, editorInFocus$, readOnly$ } from '../../core'
+import { EditorInFocus, editorInFocus$, readOnly$, useTranslation } from '../../core'
 import { useCellValue } from '@mdxeditor/gurx'
 
 //
@@ -152,10 +152,12 @@ export const SingleChoiceToggleGroup = <T extends string>({
   value: T | ''
   className?: string
 }) => {
+  const t = useTranslation()
+  
   return (
     <div className={styles.toolbarGroupOfGroups}>
       <RadixToolbar.ToggleGroup
-        aria-label="toggle group"
+        aria-label={t('toolbar.toggleGroup', 'toggle group')}
         type="single"
         className={classNames(styles.toolbarToggleSingleGroup, className)}
         onValueChange={onChange}

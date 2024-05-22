@@ -58,6 +58,7 @@
       "selectBlockTypeTooltip": "選擇塊類型",
       "placeholder": "塊類型"
     },
+    "toggleGroup": "切換群組",
     "removeBold": "移除粗體",
     "bold": "粗體",
     "removeItalic": "移除斜體",
@@ -97,5 +98,8 @@
   "codeBlock": {
     "language": "程式碼區塊語言",
     "selectLanguage": "選擇程式碼區塊語言"
+  },
+  "contentArea":{
+    "editableMarkdown": "可編輯的 Markdown"
   }
 }
