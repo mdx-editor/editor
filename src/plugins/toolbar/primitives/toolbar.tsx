@@ -153,7 +153,7 @@ export const SingleChoiceToggleGroup = <T extends string>({
   className?: string
 }) => {
   const t = useTranslation()
-  
+
   return (
     <div className={styles.toolbarGroupOfGroups}>
       <RadixToolbar.ToggleGroup
