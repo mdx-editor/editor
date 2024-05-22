@@ -1,5 +1,5 @@
 import { SandpackCodeEditor, SandpackLayout, SandpackPreview, SandpackProvider, useSandpack } from '@codesandbox/sandpack-react'
-import { useCellValue, useCellValues } from '@mdxeditor/gurx'
+import { useCellValues } from '@mdxeditor/gurx'
 import React from 'react'
 import { SandpackPreset } from '.'
 import styles from '../../styles/ui.module.css'
