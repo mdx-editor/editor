@@ -6,7 +6,7 @@ module.exports = {
     project: ['./tsconfig.json'],
     sourceType: 'module'
   },
-  plugins: ['react', '@typescript-eslint', 'json', 'html'],
+  plugins: ['react', '@typescript-eslint', 'json', 'html', 'import'],
   env: {
     browser: true,
     es2021: true,
@@ -28,6 +28,7 @@ module.exports = {
     }
   ],
   rules: {
+    'import/no-extraneous-dependencies': ['error'],
     '@typescript-eslint/no-non-null-assertion': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-unsafe-return': 'off',
