@@ -1,7 +1,6 @@
 import { mdxFromMarkdown, mdxToMarkdown } from 'mdast-util-mdx'
 import type { MdxJsxFlowElement, MdxJsxTextElement } from 'mdast-util-mdx-jsx'
 import { mdxjs } from 'micromark-extension-mdxjs'
-import React from 'react'
 import {
   addExportVisitor$,
   addImportVisitor$,
