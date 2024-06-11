@@ -1,9 +1,10 @@
 import { SandpackProvider } from '@codesandbox/sandpack-react'
 import React from 'react'
-import { CodeBlockEditorDescriptor, appendCodeBlockEditorDescriptor$, insertCodeBlock$ } from '../codeblock'
+import { appendCodeBlockEditorDescriptor$, insertCodeBlock$ } from '../codeblock'
 import { SandpackEditor } from './SandpackEditor'
 import { Cell, Signal, map, useCellValue, withLatestFrom } from '@mdxeditor/gurx'
 import { realmPlugin } from '../../RealmWithPlugins'
+import { CodeBlockEditorDescriptor } from '../codeblock/utils'
 
 type SandpackProviderProps = React.ComponentProps<typeof SandpackProvider>
 

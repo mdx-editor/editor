@@ -1,8 +1,9 @@
 import { realmPlugin } from '../../RealmWithPlugins'
 import { Cell, Signal, map } from '@mdxeditor/gurx'
-import { CodeBlockEditorDescriptor, appendCodeBlockEditorDescriptor$, insertCodeBlock$ } from '../codeblock'
+import { appendCodeBlockEditorDescriptor$, insertCodeBlock$ } from '../codeblock'
 import { CodeMirrorEditor } from './CodeMirrorEditor'
 import { Extension } from '@codemirror/state'
+import { CodeBlockEditorDescriptor } from '../codeblock/utils'
 
 /**
  * The codemirror code block languages.

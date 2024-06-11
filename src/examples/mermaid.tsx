@@ -1,7 +1,8 @@
 import React from 'react'
 import mermaid from 'mermaid'
-import { CodeBlockEditorDescriptor, useCodeBlockEditorContext, MDXEditor, codeBlockPlugin } from '..'
+import { useCodeBlockEditorContext, MDXEditor, codeBlockPlugin } from '..'
 import mmdMarkdown from './assets/mermaid-code.md?raw'
+import { CodeBlockEditorDescriptor } from '@/plugins/codeblock/utils'
 
 mermaid.initialize({ startOnLoad: true })
 
