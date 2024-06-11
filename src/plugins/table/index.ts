@@ -14,8 +14,7 @@ import {
 } from '../core'
 import { LexicalTableVisitor } from './LexicalTableVisitor'
 import { MdastTableVisitor } from './MdastTableVisitor'
-import { $createTableNode, TableNode } from './TableNode'
-export * from './TableNode'
+import { $createTableNode, TableNode } from './TableEditor'
 
 function seedTable(rows = 1, columns = 1): Mdast.Table {
   const table: Mdast.Table = {
