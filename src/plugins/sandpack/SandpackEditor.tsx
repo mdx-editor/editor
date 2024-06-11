@@ -1,12 +1,12 @@
 import { SandpackCodeEditor, SandpackLayout, SandpackPreview, SandpackProvider, useSandpack } from '@codesandbox/sandpack-react'
 import { useCellValues } from '@mdxeditor/gurx'
 import React from 'react'
-import { SandpackPreset } from '.'
 import styles from '../../styles/ui.module.css'
 import { useCodeBlockEditorContext } from '../codeblock/CodeBlockNode'
 import { iconComponentFor$, readOnly$, useTranslation } from '../core'
 import { useCodeMirrorRef } from './useCodeMirrorRef'
 import { CodeBlockEditorProps } from '../codeblock/utils'
+import { SandpackPreset } from './utils'
 
 interface CodeUpdateEmitterProps {
   snippetFileName: string
