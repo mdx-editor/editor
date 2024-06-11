@@ -1,7 +1,8 @@
 import React from 'react'
 import { describe, expect, it } from 'vitest'
-import { GenericJsxEditor, JsxComponentDescriptor, MDXEditor, MDXEditorMethods, jsxPlugin } from '../'
+import { GenericJsxEditor, MDXEditor, MDXEditorMethods, jsxPlugin } from '../'
 import { render, act } from '@testing-library/react'
+import { JsxComponentDescriptor } from '@/plugins/jsx/utils'
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 ;(globalThis as any).IS_REACT_ACT_ENVIRONMENT = true

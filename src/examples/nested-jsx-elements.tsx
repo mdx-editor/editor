@@ -3,7 +3,6 @@ import { MdxJsxTextElement } from 'mdast-util-mdx'
 import {
   Button,
   DiffSourceToggleWrapper,
-  JsxComponentDescriptor,
   MDXEditor,
   NestedLexicalEditor,
   UndoRedo,
@@ -13,6 +12,7 @@ import {
   toolbarPlugin
 } from '../'
 import { usePublisher } from '@mdxeditor/gurx'
+import { JsxComponentDescriptor } from '@/plugins/jsx/utils'
 const jsxMarkdown = `<Grid foo="fooValue">
   Content *foo*more Content
   </Grid>`

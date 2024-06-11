@@ -5,9 +5,9 @@ import { fromMarkdown, type Options } from 'mdast-util-from-markdown'
 import { toMarkdown } from 'mdast-util-to-markdown'
 import { ParseOptions } from 'micromark-util-types'
 import { FORMAT } from './FormatConstants'
-import { JsxComponentDescriptor } from './plugins/jsx'
 import { DirectiveDescriptor } from './plugins/directives'
 import { CodeBlockEditorDescriptor } from './plugins/codeblock'
+import { JsxComponentDescriptor } from './plugins/jsx/utils'
 
 /**
  * The registered descriptors for composite nodes (jsx, directives, code blocks).

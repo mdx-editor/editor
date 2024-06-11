@@ -2,7 +2,6 @@ import React from 'react'
 import {
   DiffSourceToggleWrapper,
   GenericJsxEditor,
-  JsxComponentDescriptor,
   MDXEditor,
   MDXEditorMethods,
   diffSourcePlugin,
@@ -14,6 +13,7 @@ import {
   toolbarPlugin,
   usePublisher
 } from '..'
+import { JsxComponentDescriptor } from '@/plugins/jsx/utils'
 
 const initialMarkdownContent = `
   # Hello World

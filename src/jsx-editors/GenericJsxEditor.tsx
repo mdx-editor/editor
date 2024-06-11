@@ -11,7 +11,7 @@ import React from 'react'
 import { NestedLexicalEditor, useMdastNodeUpdater } from '../plugins/core/NestedLexicalEditor'
 import { PropertyPopover } from '../plugins/core/PropertyPopover'
 import styles from '../styles/ui.module.css'
-import { JsxEditorProps } from '../plugins/jsx'
+import { JsxEditorProps } from '@/plugins/jsx/utils'
 
 const isExpressionValue = (value: string | MdxJsxAttributeValueExpression | null | undefined): value is MdxJsxAttributeValueExpression => {
   if (value !== null && typeof value === 'object' && 'type' in value && 'value' in value && typeof value.value === 'string') {
