@@ -1,7 +1,6 @@
 import { useCellValues } from '@mdxeditor/gurx'
 import React from 'react'
 import styles from '../../styles/ui.module.css'
-import { CodeBlockEditorProps } from '../codeblock'
 import { useCodeBlockEditorContext } from '../codeblock/CodeBlockNode'
 import { iconComponentFor$, readOnly$, useTranslation } from '../core'
 
@@ -13,6 +12,7 @@ import { basicSetup } from 'codemirror'
 import { codeBlockLanguages$, codeMirrorAutoLoadLanguageSupport$, codeMirrorExtensions$ } from '.'
 import { useCodeMirrorRef } from '../sandpack/useCodeMirrorRef'
 import { Select } from '../toolbar/primitives/select'
+import { CodeBlockEditorProps } from '../codeblock/utils'
 
 export const COMMON_STATE_CONFIG_EXTENSIONS: Extension[] = []
 const EMPTY_VALUE = '__EMPTY_VALUE__'

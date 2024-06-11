@@ -10,41 +10,12 @@ import {
   insertDecoratorNode$
 } from '../core'
 import { $createCodeBlockNode, CodeBlockNode, CreateCodeBlockNodeOptions } from './CodeBlockNode'
-import { VoidEmitter } from '../../utils/voidEmitter'
 import { Cell, Signal, map, withLatestFrom } from '@mdxeditor/gurx'
 import { realmPlugin } from '../../RealmWithPlugins'
-export * from './CodeBlockNode'
+import { CodeBlockEditorProps } from './utils'
 
 export type { CodeBlockEditorContextValue, CreateCodeBlockNodeOptions } from './CodeBlockNode'
 export { useCodeBlockEditorContext } from './CodeBlockNode'
-
-/**
- * The properties passed to the {@link CodeBlockEditorDescriptor.Editor} component.
- * @group Code Block
- */
-export interface CodeBlockEditorProps {
-  /**
-   * The code to edit.
-   */
-  code: string
-  /**
-   * The language of the fenced code block.
-   */
-  language: string
-  /**
-   * The meta of the fenced code block.
-   */
-  meta: string
-  /**
-   * The key of the Lexical node - use this if you are dealing with the Lexical APIs.
-   */
-  nodeKey: string
-  /**
-   * An emitter that will execute its subscription when the editor should be focused.
-   * Note: you don't need to unsubscribe, the emiter has a single subscription model.
-   */
-  focusEmitter: VoidEmitter
-}
 
 /**
  * Implement this interface to create a custom code block editor.

@@ -1,8 +1,8 @@
 import { useCellValue } from '@mdxeditor/gurx'
 import { DecoratorNode, EditorConfig, LexicalEditor, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
 import React from 'react'
-import { CodeBlockEditorProps, defaultCodeBlockLanguage$ } from '.'
 import { voidEmitter } from '../../utils/voidEmitter'
+import { CodeBlockEditorProps, defaultCodeBlockLanguage$ } from './utils'
 import { NESTED_EDITOR_UPDATED_COMMAND, codeBlockEditorDescriptors$ } from '../core'
 
 /**
