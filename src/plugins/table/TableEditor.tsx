@@ -50,6 +50,50 @@ import { DecoratorNode, LexicalNode, NodeKey, SerializedLexicalNode, Spread } fr
 import { noop } from '../../utils/fp'
 
 /**
+ * A serialized representation of a {@link TableNode}.
+ * @group Table
+ */
+export type SerializedTableNode = Spread<
+  {
+    mdastNode: Mdast.Table
+  },
+  SerializedLexicalNode
+>
+
+const EMPTY_CELL: Mdast.TableCell = { type: 'tableCell', children: [] as Mdast.PhrasingContent[] }
+
+type CoordinatesSubscription = (coords: [colIndex: number, rowIndex: number]) => void
+
+/**
+ * Retruns true if the given node is a {@link TableNode}.
+ * @group Table
+ */
+export function $isTableNode(node: LexicalNode | null | undefined): node is TableNode {
+  return node instanceof TableNode
+}
+
+/**
+ * Creates a {@link TableNode}. Use this instead of the constructor to follow the Lexical conventions.
+ * @param mdastNode - The mdast node to create the {@link TableNode} from.
+ * @group Table
+ */
+export function $createTableNode(mdastNode: Mdast.Table): TableNode {
+  return new TableNode(mdastNode)
+}
+
+function coordinatesEmitter() {
+  let subscription: CoordinatesSubscription = noop
+  return {
+    publish: (coords: [colIndex: number, rowIndex: number]) => {
+      subscription(coords)
+    },
+    subscribe: (cb: CoordinatesSubscription) => {
+      subscription = cb
+    }
+  }
+}
+
+/**
  * Returns the element type for the cell based on the rowIndex
  *
  * If the rowIndex is 0, it returns 'th' for the header cell
@@ -660,35 +704,6 @@ const RowEditor: React.FC<RowEditorProps> = ({
   )
 }
 
-// defining table node here
-
-/**
- * A serialized representation of a {@link TableNode}.
- * @group Table
- */
-export type SerializedTableNode = Spread<
-  {
-    mdastNode: Mdast.Table
-  },
-  SerializedLexicalNode
->
-
-const EMPTY_CELL: Mdast.TableCell = { type: 'tableCell', children: [] as Mdast.PhrasingContent[] }
-
-type CoordinatesSubscription = (coords: [colIndex: number, rowIndex: number]) => void
-
-function coordinatesEmitter() {
-  let subscription: CoordinatesSubscription = noop
-  return {
-    publish: (coords: [colIndex: number, rowIndex: number]) => {
-      subscription(coords)
-    },
-    subscribe: (cb: CoordinatesSubscription) => {
-      subscription = cb
-    }
-  }
-}
-
 /**
  * A Lexical node that represents a markdown table.
  * Use {@link "$createTableNode"} to construct one.
@@ -862,21 +877,4 @@ export class TableNode extends DecoratorNode<JSX.Element> {
   isInline(): false {
     return false
   }
-}
-
-/**
- * Retruns true if the given node is a {@link TableNode}.
- * @group Table
- */
-export function $isTableNode(node: LexicalNode | null | undefined): node is TableNode {
-  return node instanceof TableNode
-}
-
-/**
- * Creates a {@link TableNode}. Use this instead of the constructor to follow the Lexical conventions.
- * @param mdastNode - The mdast node to create the {@link TableNode} from.
- * @group Table
- */
-export function $createTableNode(mdastNode: Mdast.Table): TableNode {
-  return new TableNode(mdastNode)
 }
