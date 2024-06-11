@@ -11,17 +11,17 @@ import styles from '@/styles/ui.module.css'
 import classNames from 'classnames'
 import { createCommand, LexicalCommand } from 'lexical'
 import { useForm } from 'react-hook-form'
+import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 import {
   cancelLinkEdit$,
   linkAutocompleteSuggestions$,
   linkDialogState$,
+  onClickLinkCallback$,
   onWindowChange$,
   removeLink$,
   switchFromPreviewToLinkEdit$,
-  updateLink$,
-  onClickLinkCallback$
-} from '.'
-import { useCellValues, usePublisher } from '@mdxeditor/gurx'
+  updateLink$
+} from './utils'
 
 export const OPEN_LINK_DIALOG: LexicalCommand<undefined> = createCommand()
 
