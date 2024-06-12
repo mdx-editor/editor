@@ -9,10 +9,10 @@ import { EditorState, Extension } from '@codemirror/state'
 import { EditorView, lineNumbers } from '@codemirror/view'
 import { basicLight } from 'cm6-theme-basic-light'
 import { basicSetup } from 'codemirror'
-import { codeBlockLanguages$, codeMirrorAutoLoadLanguageSupport$, codeMirrorExtensions$ } from '.'
 import { useCodeMirrorRef } from '../sandpack/useCodeMirrorRef'
 import { Select } from '../toolbar/primitives/select'
 import { CodeBlockEditorProps } from '../codeblock/utils'
+import { codeBlockLanguages$, codeMirrorAutoLoadLanguageSupport$, codeMirrorExtensions$ } from './utils'
 
 export const COMMON_STATE_CONFIG_EXTENSIONS: Extension[] = []
 const EMPTY_VALUE = '__EMPTY_VALUE__'

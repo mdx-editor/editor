@@ -2,9 +2,9 @@ import { useCellValues } from '@mdxeditor/gurx'
 import React from 'react'
 import styles from '../../../styles/ui.module.css'
 import { CodeBlockNode } from '../../codeblock/CodeBlockNode'
-import { codeBlockLanguages$ } from '../../codemirror'
 import { activeEditor$, editorInFocus$, useTranslation } from '../../core'
 import { Select } from '.././primitives/select'
+import { codeBlockLanguages$ } from '@/plugins/codemirror/utils'
 
 const EMPTY_VALUE = '__EMPTY_VALUE__'
 /**

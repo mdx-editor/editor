@@ -1,21 +1,10 @@
 import { realmPlugin } from '../../RealmWithPlugins'
-import { Cell, Signal, map } from '@mdxeditor/gurx'
+import { Signal, map } from '@mdxeditor/gurx'
 import { appendCodeBlockEditorDescriptor$, insertCodeBlock$ } from '../codeblock'
 import { CodeMirrorEditor } from './CodeMirrorEditor'
 import { Extension } from '@codemirror/state'
 import { CodeBlockEditorDescriptor } from '../codeblock/utils'
-
-/**
- * The codemirror code block languages.
- * @group CodeMirror
- */
-export const codeBlockLanguages$ = Cell({
-  js: 'JavaScript',
-  ts: 'TypeScript',
-  tsx: 'TypeScript (React)',
-  jsx: 'JavaScript (React)',
-  css: 'CSS'
-})
+import { codeBlockLanguages$, codeMirrorAutoLoadLanguageSupport$, codeMirrorExtensions$ } from './utils'
 
 /**
  * Inserts a new code mirror code block with the specified parameters.
@@ -36,19 +25,6 @@ export const insertCodeMirror$ = Signal<{ language: string; code: string }>((r) 
     insertCodeBlock$
   )
 })
-
-/**
- * The code mirror extensions for the coemirror code block editor.
- * @group CodeMirror
- */
-export const codeMirrorExtensions$ = Cell<Extension[]>([])
-
-/**
- * Whether or not to try to dynamically load the code block language support.
- * Disable if you want to manually pass the supported languages.
- * @group CodeMirror
- */
-export const codeMirrorAutoLoadLanguageSupport$ = Cell<boolean>(true)
 
 /**
  * A plugin that adds lets users edit code blocks with CodeMirror.
