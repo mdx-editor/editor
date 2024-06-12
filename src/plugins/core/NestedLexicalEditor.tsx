@@ -12,12 +12,10 @@ import {
   createEditor
 } from 'lexical'
 import * as Mdast from 'mdast'
-import { Node } from 'unist'
 import React from 'react'
 import {
   NESTED_EDITOR_UPDATED_COMMAND,
   codeBlockEditorDescriptors$,
-  directiveDescriptors$,
   editorInFocus$,
   exportVisitors$,
   importVisitors$,
@@ -40,16 +38,9 @@ import { SharedHistoryPlugin } from './SharedHistoryPlugin'
 import { mergeRegister } from '@lexical/utils'
 import { isPartOftheEditorUI } from '../../utils/isPartOftheEditorUI'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
-import { DirectiveNode } from '../directives'
 import { LexicalJsxNode } from '../jsx/LexicalJsxNode'
 import { NestedEditorsContextValue } from '../directives/utils'
-
-/**
- * Use this context to provide the necessary values to the {@link NestedLexicalEditor} React component.
- * Place it as a wrapper in your custom lexical node decorators.
- * @group Custom Editor Primitives
- */
-export const NestedEditorsContext = React.createContext<NestedEditorsContextValue<Node> | undefined>(undefined)
+import { DirectiveNode, NestedEditorsContext, directiveDescriptors$ } from '../directives/DirectiveNode'
 
 /**
  * A hook to get the current {@link NestedEditorsContext} value. Use this in your custom editor components.

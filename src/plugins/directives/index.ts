@@ -6,17 +6,15 @@ import {
   addMdastExtension$,
   addSyntaxExtension$,
   addToMarkdownExtension$,
-  directiveDescriptors$,
   insertDecoratorNode$
 } from '../core'
 import { Signal, map } from '@mdxeditor/gurx'
 import { LexicalEditor } from 'lexical'
 import { Directives, directiveFromMarkdown, directiveToMarkdown } from 'mdast-util-directive'
 import { directive } from 'micromark-extension-directive'
-import { $createDirectiveNode, DirectiveNode } from './DirectiveNode'
+import { $createDirectiveNode, DirectiveNode, directiveDescriptors$ } from './DirectiveNode'
 import { DirectiveVisitor } from './DirectiveVisitor'
 import { MdastDirectiveVisitor } from './MdastDirectiveVisitor'
-export * from './DirectiveNode'
 
 /**
  * Implement this interface to create a custom editor for markdown directives.

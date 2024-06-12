@@ -31,7 +31,6 @@ import { uuidv4 } from '../../utils/uuid4'
 import {
   NESTED_EDITOR_UPDATED_COMMAND,
   codeBlockEditorDescriptors$,
-  directiveDescriptors$,
   editorRootElementRef$,
   exportVisitors$,
   iconComponentFor$,
@@ -48,6 +47,7 @@ import { useCellValues } from '@mdxeditor/gurx'
 import { DecoratorNode, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
 
 import { noop } from '../../utils/fp'
+import { directiveDescriptors$ } from '../directives/DirectiveNode'
 
 /**
  * A serialized representation of a {@link TableNode}.

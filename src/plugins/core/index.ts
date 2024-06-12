@@ -64,15 +64,13 @@ import { MdastParagraphVisitor } from './MdastParagraphVisitor'
 import { MdastRootVisitor } from './MdastRootVisitor'
 import { MdastTextVisitor } from './MdastTextVisitor'
 import { SharedHistoryPlugin } from './SharedHistoryPlugin'
-// import { DirectiveDescriptor } from '../directives'
-// import { CodeBlockEditorDescriptor } from '../codeblock'
 import { comment, commentFromMarkdown } from '../../mdastUtilHtmlComment'
 import { lexicalTheme } from '../../styles/lexicalTheme'
 import { FORMAT } from '../../FormatConstants'
 import { IconKey } from '../../defaultSvgIcons'
 import { JsxComponentDescriptor } from '../jsx/utils'
-import { DirectiveDescriptor } from '../directives/utils'
 import { CodeBlockEditorDescriptor } from '../codeblock/utils'
+import { directiveDescriptors$ } from '../directives/DirectiveNode'
 export * from './MdastHTMLNode'
 export * from './GenericHTMLNode'
 
@@ -260,12 +258,6 @@ export const jsxIsAvailable$ = Cell(false)
  * @group JSX
  */
 export const jsxComponentDescriptors$ = Cell<JsxComponentDescriptor[]>([])
-
-/**
- * Contains the currently registered Markdown directive descriptors.
- * @group Directive
- */
-export const directiveDescriptors$ = Cell<DirectiveDescriptor[]>([])
 
 /**
  * Contains the currently registered code block descriptors.
