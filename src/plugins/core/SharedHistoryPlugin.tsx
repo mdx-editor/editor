@@ -1,7 +1,8 @@
-import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin.js'
+import { HistoryPlugin, createEmptyHistoryState } from '@lexical/react/LexicalHistoryPlugin.js'
 import React from 'react'
-import { historyState$ } from '.'
-import { useCellValue } from '@mdxeditor/gurx'
+import { Cell, useCellValue } from '@mdxeditor/gurx'
+
+const historyState$ = Cell(createEmptyHistoryState())
 
 export const SharedHistoryPlugin = () => {
   return <HistoryPlugin externalHistoryState={useCellValue(historyState$)} />
