@@ -1,6 +1,5 @@
 import React from 'react'
 
-import { cmExtensions$, diffMarkdown$, readOnlyDiff$ } from '.'
 import { markdown$, markdownSourceEditorValue$, onBlur$, readOnly$ } from '../core'
 
 import { MergeView } from '@codemirror/merge'
@@ -8,6 +7,7 @@ import { EditorState } from '@codemirror/state'
 import { EditorView } from '@codemirror/view'
 import { COMMON_STATE_CONFIG_EXTENSIONS } from './SourceEditor'
 import { useCellValue, useCellValues, usePublisher, useRealm } from '@mdxeditor/gurx'
+import { cmExtensions$, diffMarkdown$, readOnlyDiff$ } from './utils'
 
 function setContent(view: EditorView | undefined, content: string) {
   if (view !== undefined) {
