@@ -13,15 +13,9 @@ import { Action, Cell, withLatestFrom } from '@mdxeditor/gurx'
 import { $getRoot } from 'lexical'
 import { frontmatterFromMarkdown, frontmatterToMarkdown } from 'mdast-util-frontmatter'
 import { frontmatter } from 'micromark-extension-frontmatter'
-import { $createFrontmatterNode, $isFrontmatterNode, FrontmatterNode } from './FrontmatterNode'
+import { $createFrontmatterNode, $isFrontmatterNode, FrontmatterNode, frontmatterDialogOpen$ } from './FrontmatterNode'
 import { LexicalFrontmatterVisitor } from './LexicalFrontmatterVisitor'
 import { MdastFrontmatterVisitor } from './MdastFrontmatterVisitor'
-
-/**
- * Whether the frontmatter dialog is open.
- * @group Frontmatter
- */
-export const frontmatterDialogOpen$ = Cell(false)
 
 /**
  * Inserts a frontmatter node at the beginning of the markdown document.
@@ -41,22 +35,6 @@ export const insertFrontmatter$ = Action((r) => {
       }
     })
     r.pub(frontmatterDialogOpen$, true)
-  })
-})
-
-/**
- * Removes the frontmatter node from the markdown document.
- * @group Frontmatter
- */
-export const removeFrontmatter$ = Action((r) => {
-  r.sub(r.pipe(removeFrontmatter$, withLatestFrom(rootEditor$)), ([, rootEditor]) => {
-    rootEditor?.update(() => {
-      const firstItem = $getRoot().getFirstChild()
-      if ($isFrontmatterNode(firstItem)) {
-        firstItem.remove()
-      }
-    })
-    r.pub(frontmatterDialogOpen$, false)
   })
 })
 
