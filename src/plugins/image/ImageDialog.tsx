@@ -4,9 +4,10 @@ import React from 'react'
 import { useForm } from 'react-hook-form'
 import styles from '../../styles/ui.module.css'
 import { editorRootElementRef$, useTranslation } from '../core/index'
-import { closeImageDialog$, imageAutocompleteSuggestions$, imageDialogState$, saveImage$ } from './index'
 import { DownshiftAutoComplete } from '../core/ui/DownshiftAutoComplete'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
+import { imageAutocompleteSuggestions$, saveImage$ } from './utils'
+import { closeImageDialog$, imageDialogState$ } from './ImageNode'
 
 interface ImageFormFields {
   src: string
