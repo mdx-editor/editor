@@ -15,7 +15,7 @@ export const CreateLink = () => {
   const t = useTranslation()
   return (
     <ButtonWithTooltip
-      aria-label={t('toolbar.link','Create link')}
+      aria-label={t('toolbar.link', 'Create link')}
       title={t('toolbar.link', 'Create link')}
       onClick={(_) => {
         openLinkDialog()
