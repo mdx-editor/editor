@@ -948,4 +948,3 @@ export const corePlugin = realmPlugin<{
 export function useTranslation() {
   return useCellValue(translation$)
 }
-
