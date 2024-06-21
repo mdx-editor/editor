@@ -231,16 +231,25 @@ const mutableMarkdownSignal$ = Signal<string>((r) => {
 
 // import configuration
 /** @internal */
+/**
+ * Contains the currently registered import vistors.
+ * @group Core
+ */
 export const importVisitors$ = Cell<MdastImportVisitor<Mdast.Nodes>[]>([])
-/** @internal */
+/**
+ * Contains the currently registered lexical nodes.
+ * @group Core
+ */
+export const usedLexicalNodes$ = Cell<Klass<LexicalNode>[]>([])
 export const syntaxExtensions$ = Cell<MarkdownParseOptions['syntaxExtensions']>([])
 /** @internal */
 export const mdastExtensions$ = Cell<NonNullable<MarkdownParseOptions['mdastExtensions']>>([])
-/** @internal */
-export const usedLexicalNodes$ = Cell<Klass<LexicalNode>[]>([])
 
 // export configuration
-/** @internal */
+/**
+ * Contains the currently registered export vistors.
+ * @group Core
+ */
 export const exportVisitors$ = Cell<NonNullable<LexicalConvertOptions['visitors']>>([])
 /** @internal */
 export const toMarkdownExtensions$ = Cell<NonNullable<LexicalConvertOptions['toMarkdownExtensions']>>([])
@@ -939,3 +948,4 @@ export const corePlugin = realmPlugin<{
 export function useTranslation() {
   return useCellValue(translation$)
 }
+
