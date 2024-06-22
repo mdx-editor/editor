@@ -33,36 +33,49 @@ const FormatButton: React.FC<FormatButtonProps> = ({ format, addTitle, removeTit
   )
 }
 
+export interface BoldItalicUnderlineTogglesProps {
+  options?: ('Bold' | 'Italic' | 'Underline')[]
+}
+
 /**
  * A toolbar component that lets the user toggle bold, italic and underline formatting.
  * @group Toolbar Components
  */
-export const BoldItalicUnderlineToggles: React.FC = () => {
+export const BoldItalicUnderlineToggles: React.FC = ({ options }: BoldItalicUnderlineTogglesProps) => {
   const t = useTranslation()
 
   return (
     <div className={styles.toolbarGroupOfGroups}>
-      <FormatButton
-        format={IS_BOLD}
-        addTitle={t('toolbar.bold', 'Bold')}
-        removeTitle={t('toolbar.removeBold', 'Remove bold')}
-        icon="format_bold"
-        formatName="bold"
-      />
-      <FormatButton
-        format={IS_ITALIC}
-        addTitle={t('toolbar.italic', 'Italic')}
-        removeTitle={t('toolbar.removeItalic', 'Remove italic')}
-        icon="format_italic"
-        formatName="italic"
-      />
-      <FormatButton
-        format={IS_UNDERLINE}
-        addTitle={t('toolbar.underline', 'Underline')}
-        removeTitle={t('toolbar.removeUnderline', 'Remove underline')}
-        icon="format_underlined"
-        formatName="underline"
-      />
+      {!options ||
+        (options.includes('Bold') && (
+          <FormatButton
+            format={IS_BOLD}
+            addTitle={t('toolbar.bold', 'Bold')}
+            removeTitle={t('toolbar.removeBold', 'Remove bold')}
+            icon="format_bold"
+            formatName="bold"
+          />
+        ))}
+      {!options ||
+        (options.includes('Italic') && (
+          <FormatButton
+            format={IS_ITALIC}
+            addTitle={t('toolbar.italic', 'Italic')}
+            removeTitle={t('toolbar.removeItalic', 'Remove italic')}
+            icon="format_italic"
+            formatName="italic"
+          />
+        ))}
+      {!options ||
+        (options.includes('Underline') && (
+          <FormatButton
+            format={IS_UNDERLINE}
+            addTitle={t('toolbar.underline', 'Underline')}
+            removeTitle={t('toolbar.removeUnderline', 'Remove underline')}
+            icon="format_underlined"
+            formatName="underline"
+          />
+        ))}
     </div>
   )
 }
