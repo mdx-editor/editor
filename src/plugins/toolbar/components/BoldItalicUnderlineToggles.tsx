@@ -41,7 +41,7 @@ export interface BoldItalicUnderlineTogglesProps {
  * A toolbar component that lets the user toggle bold, italic and underline formatting.
  * @group Toolbar Components
  */
-export const BoldItalicUnderlineToggles: React.FC = ({ options }: BoldItalicUnderlineTogglesProps) => {
+export const BoldItalicUnderlineToggles: React.FC<BoldItalicUnderlineTogglesProps> = ({ options }) => {
   const t = useTranslation()
 
   const showAllButtons = typeof options === 'undefined'
@@ -78,35 +78,47 @@ export const BoldItalicUnderlineToggles: React.FC = ({ options }: BoldItalicUnde
   )
 }
 
+export interface StrikeThroughSupSubTogglesProps {
+  options?: ('Strikethrough' | 'Sub' | 'Sup')[]
+}
+
 /**
  * A toolbar component that lets the user toggle strikeThrough, superscript and subscript formatting.
  * @group Toolbar Components
  */
-export const StrikeThroughSupSubToggles: React.FC = () => {
+export const StrikeThroughSupSubToggles: React.FC<StrikeThroughSupSubTogglesProps> = ({ options }) => {
   const t = useTranslation()
+  const showAllButtons = typeof options === 'undefined'
+
   return (
     <div className={styles.toolbarGroupOfGroups}>
-      <FormatButton
-        format={IS_STRIKETHROUGH}
-        addTitle={t('toolbar.strikethrough', 'Strikethrough')}
-        removeTitle={t('toolbar.removeStrikethrough', 'Remove strikethrough')}
-        icon="strikeThrough"
-        formatName="strikethrough"
-      />
-      <FormatButton
-        format={IS_SUPERSCRIPT}
-        addTitle={t('toolbar.superscript', 'Superscript')}
-        removeTitle={t('toolbar.removeSuperscript', 'Remove superscript')}
-        icon="superscript"
-        formatName="superscript"
-      />
-      <FormatButton
-        format={IS_SUBSCRIPT}
-        addTitle={t('toolbar.subscript', 'Subscript')}
-        removeTitle={t('toolbar.removeSubscript', 'Remove subscript')}
-        icon="subscript"
-        formatName="subscript"
-      />
+      {showAllButtons || options.includes('Strikethrough') ? (
+        <FormatButton
+          format={IS_STRIKETHROUGH}
+          addTitle={t('toolbar.strikethrough', 'Strikethrough')}
+          removeTitle={t('toolbar.removeStrikethrough', 'Remove strikethrough')}
+          icon="strikeThrough"
+          formatName="strikethrough"
+        />
+      ) : null}
+      {showAllButtons || options.includes('Sup') ? (
+        <FormatButton
+          format={IS_SUPERSCRIPT}
+          addTitle={t('toolbar.superscript', 'Superscript')}
+          removeTitle={t('toolbar.removeSuperscript', 'Remove superscript')}
+          icon="superscript"
+          formatName="superscript"
+        />
+      ) : null}
+      {showAllButtons || options.includes('Sub') ? (
+        <FormatButton
+          format={IS_SUBSCRIPT}
+          addTitle={t('toolbar.subscript', 'Subscript')}
+          removeTitle={t('toolbar.removeSubscript', 'Remove subscript')}
+          icon="subscript"
+          formatName="subscript"
+        />
+      ) : null}
     </div>
   )
 }
