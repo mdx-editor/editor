@@ -41,7 +41,7 @@ export interface BoldItalicUnderlineTogglesProps {
  * A toolbar component that lets the user toggle bold, italic and underline formatting.
  * @group Toolbar Components
  */
-export const BoldItalicUnderlineToggles: React.FC = ({ options }: BoldItalicUnderlineTogglesProps) => {
+export const BoldItalicUnderlineToggles: React.FC<BoldItalicUnderlineTogglesProps> = ({ options }) => {
   const t = useTranslation()
 
   const showAllButtons = typeof options === 'undefined'
@@ -86,7 +86,7 @@ export interface StrikeThroughSupSubTogglesProps {
  * A toolbar component that lets the user toggle strikeThrough, superscript and subscript formatting.
  * @group Toolbar Components
  */
-export const StrikeThroughSupSubToggles: React.FC = ({ options }: StrikeThroughSupSubTogglesProps) => {
+export const StrikeThroughSupSubToggles: React.FC<StrikeThroughSupSubTogglesProps> = ({ options }) => {
   const t = useTranslation()
   const showAllButtons = typeof options === 'undefined'
 
