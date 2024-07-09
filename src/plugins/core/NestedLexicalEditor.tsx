@@ -4,6 +4,7 @@ import {
   $getNodeByKey,
   $getRoot,
   BLUR_COMMAND,
+  FOCUS_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
   COMMAND_PRIORITY_EDITOR,
   COMMAND_PRIORITY_HIGH,
@@ -260,6 +261,14 @@ export const NestedLexicalEditor = function <T extends Mdast.RootContent>(props:
       })
     }
     return mergeRegister(
+      editor.registerCommand(
+        FOCUS_COMMAND,
+        () => {
+          setEditorInFocus({ editorType: 'lexical', rootNode: lexicalNode })
+          return true
+        },
+        COMMAND_PRIORITY_EDITOR
+      ),
       editor.registerCommand(
         BLUR_COMMAND,
         (payload) => {
