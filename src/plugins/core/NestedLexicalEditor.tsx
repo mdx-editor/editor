@@ -13,7 +13,8 @@ import {
   KEY_BACKSPACE_COMMAND,
   LexicalEditor,
   SELECTION_CHANGE_COMMAND,
-  createEditor
+  createEditor,
+  COMMAND_PRIORITY_LOW
 } from 'lexical'
 import * as Mdast from 'mdast'
 import { Node } from 'unist'
@@ -265,9 +266,9 @@ export const NestedLexicalEditor = function <T extends Mdast.RootContent>(props:
         FOCUS_COMMAND,
         () => {
           setEditorInFocus({ editorType: 'lexical', rootNode: lexicalNode })
-          return true
+          return false
         },
-        COMMAND_PRIORITY_EDITOR
+        COMMAND_PRIORITY_LOW
       ),
       editor.registerCommand(
         BLUR_COMMAND,
