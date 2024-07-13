@@ -16,7 +16,7 @@ import {
   createEditor
 } from 'lexical'
 import * as Mdast from 'mdast'
-import React, { ElementType } from 'react'
+import React, { ElementType, useEffect } from 'react'
 import { exportLexicalTreeToMdast } from '../../exportMarkdownFromLexical'
 import { importMdastTreeToLexical } from '../../importMarkdownToLexical'
 import { lexicalTheme } from '../../styles/lexicalTheme'
@@ -45,6 +45,7 @@ import {
   usedLexicalNodes$
 } from '../core'
 import { useCellValues } from '@mdxeditor/gurx'
+import { isEqual } from "lodash"
 
 /**
  * Returns the element type for the cell based on the rowIndex
@@ -311,7 +312,7 @@ export interface CellProps {
   align?: Mdast.AlignType
   activeCell: [number, number] | null
   setActiveCell: (cell: [number, number] | null) => void
-  focus: boolean
+  focus: boolean,
 }
 
 const Cell: React.FC<Omit<CellProps, 'focus'>> = ({ align, ...props }) => {
@@ -344,7 +345,7 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
     directiveDescriptors,
     codeBlockEditorDescriptors,
     jsxIsAvailable,
-    rootEditor
+    rootEditor,
   ] = useCellValues(
     importVisitors$,
     exportVisitors$,
@@ -353,16 +354,26 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
     directiveDescriptors$,
     codeBlockEditorDescriptors$,
     jsxIsAvailable$,
-    rootEditor$
+    rootEditor$,
   )
-
+  
+  const lastContents = React.useRef<Mdast.PhrasingContent[] | null>(null)
   const [editor] = React.useState(() => {
     const editor = createEditor({
       nodes: usedLexicalNodes,
       theme: lexicalTheme
     })
 
+    return editor
+  })
+
+  useEffect(() => {
+    if( isEqual(contents, lastContents.current) )
+      return;
+    lastContents.current = [...contents];
+
     editor.update(() => {
+      $getRoot().clear();
       importMdastTreeToLexical({
         root: $getRoot(),
         mdastRoot: { type: 'root', children: [{ type: 'paragraph', children: contents }] },
@@ -372,9 +383,8 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
         codeBlockEditorDescriptors
       })
     })
-
-    return editor
-  })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editor, contents, importVisitors])
 
   const saveAndFocus = React.useCallback(
     (nextCell: [number, number] | null) => {
@@ -462,7 +472,7 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
   }, [focus, editor])
 
   return (
-    <LexicalNestedComposer initialEditor={editor}>
+    <LexicalNestedComposer initialEditor={editor} skipCollabChecks>
       <RichTextPlugin contentEditable={<ContentEditable />} placeholder={<div></div>} ErrorBoundary={LexicalErrorBoundary} />
       <HistoryPlugin />
     </LexicalNestedComposer>

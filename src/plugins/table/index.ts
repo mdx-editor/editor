@@ -3,6 +3,8 @@ import { Signal, map } from '@mdxeditor/gurx'
 import * as Mdast from 'mdast'
 import { gfmTableFromMarkdown, gfmTableToMarkdown } from 'mdast-util-gfm-table'
 import { gfmTable } from 'micromark-extension-gfm-table'
+import type { Doc } from 'yjs';
+import { Provider } from '@lexical/yjs';
 import {
   addExportVisitor$,
   addImportVisitor$,
@@ -80,7 +82,7 @@ export const insertTable$ = Signal<{
  * @group Table
  */
 export const tablePlugin = realmPlugin({
-  init(realm) {
+  init(realm, params) {
     realm.pubIn({
       // import
       [addMdastExtension$]: gfmTableFromMarkdown(),
@@ -89,7 +91,7 @@ export const tablePlugin = realmPlugin({
       // export
       [addLexicalNode$]: TableNode,
       [addExportVisitor$]: LexicalTableVisitor,
-      [addToMarkdownExtension$]: gfmTableToMarkdown({ tableCellPadding: true, tablePipeAlign: true })
+      [addToMarkdownExtension$]: gfmTableToMarkdown({ tableCellPadding: true, tablePipeAlign: true }),
     })
   }
 })

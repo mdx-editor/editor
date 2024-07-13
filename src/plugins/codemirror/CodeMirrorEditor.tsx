@@ -32,6 +32,7 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
   const { setCode } = useCodeBlockEditorContext()
   const editorViewRef = React.useRef<EditorView | null>(null)
   const elRef = React.useRef<HTMLDivElement | null>(null)
+  const extensionsRef = React.useRef<Extension | null>(null)
 
   const setCodeRef = React.useRef(setCode)
   setCodeRef.current = setCode
@@ -72,6 +73,7 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
         parent: elRef.current!,
         state: EditorState.create({ doc: code, extensions })
       })
+      extensionsRef.current = extensions;
     })()
     return () => {
       editorViewRef.current?.destroy()
@@ -79,6 +81,15 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [readOnly, language])
+
+  React.useEffect(() => {
+    if (editorViewRef.current && extensionsRef.current) {
+      const oldState = editorViewRef.current.state;
+      editorViewRef.current.setState(
+        EditorState.create({ doc: code, extensions: extensionsRef.current, selection: oldState.selection })
+      )
+    }
+  }, [code])
 
   return (
     <div
