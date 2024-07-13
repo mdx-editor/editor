@@ -84,6 +84,9 @@
     "checkList": "Checklist",
     "deleteSandpack": "Deletar esse bloco de código",
     "undo": "Desfazer {{shortcut}}",
+    "superscript": "Sobrescrito",
+    "subscript": "Subscrito",
+    "strikethrough": "Riscado"
     "redo": "Refazer {{shortcut}}"
   },
   "admonitions": {
