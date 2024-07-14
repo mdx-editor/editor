@@ -203,3 +203,25 @@ export function ImageDialogButtonExample() {
     </>
   )
 }
+
+export function ImageDialogUploadDisabled() {
+  return (
+    <>
+      <MDXEditor
+        markdown=""
+        plugins={[
+          imagePlugin({
+            disableImageResize: true,
+            disableImageUpload: true,
+            imageUploadHandler: async () => Promise.resolve('https://picsum.photos/200/300?grayscale'),
+            imageAutocompleteSuggestions: ['https://via.placeholder.com/150', 'https://via.placeholder.com/250']
+          }),
+          diffSourcePlugin(),
+          jsxPlugin(),
+          toolbarPlugin({ toolbarContents: () => <InsertImage /> })
+        ]}
+        onChange={console.log}
+      />
+    </>
+  )
+}

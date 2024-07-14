@@ -151,6 +151,12 @@ export const imageAutocompleteSuggestions$ = Cell<string[]>([])
 export const disableImageResize$ = Cell<boolean>(false)
 
 /**
+ * Holds the disable image upload configuration flag.
+ * @group Image
+ */
+export const disableImageUpload$ = Cell<boolean>(false)
+
+/**
  * Holds the image upload handler callback.
  * @group Image
  */
@@ -236,7 +242,7 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
         editor.registerCommand<DragEvent>(
           DROP_COMMAND,
           (event) => {
-            return onDrop(event, editor, r.getValue(imageUploadHandler$))
+            return onDrop(event, editor, r.getValue(imageUploadHandler$), r.getValue(disableImageUpload$))
           },
           COMMAND_PRIORITY_HIGH
         ),
@@ -324,6 +330,7 @@ export const imagePlugin = realmPlugin<{
   imageAutocompleteSuggestions?: string[]
   disableImageResize?: boolean
   disableImageSettingsButton?: boolean
+  disableImageUpload?: boolean
   imagePreviewHandler?: ImagePreviewHandler
   ImageDialog?: (() => JSX.Element) | React.FC
 }>({
@@ -337,6 +344,7 @@ export const imagePlugin = realmPlugin<{
       [imageAutocompleteSuggestions$]: params?.imageAutocompleteSuggestions ?? [],
       [disableImageResize$]: Boolean(params?.disableImageResize),
       [disableImageSettingsButton$]: Boolean(params?.disableImageSettingsButton),
+      [disableImageUpload$]: Boolean(params?.disableImageUpload),
       [imagePreviewHandler$]: params?.imagePreviewHandler ?? null
     })
   },
@@ -346,6 +354,7 @@ export const imagePlugin = realmPlugin<{
       [imageUploadHandler$]: params?.imageUploadHandler ?? null,
       [imageAutocompleteSuggestions$]: params?.imageAutocompleteSuggestions ?? [],
       [disableImageResize$]: Boolean(params?.disableImageResize),
+      [disableImageUpload$]: Boolean(params?.disableImageUpload),
       [imagePreviewHandler$]: params?.imagePreviewHandler ?? null
     })
   }
@@ -414,12 +423,12 @@ function onDragover(event: DragEvent): boolean {
   return true
 }
 
-function onDrop(event: DragEvent, editor: LexicalEditor, imageUploadHandler: ImageUploadHandler): boolean {
+function onDrop(event: DragEvent, editor: LexicalEditor, imageUploadHandler: ImageUploadHandler, disableImageUpload: boolean): boolean {
   let cbPayload = Array.from(event.dataTransfer?.items ?? [])
   cbPayload = cbPayload.filter((i) => i.type.includes('image')) // Strip out the non-image bits
 
   if (cbPayload.length > 0) {
-    if (imageUploadHandler !== null) {
+    if (imageUploadHandler !== null && !disableImageUpload) {
       event.preventDefault()
       Promise.all(cbPayload.map((image) => imageUploadHandler(image.getAsFile()!)))
         .then((urls) => {
