@@ -242,7 +242,7 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
         editor.registerCommand<DragEvent>(
           DROP_COMMAND,
           (event) => {
-            return onDrop(event, editor, r.getValue(imageUploadHandler$), r.getValue(disableImageUpload$))
+            return onDrop(event, editor, r.getValue(imageUploadHandler$))
           },
           COMMAND_PRIORITY_HIGH
         ),
@@ -423,12 +423,12 @@ function onDragover(event: DragEvent): boolean {
   return true
 }
 
-function onDrop(event: DragEvent, editor: LexicalEditor, imageUploadHandler: ImageUploadHandler, disableImageUpload: boolean): boolean {
+function onDrop(event: DragEvent, editor: LexicalEditor, imageUploadHandler: ImageUploadHandler): boolean {
   let cbPayload = Array.from(event.dataTransfer?.items ?? [])
   cbPayload = cbPayload.filter((i) => i.type.includes('image')) // Strip out the non-image bits
 
   if (cbPayload.length > 0) {
-    if (imageUploadHandler !== null && !disableImageUpload) {
+    if (imageUploadHandler !== null) {
       event.preventDefault()
       Promise.all(cbPayload.map((image) => imageUploadHandler(image.getAsFile()!)))
         .then((urls) => {

@@ -208,7 +208,7 @@ export function ImageDialogUploadDisabled() {
   return (
     <>
       <MDXEditor
-        markdown=""
+        markdown={markdownWithHtmlImages}
         plugins={[
           imagePlugin({
             disableImageResize: true,
