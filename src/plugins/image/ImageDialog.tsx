@@ -4,7 +4,7 @@ import React from 'react'
 import { useForm } from 'react-hook-form'
 import styles from '../../styles/ui.module.css'
 import { editorRootElementRef$, useTranslation } from '../core/index'
-import { closeImageDialog$, imageAutocompleteSuggestions$, imageDialogState$, saveImage$ } from './index'
+import { closeImageDialog$, imageAutocompleteSuggestions$, imageDialogState$, imageUploadHandler$, saveImage$ } from './index'
 import { DownshiftAutoComplete } from '../core/ui/DownshiftAutoComplete'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 
@@ -16,10 +16,11 @@ interface ImageFormFields {
 }
 
 export const ImageDialog: React.FC = () => {
-  const [imageAutocompleteSuggestions, state, editorRootElementRef] = useCellValues(
+  const [imageAutocompleteSuggestions, state, editorRootElementRef, imageUploadHandler] = useCellValues(
     imageAutocompleteSuggestions$,
     imageDialogState$,
-    editorRootElementRef$
+    editorRootElementRef$,
+    imageUploadHandler$
   )
   const saveImage = usePublisher(saveImage$)
   const closeImageDialog = usePublisher(closeImageDialog$)
@@ -57,13 +58,19 @@ export const ImageDialog: React.FC = () => {
             }}
             className={styles.multiFieldForm}
           >
-            <div className={styles.formField}>
-              <label htmlFor="file">{t('uploadImage.uploadInstructions', 'Upload an image from your device:')}</label>
-              <input type="file" accept="image/*" {...register('file')} />
-            </div>
+            {imageUploadHandler !== null && (
+              <div className={styles.formField}>
+                <label htmlFor="file">{t('uploadImage.uploadInstructions', 'Upload an image from your device:')}</label>
+                <input type="file" accept="image/*" {...register('file')} />
+              </div>
+            )}
 
             <div className={styles.formField}>
-              <label htmlFor="src">{t('uploadImage.addViaUrlInstructions', 'Or add an image from an URL:')}</label>
+              <label htmlFor="src">
+                {imageUploadHandler !== null
+                  ? t('uploadImage.addViaUrlInstructions', 'Or add an image from an URL:')
+                  : t('uploadImage.addViaUrlInstructionsNoUpload', 'Add an image from an URL:')}
+              </label>
               <DownshiftAutoComplete
                 register={register}
                 initialInputValue={state.type === 'editing' ? state.initialValues.src ?? '' : ''}

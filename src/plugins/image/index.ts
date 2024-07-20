@@ -221,6 +221,9 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
         editor.registerCommand<DragEvent>(
           DRAGSTART_COMMAND,
           (event) => {
+            if (!theUploadHandler) {
+              return false
+            }
             return onDragStart(event)
           },
           COMMAND_PRIORITY_HIGH

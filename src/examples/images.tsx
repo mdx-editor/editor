@@ -29,6 +29,30 @@ some more
 some
 `
 
+export const ImageWithNoBackend: Story<{ readOnly: boolean }> = () => {
+  return (
+    <>
+      <MDXEditor
+        markdown=""
+        plugins={[
+          imagePlugin({
+            imageUploadHandler: expressImageUploadHandler
+          }),
+          diffSourcePlugin(),
+          toolbarPlugin({
+            toolbarContents: () => (
+              <DiffSourceToggleWrapper>
+                <InsertImage />
+              </DiffSourceToggleWrapper>
+            )
+          })
+        ]}
+        onChange={console.log}
+      />
+    </>
+  )
+}
+
 export const ImageWithBackend: Story<{ readOnly: boolean }> = () => {
   return (
     <>
