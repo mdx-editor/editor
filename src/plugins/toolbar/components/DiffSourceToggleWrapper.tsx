@@ -56,6 +56,7 @@ export const DiffSourceToggleWrapper: React.FC<{ children: React.ReactNode; opti
 
       <div style={{ marginLeft: 'auto', pointerEvents: 'auto', opacity: 1 }}>
         <SingleChoiceToggleGroup
+          aria-label={t('toolbar.toggleGroup', 'toggle group')}
           className={styles.diffSourceToggle}
           value={viewMode}
           items={toggleGroupItems}
