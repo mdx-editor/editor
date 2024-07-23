@@ -10,7 +10,7 @@ import {
     IS_SUPERSCRIPT,
     IS_UNDERLINE
 } from '../../../FormatConstants'
-import {MultipleChoiceToggleGroup, ToggleSingleGroupWithItem} from '.././primitives/toolbar'
+import {MultipleChoiceToggleGroup, SingleChoiceToggleGroup, ToggleSingleGroupWithItem} from '.././primitives/toolbar'
 import {TextFormatType} from 'lexical'
 import styles from '../../../styles/ui.module.css'
 import {IconKey} from '../../../defaultSvgIcons'
@@ -102,43 +102,83 @@ export interface StrikeThroughSupSubTogglesProps {
     options?: ('Strikethrough' | 'Sub' | 'Sup')[]
 }
 
+const SupSubRadioItems = {
+    Sup: {
+        icon: 'superscript',
+        formatName: 'superscript' as TextFormatType,
+        titleFormatKey: 'toolbar.superscript',
+        titleFormatDefaultTranslation: 'Superscript',
+        titleRemoveFormatKey: 'toolbar.removeSuperscript',
+        titleRemoveFormatDefaultTranslation: 'Remove superscript',
+    },
+    Sub: {
+        icon: 'subscript',
+        formatName: 'subscript' as TextFormatType,
+        titleFormatKey: 'toolbar.subscript',
+        titleFormatDefaultTranslation: 'Subscript',
+        titleRemoveFormatKey: 'toolbar.removeSubscript',
+        titleRemoveFormatDefaultTranslation: 'Remove subscript',
+    }
+}
+const isSupSubRadioItemsKey = (key: string): key is keyof typeof SupSubRadioItems => Object.keys(SupSubRadioItems).includes(key)
 /**
  * A toolbar component that lets the user toggle strikeThrough, superscript and subscript formatting.
  * @group Toolbar Components
  */
 export const StrikeThroughSupSubToggles: React.FC<StrikeThroughSupSubTogglesProps> = ({options}) => {
     const t = useTranslation()
+    const [currentFormat, iconComponentFor] = useCellValues(currentFormat$, iconComponentFor$)
+    const applyFormat = usePublisher(applyFormat$)
+
+    const isSup = (currentFormat & IS_SUPERSCRIPT) !== 0
+    const isSub = (currentFormat & IS_SUBSCRIPT) !== 0
+
+    const [radioValue, setRadioValue] = useState<keyof typeof SupSubRadioItems | ''>('')
+    const radioItems = (options || Object.keys(SupSubRadioItems))
+        .filter(isSupSubRadioItemsKey)
+        .map((type) => {
+            const item = SupSubRadioItems[type]
+            return ({
+                value: type,
+                title: radioValue !== type ? t(item.titleFormatKey, item.titleFormatDefaultTranslation) : t(item.titleRemoveFormatKey, item.titleRemoveFormatDefaultTranslation),
+                contents: iconComponentFor(item.icon as IconKey)
+            });
+        })
+    useEffect(() => {
+        if (isSup) {
+            setRadioValue("Sup")
+        } else if (isSub) {
+            setRadioValue("Sub")
+        } else {
+            setRadioValue('')
+        }
+    }, [currentFormat])
+
+    const handleRadioItemChange = (newValue: keyof typeof SupSubRadioItems | '') => {
+        if (newValue) {
+            applyFormat(SupSubRadioItems[newValue].formatName)
+        } else if (radioValue) {
+            applyFormat(SupSubRadioItems[radioValue].formatName)
+        }
+        setRadioValue(newValue)
+    }
+
     const showAllButtons = typeof options === 'undefined'
 
     return (
-        <div className={styles.toolbarGroupOfGroups}>
-            {showAllButtons || options.includes('Strikethrough') ? (
-                <FormatButton
-                    format={IS_STRIKETHROUGH}
-                    addTitle={t('toolbar.strikethrough', 'Strikethrough')}
-                    removeTitle={t('toolbar.removeStrikethrough', 'Remove strikethrough')}
-                    icon="strikeThrough"
-                    formatName="strikethrough"
-                />
-            ) : null}
-            {showAllButtons || options.includes('Sup') ? (
-                <FormatButton
-                    format={IS_SUPERSCRIPT}
-                    addTitle={t('toolbar.superscript', 'Superscript')}
-                    removeTitle={t('toolbar.removeSuperscript', 'Remove superscript')}
-                    icon="superscript"
-                    formatName="superscript"
-                />
-            ) : null}
-            {showAllButtons || options.includes('Sub') ? (
-                <FormatButton
-                    format={IS_SUBSCRIPT}
-                    addTitle={t('toolbar.subscript', 'Subscript')}
-                    removeTitle={t('toolbar.removeSubscript', 'Remove subscript')}
-                    icon="subscript"
-                    formatName="subscript"
-                />
-            ) : null}
-        </div>
+        <>
+            <div className={styles.toolbarGroupOfGroups}>
+                {showAllButtons || options.includes('Strikethrough') ? (
+                    <FormatButton
+                        format={IS_STRIKETHROUGH}
+                        addTitle={t('toolbar.strikethrough', 'Strikethrough')}
+                        removeTitle={t('toolbar.removeStrikethrough', 'Remove strikethrough')}
+                        icon="strikeThrough"
+                        formatName="strikethrough"
+                    />
+                ) : null}
+            </div>
+            <SingleChoiceToggleGroup aria-label={t('toolbar.supSubRadio', 'Superscript / subscript formatting')} value={radioValue} items={radioItems} onChange={handleRadioItemChange}/>
+        </>
     )
 }

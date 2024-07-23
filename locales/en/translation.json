@@ -59,6 +59,7 @@
       "placeholder": "Block type"
     },
     "toggleGroup":"toggle group",
+    "supSubRadio": "Superscript / subscript formatting",
     "removeBold": "Remove bold",
     "bold": "Bold",
     "removeItalic": "Remove italic",

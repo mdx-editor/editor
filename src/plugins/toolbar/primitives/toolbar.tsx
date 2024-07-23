@@ -161,6 +161,7 @@ export const SingleChoiceToggleGroup = <T extends string>({
                                                               value,
                                                               onChange,
                                                               className,
+                                                              "aria-label": ariaLabel,
                                                               items
                                                           }: {
     items: {
@@ -168,6 +169,7 @@ export const SingleChoiceToggleGroup = <T extends string>({
         value: T
         contents: React.ReactNode
     }[]
+    "aria-label": string
     onChange: (value: T | '') => void
     value: T | ''
     className?: string
@@ -177,7 +179,7 @@ export const SingleChoiceToggleGroup = <T extends string>({
     return (
         <div className={styles.toolbarGroupOfGroups}>
             <RadixToolbar.ToggleGroup
-                aria-label={t('toolbar.toggleGroup', 'toggle group')}
+                aria-label={ariaLabel}
                 type="single"
                 className={classNames(styles.toolbarToggleSingleGroup, className)}
                 onValueChange={onChange}
