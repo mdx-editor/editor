@@ -58,7 +58,9 @@ export const ImageDialog: React.FC = () => {
             }}
             className={styles.multiFieldForm}
           >
-            {imageUploadHandler !== null && (
+            {imageUploadHandler === null ? (
+              <input type="hidden" accept="image/*" {...register('file')} />
+            ) : (
               <div className={styles.formField}>
                 <label htmlFor="file">{t('uploadImage.uploadInstructions', 'Upload an image from your device:')}</label>
                 <input type="file" accept="image/*" {...register('file')} />

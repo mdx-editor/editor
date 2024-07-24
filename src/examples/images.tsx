@@ -35,9 +35,7 @@ export const ImageWithNoBackend: Story<{ readOnly: boolean }> = () => {
       <MDXEditor
         markdown=""
         plugins={[
-          imagePlugin({
-            imageUploadHandler: expressImageUploadHandler
-          }),
+          imagePlugin(),
           diffSourcePlugin(),
           toolbarPlugin({
             toolbarContents: () => (
