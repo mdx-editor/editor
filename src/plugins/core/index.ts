@@ -840,7 +840,7 @@ export const translation$ = Cell<Translation>(() => {
 /** @internal */
 export const corePlugin = realmPlugin<{
   initialMarkdown: string
-  contentEditableProps: string
+  contentEditableProps: ContentEditableProps
   placeholder?: React.ReactNode
   autoFocus: boolean | { defaultSelection?: 'rootStart' | 'rootEnd'; preventScroll?: boolean | undefined }
   onChange: (markdown: string) => void
