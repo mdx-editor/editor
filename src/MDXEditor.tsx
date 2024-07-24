@@ -44,7 +44,8 @@ const LexicalProvider: React.FC<{
 
 const RichTextEditor: React.FC = () => {
   const t = useTranslation()
-  const [contentEditableProps, composerChildren, topAreaChildren, editorWrappers, placeholder] = useCellValues(
+  const [contentEditableClassName, contentEditableProps, composerChildren, topAreaChildren, editorWrappers, placeholder] = useCellValues(
+    contentEditableClassName$,
     contentEditableProps$,
     composerChildren$,
     topAreaChildren$,
@@ -52,7 +53,7 @@ const RichTextEditor: React.FC = () => {
     placeholder$
   )
 
-  const { className: contentEditableClassName, ...otherContentEditableProps} = contentEditableProps
+  const { className: contentEditablePropsClassName, ...otherContentEditableProps} = contentEditableProps
 
   return (
     <>
@@ -64,13 +65,13 @@ const RichTextEditor: React.FC = () => {
           <RichTextPlugin
             contentEditable={
               <ContentEditable
-                className={classNames(styles.contentEditable, contentEditableClassName)}
+                className={classNames(styles.contentEditable, contentEditableClassName,  contentEditablePropsClassName)}
                 ariaLabel={t('contentArea.editableMarkdown', 'editable markdown')}
                 { ...otherContentEditableProps }
               />
             }
             placeholder={
-              <div className={classNames(styles.contentEditable, styles.placeholder, contentEditableClassName)}>
+              <div className={classNames(styles.contentEditable, styles.placeholder, contentEditableClassName, contentEditablePropsClassName)}>
                 <p>{placeholder}</p>
               </div>
             }
@@ -222,6 +223,12 @@ const Methods: React.FC<{ mdxRef: React.ForwardedRef<MDXEditorMethods> }> = ({ m
  */
 export interface MDXEditorProps {
   /**
+   * the CSS class to apply to the content editable element of the editor.
+   * Use this to style the various content elements like lists and blockquotes.
+   * @deprecated Will be removed in further version. Use contentEditableProps.className instead
+   */
+  contentEditableClassName?: string
+  /**
    * the props to apply to the content editable element of the editor.
    * You can use this to style the various content elements like lists and blockquotes, to identify the textbox, etc.
    */
@@ -294,6 +301,7 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>((pro
     <RealmWithPlugins
       plugins={[
         corePlugin({
+          contentEditableClassName: props.contentEditableClassName ?? '',
           contentEditableProps: props.contentEditableProps ?? {},
           initialMarkdown: props.markdown,
           onChange: props.onChange ?? noop,
