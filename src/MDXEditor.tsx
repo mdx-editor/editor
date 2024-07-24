@@ -4,7 +4,7 @@ import { RealmPlugin, RealmWithPlugins } from './RealmWithPlugins'
 import {
   Translation,
   composerChildren$,
-  contentEditableClassName$,
+  contentEditableProps$,
   corePlugin,
   editorRootElementRef$,
   editorWrappers$,
@@ -19,7 +19,7 @@ import {
   viewMode$
 } from './plugins/core'
 
-import { ContentEditable } from '@lexical/react/LexicalContentEditable.js'
+import { ContentEditable, Props as ContentEditableProps } from '@lexical/react/LexicalContentEditable.js'
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary.js'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin.js'
 import classNames from 'classnames'
@@ -44,13 +44,16 @@ const LexicalProvider: React.FC<{
 
 const RichTextEditor: React.FC = () => {
   const t = useTranslation()
-  const [contentEditableClassName, composerChildren, topAreaChildren, editorWrappers, placeholder] = useCellValues(
-    contentEditableClassName$,
+  const [contentEditableProps, composerChildren, topAreaChildren, editorWrappers, placeholder] = useCellValues(
+    contentEditableProps$,
     composerChildren$,
     topAreaChildren$,
     editorWrappers$,
     placeholder$
   )
+
+  const { className: contentEditableClassName, ...otherContentEditableProps} = contentEditableProps
+
   return (
     <>
       {topAreaChildren.map((Child, index) => (
@@ -63,10 +66,11 @@ const RichTextEditor: React.FC = () => {
               <ContentEditable
                 className={classNames(styles.contentEditable, contentEditableClassName)}
                 ariaLabel={t('contentArea.editableMarkdown', 'editable markdown')}
+                { ...otherContentEditableProps }
               />
             }
             placeholder={
-              <div className={classNames(styles.contentEditable, styles.placeholder, contentEditableClassName)}>
+              <div className={classNames(styles.contentEditable, styles.placeholder, contentEditableProps)}>
                 <p>{placeholder}</p>
               </div>
             }
@@ -218,10 +222,10 @@ const Methods: React.FC<{ mdxRef: React.ForwardedRef<MDXEditorMethods> }> = ({ m
  */
 export interface MDXEditorProps {
   /**
-   * the CSS class to apply to the content editable element of the editor.
-   * Use this to style the various content elements like lists and blockquotes.
+   * the props to apply to the content editable element of the editor.
+   * You can use this to style the various content elements like lists and blockquotes, to identify the textbox, etc.
    */
-  contentEditableClassName?: string
+  contentEditableProps?: ContentEditableProps
   /**
    * The markdown to edit. Notice that this is read only when the component is mounted.
    * To change the component content dynamically, use the `MDXEditorMethods.setMarkdown` method.
@@ -247,7 +251,7 @@ export interface MDXEditorProps {
   plugins?: RealmPlugin[]
   /**
    * The class name to apply to the root component element. Use this if you want to change the editor dimensions, maximum height, etc.
-   * For a content-specific styling, Use `contentEditableClassName` property.
+   * For a content-specific styling, Use `contentEditableProps.className` property.
    */
   className?: string
   /**
@@ -290,7 +294,7 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>((pro
     <RealmWithPlugins
       plugins={[
         corePlugin({
-          contentEditableClassName: props.contentEditableClassName ?? '',
+          contentEditableProps: props.contentEditableProps ?? {},
           initialMarkdown: props.markdown,
           onChange: props.onChange ?? noop,
           onBlur: props.onBlur ?? noop,
