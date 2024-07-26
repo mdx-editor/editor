@@ -3,6 +3,7 @@ import { applyListType$, currentListType$ } from '../../lists'
 import { SingleChoiceToggleGroup } from '.././primitives/toolbar'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 import { iconComponentFor$, useTranslation } from '../../core'
+import styles from '@/styles/ui.module.css'
 
 const ICON_NAME_MAP = {
   bullet: 'format_list_bulleted',
@@ -37,11 +38,13 @@ export const ListsToggle: React.FC<{
   }))
 
   return (
-    <SingleChoiceToggleGroup
-      aria-label={t('toolbar.toggleGroup', 'toggle group')}
-      value={currentListType || ''}
-      items={items}
-      onChange={applyListType}
-    />
+    <div className={styles.toolbarGroupOfGroups}>
+      <SingleChoiceToggleGroup
+        aria-label={t('toolbar.toggleGroup', 'toggle group')}
+        value={currentListType || ''}
+        items={items}
+        onChange={applyListType}
+      />
+    </div>
   )
 }

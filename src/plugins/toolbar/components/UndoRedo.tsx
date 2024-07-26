@@ -5,6 +5,7 @@ import React from 'react'
 import { IS_APPLE } from '../../../utils/detectMac'
 import { activeEditor$, iconComponentFor$, useTranslation } from '../../core'
 import { MultipleChoiceToggleGroup } from '.././primitives/toolbar'
+import styles from '@/styles/ui.module.css'
 
 /**
  * A toolbar component that lets the user undo and redo changes in the editor.
@@ -49,23 +50,25 @@ export const UndoRedo: React.FC = () => {
   }
 
   return (
-    <MultipleChoiceToggleGroup
-      value={[]}
-      onValueChange={handleValueChange}
-      items={[
-        {
-          title: t('toolbar.undo', 'Undo {{shortcut}}', { shortcut: IS_APPLE ? '⌘Z' : 'Ctrl+Z' }),
-          disabled: !canUndo,
-          contents: iconComponentFor('undo'),
-          value: 'undo'
-        },
-        {
-          title: t('toolbar.redo', 'Redo {{shortcut}}', { shortcut: IS_APPLE ? '⌘Y' : 'Ctrl+Y' }),
-          disabled: !canRedo,
-          contents: iconComponentFor('redo'),
-          value: 'redo'
-        }
-      ]}
-    />
+    <div className={styles.toolbarGroupOfGroups}>
+      <MultipleChoiceToggleGroup
+        value={[]}
+        onValueChange={handleValueChange}
+        items={[
+          {
+            title: t('toolbar.undo', 'Undo {{shortcut}}', { shortcut: IS_APPLE ? '⌘Z' : 'Ctrl+Z' }),
+            disabled: !canUndo,
+            contents: iconComponentFor('undo'),
+            value: 'undo'
+          },
+          {
+            title: t('toolbar.redo', 'Redo {{shortcut}}', { shortcut: IS_APPLE ? '⌘Y' : 'Ctrl+Y' }),
+            disabled: !canRedo,
+            contents: iconComponentFor('redo'),
+            value: 'redo'
+          }
+        ]}
+      />
+    </div>
   )
 }

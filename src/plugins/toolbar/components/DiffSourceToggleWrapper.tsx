@@ -35,13 +35,25 @@ export const DiffSourceToggleWrapper: React.FC<{ children: React.ReactNode; opti
   }[] = []
 
   if (options.includes('rich-text')) {
-    toggleGroupItems.push({ title: t('toolbar.richText', 'Rich text'), contents: iconComponentFor('rich_text'), value: 'rich-text' })
+    toggleGroupItems.push({
+      title: t('toolbar.richText', 'Rich text'),
+      contents: iconComponentFor('rich_text'),
+      value: 'rich-text'
+    })
   }
   if (options.includes('diff')) {
-    toggleGroupItems.push({ title: t('toolbar.diffMode', 'Diff mode'), contents: iconComponentFor('difference'), value: 'diff' })
+    toggleGroupItems.push({
+      title: t('toolbar.diffMode', 'Diff mode'),
+      contents: iconComponentFor('difference'),
+      value: 'diff'
+    })
   }
   if (options.includes('source')) {
-    toggleGroupItems.push({ title: t('toolbar.source', 'Source mode'), contents: iconComponentFor('markdown'), value: 'source' })
+    toggleGroupItems.push({
+      title: t('toolbar.source', 'Source mode'),
+      contents: iconComponentFor('markdown'),
+      value: 'source'
+    })
   }
 
   return (
@@ -55,15 +67,17 @@ export const DiffSourceToggleWrapper: React.FC<{ children: React.ReactNode; opti
       )}
 
       <div style={{ marginLeft: 'auto', pointerEvents: 'auto', opacity: 1 }}>
-        <SingleChoiceToggleGroup
-          aria-label={t('toolbar.toggleGroup', 'toggle group')}
-          className={styles.diffSourceToggle}
-          value={viewMode}
-          items={toggleGroupItems}
-          onChange={(value) => {
-            changeViewMode(value === '' ? 'rich-text' : value)
-          }}
-        />
+        <div className={styles.toolbarGroupOfGroups}>
+          <SingleChoiceToggleGroup
+            aria-label={t('toolbar.toggleGroup', 'toggle group')}
+            className={styles.diffSourceToggle}
+            value={viewMode}
+            items={toggleGroupItems}
+            onChange={(value) => {
+              changeViewMode(value === '' ? 'rich-text' : value)
+            }}
+          />
+        </div>
       </div>
     </>
   )

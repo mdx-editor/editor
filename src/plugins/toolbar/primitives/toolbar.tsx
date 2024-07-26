@@ -5,9 +5,8 @@ import React from 'react'
 import styles from '../../../styles/ui.module.css'
 import { TooltipWrap } from './TooltipWrap'
 import { SelectButtonTrigger, SelectContent, SelectItem } from './select'
-import { EditorInFocus, editorInFocus$, readOnly$, useTranslation } from '../../core'
+import { EditorInFocus, editorInFocus$, readOnly$ } from '../../core'
 import { useCellValue } from '@mdxeditor/gurx'
-import { TextFormatType } from 'lexical'
 
 //
 // function decorate<P extends { className?: string | undefined }>(Component: React.ComponentType<P>, decoratedProps: P) {
@@ -120,8 +119,8 @@ export const MultipleChoiceToggleGroup: React.FC<
   const handleValueChange = (newValue: string[]) => {
     if (onValueChangeDiff) {
       const diff = [
-        ...newValue.filter((format) => !(value || []).includes(format)),
-        ...(value || []).filter((existingFormat) => !newValue.includes(existingFormat))
+        ...newValue.filter((format) => !(value ?? []).includes(format)),
+        ...(value ?? []).filter((existingFormat) => !newValue.includes(existingFormat))
       ]
       onValueChangeDiff(diff)
     }
@@ -130,21 +129,19 @@ export const MultipleChoiceToggleGroup: React.FC<
   }
 
   return (
-    <div className={styles.toolbarGroupOfGroups}>
-      <RadixToolbar.ToggleGroup
-        type="multiple"
-        className={styles.toolbarToggleSingleGroup}
-        value={value || []}
-        onValueChange={handleValueChange}
-        {...otherProps}
-      >
-        {items.map((item, index) => (
-          <ToolbarToggleItem title={item.title} value={item.value} disabled={item.disabled} key={index}>
-            <TooltipWrap title={item.title}>{item.contents}</TooltipWrap>
-          </ToolbarToggleItem>
-        ))}
-      </RadixToolbar.ToggleGroup>
-    </div>
+    <RadixToolbar.ToggleGroup
+      type="multiple"
+      className={styles.toolbarToggleSingleGroup}
+      value={value ?? []}
+      onValueChange={handleValueChange}
+      {...otherProps}
+    >
+      {items.map((item, index) => (
+        <ToolbarToggleItem title={item.title} value={item.value} disabled={item.disabled} key={index}>
+          <TooltipWrap title={item.title}>{item.contents}</TooltipWrap>
+        </ToolbarToggleItem>
+      ))}
+    </RadixToolbar.ToggleGroup>
   )
 }
 
@@ -169,27 +166,23 @@ export const SingleChoiceToggleGroup = <T extends string>({
   value: T | ''
   className?: string
 }) => {
-  const t = useTranslation()
-
   return (
-    <div className={styles.toolbarGroupOfGroups}>
-      <RadixToolbar.ToggleGroup
-        aria-label={ariaLabel}
-        type="single"
-        className={classNames(styles.toolbarToggleSingleGroup, className)}
-        onValueChange={onChange}
-        value={value || ''}
-        onFocus={(e) => {
-          e.preventDefault()
-        }}
-      >
-        {items.map((item, index) => (
-          <ToolbarToggleItem key={index} aria-label={item.title} value={item.value}>
-            <TooltipWrap title={item.title}>{item.contents}</TooltipWrap>
-          </ToolbarToggleItem>
-        ))}
-      </RadixToolbar.ToggleGroup>
-    </div>
+    <RadixToolbar.ToggleGroup
+      aria-label={ariaLabel}
+      type="single"
+      className={classNames(styles.toolbarToggleSingleGroup, className)}
+      onValueChange={onChange}
+      value={value || ''}
+      onFocus={(e) => {
+        e.preventDefault()
+      }}
+    >
+      {items.map((item, index) => (
+        <ToolbarToggleItem key={index} aria-label={item.title} value={item.value}>
+          <TooltipWrap title={item.title}>{item.contents}</TooltipWrap>
+        </ToolbarToggleItem>
+      ))}
+    </RadixToolbar.ToggleGroup>
   )
 }
 

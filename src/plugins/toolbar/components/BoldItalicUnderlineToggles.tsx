@@ -184,6 +184,7 @@ export const StrikeThroughSupSubToggles: React.FC<StrikeThroughSupSubTogglesProp
       </div>
       <SingleChoiceToggleGroup
         aria-label={t('toolbar.supSubRadio', 'Superscript / subscript formatting')}
+        className={styles.noMargin}
         value={radioValue}
         items={radioItems}
         onChange={handleRadioItemChange}

@@ -4,6 +4,7 @@ import { applyFormat$, currentFormat$, iconComponentFor$, useTranslation } from 
 import { MultipleChoiceToggleGroup } from '.././primitives/toolbar'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 import { TextFormatType } from 'lexical'
+import styles from '@/styles/ui.module.css'
 
 /**
  * A toolbar component that lets the user toggle code formatting.
@@ -29,11 +30,13 @@ export const CodeToggle: React.FC = () => {
   }
 
   return (
-    <MultipleChoiceToggleGroup
-      value={appliedFormats}
-      onValueChange={setAppliedFormats}
-      onValueChangeDiff={handleApplyFormatDiff}
-      items={[{ title: title, contents: iconComponentFor('code'), value: 'code' }]}
-    />
+    <div className={styles.toolbarGroupOfGroups}>
+      <MultipleChoiceToggleGroup
+        value={appliedFormats}
+        onValueChange={setAppliedFormats}
+        onValueChangeDiff={handleApplyFormatDiff}
+        items={[{ title: title, contents: iconComponentFor('code'), value: 'code' }]}
+      />
+    </div>
   )
 }
