@@ -5,7 +5,7 @@ import React from 'react'
 import styles from '../../../styles/ui.module.css'
 import { TooltipWrap } from './TooltipWrap'
 import { SelectButtonTrigger, SelectContent, SelectItem } from './select'
-import { EditorInFocus, editorInFocus$, readOnly$, useTranslation } from '../../core'
+import { EditorInFocus, editorInFocus$, readOnly$ } from '../../core'
 import { useCellValue } from '@mdxeditor/gurx'
 
 //
@@ -105,31 +105,43 @@ export const ToggleSingleGroupWithItem = React.forwardRef<
  * A toolbar primitive that allows you to build an UI with multiple non-exclusive toggle groups, like the bold/italic/underline toggle.
  * @group Toolbar Primitives
  */
-export const MultipleChoiceToggleGroup: React.FC<{
-  items: {
-    title: string
-    contents: React.ReactNode
-    active: boolean
-    onChange: (active: boolean) => void
-    disabled?: boolean
-  }[]
-}> = ({ items }) => {
+export const MultipleChoiceToggleGroup: React.FC<
+  Omit<RadixToolbar.ToolbarToggleGroupMultipleProps, 'type'> & {
+    onValueChangeDiff?: (diff: string[]) => void
+    items: {
+      title: string
+      contents: React.ReactNode
+      value: string
+      disabled?: boolean
+    }[]
+  }
+> = ({ items, value, onValueChange, onValueChangeDiff, ...otherProps }) => {
+  const handleValueChange = (newValue: string[]) => {
+    if (onValueChangeDiff) {
+      const diff = [
+        ...newValue.filter((format) => !(value ?? []).includes(format)),
+        ...(value ?? []).filter((existingFormat) => !newValue.includes(existingFormat))
+      ]
+      onValueChangeDiff(diff)
+    }
+
+    onValueChange?.(newValue)
+  }
+
   return (
-    <div className={styles.toolbarGroupOfGroups}>
+    <RadixToolbar.ToggleGroup
+      type="multiple"
+      className={styles.toolbarToggleSingleGroup}
+      value={value ?? []}
+      onValueChange={handleValueChange}
+      {...otherProps}
+    >
       {items.map((item, index) => (
-        <ToggleSingleGroupWithItem
-          key={index}
-          title={item.title}
-          on={item.active}
-          onValueChange={(v) => {
-            item.onChange(v === 'on')
-          }}
-          disabled={item.disabled}
-        >
-          {item.contents}
-        </ToggleSingleGroupWithItem>
+        <ToolbarToggleItem title={item.title} value={item.value} disabled={item.disabled} key={index}>
+          <TooltipWrap title={item.title}>{item.contents}</TooltipWrap>
+        </ToolbarToggleItem>
       ))}
-    </div>
+    </RadixToolbar.ToggleGroup>
   )
 }
 
@@ -141,6 +153,7 @@ export const SingleChoiceToggleGroup = <T extends string>({
   value,
   onChange,
   className,
+  'aria-label': ariaLabel,
   items
 }: {
   items: {
@@ -148,31 +161,28 @@ export const SingleChoiceToggleGroup = <T extends string>({
     value: T
     contents: React.ReactNode
   }[]
+  'aria-label': string
   onChange: (value: T | '') => void
   value: T | ''
   className?: string
 }) => {
-  const t = useTranslation()
-
   return (
-    <div className={styles.toolbarGroupOfGroups}>
-      <RadixToolbar.ToggleGroup
-        aria-label={t('toolbar.toggleGroup', 'toggle group')}
-        type="single"
-        className={classNames(styles.toolbarToggleSingleGroup, className)}
-        onValueChange={onChange}
-        value={value || ''}
-        onFocus={(e) => {
-          e.preventDefault()
-        }}
-      >
-        {items.map((item, index) => (
-          <ToolbarToggleItem key={index} aria-label={item.title} value={item.value}>
-            <TooltipWrap title={item.title}>{item.contents}</TooltipWrap>
-          </ToolbarToggleItem>
-        ))}
-      </RadixToolbar.ToggleGroup>
-    </div>
+    <RadixToolbar.ToggleGroup
+      aria-label={ariaLabel}
+      type="single"
+      className={classNames(styles.toolbarToggleSingleGroup, className)}
+      onValueChange={onChange}
+      value={value || ''}
+      onFocus={(e) => {
+        e.preventDefault()
+      }}
+    >
+      {items.map((item, index) => (
+        <ToolbarToggleItem key={index} aria-label={item.title} value={item.value}>
+          <TooltipWrap title={item.title}>{item.contents}</TooltipWrap>
+        </ToolbarToggleItem>
+      ))}
+    </RadixToolbar.ToggleGroup>
   )
 }
 

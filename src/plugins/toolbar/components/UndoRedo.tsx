@@ -5,6 +5,7 @@ import React from 'react'
 import { IS_APPLE } from '../../../utils/detectMac'
 import { activeEditor$, iconComponentFor$, useTranslation } from '../../core'
 import { MultipleChoiceToggleGroup } from '.././primitives/toolbar'
+import styles from '@/styles/ui.module.css'
 
 /**
  * A toolbar component that lets the user undo and redo changes in the editor.
@@ -39,24 +40,35 @@ export const UndoRedo: React.FC = () => {
     }
   }, [activeEditor])
 
+  const handleValueChange = (newValue: string[]) => {
+    const action = newValue[0]
+    if (action === 'undo') {
+      activeEditor?.dispatchCommand(UNDO_COMMAND, undefined)
+    } else {
+      activeEditor?.dispatchCommand(REDO_COMMAND, undefined)
+    }
+  }
+
   return (
-    <MultipleChoiceToggleGroup
-      items={[
-        {
-          title: t('toolbar.undo', 'Undo {{shortcut}}', { shortcut: IS_APPLE ? '⌘Z' : 'Ctrl+Z' }),
-          disabled: !canUndo,
-          contents: iconComponentFor('undo'),
-          active: false,
-          onChange: () => activeEditor?.dispatchCommand(UNDO_COMMAND, undefined)
-        },
-        {
-          title: t('toolbar.redo', 'Redo {{shortcut}}', { shortcut: IS_APPLE ? '⌘Y' : 'Ctrl+Y' }),
-          disabled: !canRedo,
-          contents: iconComponentFor('redo'),
-          active: false,
-          onChange: () => activeEditor?.dispatchCommand(REDO_COMMAND, undefined)
-        }
-      ]}
-    />
+    <div className={styles.toolbarGroupOfGroups}>
+      <MultipleChoiceToggleGroup
+        value={[]}
+        onValueChange={handleValueChange}
+        items={[
+          {
+            title: t('toolbar.undo', 'Undo {{shortcut}}', { shortcut: IS_APPLE ? '⌘Z' : 'Ctrl+Z' }),
+            disabled: !canUndo,
+            contents: iconComponentFor('undo'),
+            value: 'undo'
+          },
+          {
+            title: t('toolbar.redo', 'Redo {{shortcut}}', { shortcut: IS_APPLE ? '⌘Y' : 'Ctrl+Y' }),
+            disabled: !canRedo,
+            contents: iconComponentFor('redo'),
+            value: 'redo'
+          }
+        ]}
+      />
+    </div>
   )
 }
