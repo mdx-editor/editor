@@ -1,8 +1,8 @@
 import { applyFormat$, currentFormat$, iconComponentFor$, useTranslation } from '../../core'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { FORMAT, IS_BOLD, IS_ITALIC, IS_STRIKETHROUGH, IS_SUBSCRIPT, IS_SUPERSCRIPT, IS_UNDERLINE } from '../../../FormatConstants'
-import { ToggleSingleGroupWithItem } from '.././primitives/toolbar'
+import { MultipleChoiceToggleGroup, SingleChoiceToggleGroup, ToggleSingleGroupWithItem } from '.././primitives/toolbar'
 import { TextFormatType } from 'lexical'
 import styles from '../../../styles/ui.module.css'
 import { IconKey } from '../../../defaultSvgIcons'
@@ -57,7 +57,9 @@ export const BoldItalicUnderlineToggles: React.FC<BoldItalicUnderlineTogglesProp
       [isBold ? 'bold' : null, isItalic ? 'italic' : null, isUnderline ? 'underline' : null].filter((f) => !!f) as TextFormatType[]
     )
   }, [currentFormat])
-  const handleApplyFormatDiff = (diff: string[]) => (diff as TextFormatType[]).forEach(applyFormat)
+  const handleApplyFormatDiff = (diff: string[]) => {
+    ;(diff as TextFormatType[]).forEach(applyFormat)
+  }
 
   return (
     <div className={styles.toolbarGroupOfGroups}>
@@ -135,7 +137,7 @@ export const StrikeThroughSupSubToggles: React.FC<StrikeThroughSupSubTogglesProp
   const isSub = (currentFormat & IS_SUBSCRIPT) !== 0
 
   const [radioValue, setRadioValue] = useState<keyof typeof SupSubRadioItems | ''>('')
-  const radioItems = (options || Object.keys(SupSubRadioItems)).filter(isSupSubRadioItemsKey).map((type) => {
+  const radioItems = (options ?? Object.keys(SupSubRadioItems)).filter(isSupSubRadioItemsKey).map((type) => {
     const item = SupSubRadioItems[type]
     return {
       value: type,

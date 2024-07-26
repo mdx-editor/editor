@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { IS_CODE } from '../../../FormatConstants'
 import { applyFormat$, currentFormat$, iconComponentFor$, useTranslation } from '../../core'
 import { MultipleChoiceToggleGroup } from '.././primitives/toolbar'
@@ -24,7 +24,9 @@ export const CodeToggle: React.FC = () => {
     setAppliedFormats([codeIsOn ? 'code' : null].filter((f) => !!f) as string[])
   }, [currentFormat])
 
-  const handleApplyFormatDiff = (diff: string[]) => (diff as TextFormatType[]).forEach(applyFormat)
+  const handleApplyFormatDiff = (diff: string[]) => {
+    ;(diff as TextFormatType[]).forEach(applyFormat)
+  }
 
   return (
     <MultipleChoiceToggleGroup
