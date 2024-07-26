@@ -217,10 +217,6 @@
 .toolbarGroupOfGroups {
   display: flex;
   margin: 0 var(--spacing-1);
-
-  &.noMargin {
-    margin: 0;
-  }
 }
 
 .toolbarToggleSingleGroup:first-of-type .toolbarToggleItem:only-child,
