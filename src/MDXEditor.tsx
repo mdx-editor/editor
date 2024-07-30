@@ -65,7 +65,7 @@ const RichTextEditor: React.FC = () => {
           <RichTextPlugin
             contentEditable={
               <ContentEditable
-                className={classNames(styles.contentEditable, contentEditableClassName,  contentEditablePropsClassName)}
+                className={classNames(styles.contentEditable, contentEditableClassName, contentEditablePropsClassName)}
                 ariaLabel={t('contentArea.editableMarkdown', 'editable markdown')}
                 { ...otherContentEditableProps }
               />
