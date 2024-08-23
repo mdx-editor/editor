@@ -175,20 +175,20 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
         const handler =
           dialogState.type === 'editing'
             ? (src: string) => {
-              theEditor?.update(() => {
-                const { nodeKey } = dialogState
-                const imageNode = $getNodeByKey(nodeKey)! as ImageNode
+                theEditor?.update(() => {
+                  const { nodeKey } = dialogState
+                  const imageNode = $getNodeByKey(nodeKey)! as ImageNode
 
-                imageNode.setTitle(values.title)
-                imageNode.setAltText(values.altText)
-                imageNode.setSrc(src)
-              })
-              r.pub(imageDialogState$, { type: 'inactive' })
-            }
+                  imageNode.setTitle(values.title)
+                  imageNode.setAltText(values.altText)
+                  imageNode.setSrc(src)
+                })
+                r.pub(imageDialogState$, { type: 'inactive' })
+              }
             : (src: string) => {
-              r.pub(internalInsertImage$, { ...values, src })
-              r.pub(imageDialogState$, { type: 'inactive' })
-            }
+                r.pub(internalInsertImage$, { ...values, src })
+                r.pub(imageDialogState$, { type: 'inactive' })
+              }
 
         if (values.file.length > 0) {
           imageUploadHandler?.(values.file.item(0)!)
@@ -315,8 +315,6 @@ export const closeImageDialog$ = Action((r) => {
 
 export const disableImageSettingsButton$ = Cell<boolean>(false)
 
-export const hideImageToolbar$ = Cell<boolean>(false)
-
 /**
  * Saves the data from the image dialog
  * @group Image
@@ -332,7 +330,6 @@ export const imagePlugin = realmPlugin<{
   imageAutocompleteSuggestions?: string[]
   disableImageResize?: boolean
   disableImageSettingsButton?: boolean
-  hideImageToolbar?: boolean
   imagePreviewHandler?: ImagePreviewHandler
   ImageDialog?: (() => JSX.Element) | React.FC
 }>({
@@ -346,7 +343,6 @@ export const imagePlugin = realmPlugin<{
       [imageAutocompleteSuggestions$]: params?.imageAutocompleteSuggestions ?? [],
       [disableImageResize$]: Boolean(params?.disableImageResize),
       [disableImageSettingsButton$]: Boolean(params?.disableImageSettingsButton),
-      [hideImageToolbar$]: Boolean(params?.hideImageToolbar),
       [imagePreviewHandler$]: params?.imagePreviewHandler ?? null
     })
   },

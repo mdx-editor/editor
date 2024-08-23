@@ -20,7 +20,7 @@ import {
   KEY_ESCAPE_COMMAND,
   SELECTION_CHANGE_COMMAND
 } from 'lexical'
-import { disableImageResize$, disableImageSettingsButton$, imagePreviewHandler$, openEditImageDialog$, hideImageToolbar$ } from '.'
+import { disableImageResize$, disableImageSettingsButton$, imagePreviewHandler$, openEditImageDialog$ } from '.'
 import styles from '../../styles/ui.module.css'
 import { iconComponentFor$, readOnly$, useTranslation } from '../core'
 import { $isImageNode } from './ImageNode'
@@ -85,13 +85,12 @@ function LazyImage({
 }
 
 export function ImageEditor({ src, title, alt, nodeKey, width, height }: ImageEditorProps): JSX.Element | null {
-  const [disableImageResize, disableImageSettingsButton, imagePreviewHandler, iconComponentFor, readOnly, hideImageToolbar] = useCellValues(
+  const [disableImageResize, disableImageSettingsButton, imagePreviewHandler, iconComponentFor, readOnly] = useCellValues(
     disableImageResize$,
     disableImageSettingsButton$,
     imagePreviewHandler$,
     iconComponentFor$,
-    readOnly$,
-    hideImageToolbar$
+    readOnly$
   )
 
   const openEditImageDialog = usePublisher(openEditImageDialog$)
@@ -272,44 +271,42 @@ export function ImageEditor({ src, title, alt, nodeKey, width, height }: ImageEd
         {draggable && isFocused && !disableImageResize && (
           <ImageResizer editor={editor} imageRef={imageRef} onResizeStart={onResizeStart} onResizeEnd={onResizeEnd} />
         )}
-        {!hideImageToolbar && (
-          <div className={styles.editImageToolbar}>
+        <div className={styles.editImageToolbar}>
+          <button
+            className={styles.iconButton}
+            type="button"
+            title={t('image.delete', 'Delete image')}
+            disabled={readOnly}
+            onClick={(e) => {
+              e.preventDefault()
+              editor.update(() => {
+                $getNodeByKey(nodeKey)?.remove()
+              })
+            }}
+          >
+            {iconComponentFor('delete_small')}
+          </button>
+          {!disableImageSettingsButton && (
             <button
-              className={styles.iconButton}
               type="button"
-              title={t('image.delete', 'Delete image')}
+              className={classNames(styles.iconButton, styles.editImageButton)}
+              title={t('imageEditor.editImage', 'Edit image')}
               disabled={readOnly}
-              onClick={(e) => {
-                e.preventDefault()
-                editor.update(() => {
-                  $getNodeByKey(nodeKey)?.remove()
+              onClick={() => {
+                openEditImageDialog({
+                  nodeKey: nodeKey,
+                  initialValues: {
+                    src: !initialImagePath ? imageSource : initialImagePath,
+                    title: title ?? '',
+                    altText: alt ?? ''
+                  }
                 })
               }}
             >
-              {iconComponentFor('delete_small')}
+              {iconComponentFor('settings')}
             </button>
-            {!disableImageSettingsButton && (
-              <button
-                type="button"
-                className={classNames(styles.iconButton, styles.editImageButton)}
-                title={t('imageEditor.editImage', 'Edit image')}
-                disabled={readOnly}
-                onClick={() => {
-                  openEditImageDialog({
-                    nodeKey: nodeKey,
-                    initialValues: {
-                      src: !initialImagePath ? imageSource : initialImagePath,
-                      title: title ?? '',
-                      altText: alt ?? ''
-                    }
-                  })
-                }}
-              >
-                {iconComponentFor('settings')}
-              </button>
-            )}
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </React.Suspense>
   ) : null
