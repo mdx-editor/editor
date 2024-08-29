@@ -453,7 +453,7 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
           saveAndFocus(null)
           return true
         },
-        COMMAND_PRIORITY_CRITICAL
+        COMMAND_PRIORITY_EDITOR
       )
     )
   }, [colIndex, editor, rootEditor, rowIndex, saveAndFocus, setActiveCell])
