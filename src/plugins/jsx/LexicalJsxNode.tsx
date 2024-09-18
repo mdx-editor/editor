@@ -32,7 +32,7 @@ export class LexicalJsxNode extends DecoratorNode<JSX.Element> {
   }
 
   static clone(node: LexicalJsxNode): LexicalJsxNode {
-    return new LexicalJsxNode(structuredClone(node.__mdastNode))
+    return new LexicalJsxNode(structuredClone(node.__mdastNode), node.__key)
   }
 
   static importJSON(serializedNode: SerializedLexicalJsxNode): LexicalJsxNode {
