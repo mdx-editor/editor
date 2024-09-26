@@ -13,11 +13,12 @@ import { basicSetup } from 'codemirror'
 import { codeBlockLanguages$, codeMirrorAutoLoadLanguageSupport$, codeMirrorExtensions$ } from '.'
 import { useCodeMirrorRef } from '../sandpack/useCodeMirrorRef'
 import { Select } from '../toolbar/primitives/select'
+import { DividerHorizontalIcon } from '@radix-ui/react-icons'
 
 export const COMMON_STATE_CONFIG_EXTENSIONS: Extension[] = []
 const EMPTY_VALUE = '__EMPTY_VALUE__'
 
-export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: CodeBlockEditorProps) => {
+export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter, hideEditFeatures }: CodeBlockEditorProps) => {
   const t = useTranslation()
   const { parentEditor, lexicalNode } = useCodeBlockEditorContext()
   const [readOnly, codeMirrorExtensions, autoLoadLanguageSupport, iconComponentFor, codeBlockLanguages] = useCellValues(
@@ -88,35 +89,41 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
       }}
     >
       <div className={styles.codeMirrorToolbar}>
-        <Select
-          value={language}
-          onChange={(language) => {
-            parentEditor.update(() => {
-              lexicalNode.setLanguage(language === EMPTY_VALUE ? '' : language)
-              setTimeout(() => {
-                parentEditor.update(() => {
-                  lexicalNode.getLatest().select()
+        {hideEditFeatures ? (
+          <div>{language}</div>
+        ) : (
+          <Select
+            value={language}
+            onChange={(language) => {
+              parentEditor.update(() => {
+                lexicalNode.setLanguage(language === EMPTY_VALUE ? '' : language)
+                setTimeout(() => {
+                  parentEditor.update(() => {
+                    lexicalNode.getLatest().select()
+                  })
                 })
               })
-            })
-          }}
-          triggerTitle={t('codeBlock.selectLanguage', 'Select code block language')}
-          placeholder={t('codeBlock.inlineLanguage', 'Language')}
-          items={Object.entries(codeBlockLanguages).map(([value, label]) => ({ value: value ? value : EMPTY_VALUE, label }))}
-        />
-        <button
-          className={styles.iconButton}
-          type="button"
-          title={t('codeblock.delete', 'Delete code block')}
-          onClick={(e) => {
-            e.preventDefault()
-            parentEditor.update(() => {
-              lexicalNode.remove()
-            })
-          }}
-        >
-          {iconComponentFor('delete_small')}
-        </button>
+            }}
+            triggerTitle={t('codeBlock.selectLanguage', 'Select code block language')}
+            placeholder={t('codeBlock.inlineLanguage', 'Language')}
+            items={Object.entries(codeBlockLanguages).map(([value, label]) => ({ value: value ? value : EMPTY_VALUE, label }))}
+          />
+        )}
+        {!hideEditFeatures ? (
+          <button
+            className={styles.iconButton}
+            type="button"
+            title={t('codeblock.delete', 'Delete code block')}
+            onClick={(e) => {
+              e.preventDefault()
+              parentEditor.update(() => {
+                lexicalNode.remove()
+              })
+            }}
+          >
+            {iconComponentFor('delete_small')}
+          </button>
+        ) : null}
       </div>
       <div ref={elRef} />
     </div>

@@ -44,6 +44,8 @@ export interface CodeBlockEditorProps {
    * Note: you don't need to unsubscribe, the emiter has a single subscription model.
    */
   focusEmitter: VoidEmitter
+
+  hideEditFeatures?: boolean
 }
 
 /**
