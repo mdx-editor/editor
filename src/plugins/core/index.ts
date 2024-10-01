@@ -856,7 +856,7 @@ export const corePlugin = realmPlugin<{
     r.register(createActiveEditorSubscription$)
     r.register(markdownSignal$)
     r.pubIn({
-      [initialMarkdown$]: params?.initialMarkdown.trim(),
+      [initialMarkdown$]: params?.initialMarkdown ?? '',
       [iconComponentFor$]: params?.iconComponentFor,
       [addImportVisitor$]: [MdastRootVisitor, MdastParagraphVisitor, MdastTextVisitor, MdastBreakVisitor, ...formattingVisitors],
       [addLexicalNode$]: [ParagraphNode, TextNode, GenericHTMLNode],
