@@ -10,6 +10,7 @@
     "cancel": "Cancel"
   },
   "uploadImage": {
+    "dialogTitle": "Upload an image",
     "uploadInstructions": "Upload an image from your device:",
     "addViaUrlInstructions": "Or add an image from an URL:",
     "autoCompletePlaceholder": "Select or paste an image src",

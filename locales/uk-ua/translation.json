@@ -10,6 +10,7 @@
       "cancel": "Скасувати"
     },
     "uploadImage": {
+      "dialogTitle": "Завантажити зображення",
       "uploadInstructions": "Завантажте зображення з вашого пристрою:",
       "addViaUrlInstructions": "Або додайте зображення з URL посилання:",
       "autoCompletePlaceholder": "Виберіть або вставте джерело зображення",

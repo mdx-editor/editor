@@ -49,6 +49,7 @@ export const ImageDialog: React.FC = () => {
             e.preventDefault()
           }}
         >
+          <Dialog.Title>{t('uploadImage.dialogTitle', 'Upload an image')}</Dialog.Title>
           <form
             onSubmit={(e) => {
               void handleSubmit(saveImage)(e)
