@@ -20,6 +20,7 @@ function App() {
       markdown="Hello world"
       plugins={[
         toolbarPlugin({
+          toolbarClassName: 'my-classname',
           toolbarContents: () => (
             <>
               {' '}
