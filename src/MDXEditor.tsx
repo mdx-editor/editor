@@ -279,6 +279,10 @@ export interface MDXEditorProps {
    * Pass your own translation function if you want to localize the editor.
    */
   translation?: Translation
+  /**
+   * Whether to apply trim() to the initial markdown input (default: true)
+   */
+  trim?: boolean
 }
 
 /**
@@ -301,7 +305,8 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>((pro
           iconComponentFor: props.iconComponentFor ?? defaultIconComponentFor,
           suppressHtmlProcessing: props.suppressHtmlProcessing ?? false,
           onError: props.onError ?? noop,
-          translation: props.translation ?? defaultTranslation
+          translation: props.translation ?? defaultTranslation,
+          trim: props.trim ?? true
         }),
         ...(props.plugins ?? [])
       ]}
