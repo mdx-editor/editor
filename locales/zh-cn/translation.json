@@ -10,6 +10,7 @@
     "cancel": "取消"
   },
   "uploadImage": {
+    "dialogTitle": "上传图片",
     "uploadInstructions": "从您的设备中上传图片：",
     "addViaUrlInstructions": "或从网址新增图片：",
     "autoCompletePlaceholder": "选择或粘贴图片",

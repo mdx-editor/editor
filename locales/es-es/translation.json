@@ -10,6 +10,7 @@
     "cancel": "Cancelar"
   },
   "uploadImage": {
+    "dialogTitle": "Subir una imágen",
     "uploadInstructions": "Sube una imágen desde tu dispositivo:",
     "addViaUrlInstructions": "O añade una imágen desde una URL:",
     "autoCompletePlaceholder": "Selecciona o pega el src de la imágen",
