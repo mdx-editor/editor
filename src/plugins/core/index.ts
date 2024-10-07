@@ -850,13 +850,16 @@ export const corePlugin = realmPlugin<{
   iconComponentFor: (name: IconKey) => React.ReactElement
   suppressHtmlProcessing?: boolean
   translation: Translation
+  trim?: boolean
 }>({
   init(r, params) {
+    const initialMarkdown = params?.initialMarkdown ?? ''
+
     r.register(createRootEditorSubscription$)
     r.register(createActiveEditorSubscription$)
     r.register(markdownSignal$)
     r.pubIn({
-      [initialMarkdown$]: params?.initialMarkdown ?? '',
+      [initialMarkdown$]: params?.trim ? initialMarkdown.trim() : initialMarkdown,
       [iconComponentFor$]: params?.iconComponentFor,
       [addImportVisitor$]: [MdastRootVisitor, MdastParagraphVisitor, MdastTextVisitor, MdastBreakVisitor, ...formattingVisitors],
       [addLexicalNode$]: [ParagraphNode, TextNode, GenericHTMLNode],
