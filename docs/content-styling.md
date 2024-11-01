@@ -6,7 +6,7 @@ position: 1
 
 # Content styling
 
-The MDXEditor component exposes a property called `contentEditableClassName` that you can use to style the content of the editor. This is useful if you want to use a different font family, or change the contents of the various blocks inside.
+The MDXEditor component exposes a property called `contentEditableProps` (containing a property `className`) that you can use to style the content of the editor. This is useful if you want to use a different font family, or change the contents of the various blocks inside.
 
 For best results, ensure that you style the editor using the same CSS classes that you use in your application. 
 
@@ -23,7 +23,7 @@ For best results, ensure that you style the editor using the same CSS classes th
 ```tsx
 <MDXEditor 
 markdown="Hello **world**!" 
-contentEditableClassName="prose"
+contentEditableProps={{ className: "prose" }}
 />
 ```
 
