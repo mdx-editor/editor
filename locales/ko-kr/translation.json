@@ -15,7 +15,7 @@
     "addViaUrlInstructions": "URL로 이미지 가져오기:",
     "autoCompletePlaceholder": "이미지 소스를 선택하거나 붙여넣으세요.",
     "alt": "Alt:",
-    "title": "Title:"
+    "title": "제목:"
   },
   "imageEditor": {
     "editImage": "이미지 편집"
@@ -23,7 +23,7 @@
   "createLink": {
     "url": "URL",
     "urlPlaceholder": "URL을 선택하거나 붙여넣으세요.",
-    "title": "Title",
+    "title": "제목",
     "saveTooltip": "URL 설정",
     "cancelTooltip": "변경 취소"
   },
@@ -31,7 +31,7 @@
     "open": "새 창에서 {{url}} 열기",
     "edit": "링크 URL 수정",
     "copyToClipboard": "클립보드에 복사",
-    "copied": "Copied!",
+    "copied": "복사됨!",
     "remove": "링크 삭제"
   },
   "table": {
@@ -69,9 +69,9 @@
     "removeInlineCode": "코드 형식 제거",
     "inlineCode": "인라인 코드 형식",
     "link": "링크 삽입",
-    "richText": "Rich text",
-    "diffMode": "Diff 모드",
-    "source": "source 모드",
+    "richText": "서식있는 텍스트",
+    "diffMode": "비교 모드",
+    "source": "소스 모드",
     "admonition": "경고 블록 삽입",
     "codeBlock": "코드 블록 삽입",
     "editFrontmatter": "frontmatter 편집",
