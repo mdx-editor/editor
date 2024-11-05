@@ -6,7 +6,9 @@ import { MdastImportVisitor } from '../../importMarkdownToLexical'
 export const MdastMdxJsxElementVisitor: MdastImportVisitor<MdxJsxTextElement> = {
   testNode: (node, { jsxComponentDescriptors }) => {
     if (node.type === 'mdxJsxTextElement' || node.type === 'mdxJsxFlowElement') {
-      const descriptor = jsxComponentDescriptors.find((descriptor) => descriptor.name === node.name)
+      const descriptor =
+        jsxComponentDescriptors.find((descriptor) => descriptor.name === node.name) ??
+        jsxComponentDescriptors.find((descriptor) => descriptor.name === '*')
       return descriptor !== undefined
     }
     return false

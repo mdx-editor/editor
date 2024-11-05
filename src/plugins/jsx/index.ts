@@ -56,8 +56,9 @@ export interface JsxPropertyDescriptor {
  */
 export interface JsxComponentDescriptor {
   /**
-   * The tag name. For example: 'div', 'span', 'MyComponent'.
+   * The tag name. For example: 'div', 'span', 'MyComponent'. Use '*' for any tag.
    * Note: For fragments, use null.
+   *
    */
   name: string | null
   /**
