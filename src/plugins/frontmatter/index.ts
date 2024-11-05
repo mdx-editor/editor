@@ -16,6 +16,7 @@ import { frontmatter } from 'micromark-extension-frontmatter'
 import { $createFrontmatterNode, $isFrontmatterNode, FrontmatterNode } from './FrontmatterNode'
 import { LexicalFrontmatterVisitor } from './LexicalFrontmatterVisitor'
 import { MdastFrontmatterVisitor } from './MdastFrontmatterVisitor'
+export * from './FrontmatterNode'
 
 /**
  * Whether the frontmatter dialog is open.
