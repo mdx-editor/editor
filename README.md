@@ -1,7 +1,6 @@
-# MDXEditor
 
-![npm](https://img.shields.io/npm/v/@mdxeditor/editor)
-![npm bundle size (scoped)](https://img.shields.io/bundlephobia/minzip/@mdxeditor/editor)
+
+# Forked MDXEditor - remove @codesandbox package
 
 > Because markdown editing can be even more delightful.
 

@@ -77,13 +77,11 @@
       "editFrontmatter": "Редагувати frontmatter",
       "insertFrontmatter": "Вставити frontmatter",
       "image": "Вставити зображення",
-      "insertSandpack": "Вставити Sandpack",
       "table": "Вставити таблицю",
       "thematicBreak": "Вставити тематичний розрив",
       "bulletedList": "Маркований список",
       "numberedList": "Нумерований список",
       "checkList": "Контрольний список",
-      "deleteSandpack": "Видалити цей блок коду",
       "undo": "Скасувати {{shortcut}}",
       "redo": "Повторити скасоване {{shortcut}}"
     },

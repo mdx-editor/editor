@@ -77,13 +77,11 @@
     "editFrontmatter": "Editar frontmatter",
     "insertFrontmatter": "Insertar frontmatter",
     "image": "Insertar imágen",
-    "insertSandpack": "Insertar Sandpack",
     "table": "Insertar tabla",
     "thematicBreak": "Insertar salto de línea",
     "bulletedList": "Lista con viñetas",
     "numberedList": "Lista numerada",
     "checkList": "Lista de verificación",
-    "deleteSandpack": "Borrar este bloque de código",
     "undo": "Deshacer {{shortcut}}",
     "redo": "Rehacer {{shortcut}}"
   },

@@ -15,7 +15,6 @@ import {
   listsPlugin,
   markdownShortcutPlugin,
   quotePlugin,
-  sandpackPlugin,
   tablePlugin,
   thematicBreakPlugin,
   toolbarPlugin,
@@ -28,7 +27,7 @@ import {
   ListsToggle,
   KitchenSinkToolbar
 } from '..'
-import { ALL_PLUGINS, YoutubeDirectiveDescriptor, virtuosoSampleSandpackConfig } from './_boilerplate'
+import { ALL_PLUGINS, YoutubeDirectiveDescriptor } from './_boilerplate'
 import kitchenSinkMarkdown from './assets/kitchen-sink.md?raw'
 import './dark-editor.css'
 import { basicDark } from 'cm6-theme-basic-dark'
@@ -68,7 +67,6 @@ export const CustomTheming = () => {
         thematicBreakPlugin(),
         frontmatterPlugin(),
         codeBlockPlugin({ defaultCodeBlockLanguage: 'txt' }),
-        sandpackPlugin({ sandpackConfig: virtuosoSampleSandpackConfig }),
         codeMirrorPlugin({
           codeBlockLanguages: { js: 'JavaScript', css: 'CSS', txt: 'text', tsx: 'TypeScript' },
           codeMirrorExtensions: [basicDark]
@@ -122,9 +120,6 @@ export const ConditionalToolbar = () => {
           tablePlugin(),
           thematicBreakPlugin(),
           frontmatterPlugin(),
-          // codeBlockPlugin({ defaultCodeBlockLanguage: 'txt' }),
-          // sandpackPlugin({ sandpackConfig: virtuosoSampleSandpackConfig }),
-          // codeMirrorPlugin({ codeBlockLanguages: { js: 'JavaScript', css: 'CSS', txt: 'text' } }),
           directivesPlugin({ directiveDescriptors: [YoutubeDirectiveDescriptor, AdmonitionDirectiveDescriptor] }),
           diffSourcePlugin({ viewMode: 'rich-text', diffMarkdown: 'boo' }),
           markdownShortcutPlugin()
@@ -157,7 +152,6 @@ export const SimpleToolbar = () => {
         thematicBreakPlugin(),
         frontmatterPlugin(),
         codeBlockPlugin({ defaultCodeBlockLanguage: 'txt' }),
-        sandpackPlugin({ sandpackConfig: virtuosoSampleSandpackConfig }),
         codeMirrorPlugin({ codeBlockLanguages: { js: 'JavaScript', css: 'CSS', txt: 'text' } }),
         directivesPlugin({ directiveDescriptors: [YoutubeDirectiveDescriptor, AdmonitionDirectiveDescriptor] }),
         diffSourcePlugin({ viewMode: 'rich-text', diffMarkdown: 'boo' }),

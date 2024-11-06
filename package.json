@@ -1,10 +1,9 @@
 {
-  "name": "@mdxeditor/editor",
-  "author": "Petyo Ivanov",
-  "homepage": "https://mdxeditor.dev/",
+  "name": "@rryando/editor",
+  "author": "Ryan Rynaldo",
   "bugs": {
-    "url": "https://github.com/mdx-editor/editor/issues",
-    "email": "petyo@virtuoso.dev"
+    "url": "https://github.com/rryando/editor/issues",
+    "email": "ryanldo.dev@gmail.com"
   },
   "private": false,
   "sideEffects": [
@@ -12,7 +11,7 @@
   ],
   "type": "module",
   "version": "0.0.0-development",
-  "description": "React component for rich text markdown editing",
+  "description": "Forked from https://github.com/mdx-editor/editor to remove @codesandbox package - remove bundle size",
   "scripts": {
     "build": "vite build",
     "build:docs:api": "typedoc",
@@ -42,7 +41,6 @@
     "@codemirror/merge": "^6.4.0",
     "@codemirror/state": "^6.4.0",
     "@codemirror/view": "^6.23.0",
-    "@codesandbox/sandpack-react": "^2.10.0",
     "@lexical/clipboard": "^0.17.1",
     "@lexical/link": "^0.17.1",
     "@lexical/list": "^0.17.1",

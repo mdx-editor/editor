@@ -77,13 +77,11 @@
     "editFrontmatter": "Edit frontmatter",
     "insertFrontmatter": "Insert frontmatter",
     "image": "Insert image",
-    "insertSandpack": "Insert Sandpack",
     "table": "Insert Table",
     "thematicBreak": "Insert thematic break",
     "bulletedList": "Bulleted list",
     "numberedList": "Numbered list",
     "checkList": "Check list",
-    "deleteSandpack": "Delete this code block",
     "undo": "Undo {{shortcut}}",
     "redo": "Redo {{shortcut}}"
   },

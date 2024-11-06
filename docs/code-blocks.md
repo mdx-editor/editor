@@ -20,21 +20,6 @@ export default function App() {
 }
 `.trim()
 
-const simpleSandpackConfig: SandpackConfig = {
-  defaultPreset: 'react',
-  presets: [
-    {
-      label: 'React',
-      name: 'react',
-      meta: 'live react',
-      sandpackTemplate: 'react',
-      sandpackTheme: 'light',
-      snippetFileName: '/App.js',
-      snippetLanguage: 'jsx',
-      initialSnippetContent: defaultSnippetContent
-    },
-  ]
-}
 
 function App() {
   return (
@@ -43,13 +28,11 @@ function App() {
       plugins={[
        // the default code block language to insert when the user clicks the "insert code block" button
         codeBlockPlugin({defaultCodeBlockLanguage: 'js'}),
-        sandpackPlugin({ sandpackConfig: simpleSandpackConfig }),
         codeMirrorPlugin({ codeBlockLanguages: { js: 'JavaScript', css: 'CSS' } }),
         toolbarPlugin({toolbarContents: () => (
           <ConditionalContents
             options={[
                 { when: (editor) => editor?.editorType === 'codeblock', contents: () => <ChangeCodeMirrorLanguage /> },
-                { when: (editor) => editor?.editorType === 'sandpack', contents: () => <ShowSandpackInfo /> },
                 { fallback: () => ( <> 
                 <InsertCodeBlock />
                 <InsertSandpack />
@@ -96,9 +79,6 @@ export default function App() {
 
 The code mirror editor plugin enables editing of fenced code blocks with basic code editing features like syntax highlighting, indentation and bracket matching. A set of toolbar component utilities support the display of a language selector when the block is in focus, while hiding the rich text editor controls. The plugin accepts supported languages as a parameter option. 
 
-## Configuring the Sandpack editor
-
-Compared to the code mirror editor, the Sandpack one is a bit more complex, as Sandpack needs to know the context of the code block in order to execute it correctly. Before diving in, it's good to [understand Sandpack configuration](https://sandpack.codesandbox.io/) itself. MDXEditor supports multiple Sandpack configurations, based on the meta data of the code block. To configure the supported presets, pass a `sandpackConfig` option in the plugin initialization. For more details, refer to the [SandpackConfig interface](../api/editor.sandpackconfig) and the [SandpackPreset interface](../api/editor.sandpackpreset).
 
 ## Build a custom code block editor
 
