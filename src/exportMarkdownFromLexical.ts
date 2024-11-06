@@ -194,7 +194,9 @@ export function exportLexicalTreeToMdast({
   const defaultImportsMap = new Map<string, string>()
 
   for (const componentName of referredComponents) {
-    const descriptor = jsxComponentDescriptors.find((descriptor) => descriptor.name === componentName)
+    const descriptor =
+      jsxComponentDescriptors.find((descriptor) => descriptor.name === componentName) ??
+      jsxComponentDescriptors.find((descriptor) => descriptor.name === '*')
     if (!descriptor) {
       throw new Error(`Component ${componentName} is used but not imported`)
     }
