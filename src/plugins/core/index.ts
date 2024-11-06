@@ -16,6 +16,7 @@ import {
   BLUR_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
   DecoratorNode,
+  EditorThemeClasses,
   ElementNode,
   FOCUS_COMMAND,
   FORMAT_TEXT_COMMAND,
@@ -836,6 +837,8 @@ export const translation$ = Cell<Translation>(() => {
   throw new Error('No translation function provided')
 })
 
+export const lexicalTheme$ = Cell<EditorThemeClasses>(lexicalTheme)
+
 /** @internal */
 export const corePlugin = realmPlugin<{
   initialMarkdown: string
@@ -851,6 +854,7 @@ export const corePlugin = realmPlugin<{
   suppressHtmlProcessing?: boolean
   translation: Translation
   trim?: boolean
+  lexicalTheme?: EditorThemeClasses
 }>({
   init(r, params) {
     const initialMarkdown = params?.initialMarkdown ?? ''
@@ -880,7 +884,8 @@ export const corePlugin = realmPlugin<{
       [translation$]: params?.translation,
       [addMdastExtension$]: gfmStrikethroughFromMarkdown(),
       [addSyntaxExtension$]: gfmStrikethrough(),
-      [addToMarkdownExtension$]: [mdxJsxToMarkdown(), gfmStrikethroughToMarkdown()]
+      [addToMarkdownExtension$]: [mdxJsxToMarkdown(), gfmStrikethroughToMarkdown()],
+      [lexicalTheme$]: params?.lexicalTheme ?? lexicalTheme
     })
 
     r.singletonSub(markdownErrorSignal$, params?.onError)
@@ -905,7 +910,7 @@ export const corePlugin = realmPlugin<{
       onError: (error) => {
         throw error
       },
-      theme: lexicalTheme
+      theme: r.getValue(lexicalTheme$)
     })
 
     newEditor.update(() => {

@@ -49,6 +49,16 @@ const jsxComponentDescriptors: JsxComponentDescriptor[] = [
     props: [],
     hasChildren: true,
     Editor: GenericJsxEditor
+  },
+  {
+    name: '*',
+    kind: 'flow',
+    hasChildren: false,
+    props: [],
+    Editor: () => {
+      console.log('Unknown tag')
+      return <div>Unknown tag</div>
+    }
   }
 ]
 
