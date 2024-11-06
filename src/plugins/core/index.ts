@@ -1,6 +1,7 @@
 import { realmPlugin } from '../../RealmWithPlugins'
 import { createEmptyHistoryState } from '@lexical/react/LexicalHistoryPlugin.js'
 import { $isHeadingNode, HeadingTagType } from '@lexical/rich-text'
+import { Props as ContentEditableProps } from '@lexical/react/LexicalContentEditable'
 import { $setBlocksType } from '@lexical/selection'
 import { $findMatchingParent, $insertNodeToNearestRoot, $wrapNodeInElement } from '@lexical/utils'
 import { Cell, NodeRef, Realm, Signal, filter, map, scan, useCellValue, withLatestFrom } from '@mdxeditor/gurx'
@@ -115,8 +116,15 @@ export const activeEditor$ = Cell<LexicalEditor | null>(null)
 /**
  * Holds the CSS class name of the content editable element.
  * @group Core
+ * @deprecated Will be removed in further version. Use contentEditableProps.className instead
  */
 export const contentEditableClassName$ = Cell('')
+
+/**
+ * Holds the props to pass to the content editable element.
+ * @group Core
+ */
+export const contentEditableProps$ = Cell<ContentEditableProps>({})
 
 /**
  * Holds the readOnly state of the editor.
@@ -843,6 +851,7 @@ export const lexicalTheme$ = Cell<EditorThemeClasses>(lexicalTheme)
 export const corePlugin = realmPlugin<{
   initialMarkdown: string
   contentEditableClassName: string
+  contentEditableProps: ContentEditableProps
   placeholder?: React.ReactNode
   autoFocus: boolean | { defaultSelection?: 'rootStart' | 'rootEnd'; preventScroll?: boolean | undefined }
   onChange: (markdown: string) => void
@@ -877,6 +886,7 @@ export const corePlugin = realmPlugin<{
 
       [addComposerChild$]: SharedHistoryPlugin,
       [contentEditableClassName$]: params?.contentEditableClassName,
+      [contentEditableProps$]: params?.contentEditableProps,
       [toMarkdownOptions$]: params?.toMarkdownOptions,
       [autoFocus$]: params?.autoFocus,
       [placeholder$]: params?.placeholder,
@@ -941,6 +951,7 @@ export const corePlugin = realmPlugin<{
   update(realm, params) {
     realm.pubIn({
       [contentEditableClassName$]: params?.contentEditableClassName,
+      [contentEditableProps$]: params?.contentEditableProps,
       [toMarkdownOptions$]: params?.toMarkdownOptions,
       [autoFocus$]: params?.autoFocus,
       [placeholder$]: params?.placeholder,
