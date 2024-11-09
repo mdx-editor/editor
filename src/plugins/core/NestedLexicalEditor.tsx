@@ -28,6 +28,7 @@ import {
   importVisitors$,
   jsxComponentDescriptors$,
   jsxIsAvailable$,
+  lexicalTheme$,
   nestedEditorChildren$,
   rootEditor$,
   usedLexicalNodes$
@@ -37,7 +38,6 @@ import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary.js'
 import { LexicalNestedComposer } from '@lexical/react/LexicalNestedComposer.js'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin.js'
 import classNames from 'classnames'
-import { lexicalTheme } from '../../styles/lexicalTheme'
 import { exportLexicalTreeToMdast } from '../../exportMarkdownFromLexical'
 import { importMdastTreeToLexical } from '../../importMarkdownToLexical'
 import styles from '../../styles/ui.module.css'
@@ -45,7 +45,7 @@ import { SharedHistoryPlugin } from './SharedHistoryPlugin'
 import { mergeRegister } from '@lexical/utils'
 import { VoidEmitter } from '../../utils/voidEmitter'
 import { isPartOftheEditorUI } from '../../utils/isPartOftheEditorUI'
-import { useCellValues, usePublisher } from '@mdxeditor/gurx'
+import { useCellValues, usePublisher, useRealm } from '@mdxeditor/gurx'
 import { DirectiveNode } from '../directives'
 import { LexicalJsxNode } from '../jsx/LexicalJsxNode'
 
@@ -181,6 +181,7 @@ export const NestedLexicalEditor = function <T extends Mdast.RootContent>(props:
   const updateMdastNode = useMdastNodeUpdater<T>()
   const removeNode = useLexicalNodeRemove()
   const content = getContent(mdastNode)
+  const realm = useRealm()
 
   const [
     rootEditor,
@@ -191,7 +192,8 @@ export const NestedLexicalEditor = function <T extends Mdast.RootContent>(props:
     directiveDescriptors,
     codeBlockEditorDescriptors,
     jsxIsAvailable,
-    nestedEditorChildren
+    nestedEditorChildren,
+    lexicalTheme
   ] = useCellValues(
     rootEditor$,
     importVisitors$,
@@ -201,7 +203,8 @@ export const NestedLexicalEditor = function <T extends Mdast.RootContent>(props:
     directiveDescriptors$,
     codeBlockEditorDescriptors$,
     jsxIsAvailable$,
-    nestedEditorChildren$
+    nestedEditorChildren$,
+    lexicalTheme$
   )
 
   const setEditorInFocus = usePublisher(editorInFocus$)
@@ -209,7 +212,7 @@ export const NestedLexicalEditor = function <T extends Mdast.RootContent>(props:
   const [editor] = React.useState(() => {
     const editor = createEditor({
       nodes: usedLexicalNodes,
-      theme: lexicalTheme
+      theme: realm.getValue(lexicalTheme$)
     })
     return editor
   })
@@ -261,6 +264,7 @@ export const NestedLexicalEditor = function <T extends Mdast.RootContent>(props:
         updateMdastNode(getUpdatedMdastNode(structuredClone(mdastNode) as any, content as any))
       })
     }
+
     return mergeRegister(
       editor.registerCommand(
         FOCUS_COMMAND,
@@ -330,7 +334,7 @@ export const NestedLexicalEditor = function <T extends Mdast.RootContent>(props:
   ])
 
   return (
-    <LexicalNestedComposer initialEditor={editor}>
+    <LexicalNestedComposer initialEditor={editor} initialTheme={lexicalTheme}>
       <RichTextPlugin
         contentEditable={
           <ContentEditable {...contentEditableProps} className={classNames(styles.nestedEditor, contentEditableProps?.className)} />
