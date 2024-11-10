@@ -26,6 +26,9 @@ some more
 
 <img src="https://picsum.photos/200/300" width="200" height="300" /> some <img src="https://picsum.photos/200/300" /> flow
 
+Image with a class attribute:
+
+<img src="https://picsum.photos/200/300" class="custom" />
 some
 `
 

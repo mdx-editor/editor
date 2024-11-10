@@ -77,12 +77,17 @@ export const MdastJsxImageVisitor: MdastImportVisitor<MdxJsxTextElement | MdxJsx
     const height = getAttributeValue(mdastNode, 'height')
     const width = getAttributeValue(mdastNode, 'width')
 
+    const rest = mdastNode.attributes.filter((a) => {
+      return a.type === 'mdxJsxAttribute' && !['src', 'alt', 'title', 'height', 'width'].includes(a.name)
+    })
+
     const image = $createImageNode({
       src,
       altText,
       title,
       width: width ? parseInt(width, 10) : undefined,
-      height: height ? parseInt(height, 10) : undefined
+      height: height ? parseInt(height, 10) : undefined,
+      rest
     })
 
     if (lexicalParent.getType() === 'root') {
