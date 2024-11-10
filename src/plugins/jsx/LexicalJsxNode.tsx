@@ -32,7 +32,7 @@ export class LexicalJsxNode extends DecoratorNode<JSX.Element> {
   }
 
   static clone(node: LexicalJsxNode): LexicalJsxNode {
-    return new LexicalJsxNode(structuredClone(node.__mdastNode))
+    return new LexicalJsxNode(structuredClone(node.__mdastNode), node.__key)
   }
 
   static importJSON(serializedNode: SerializedLexicalJsxNode): LexicalJsxNode {
@@ -105,7 +105,10 @@ export function JsxEditorContainer(props: {
 }) {
   const { mdastNode } = props
   const jsxComponentDescriptors = useCellValue(jsxComponentDescriptors$)
-  const descriptor = jsxComponentDescriptors.find((descriptor) => descriptor.name === mdastNode.name)
+  const descriptor =
+    jsxComponentDescriptors.find((descriptor) => descriptor.name === mdastNode.name) ??
+    jsxComponentDescriptors.find((descriptor) => descriptor.name === '*')
+
   if (!descriptor) {
     throw new Error(`No JSX descriptor found for ${mdastNode.name}`)
   }

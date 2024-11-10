@@ -1,0 +1,106 @@
+{
+  "frontmatterEditor": {
+    "title": "Editar frontmatter del documento",
+    "key": "Clave",
+    "value": "Valor",
+    "addEntry": "Añadir entrada"
+  },
+  "dialogControls": {
+    "save": "Guardar",
+    "cancel": "Cancelar"
+  },
+  "uploadImage": {
+    "dialogTitle": "Subir una imágen",
+    "uploadInstructions": "Sube una imágen desde tu dispositivo:",
+    "addViaUrlInstructions": "O añade una imágen desde una URL:",
+    "autoCompletePlaceholder": "Selecciona o pega el src de la imágen",
+    "alt": "Alt:",
+    "title": "Título:"
+  },
+  "imageEditor": {
+    "editImage": "Editar image"
+  },
+  "createLink": {
+    "url": "URL",
+    "urlPlaceholder": "Selecciona o pega una URL",
+    "title": "Título",
+    "saveTooltip": "Establecer URL",
+    "cancelTooltip": "Cancelar cambios"
+  },
+  "linkPreview": {
+    "open": "Abrir {{url}} en una ventana nueva",
+    "edit": "Editar URL del enlace",
+    "copyToClipboard": "Copiar al portapapeles",
+    "copied": "¡Copiado!",
+    "remove": "Borrar enlace"
+  },
+  "table": {
+    "deleteTable": "Borrar tabla",
+    "columnMenu": "Menú de columna",
+    "textAlignment": "Alineación del texto",
+    "alignLeft": "Alinear a la izquierda",
+    "alignCenter": "Alinear al centro",
+    "alignRight": "Alinear a la derecha",
+    "insertColumnLeft": "Añadir una columna a la izquierda de esta",
+    "insertColumnRight": "Añadir una columna a la derecha de esta",
+    "deleteColumn": "Borrar esta columna",
+    "rowMenu": "Menú de fila",
+    "insertRowAbove": "Insertar una fila por encima de esta",
+    "insertRowBelow": "Insertar una fila por debajo de esta",
+    "deleteRow": "Borrar esta fila"
+  },
+  "toolbar": {
+    "blockTypes": {
+      "paragraph": "Párrafo",
+      "quote": "Cita",
+      "heading": "Encabezado {{level}}"
+    },
+    "blockTypeSelect": {
+      "selectBlockTypeTooltip": "Selecciona el tipo de bloque",
+      "placeholder": "Tipo de bloque"
+    },
+    "toggleGroup":"Conmutar grupo",
+    "removeBold": "Borrar negrita",
+    "bold": "Negrita",
+    "removeItalic": "Borrar cursiva",
+    "italic": "Cursiva",
+    "underline": "Borrar subrayado",
+    "removeUnderline": "Subrayado",
+    "removeInlineCode": "Borrar formato de código",
+    "inlineCode": "Formato de código en línea",
+    "link": "Crear enlace",
+    "richText": "Texto enriquecido",
+    "diffMode": "Modo diferencial",
+    "source": "Modo fuente",
+    "admonition": "Insertar admonición",
+    "codeBlock": "Insertar bloque de código",
+    "editFrontmatter": "Editar frontmatter",
+    "insertFrontmatter": "Insertar frontmatter",
+    "image": "Insertar imágen",
+    "insertSandpack": "Insertar Sandpack",
+    "table": "Insertar tabla",
+    "thematicBreak": "Insertar salto de línea",
+    "bulletedList": "Lista con viñetas",
+    "numberedList": "Lista numerada",
+    "checkList": "Lista de verificación",
+    "deleteSandpack": "Borrar este bloque de código",
+    "undo": "Deshacer {{shortcut}}",
+    "redo": "Rehacer {{shortcut}}"
+  },
+  "admonitions": {
+    "note": "Nota",
+    "tip": "Consejo",
+    "danger": "Peligro",
+    "info": "Información",
+    "caution": "Aviso",
+    "changeType": "Seleccionar tipo de adminición",
+    "placeholder": "Tipo de admonición"
+  },
+  "codeBlock": {
+    "language": "Lenguaje del bloque de código",
+    "selectLanguage": "Seleccionar el lenguaje del bloque de código"
+  },
+  "contentArea":{
+    "editableMarkdown": "Markdown editable"
+  }
+}

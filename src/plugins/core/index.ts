@@ -16,6 +16,7 @@ import {
   BLUR_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
   DecoratorNode,
+  EditorThemeClasses,
   ElementNode,
   FOCUS_COMMAND,
   FORMAT_TEXT_COMMAND,
@@ -547,7 +548,9 @@ export const createRootEditorSubscription$ = Appender(rootEditorSubscriptions$, 
         },
         COMMAND_PRIORITY_CRITICAL
       )
-    },
+    }
+
+    /*
     // Fixes select all when frontmatter is present
     (rootEditor) => {
       return rootEditor.registerCommand<KeyboardEvent>(
@@ -580,7 +583,7 @@ export const createRootEditorSubscription$ = Appender(rootEditorSubscriptions$, 
         },
         COMMAND_PRIORITY_CRITICAL
       )
-    }
+    }*/
   ])
 })
 
@@ -836,6 +839,8 @@ export const translation$ = Cell<Translation>(() => {
   throw new Error('No translation function provided')
 })
 
+export const lexicalTheme$ = Cell<EditorThemeClasses>(lexicalTheme)
+
 /** @internal */
 export const corePlugin = realmPlugin<{
   initialMarkdown: string
@@ -850,13 +855,17 @@ export const corePlugin = realmPlugin<{
   iconComponentFor: (name: IconKey) => React.ReactElement
   suppressHtmlProcessing?: boolean
   translation: Translation
+  trim?: boolean
+  lexicalTheme?: EditorThemeClasses
 }>({
   init(r, params) {
+    const initialMarkdown = params?.initialMarkdown ?? ''
+
     r.register(createRootEditorSubscription$)
     r.register(createActiveEditorSubscription$)
     r.register(markdownSignal$)
     r.pubIn({
-      [initialMarkdown$]: params?.initialMarkdown.trim(),
+      [initialMarkdown$]: params?.trim ? initialMarkdown.trim() : initialMarkdown,
       [iconComponentFor$]: params?.iconComponentFor,
       [addImportVisitor$]: [MdastRootVisitor, MdastParagraphVisitor, MdastTextVisitor, MdastBreakVisitor, ...formattingVisitors],
       [addLexicalNode$]: [ParagraphNode, TextNode, GenericHTMLNode],
@@ -877,7 +886,8 @@ export const corePlugin = realmPlugin<{
       [translation$]: params?.translation,
       [addMdastExtension$]: gfmStrikethroughFromMarkdown(),
       [addSyntaxExtension$]: gfmStrikethrough(),
-      [addToMarkdownExtension$]: [mdxJsxToMarkdown(), gfmStrikethroughToMarkdown()]
+      [addToMarkdownExtension$]: [mdxJsxToMarkdown(), gfmStrikethroughToMarkdown()],
+      [lexicalTheme$]: params?.lexicalTheme ?? lexicalTheme
     })
 
     r.singletonSub(markdownErrorSignal$, params?.onError)
@@ -902,7 +912,7 @@ export const corePlugin = realmPlugin<{
       onError: (error) => {
         throw error
       },
-      theme: lexicalTheme
+      theme: r.getValue(lexicalTheme$)
     })
 
     newEditor.update(() => {

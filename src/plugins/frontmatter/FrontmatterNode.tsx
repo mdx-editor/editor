@@ -78,6 +78,10 @@ export class FrontmatterNode extends DecoratorNode<JSX.Element> {
       />
     )
   }
+
+  isKeyboardSelectable(): boolean {
+    return false
+  }
 }
 
 /**

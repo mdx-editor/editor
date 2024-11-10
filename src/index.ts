@@ -33,6 +33,7 @@ import './styles/globals.css'
 export * from '@mdxeditor/gurx'
 // editor component
 export * from './MDXEditor'
+export * from './defaultSvgIcons'
 
 // import/export
 export * from './importMarkdownToLexical'
@@ -117,3 +118,5 @@ export * from './utils/voidEmitter'
 export * from './RealmWithPlugins'
 
 export * from './FormatConstants'
+
+export * from './styles/lexicalTheme'

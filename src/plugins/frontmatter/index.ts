@@ -10,12 +10,21 @@ import {
   rootEditor$
 } from '../core'
 import { Action, Cell, withLatestFrom } from '@mdxeditor/gurx'
-import { $getRoot } from 'lexical'
+import {
+  $getRoot,
+  $getSelection,
+  $isRangeSelection,
+  $setSelection,
+  COMMAND_PRIORITY_CRITICAL,
+  KEY_DOWN_COMMAND,
+  LexicalEditor
+} from 'lexical'
 import { frontmatterFromMarkdown, frontmatterToMarkdown } from 'mdast-util-frontmatter'
 import { frontmatter } from 'micromark-extension-frontmatter'
 import { $createFrontmatterNode, $isFrontmatterNode, FrontmatterNode } from './FrontmatterNode'
 import { LexicalFrontmatterVisitor } from './LexicalFrontmatterVisitor'
 import { MdastFrontmatterVisitor } from './MdastFrontmatterVisitor'
+export * from './FrontmatterNode'
 
 /**
  * Whether the frontmatter dialog is open.
@@ -86,7 +95,47 @@ export const frontmatterPlugin = realmPlugin({
       [addLexicalNode$]: FrontmatterNode,
       [addImportVisitor$]: MdastFrontmatterVisitor,
       [addExportVisitor$]: LexicalFrontmatterVisitor,
-      [addToMarkdownExtension$]: frontmatterToMarkdown('yaml')
+      [addToMarkdownExtension$]: frontmatterToMarkdown('yaml'),
+      [createRootEditorSubscription$]: (editor: LexicalEditor) => {
+        return editor.registerCommand<KeyboardEvent>(
+          KEY_DOWN_COMMAND,
+          (event) => {
+            let shouldPrevent = false
+
+            editor.read(() => {
+              const selection = $getSelection()
+
+              if ($isRangeSelection(selection)) {
+                if (selection.isCollapsed() && selection.anchor.offset === 0 && selection.focus.offset === 0 && event.key === 'Backspace') {
+                  shouldPrevent = true
+                  event.preventDefault()
+                } else {
+                  const firstNode = selection.getNodes()[0]
+                  if ($isFrontmatterNode(firstNode)) {
+                    const yaml = firstNode.getYaml()
+                    setTimeout(() => {
+                      editor.update(
+                        () => {
+                          $getRoot().splice(0, 0, [$createFrontmatterNode(yaml)])
+                        },
+                        { discrete: true }
+                      )
+                    })
+                  }
+                }
+              }
+            })
+
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            if (shouldPrevent) {
+              return true
+            }
+
+            return false
+          },
+          COMMAND_PRIORITY_CRITICAL
+        )
+      }
     })
   }
 })

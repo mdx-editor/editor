@@ -28,7 +28,7 @@ import { lexicalTheme } from './styles/lexicalTheme'
 import styles from './styles/ui.module.css'
 import { noop } from './utils/fp'
 import { createLexicalComposerContext, LexicalComposerContext, LexicalComposerContextType } from '@lexical/react/LexicalComposerContext'
-import { LexicalEditor } from 'lexical'
+import { EditorThemeClasses, LexicalEditor } from 'lexical'
 import { IconKey, defaultSvgIcons } from './defaultSvgIcons'
 
 const LexicalProvider: React.FC<{
@@ -279,6 +279,15 @@ export interface MDXEditorProps {
    * Pass your own translation function if you want to localize the editor.
    */
   translation?: Translation
+  /**
+   * Whether to apply trim() to the initial markdown input (default: true)
+   */
+  trim?: boolean
+
+  /**
+   * A custom lexical theme to use for the editor.
+   */
+  lexicalTheme?: EditorThemeClasses
 }
 
 /**
@@ -301,7 +310,9 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>((pro
           iconComponentFor: props.iconComponentFor ?? defaultIconComponentFor,
           suppressHtmlProcessing: props.suppressHtmlProcessing ?? false,
           onError: props.onError ?? noop,
-          translation: props.translation ?? defaultTranslation
+          translation: props.translation ?? defaultTranslation,
+          trim: props.trim ?? true,
+          lexicalTheme: props.lexicalTheme
         }),
         ...(props.plugins ?? [])
       ]}

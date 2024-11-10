@@ -1,0 +1,106 @@
+{
+  "frontmatterEditor": {
+    "title": "문서 frontmatter 편집",
+    "key": "키",
+    "value": "값",
+    "addEntry": "항목 추가"
+  },
+  "dialogControls": {
+    "save": "저장",
+    "cancel": "취소"
+  },
+  "uploadImage": {
+    "dialogTitle": "이미지 업로드",
+    "uploadInstructions": "로컬에서 이미지 업로드:",
+    "addViaUrlInstructions": "URL로 이미지 가져오기:",
+    "autoCompletePlaceholder": "이미지 소스를 선택하거나 붙여넣으세요.",
+    "alt": "Alt:",
+    "title": "제목:"
+  },
+  "imageEditor": {
+    "editImage": "이미지 편집"
+  },
+  "createLink": {
+    "url": "URL",
+    "urlPlaceholder": "URL을 선택하거나 붙여넣으세요.",
+    "title": "제목",
+    "saveTooltip": "URL 설정",
+    "cancelTooltip": "변경 취소"
+  },
+  "linkPreview": {
+    "open": "새 창에서 {{url}} 열기",
+    "edit": "링크 URL 수정",
+    "copyToClipboard": "클립보드에 복사",
+    "copied": "복사됨!",
+    "remove": "링크 삭제"
+  },
+  "table": {
+    "deleteTable": "테이블 삭제",
+    "columnMenu": "열 메뉴",
+    "textAlignment": "텍스트 정렬",
+    "alignLeft": "왼쪽 정렬",
+    "alignCenter": "중심 정렬",
+    "alignRight": "오른쪽 정렬",
+    "insertColumnLeft": "왼쪽으로 열 추가",
+    "insertColumnRight": "오른쪽으로 열 추가",
+    "deleteColumn": "이 열 삭제",
+    "rowMenu": "행 메뉴",
+    "insertRowAbove": "위로 행 추가",
+    "insertRowBelow": "아래로 행 추가",
+    "deleteRow": "이 행 삭제"
+  },
+  "toolbar": {
+    "blockTypes": {
+      "paragraph": "단락",
+      "quote": "인용구",
+      "heading": "머릿말 {{level}}"
+    },
+    "blockTypeSelect": {
+      "selectBlockTypeTooltip": "블록 유형 선택",
+      "placeholder": "블록 유형"
+    },
+    "toggleGroup": "그룹 전환",
+    "removeBold": "굵은 글씨 제거",
+    "bold": "굵게",
+    "removeItalic": "기울임 제거",
+    "italic": "기울임",
+    "underline": "밑줄 제거",
+    "removeUnderline": "밑줄",
+    "removeInlineCode": "코드 형식 제거",
+    "inlineCode": "인라인 코드 형식",
+    "link": "링크 삽입",
+    "richText": "서식있는 텍스트",
+    "diffMode": "비교 모드",
+    "source": "소스 모드",
+    "admonition": "경고 블록 삽입",
+    "codeBlock": "코드 블록 삽입",
+    "editFrontmatter": "frontmatter 편집",
+    "insertFrontmatter": "frontmatter 삽입",
+    "image": "이미지 삽입",
+    "insertSandpack": "Sandpack 삽입",
+    "table": "표 삽입",
+    "thematicBreak": "수평선 삽입",
+    "bulletedList": "글머리 기호 목록",
+    "numberedList": "번호가 매겨진 목록",
+    "checkList": "체크 리스트",
+    "deleteSandpack": "이 코드 블록 삭제",
+    "undo": "취소 {{shortcut}}",
+    "redo": "다시 {{shortcut}}"
+  },
+  "admonitions": {
+    "note": "메모",
+    "tip": "팁",
+    "danger": "위험",
+    "info": "정보",
+    "caution": "주의",
+    "changeType": "경고 타입을 선택해주세요.",
+    "placeholder": "경고 타입"
+  },
+  "codeBlock": {
+    "language": "코드 블록 언어",
+    "selectLanguage": "코드 블록 언어 선택"
+  },
+  "contentArea": {
+    "editableMarkdown": "편집 가능한 마크다운"
+  }
+}

@@ -26,8 +26,33 @@ some more
 
 <img src="https://picsum.photos/200/300" width="200" height="300" /> some <img src="https://picsum.photos/200/300" /> flow
 
+Image with a class attribute:
+
+<img src="https://picsum.photos/200/300" class="custom" />
 some
 `
+
+export const ImageWithNoBackend: Story<{ readOnly: boolean }> = () => {
+  return (
+    <>
+      <MDXEditor
+        markdown=""
+        plugins={[
+          imagePlugin(),
+          diffSourcePlugin(),
+          toolbarPlugin({
+            toolbarContents: () => (
+              <DiffSourceToggleWrapper>
+                <InsertImage />
+              </DiffSourceToggleWrapper>
+            )
+          })
+        ]}
+        onChange={console.log}
+      />
+    </>
+  )
+}
 
 export const ImageWithBackend: Story<{ readOnly: boolean }> = () => {
   return (

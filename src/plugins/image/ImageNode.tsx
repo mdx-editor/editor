@@ -13,6 +13,7 @@ import type {
 
 import { DecoratorNode } from 'lexical'
 import { ImageEditor } from './ImageEditor'
+import { MdxJsxAttribute, MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx'
 
 function convertImageElement(domNode: Node): null | DOMConversionOutput {
   if (domNode instanceof HTMLImageElement) {
@@ -34,6 +35,7 @@ export type SerializedImageNode = Spread<
     width?: number
     height?: number
     src: string
+    rest: (MdxJsxAttribute | MdxJsxExpressionAttribute)[]
     type: 'image'
     version: 1
   },
@@ -57,24 +59,28 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
   __height: 'inherit' | number
 
   /** @internal */
+  __rest: (MdxJsxAttribute | MdxJsxExpressionAttribute)[]
+
+  /** @internal */
   static getType(): string {
     return 'image'
   }
 
   /** @internal */
   static clone(node: ImageNode): ImageNode {
-    return new ImageNode(node.__src, node.__altText, node.__title, node.__width, node.__height, node.__key)
+    return new ImageNode(node.__src, node.__altText, node.__title, node.__width, node.__height, node.__rest, node.__key)
   }
 
   /** @internal */
   static importJSON(serializedNode: SerializedImageNode): ImageNode {
-    const { altText, title, src, width, height } = serializedNode
+    const { altText, title, src, width, rest, height } = serializedNode
     const node = $createImageNode({
       altText,
       title,
       src,
       height,
-      width
+      width,
+      rest
     })
     return node
   }
@@ -116,14 +122,16 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     title: string | undefined,
     width?: 'inherit' | number,
     height?: 'inherit' | number,
+    rest?: (MdxJsxAttribute | MdxJsxExpressionAttribute)[],
     key?: NodeKey
   ) {
     super(key)
     this.__src = src
     this.__title = title
     this.__altText = altText
-    this.__width = width ?? 'inherit'
-    this.__height = height ?? 'inherit'
+    this.__width = width ? width : 'inherit'
+    this.__height = height ? height : 'inherit'
+    this.__rest = rest ?? []
   }
 
   /** @internal */
@@ -134,6 +142,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
       height: this.__height === 'inherit' ? 0 : this.__height,
       width: this.__width === 'inherit' ? 0 : this.__width,
       src: this.getSrc(),
+      rest: this.__rest,
       type: 'image',
       version: 1
     }
@@ -184,6 +193,10 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     return this.__width
   }
 
+  getRest(): (MdxJsxAttribute | MdxJsxExpressionAttribute)[] {
+    return this.__rest
+  }
+
   setTitle(title: string | undefined): void {
     this.getWritable().__title = title
   }
@@ -197,8 +210,8 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
   }
 
   /** @internal */
-  hasExplicitDimensions(): boolean {
-    return this.__width !== 'inherit' || this.__height !== 'inherit'
+  shouldBeSerializedAsElement(): boolean {
+    return this.__width !== 'inherit' || this.__height !== 'inherit' || this.__rest.length > 0
   }
 
   /** @internal */
@@ -211,6 +224,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
         width={this.__width}
         height={this.__height}
         alt={this.__altText}
+        rest={this.__rest}
       />
     )
   }
@@ -226,6 +240,7 @@ export interface CreateImageNodeParameters {
   height?: number
   title?: string
   key?: NodeKey
+  rest?: (MdxJsxAttribute | MdxJsxExpressionAttribute)[]
   src: string
 }
 
@@ -235,8 +250,8 @@ export interface CreateImageNodeParameters {
  * @group Image
  */
 export function $createImageNode(params: CreateImageNodeParameters): ImageNode {
-  const { altText, title, src, key, width, height } = params
-  return new ImageNode(src, altText, title, width, height, key)
+  const { altText, title, src, key, width, height, rest } = params
+  return new ImageNode(src, altText, title, width, height, rest, key)
 }
 
 /**

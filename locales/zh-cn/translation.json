@@ -10,6 +10,7 @@
     "cancel": "取消"
   },
   "uploadImage": {
+    "dialogTitle": "上传图片",
     "uploadInstructions": "从您的设备中上传图片：",
     "addViaUrlInstructions": "或从网址新增图片：",
     "autoCompletePlaceholder": "选择或粘贴图片",
@@ -84,7 +85,13 @@
     "checkList": "任务列表",
     "deleteSandpack": "删除 Sandpack",
     "undo": "撤销 {{shortcut}}",
-    "redo": "重做 {{shortcut}}"
+    "redo": "重做 {{shortcut}}",
+    "superscript": "上标",
+    "subscript": "下标",
+    "strikethrough": "删除线",
+    "removeSubscript": "移除下标",
+    "removeSuperscript": "移除上标",
+    "removeStrikethrough": "移除删除线"
   },
   "admonitions": {
     "note": "注意",

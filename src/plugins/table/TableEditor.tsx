@@ -8,6 +8,7 @@ import {
   $getRoot,
   BLUR_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
+  COMMAND_PRIORITY_EDITOR,
   COMMAND_PRIORITY_LOW,
   FOCUS_COMMAND,
   KEY_ENTER_COMMAND,
@@ -453,7 +454,7 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
           saveAndFocus(null)
           return true
         },
-        COMMAND_PRIORITY_CRITICAL
+        COMMAND_PRIORITY_EDITOR
       ),
 
       editor.registerCommand(
@@ -462,7 +463,7 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
           saveAndFocus(null)
           return true
         },
-        COMMAND_PRIORITY_CRITICAL
+        COMMAND_PRIORITY_EDITOR
       )
     )
   }, [colIndex, editor, rootEditor, rowIndex, saveAndFocus, setActiveCell])

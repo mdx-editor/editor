@@ -228,7 +228,7 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
         editor.registerCommand<DragEvent>(
           DRAGOVER_COMMAND,
           (event) => {
-            return onDragover(event)
+            return onDragover(event, !!theUploadHandler)
           },
           COMMAND_PRIORITY_LOW
         ),
@@ -240,38 +240,44 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
           },
           COMMAND_PRIORITY_HIGH
         ),
-        ...(theUploadHandler !== null
-          ? [
-              editor.registerCommand(
-                PASTE_COMMAND,
-                (event: ClipboardEvent) => {
-                  let cbPayload = Array.from(event.clipboardData?.items ?? [])
-                  cbPayload = cbPayload.filter((i) => i.type.includes('image')) // Strip out the non-image bits
+        editor.registerCommand(
+          PASTE_COMMAND,
+          (event: ClipboardEvent) => {
+            if (!theUploadHandler) {
+              let fromWeb = Array.from(event.clipboardData?.items ?? [])
+              fromWeb = fromWeb.filter((i) => i.type.includes('text')) // Strip out the non-image bits
 
-                  if (!cbPayload.length || cbPayload.length === 0) {
-                    return false
-                  } // If no image was present in the collection, bail.
+              if (!fromWeb.length || fromWeb.length === 0) {
+                return true
+              } // If from file system, eject without calling imageUploadHandler.
+              return false // If from web, bail.
+            }
 
-                  const imageUploadHandlerValue = r.getValue(imageUploadHandler$)!
+            let cbPayload = Array.from(event.clipboardData?.items ?? [])
+            cbPayload = cbPayload.filter((i) => i.type.includes('image')) // Strip out the non-image bits
 
-                  Promise.all(cbPayload.map((file) => imageUploadHandlerValue(file.getAsFile()!)))
-                    .then((urls) => {
-                      urls.forEach((url) => {
-                        editor.dispatchCommand(INSERT_IMAGE_COMMAND, {
-                          src: url,
-                          altText: ''
-                        })
-                      })
-                    })
-                    .catch((e: unknown) => {
-                      throw e
-                    })
-                  return true
-                },
-                COMMAND_PRIORITY_CRITICAL
-              )
-            ]
-          : [])
+            if (!cbPayload.length || cbPayload.length === 0) {
+              return false
+            } // If no image was present in the collection, bail.
+
+            const imageUploadHandlerValue = r.getValue(imageUploadHandler$)!
+
+            Promise.all(cbPayload.map((file) => imageUploadHandlerValue(file.getAsFile()!)))
+              .then((urls) => {
+                urls.forEach((url) => {
+                  editor.dispatchCommand(INSERT_IMAGE_COMMAND, {
+                    src: url,
+                    altText: ''
+                  })
+                })
+              })
+              .catch((e: unknown) => {
+                throw e
+              })
+            return true
+          },
+          COMMAND_PRIORITY_CRITICAL
+        )
       )
     })
   }
@@ -392,14 +398,16 @@ function onDragStart(event: DragEvent): boolean {
   return true
 }
 
-function onDragover(event: DragEvent): boolean {
-  // test if the user is dragging a file from the explorer
-  let cbPayload = Array.from(event.dataTransfer?.items ?? [])
-  cbPayload = cbPayload.filter((i) => i.type.includes('image')) // Strip out the non-image bits
+function onDragover(event: DragEvent, hasUploadHandler: boolean): boolean {
+  if (hasUploadHandler) {
+    // test if the user is dragging a file from the explorer
+    let cbPayload = Array.from(event.dataTransfer?.items ?? [])
+    cbPayload = cbPayload.filter((i) => i.type.includes('image')) // Strip out the non-image bits
 
-  if (cbPayload.length > 0) {
-    event.preventDefault()
-    return true
+    if (cbPayload.length > 0) {
+      event.preventDefault()
+      return true
+    }
   }
 
   // handle moving images

@@ -10,6 +10,7 @@
     "cancel": "Cancelar"
   },
   "uploadImage": {
+    "dialogTitle": "Enviar uma imagem",
     "uploadInstructions": "Enviar uma imagem do seu dispotivo:",
     "addViaUrlInstructions": "Ou adicionar uma imagem a partir de um URL:",
     "autoCompletePlaceholder": "Insira um link de imagem",
