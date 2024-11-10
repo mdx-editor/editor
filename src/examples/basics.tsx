@@ -258,6 +258,9 @@ export function Frontmatter() {
   return (
     <MDXEditor
       markdown={frontmatterMarkdown}
+      onChange={(value) => {
+        console.log(`new value: ${value}`)
+      }}
       plugins={[frontmatterPlugin(), toolbarPlugin({ toolbarContents: () => <InsertFrontmatter /> })]}
     />
   )

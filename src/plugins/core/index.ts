@@ -548,7 +548,9 @@ export const createRootEditorSubscription$ = Appender(rootEditorSubscriptions$, 
         },
         COMMAND_PRIORITY_CRITICAL
       )
-    },
+    }
+
+    /*
     // Fixes select all when frontmatter is present
     (rootEditor) => {
       return rootEditor.registerCommand<KeyboardEvent>(
@@ -581,7 +583,7 @@ export const createRootEditorSubscription$ = Appender(rootEditorSubscriptions$, 
         },
         COMMAND_PRIORITY_CRITICAL
       )
-    }
+    }*/
   ])
 })
 
