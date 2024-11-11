@@ -125,7 +125,10 @@ export const frontmatterPlugin = realmPlugin({
                     setTimeout(() => {
                       editor.update(
                         () => {
-                          $getRoot().splice(0, 0, [$createFrontmatterNode(yaml)])
+                          const firstItem = $getRoot().getFirstChild()
+                          if (!$isFrontmatterNode(firstItem)) {
+                            $getRoot().splice(0, 0, [$createFrontmatterNode(yaml)])
+                          }
                         },
                         { discrete: true }
                       )
