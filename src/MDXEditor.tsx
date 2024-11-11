@@ -5,6 +5,7 @@ import {
   Translation,
   composerChildren$,
   contentEditableClassName$,
+  spellCheck$,
   corePlugin,
   editorRootElementRef$,
   editorWrappers$,
@@ -44,8 +45,9 @@ const LexicalProvider: React.FC<{
 
 const RichTextEditor: React.FC = () => {
   const t = useTranslation()
-  const [contentEditableClassName, composerChildren, topAreaChildren, editorWrappers, placeholder] = useCellValues(
+  const [contentEditableClassName, spellCheck, composerChildren, topAreaChildren, editorWrappers, placeholder] = useCellValues(
     contentEditableClassName$,
+    spellCheck$,
     composerChildren$,
     topAreaChildren$,
     editorWrappers$,
@@ -63,6 +65,7 @@ const RichTextEditor: React.FC = () => {
               <ContentEditable
                 className={classNames(styles.contentEditable, contentEditableClassName)}
                 ariaLabel={t('contentArea.editableMarkdown', 'editable markdown')}
+                spellCheck={spellCheck}
               />
             }
             placeholder={
@@ -223,6 +226,11 @@ export interface MDXEditorProps {
    */
   contentEditableClassName?: string
   /**
+   * Controls the spellCheck value for the content editable element of the eitor.
+   * Defaults to true, use false to disable spell checking.
+   */
+  spellCheck?: boolean
+  /**
    * The markdown to edit. Notice that this is read only when the component is mounted.
    * To change the component content dynamically, use the `MDXEditorMethods.setMarkdown` method.
    */
@@ -300,6 +308,7 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>((pro
       plugins={[
         corePlugin({
           contentEditableClassName: props.contentEditableClassName ?? '',
+          spellCheck: props.spellCheck ?? true,
           initialMarkdown: props.markdown,
           onChange: props.onChange ?? noop,
           onBlur: props.onBlur ?? noop,

@@ -119,6 +119,12 @@ export const activeEditor$ = Cell<LexicalEditor | null>(null)
 export const contentEditableClassName$ = Cell('')
 
 /**
+ * Holds the spellcheck value of the content editable element.
+ * @group Core
+ */
+export const spellCheck$ = Cell(true)
+
+/**
  * Holds the readOnly state of the editor.
  * @group Core
  */
@@ -845,6 +851,7 @@ export const lexicalTheme$ = Cell<EditorThemeClasses>(lexicalTheme)
 export const corePlugin = realmPlugin<{
   initialMarkdown: string
   contentEditableClassName: string
+  spellCheck: boolean
   placeholder?: React.ReactNode
   autoFocus: boolean | { defaultSelection?: 'rootStart' | 'rootEnd'; preventScroll?: boolean | undefined }
   onChange: (markdown: string) => void
@@ -879,6 +886,7 @@ export const corePlugin = realmPlugin<{
 
       [addComposerChild$]: SharedHistoryPlugin,
       [contentEditableClassName$]: params?.contentEditableClassName,
+      [spellCheck$]: params?.spellCheck,
       [toMarkdownOptions$]: params?.toMarkdownOptions,
       [autoFocus$]: params?.autoFocus,
       [placeholder$]: params?.placeholder,
@@ -943,6 +951,7 @@ export const corePlugin = realmPlugin<{
   update(realm, params) {
     realm.pubIn({
       [contentEditableClassName$]: params?.contentEditableClassName,
+      [spellCheck$]: params?.spellCheck,
       [toMarkdownOptions$]: params?.toMarkdownOptions,
       [autoFocus$]: params?.autoFocus,
       [placeholder$]: params?.placeholder,
