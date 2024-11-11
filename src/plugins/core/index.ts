@@ -294,6 +294,12 @@ export const codeBlockEditorDescriptors$ = Cell<CodeBlockEditorDescriptor[]>([])
 export const editorRootElementRef$ = Cell<React.RefObject<HTMLDivElement> | null>(null)
 
 /**
+ * A reference to the content editable element.
+ * @group Core
+ */
+export const contentEditableRef$ = Cell<React.RefObject<HTMLDivElement> | null>(null)
+
+/**
  * Registers a lexical node to be used in the editor.
  * @group Core
  */

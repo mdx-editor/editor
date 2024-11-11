@@ -17,7 +17,8 @@ import {
   setMarkdown$,
   topAreaChildren$,
   useTranslation,
-  viewMode$
+  viewMode$,
+  contentEditableRef$
 } from './plugins/core'
 
 import { ContentEditable } from '@lexical/react/LexicalContentEditable.js'
@@ -45,6 +46,11 @@ const LexicalProvider: React.FC<{
 
 const RichTextEditor: React.FC = () => {
   const t = useTranslation()
+  const setContentEditableRef = usePublisher(contentEditableRef$)
+  const onRef = (_contentEditableRef: HTMLDivElement) => {
+    setContentEditableRef({ current: _contentEditableRef })
+  }
+
   const [contentEditableClassName, spellCheck, composerChildren, topAreaChildren, editorWrappers, placeholder] = useCellValues(
     contentEditableClassName$,
     spellCheck$,
@@ -62,11 +68,13 @@ const RichTextEditor: React.FC = () => {
         <div className={classNames(styles.rootContentEditableWrapper, 'mdxeditor-root-contenteditable')}>
           <RichTextPlugin
             contentEditable={
-              <ContentEditable
-                className={classNames(styles.contentEditable, contentEditableClassName)}
-                ariaLabel={t('contentArea.editableMarkdown', 'editable markdown')}
-                spellCheck={spellCheck}
-              />
+              <div ref={onRef}>
+                <ContentEditable
+                  className={classNames(styles.contentEditable, contentEditableClassName)}
+                  ariaLabel={t('contentArea.editableMarkdown', 'editable markdown')}
+                  spellCheck={spellCheck}
+                />
+              </div>
             }
             placeholder={
               <div className={classNames(styles.contentEditable, styles.placeholder, contentEditableClassName)}>
