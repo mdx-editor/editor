@@ -14,8 +14,10 @@ import {
   $getRoot,
   $getSelection,
   $isRangeSelection,
+  $isTextNode,
   $setSelection,
   COMMAND_PRIORITY_CRITICAL,
+  ElementNode,
   KEY_DOWN_COMMAND,
   LexicalEditor
 } from 'lexical'
@@ -107,8 +109,15 @@ export const frontmatterPlugin = realmPlugin({
 
               if ($isRangeSelection(selection)) {
                 if (selection.isCollapsed() && selection.anchor.offset === 0 && selection.focus.offset === 0 && event.key === 'Backspace') {
-                  shouldPrevent = true
-                  event.preventDefault()
+                  let node = selection.getNodes()[0] as ElementNode | null
+                  if ($isTextNode(node)) {
+                    node = node.getParent()
+                  }
+                  const prevSibling = node?.getPreviousSibling()
+                  if ($isFrontmatterNode(prevSibling)) {
+                    shouldPrevent = true
+                    event.preventDefault()
+                  }
                 } else {
                   const firstNode = selection.getNodes()[0]
                   if ($isFrontmatterNode(firstNode)) {
