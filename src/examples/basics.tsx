@@ -31,6 +31,7 @@ import jsxMarkdown from './assets/jsx.md?raw'
 import tableMarkdown from './assets/table.md?raw'
 
 import { virtuosoSampleSandpackConfig } from './_boilerplate'
+import { draggableBlockPlugin } from '../plugins/DraggableBlockPlugin'
 
 const helloMarkdown = `Hello <u>world am **here**</u> more <u>under</u> line. Some \`code with backticks\` and <code>code tag</code> `
 
@@ -66,6 +67,7 @@ tag
 **<code>hello</code> world**
 `}
         onChange={console.log}
+        plugins={[draggableBlockPlugin()]}
       />
     </>
   )
@@ -220,6 +222,7 @@ export function Table() {
       plugins={[
         tablePlugin(),
         diffSourcePlugin(),
+        draggableBlockPlugin(),
         toolbarPlugin({
           toolbarContents: () => (
             <DiffSourceToggleWrapper>
@@ -296,6 +299,7 @@ export function CodeBlock() {
       onChange={console.log}
       markdown={codeBlocksMarkdown}
       plugins={[
+        draggableBlockPlugin(),
         codeBlockPlugin({ codeBlockEditorDescriptors: [PlainTextCodeEditorDescriptor] }),
         sandpackPlugin({ sandpackConfig: virtuosoSampleSandpackConfig }),
         codeMirrorPlugin({

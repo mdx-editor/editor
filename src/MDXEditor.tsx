@@ -69,6 +69,10 @@ const RichTextEditor: React.FC = () => {
                 <ContentEditable
                   className={classNames(styles.contentEditable, contentEditableClassName)}
                   ariaLabel={t('contentArea.editableMarkdown', 'editable markdown')}
+                  style={{
+                    paddingLeft: '32px',
+                    paddingRight: '32px'
+                  }}
                 />
               </div>
             }
