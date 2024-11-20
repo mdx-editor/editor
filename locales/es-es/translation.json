@@ -10,15 +10,15 @@
     "cancel": "Cancelar"
   },
   "uploadImage": {
-    "dialogTitle": "Subir una imágen",
-    "uploadInstructions": "Sube una imágen desde tu dispositivo:",
-    "addViaUrlInstructions": "O añade una imágen desde una URL:",
-    "autoCompletePlaceholder": "Selecciona o pega el src de la imágen",
+    "dialogTitle": "Subir una imagen",
+    "uploadInstructions": "Sube una imagen desde tu dispositivo:",
+    "addViaUrlInstructions": "O añade una imagen desde una URL:",
+    "autoCompletePlaceholder": "Selecciona o pega el src de la imagen",
     "alt": "Alt:",
     "title": "Título:"
   },
   "imageEditor": {
-    "editImage": "Editar image"
+    "editImage": "Editar imagen"
   },
   "createLink": {
     "url": "URL",
@@ -76,7 +76,7 @@
     "codeBlock": "Insertar bloque de código",
     "editFrontmatter": "Editar frontmatter",
     "insertFrontmatter": "Insertar frontmatter",
-    "image": "Insertar imágen",
+    "image": "Insertar imagen",
     "insertSandpack": "Insertar Sandpack",
     "table": "Insertar tabla",
     "thematicBreak": "Insertar salto de línea",
@@ -93,7 +93,7 @@
     "danger": "Peligro",
     "info": "Información",
     "caution": "Aviso",
-    "changeType": "Seleccionar tipo de adminición",
+    "changeType": "Seleccionar tipo de admonición",
     "placeholder": "Tipo de admonición"
   },
   "codeBlock": {
