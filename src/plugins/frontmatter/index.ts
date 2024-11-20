@@ -15,7 +15,6 @@ import {
   $getSelection,
   $isRangeSelection,
   $isTextNode,
-  $setSelection,
   COMMAND_PRIORITY_CRITICAL,
   ElementNode,
   KEY_DOWN_COMMAND,

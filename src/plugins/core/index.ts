@@ -9,7 +9,6 @@ import {
   $getRoot,
   $getSelection,
   $insertNodes,
-  $isDecoratorNode,
   $isRangeSelection,
   $isRootOrShadowRoot,
   $setSelection,
@@ -20,7 +19,6 @@ import {
   ElementNode,
   FOCUS_COMMAND,
   FORMAT_TEXT_COMMAND,
-  KEY_DOWN_COMMAND,
   Klass,
   LexicalEditor,
   LexicalNode,
@@ -50,7 +48,6 @@ import {
   UnrecognizedMarkdownConstructError,
   importMarkdownToLexical
 } from '../../importMarkdownToLexical'
-import { controlOrMeta } from '../../utils/detectMac'
 import { noop } from '../../utils/fp'
 import type { JsxComponentDescriptor } from '../jsx'
 import { GenericHTMLNode } from './GenericHTMLNode'

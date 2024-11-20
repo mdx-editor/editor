@@ -30,9 +30,9 @@ export interface MdastImportVisitor<UN extends Mdast.Nodes> {
   /**
    * The test function that determines if this visitor should be used for the given node.
    * As a convenience, you can also pass a string here, which will be compared to the node's type.
-   * @param options - the registered descriptors for composite nodes (jsx, directives, code blocks).
+   * @param descriptors - the registered descriptors for composite nodes (jsx, directives, code blocks).
    */
-  testNode: ((mdastNode: Mdast.Nodes, options: Descriptors) => boolean) | string
+  testNode: ((mdastNode: Mdast.Nodes, descriptors: Descriptors) => boolean) | string
   visitNode(params: {
     /**
      * The node that is currently being visited.
@@ -46,6 +46,10 @@ export interface MdastImportVisitor<UN extends Mdast.Nodes> {
      * The parent lexical node to which the results of the processing should be added.
      */
     lexicalParent: LexicalNode
+    /**
+     * The descriptors for composite nodes (jsx, directives, code blocks).
+     */
+    descriptors: Descriptors
     /**
      * A set of convenience utilities that can be used to add nodes to the lexical tree.
      */
@@ -219,6 +223,7 @@ export function importMdastTreeToLexical({ root, mdastRoot, visitors, ...descrip
       mdastNode,
       lexicalParent,
       mdastParent,
+      descriptors,
       actions: {
         visitChildren,
         addAndStepInto(lexicalNode) {

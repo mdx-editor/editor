@@ -11,3 +11,7 @@ more Content
 something more.
 
 <UnknownJsxNode>What</UnknownJsxNode>
+
+<MyLeaf foo="fooValue">Some content</MyLeaf>
+
+<MyLeaf foo="fooValue" />
