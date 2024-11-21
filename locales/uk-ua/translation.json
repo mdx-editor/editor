@@ -18,6 +18,7 @@
       "title": "Назва:"
     },
     "imageEditor": {
+      "deleteImage": "Видалити зображення",
       "editImage": "Редагувати зображення"
     },
     "createLink": {

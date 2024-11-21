@@ -18,6 +18,7 @@
     "title": "Title:"
   },
   "imageEditor": {
+    "deleteImage": "Delete image",
     "editImage": "Edit image"
   },
   "createLink": {

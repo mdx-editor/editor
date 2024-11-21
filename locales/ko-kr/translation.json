@@ -18,6 +18,7 @@
     "title": "제목:"
   },
   "imageEditor": {
+    "deleteImage": "이미지 삭제",
     "editImage": "이미지 편집"
   },
   "createLink": {
