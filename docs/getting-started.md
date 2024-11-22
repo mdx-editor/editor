@@ -71,6 +71,7 @@ export default function InitializedMDXEditor({
 // ForwardRefEditor.tsx
 import dynamic from 'next/dynamic'
 import { forwardRef } from "react"
+import { type MDXEditorMethods, type MDXEditorProps} from '@mdxeditor/editor'
 
 // This is the only place InitializedMDXEditor is imported directly.
 const Editor = dynamic(() => import('./InitializedMDXEditor'), {
