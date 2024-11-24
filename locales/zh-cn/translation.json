@@ -18,6 +18,7 @@
     "title": "标题："
   },
   "imageEditor": {
+    "deleteImage": "删除图片",
     "editImage": "编辑图片"
   },
   "createLink": {

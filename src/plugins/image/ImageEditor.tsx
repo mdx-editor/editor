@@ -292,7 +292,7 @@ export function ImageEditor({ src, title, alt, nodeKey, width, height, rest }: I
             <button
               className={styles.iconButton}
               type="button"
-              title={t('image.delete', 'Delete image')}
+              title={t('imageEditor.deleteImage', 'Delete image')}
               disabled={readOnly}
               onClick={(e) => {
                 e.preventDefault()
