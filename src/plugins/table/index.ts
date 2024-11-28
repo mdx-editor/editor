@@ -79,8 +79,13 @@ export const insertTable$ = Signal<{
  * A plugin that adds support for tables to the editor.
  * @group Table
  */
-export const tablePlugin = realmPlugin({
-  init(realm) {
+export const tablePlugin = realmPlugin<{
+  /** Whether to add a space of padding between delimiters and cells(default: `true`) */
+  tableCellPadding?: boolean | null | undefined
+  /** Whether to align the delimiters(default: `true`).*/
+  tablePipeAlign?: boolean | null | undefined
+}>({
+  init(realm, params) {
     realm.pubIn({
       // import
       [addMdastExtension$]: gfmTableFromMarkdown(),
@@ -89,7 +94,7 @@ export const tablePlugin = realmPlugin({
       // export
       [addLexicalNode$]: TableNode,
       [addExportVisitor$]: LexicalTableVisitor,
-      [addToMarkdownExtension$]: gfmTableToMarkdown({ tableCellPadding: true, tablePipeAlign: true })
+      [addToMarkdownExtension$]: gfmTableToMarkdown({ tableCellPadding: params?.tableCellPadding, tablePipeAlign: params?.tablePipeAlign })
     })
   }
 })
