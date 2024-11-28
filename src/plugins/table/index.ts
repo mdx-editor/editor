@@ -1,7 +1,7 @@
 import { realmPlugin } from '../../RealmWithPlugins'
 import { Signal, map } from '@mdxeditor/gurx'
 import * as Mdast from 'mdast'
-import { gfmTableFromMarkdown, gfmTableToMarkdown, Options } from 'mdast-util-gfm-table'
+import { gfmTableFromMarkdown, gfmTableToMarkdown, Options as GfmTableOptions } from 'mdast-util-gfm-table'
 import { gfmTable } from 'micromark-extension-gfm-table'
 import {
   addExportVisitor$,
@@ -79,7 +79,7 @@ export const insertTable$ = Signal<{
  * A plugin that adds support for tables to the editor.
  * @group Table
  */
-export const tablePlugin = realmPlugin<Options>({
+export const tablePlugin = realmPlugin<GfmTableOptions>({
   init(realm, params) {
     realm.pubIn({
       // import
