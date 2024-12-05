@@ -253,8 +253,9 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
               return false // If from web, bail.
             }
 
-            let cbPayload = Array.from(event.clipboardData?.items ?? [])
-            cbPayload = cbPayload.filter((i) => i.type.includes('image')) // Strip out the non-image bits
+            const cbPayload = Array.from(event.clipboardData?.items ?? [])
+            const isMixedPayload = cbPayload.some((item) => !item.type.includes('image'))
+            if (isMixedPayload) return false
 
             if (!cbPayload.length || cbPayload.length === 0) {
               return false
