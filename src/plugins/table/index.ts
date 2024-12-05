@@ -89,7 +89,10 @@ export const tablePlugin = realmPlugin<GfmTableOptions>({
       // export
       [addLexicalNode$]: TableNode,
       [addExportVisitor$]: LexicalTableVisitor,
-      [addToMarkdownExtension$]: gfmTableToMarkdown({ tableCellPadding: params?.tableCellPadding ?? true, tablePipeAlign: params?.tablePipeAlign ?? true })
+      [addToMarkdownExtension$]: gfmTableToMarkdown({
+        tableCellPadding: params?.tableCellPadding ?? true,
+        tablePipeAlign: params?.tablePipeAlign ?? true
+      })
     })
   }
 })
