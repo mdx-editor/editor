@@ -115,6 +115,9 @@ export * from './utils/makeHslTransparent'
 export * from './utils/uuid4'
 export * from './utils/voidEmitter'
 
+// Forward lexical commands to customize toolbar
+export * from './utils/lexicalCommands'
+
 export * from './RealmWithPlugins'
 
 export * from './FormatConstants'
