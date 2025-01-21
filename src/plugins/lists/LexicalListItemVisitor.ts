@@ -21,14 +21,13 @@ export const LexicalListItemVisitor: LexicalExportVisitor<ListItemNode, Mdast.Li
       }
     } else {
       const parentList = lexicalNode.getParent()! as ListNode
-      // nest the children in a paragraph for MDAST compatibility
       const listItem = actions.appendToParent(mdastParent, {
         type: 'listItem' as const,
         checked: parentList.getListType() === 'check' ? Boolean(lexicalNode.getChecked()) : undefined,
         spread: false,
-        children: [{ type: 'paragraph' as const, children: [] }]
+        children: []
       }) as Mdast.ListItem
-      actions.visitChildren(lexicalNode, listItem.children[0] as Mdast.Paragraph)
+      actions.visitChildren(lexicalNode, listItem)
     }
   }
 }
