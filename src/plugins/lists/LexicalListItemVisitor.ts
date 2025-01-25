@@ -26,9 +26,9 @@ export const LexicalListItemVisitor: LexicalExportVisitor<ListItemNode, Mdast.Li
         type: 'listItem' as const,
         checked: parentList.getListType() === 'check' ? Boolean(lexicalNode.getChecked()) : undefined,
         spread: false,
-        children: [{ type: 'paragraph' as const, children: [] }]
+        children: []
       }) as Mdast.ListItem
-      actions.visitChildren(lexicalNode, listItem.children[0] as Mdast.Paragraph)
+      actions.visitChildren(lexicalNode, listItem)
     }
   }
 }
