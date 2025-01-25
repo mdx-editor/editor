@@ -1,4 +1,3 @@
-import { realmPlugin } from '../../RealmWithPlugins'
 import {
   BOLD_ITALIC_STAR,
   BOLD_ITALIC_UNDERSCORE,
@@ -11,16 +10,17 @@ import {
   ITALIC_STAR,
   ITALIC_UNDERSCORE,
   LINK,
+  MultilineElementTransformer,
   ORDERED_LIST,
   QUOTE,
-  TextFormatTransformer,
-  TextMatchTransformer,
+  Transformer,
   UNORDERED_LIST
 } from '@lexical/markdown'
 import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin.js'
 import { $createHeadingNode, $isHeadingNode, HeadingNode, HeadingTagType } from '@lexical/rich-text'
 import { ElementNode } from 'lexical'
 import React from 'react'
+import { realmPlugin } from '../../RealmWithPlugins'
 import { $createCodeBlockNode, CodeBlockNode } from '../codeblock/CodeBlockNode'
 import { activePlugins$, addComposerChild$, addNestedEditorChild$ } from '../core'
 import { HEADING_LEVEL, allowedHeadingLevels$ } from '../headings'
@@ -51,7 +51,7 @@ const createBlockNode = (createNode: (match: string[]) => ElementNode): ElementT
 }
 
 function pickTransformersForActivePlugins(pluginIds: string[], allowedHeadingLevels: readonly HEADING_LEVEL[]) {
-  const transformers: (ElementTransformer | TextFormatTransformer | TextMatchTransformer)[] = [
+  const transformers: Transformer[] = [
     BOLD_ITALIC_STAR,
     BOLD_ITALIC_UNDERSCORE,
     BOLD_STAR,
@@ -101,7 +101,7 @@ function pickTransformersForActivePlugins(pluginIds: string[], allowedHeadingLev
   }
 
   if (pluginIds.includes('codeblock')) {
-    const codeTransformerCopy: ElementTransformer = {
+    const codeTransformerCopy: MultilineElementTransformer = {
       ...CODE,
       dependencies: [CodeBlockNode],
       replace: (parentNode, _children, match) => {
