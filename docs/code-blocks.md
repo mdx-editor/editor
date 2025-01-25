@@ -32,33 +32,38 @@ const simpleSandpackConfig: SandpackConfig = {
       snippetFileName: '/App.js',
       snippetLanguage: 'jsx',
       initialSnippetContent: defaultSnippetContent
-    },
+    }
   ]
 }
 
 function App() {
   return (
-    <MDXEditor 
-      markdown='hello world'
+    <MDXEditor
+      markdown="hello world"
       plugins={[
-       // the default code block language to insert when the user clicks the "insert code block" button
-        codeBlockPlugin({defaultCodeBlockLanguage: 'js'}),
+        // the default code block language to insert when the user clicks the "insert code block" button
+        codeBlockPlugin({ defaultCodeBlockLanguage: 'js' }),
         sandpackPlugin({ sandpackConfig: simpleSandpackConfig }),
         codeMirrorPlugin({ codeBlockLanguages: { js: 'JavaScript', css: 'CSS' } }),
-        toolbarPlugin({toolbarContents: () => (
-          <ConditionalContents
-            options={[
+        toolbarPlugin({
+          toolbarContents: () => (
+            <ConditionalContents
+              options={[
                 { when: (editor) => editor?.editorType === 'codeblock', contents: () => <ChangeCodeMirrorLanguage /> },
                 { when: (editor) => editor?.editorType === 'sandpack', contents: () => <ShowSandpackInfo /> },
-                { fallback: () => ( <> 
-                <InsertCodeBlock />
-                <InsertSandpack />
-              </>) }
+                {
+                  fallback: () => (
+                    <>
+                      <InsertCodeBlock />
+                      <InsertSandpack />
+                    </>
+                  )
+                }
               ]}
-            />)
+            />
+          )
         })
-      ]
-      } 
+      ]}
     />
   )
 }
@@ -79,7 +84,7 @@ CSS:
 
 ```css
 body {
-    color: red;
+  color: red;
 }
 ```
 
@@ -94,7 +99,7 @@ export default function App() {
 
 ## Configuring the CodeMirror editor
 
-The code mirror editor plugin enables editing of fenced code blocks with basic code editing features like syntax highlighting, indentation and bracket matching. A set of toolbar component utilities support the display of a language selector when the block is in focus, while hiding the rich text editor controls. The plugin accepts supported languages as a parameter option. 
+The code mirror editor plugin enables editing of fenced code blocks with basic code editing features like syntax highlighting, indentation and bracket matching. A set of toolbar component utilities support the display of a language selector when the block is in focus, while hiding the rich text editor controls. The plugin accepts supported languages as a parameter option.
 
 ## Configuring the Sandpack editor
 
@@ -113,7 +118,7 @@ const PlainTextCodeEditorDescriptor: CodeBlockEditorDescriptor = {
   // The Editor is a React component
   Editor: (props) => {
     const cb = useCodeBlockEditorContext()
-   // stops the proppagation so that the parent lexical editor does not handle certain events.
+    // stops the propagation so that the parent lexical editor does not handle certain events.
     return (
       <div onKeyDown={(e) => e.nativeEvent.stopImmediatePropagation()}>
         <textarea rows={3} cols={20} defaultValue={props.code} onChange={(e) => cb.setCode(e.target.value)} />
@@ -123,15 +128,48 @@ const PlainTextCodeEditorDescriptor: CodeBlockEditorDescriptor = {
 }
 
 /** use markdown with some code blocks */
-const codeBlocksMarkdown = ""
+const codeBlocksMarkdown = ''
 
 export function CodeBlock() {
   return (
     <MDXEditor
       onChange={console.log}
       markdown={codeBlocksMarkdown}
+      plugins={[codeBlockPlugin({ codeBlockEditorDescriptors: [PlainTextCodeEditorDescriptor] })]}
+    />
+  )
+}
+```
+
+## Creating a fallback editor
+
+If the users have access to direct editing of the markdown code, they can insert a code block that does not have a corresponding editor. To handle this, you can create a "fallback" descriptor with a low priority that acts as a "catchAll" case. The example below uses the `CodeMirrorEditor` component.
+
+```tsx
+export function FallbackCodeEditor() {
+  return (
+    <MDXEditor
+      markdown={listWithCode}
+      onChange={(md) => {
+        console.log(md)
+      }}
       plugins={[
-        codeBlockPlugin({ codeBlockEditorDescriptors: [PlainTextCodeEditorDescriptor] }),
+        listsPlugin(),
+        codeBlockPlugin({
+          codeBlockEditorDescriptors: [{ priority: -10, match: (_) => true, Editor: CodeMirrorEditor }]
+        }),
+        sandpackPlugin({ sandpackConfig: virtuosoSampleSandpackConfig }),
+        codeMirrorPlugin({
+          codeBlockLanguages: { jsx: 'JavaScript (react)', js: 'JavaScript', css: 'CSS', tsx: 'TypeScript (react)' }
+        }),
+        diffSourcePlugin(),
+        toolbarPlugin({
+          toolbarContents: () => (
+            <DiffSourceToggleWrapper>
+              <UndoRedo />
+            </DiffSourceToggleWrapper>
+          )
+        })
       ]}
     />
   )
