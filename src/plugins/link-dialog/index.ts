@@ -1,5 +1,6 @@
 import { $createLinkNode, $isLinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link'
 import {
+  $addUpdateTag,
   $createTextNode,
   $getSelection,
   $insertNodes,
@@ -234,6 +235,7 @@ export const linkDialogState$ = Cell<InactiveLinkDialog | PreviewLinkDialog | Ed
               rectangle: getSelectionRectangle(activeEditor)
             } as PreviewLinkDialog
           } else {
+            console.log('setting to inactive')
             return { type: 'inactive' } as InactiveLinkDialog
           }
         } else {
@@ -290,30 +292,33 @@ export const openLinkEditDialog$ = Action((r) => {
     ),
     ([, selection, editor]) => {
       editor?.focus(() => {
-        editor.getEditorState().read(() => {
-          const node = getLinkNodeInSelection(selection)
-          const rectangle = getSelectionRectangle(editor)!
-          if (node) {
-            r.pub(linkDialogState$, {
-              type: 'edit',
-              initialUrl: node.getURL(),
-              initialTitle: node.getTitle() ?? '',
-              url: node.getURL(),
-              title: node.getTitle() ?? '',
-              linkNodeKey: node.getKey(),
-              rectangle
-            })
-          } else {
-            r.pub(linkDialogState$, {
-              type: 'edit',
-              initialUrl: '',
-              initialTitle: '',
-              title: '',
-              url: '',
-              linkNodeKey: '',
-              rectangle
-            })
-          }
+        // needs to be done due to a change in v0.22
+        setTimeout(() => {
+          editor.getEditorState().read(() => {
+            const node = getLinkNodeInSelection(selection)
+            const rectangle = getSelectionRectangle(editor)!
+            if (node) {
+              r.pub(linkDialogState$, {
+                type: 'edit',
+                initialUrl: node.getURL(),
+                initialTitle: node.getTitle() ?? '',
+                url: node.getURL(),
+                title: node.getTitle() ?? '',
+                linkNodeKey: node.getKey(),
+                rectangle
+              })
+            } else {
+              r.pub(linkDialogState$, {
+                type: 'edit',
+                initialUrl: '',
+                initialTitle: '',
+                title: '',
+                url: '',
+                linkNodeKey: '',
+                rectangle
+              })
+            }
+          })
         })
       })
     }
