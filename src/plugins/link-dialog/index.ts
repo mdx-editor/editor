@@ -235,7 +235,6 @@ export const linkDialogState$ = Cell<InactiveLinkDialog | PreviewLinkDialog | Ed
               rectangle: getSelectionRectangle(activeEditor)
             } as PreviewLinkDialog
           } else {
-            console.log('setting to inactive')
             return { type: 'inactive' } as InactiveLinkDialog
           }
         } else {
