@@ -42,7 +42,7 @@
     "@codemirror/merge": "^6.4.0",
     "@codemirror/state": "^6.4.0",
     "@codemirror/view": "^6.23.0",
-    "@codesandbox/sandpack-react": "^2.10.0",
+    "@codesandbox/sandpack-react": "^2.19.11",
     "@lexical/clipboard": "^0.23.1",
     "@lexical/link": "^0.23.1",
     "@lexical/list": "^0.23.1",
