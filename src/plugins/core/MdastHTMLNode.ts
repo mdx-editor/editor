@@ -52,7 +52,7 @@ export function isMdastHTMLNode(node: Mdast.Nodes): node is MdastHTMLNode {
  * All the HTML tags supported by the generic html node.
  * @group HTML
  */
-export const htmlTags = [
+export const htmlTags: string[] = [
   'a',
   'abbr',
   'address',

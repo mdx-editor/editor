@@ -1,6 +1,5 @@
 import { $createLinkNode, $isLinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link'
 import {
-  $addUpdateTag,
   $createTextNode,
   $getSelection,
   $insertNodes,
