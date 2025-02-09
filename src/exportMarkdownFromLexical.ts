@@ -59,6 +59,10 @@ export interface LexicalExportVisitor<LN extends LexicalNode, UN extends Mdast.N
        * @see {@link JsxComponentDescriptor}
        */
       registerReferredComponent(componentName: string): void
+      /**
+       * visits the specified lexical node
+       */
+      visit(node: LexicalNode, parent: Mdast.Parent): void
     }
   }): void
 
@@ -179,6 +183,7 @@ export function exportLexicalTreeToMdast({
         },
         appendToParent,
         visitChildren,
+        visit,
         registerReferredComponent
       }
     })
