@@ -234,7 +234,7 @@ export interface MDXEditorProps {
    */
   contentEditableClassName?: string
   /**
-   * Controls the spellCheck value for the content editable element of the eitor.
+   * Controls the spellCheck value for the content editable element of the editor.
    * Defaults to true, use false to disable spell checking.
    */
   spellCheck?: boolean
@@ -288,7 +288,7 @@ export interface MDXEditorProps {
    */
   iconComponentFor?: (name: IconKey) => JSX.Element
   /**
-   * Set to false if you want to suppress the processing of HTML tags.
+   * Set to true if you want to suppress the processing of HTML tags.
    */
   suppressHtmlProcessing?: boolean
   /**
