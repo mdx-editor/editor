@@ -36,6 +36,7 @@ export const SandpackEditor = ({ nodeKey, code, focusEmitter, preset }: Sandpack
         <button
           className={styles.iconButton}
           type="button"
+          disabled={readOnly}
           title={t('codeblock.delete', 'Delete code block')}
           onClick={(e) => {
             e.preventDefault()

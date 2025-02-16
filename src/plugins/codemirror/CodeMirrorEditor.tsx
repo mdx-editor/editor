@@ -89,6 +89,7 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
     >
       <div className={styles.codeMirrorToolbar}>
         <Select
+          disabled={readOnly}
           value={language}
           onChange={(language) => {
             parentEditor.update(() => {
@@ -107,6 +108,7 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
         <button
           className={styles.iconButton}
           type="button"
+          disabled={readOnly}
           title={t('codeblock.delete', 'Delete code block')}
           onClick={(e) => {
             e.preventDefault()
