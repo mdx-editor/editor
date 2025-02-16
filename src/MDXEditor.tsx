@@ -246,8 +246,9 @@ export interface MDXEditorProps {
   /**
    * Triggered when the editor value changes. The callback is not throttled, you can use any throttling mechanism
    * if you intend to do auto-saving.
+   * @param initialMarkdownNormalize - set to true if the change is triggered when the initial markdown is set. This can happen due to variety of reasons - for example, additional whitespace, bullet symbols different than the configured ones, etc.
    */
-  onChange?: (markdown: string) => void
+  onChange?: (markdown: string, initialMarkdownNormalize: boolean) => void
   /**
    * Triggered when the markdown parser encounters an error. The payload includes the invalid source and the error message.
    */

@@ -215,10 +215,16 @@ export const initialMarkdown$ = Cell('')
  */
 export const markdown$ = Cell('')
 
+export const initialMarkdownNormalize$ = Cell(false)
 /** @internal */
 const markdownSignal$ = Signal<string>((r) => {
   r.link(markdown$, markdownSignal$)
-  r.link(initialMarkdown$, markdown$)
+  r.sub(initialMarkdown$, (md) => {
+    r.pubIn({
+      [initialMarkdownNormalize$]: true,
+      [markdown$]: md
+    })
+  })
 })
 
 const mutableMarkdownSignal$ = Signal<string>((r) => {
@@ -546,6 +552,7 @@ export const createRootEditorSubscription$ = Appender(rootEditorSubscriptions$, 
         })
 
         r.pub(markdown$, theNewMarkdownValue.trim())
+        r.pub(initialMarkdownNormalize$, false)
       })
     },
     (rootEditor) => {
@@ -857,7 +864,7 @@ export const corePlugin = realmPlugin<{
   spellCheck: boolean
   placeholder?: React.ReactNode
   autoFocus: boolean | { defaultSelection?: 'rootStart' | 'rootEnd'; preventScroll?: boolean | undefined }
-  onChange: (markdown: string) => void
+  onChange: (markdown: string, initialMarkdownNormalize: boolean) => void
   onBlur?: (e: FocusEvent) => void
   onError?: (payload: { error: string; source: string }) => void
   toMarkdownOptions: NonNullable<LexicalConvertOptions['toMarkdownOptions']>
@@ -902,7 +909,9 @@ export const corePlugin = realmPlugin<{
     })
 
     r.singletonSub(markdownErrorSignal$, params?.onError)
-    r.singletonSub(mutableMarkdownSignal$, params?.onChange)
+    r.singletonSub(mutableMarkdownSignal$, (value) => {
+      params?.onChange(value, r.getValue(initialMarkdownNormalize$))
+    })
     r.singletonSub(onBlur$, params?.onBlur)
 
     // Use the JSX extension to parse HTML
@@ -961,7 +970,9 @@ export const corePlugin = realmPlugin<{
       [readOnly$]: params?.readOnly
     })
 
-    realm.singletonSub(mutableMarkdownSignal$, params?.onChange)
+    realm.singletonSub(mutableMarkdownSignal$, (value) => {
+      params?.onChange(value, realm.getValue(initialMarkdownNormalize$))
+    })
     realm.singletonSub(onBlur$, params?.onBlur)
     realm.singletonSub(markdownErrorSignal$, params?.onError)
   }
