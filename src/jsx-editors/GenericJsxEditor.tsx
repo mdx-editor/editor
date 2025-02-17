@@ -34,16 +34,16 @@ const isMdxJsxAttribute = (value: MdxJsxAttribute | MdxJsxExpressionAttribute): 
 /**
  * A component capable of editing JSX properties
  */
-type PropertyEditorType = typeof PropertyPopover;
+type PropertyEditorType = typeof PropertyPopover
 
 /**
  * Properties for the Generic Jsx Editor
  */
-export interface GenericJsxEditorProps extends JsxEditorProps{
+export interface GenericJsxEditorProps extends JsxEditorProps {
   /**
    * A custom property editor component {@link PropertyEditorType}
    */
-  PropertyEditor?:PropertyEditorType;
+  PropertyEditor?: PropertyEditorType
 }
 
 /**
@@ -110,7 +110,7 @@ export const GenericJsxEditor: React.FC<GenericJsxEditorProps> = ({ mdastNode, d
     [mdastNode, updateMdastNode, descriptor]
   )
 
-  const PropertyEditorComponent = PropertyEditor ?? PropertyPopover;
+  const PropertyEditorComponent = PropertyEditor ?? PropertyPopover
 
   const shouldRenderComponentName = descriptor.props.length == 0 && descriptor.hasChildren && descriptor.kind === 'flow'
 
@@ -118,7 +118,9 @@ export const GenericJsxEditor: React.FC<GenericJsxEditorProps> = ({ mdastNode, d
     <div className={descriptor.kind === 'text' ? styles.inlineEditor : styles.blockEditor}>
       {shouldRenderComponentName ? <span className={styles.genericComponentName}>{mdastNode.name ?? 'Fragment'}</span> : null}
 
-      {descriptor.props.length > 0 ? <PropertyEditorComponent properties={properties} title={mdastNode.name ?? ''} onChange={onChange} /> : null}
+      {descriptor.props.length > 0 ? (
+        <PropertyEditorComponent properties={properties} title={mdastNode.name ?? ''} onChange={onChange} />
+      ) : null}
 
       {descriptor.hasChildren ? (
         <NestedLexicalEditor<MdxJsxTextElement | MdxJsxFlowElement>
