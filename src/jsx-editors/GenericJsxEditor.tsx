@@ -32,12 +32,27 @@ const isMdxJsxAttribute = (value: MdxJsxAttribute | MdxJsxExpressionAttribute): 
 }
 
 /**
+ * A component capable of editing JSX properties
+ */
+type PropertyEditorType = typeof PropertyPopover;
+
+/**
+ * Properties for the Generic Jsx Editor
+ */
+export interface GenericJsxEditorProps extends JsxEditorProps{
+  /**
+   * A custom property editor component {@link PropertyEditorType}
+   */
+  PropertyEditor?:PropertyEditorType;
+}
+
+/**
  * A generic editor that can be used as an universal UI for any JSX element.
  * Allows editing of the element content and properties.
  * Use this editor for the {@link JsxComponentDescriptor} Editor option.
  * @group JSX
  */
-export const GenericJsxEditor: React.FC<JsxEditorProps> = ({ mdastNode, descriptor }) => {
+export const GenericJsxEditor: React.FC<GenericJsxEditorProps> = ({ mdastNode, descriptor, PropertyEditor }) => {
   const updateMdastNode = useMdastNodeUpdater()
 
   const properties = React.useMemo(
@@ -95,13 +110,15 @@ export const GenericJsxEditor: React.FC<JsxEditorProps> = ({ mdastNode, descript
     [mdastNode, updateMdastNode, descriptor]
   )
 
+  const PropertyEditorComponent = PropertyEditor ?? PropertyPopover;
+
   const shouldRenderComponentName = descriptor.props.length == 0 && descriptor.hasChildren && descriptor.kind === 'flow'
 
   return (
     <div className={descriptor.kind === 'text' ? styles.inlineEditor : styles.blockEditor}>
       {shouldRenderComponentName ? <span className={styles.genericComponentName}>{mdastNode.name ?? 'Fragment'}</span> : null}
 
-      {descriptor.props.length > 0 ? <PropertyPopover properties={properties} title={mdastNode.name ?? ''} onChange={onChange} /> : null}
+      {descriptor.props.length > 0 ? <PropertyEditorComponent properties={properties} title={mdastNode.name ?? ''} onChange={onChange} /> : null}
 
       {descriptor.hasChildren ? (
         <NestedLexicalEditor<MdxJsxTextElement | MdxJsxFlowElement>
