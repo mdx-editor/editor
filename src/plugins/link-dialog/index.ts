@@ -12,7 +12,15 @@ import {
 } from 'lexical'
 import { IS_APPLE } from '../../utils/detectMac'
 import { getSelectedNode, getSelectionRectangle } from '../../utils/lexicalHelpers'
-import { activeEditor$, addComposerChild$, createActiveEditorSubscription$, currentSelection$, readOnly$ } from '../core'
+import {
+  activeEditor$,
+  addComposerChild$,
+  createActiveEditorSubscription$,
+  currentSelection$,
+  readOnly$,
+  viewMode$,
+  markdownSourceEditorValue$
+} from '../core'
 import { LinkDialog } from './LinkDialog'
 import { Action, Cell, Signal, filter, map, withLatestFrom } from '@mdxeditor/gurx'
 import { realmPlugin } from '../../RealmWithPlugins'
@@ -100,6 +108,12 @@ export const linkDialogState$ = Cell<InactiveLinkDialog | PreviewLinkDialog | Ed
       },
       COMMAND_PRIORITY_LOW
     )
+  })
+
+  r.sub(r.pipe(viewMode$, withLatestFrom(markdownSourceEditorValue$)), ([markdownSourceFromEditor]) => {
+    if (markdownSourceFromEditor !== 'rich-text') {
+      r.pub(linkDialogState$, { type: 'inactive' })
+    }
   })
 
   r.pub(createActiveEditorSubscription$, (editor) => {
