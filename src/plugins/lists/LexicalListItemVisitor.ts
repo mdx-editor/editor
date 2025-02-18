@@ -1,7 +1,7 @@
 import { $isListItemNode, $isListNode, ListItemNode, ListNode } from '@lexical/list'
 import * as Mdast from 'mdast'
 import { LexicalExportVisitor } from '../../exportMarkdownFromLexical'
-import { $isElementNode, $isTextNode, $isDecoratorNode } from 'lexical'
+import { $isElementNode, $isTextNode, $isDecoratorNode, $isLineBreakNode } from 'lexical'
 
 export const LexicalListItemVisitor: LexicalExportVisitor<ListItemNode, Mdast.ListItem> = {
   testLexicalNode: $isListItemNode,
@@ -31,7 +31,7 @@ export const LexicalListItemVisitor: LexicalExportVisitor<ListItemNode, Mdast.Li
       }) as Mdast.ListItem
       let surroundingParagraph: Mdast.Paragraph | null = null
       for (const child of lexicalNode.getChildren()) {
-        if ($isTextNode(child) || ($isElementNode(child) && child.isInline()) || ($isDecoratorNode(child) && child.isInline())) {
+        if ($isTextNode(child) || $isLineBreakNode(child) || (child.isInline() && ($isElementNode(child) || $isDecoratorNode(child)))) {
           if (!surroundingParagraph) {
             surroundingParagraph = actions.appendToParent(listItem, {
               type: 'paragraph' as const,
