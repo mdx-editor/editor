@@ -1,4 +1,5 @@
 import { $createLinkNode, $isLinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link'
+import { Action, Cell, Signal, filter, map, withLatestFrom } from '@mdxeditor/gurx'
 import {
   $createTextNode,
   $getSelection,
@@ -10,12 +11,11 @@ import {
   KEY_MODIFIER_COMMAND,
   RangeSelection
 } from 'lexical'
+import { realmPlugin } from '../../RealmWithPlugins'
 import { IS_APPLE } from '../../utils/detectMac'
 import { getSelectedNode, getSelectionRectangle } from '../../utils/lexicalHelpers'
-import { activeEditor$, addComposerChild$, createActiveEditorSubscription$, currentSelection$, readOnly$ } from '../core'
+import { activeEditor$, addComposerChild$, createActiveEditorSubscription$, currentSelection$, readOnly$, viewMode$ } from '../core'
 import { LinkDialog } from './LinkDialog'
-import { Action, Cell, Signal, filter, map, withLatestFrom } from '@mdxeditor/gurx'
-import { realmPlugin } from '../../RealmWithPlugins'
 
 /**
  * Describes the boundaries of the current selection so that the link dialog can position itself accordingly.
@@ -100,6 +100,12 @@ export const linkDialogState$ = Cell<InactiveLinkDialog | PreviewLinkDialog | Ed
       },
       COMMAND_PRIORITY_LOW
     )
+  })
+
+  r.sub(r.pipe(viewMode$), (viewMode) => {
+    if (viewMode !== 'rich-text') {
+      r.pub(linkDialogState$, { type: 'inactive' })
+    }
   })
 
   r.pub(createActiveEditorSubscription$, (editor) => {
