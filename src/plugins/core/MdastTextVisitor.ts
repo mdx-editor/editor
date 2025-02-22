@@ -5,6 +5,12 @@ import { MdastImportVisitor } from '../../importMarkdownToLexical'
 export const MdastTextVisitor: MdastImportVisitor<Mdast.Text> = {
   testNode: 'text',
   visitNode({ mdastNode, actions }) {
-    actions.addAndStepInto($createTextNode(mdastNode.value).setFormat(actions.getParentFormatting()))
+    const node = $createTextNode(mdastNode.value)
+    node.setFormat(actions.getParentFormatting())
+    const style = actions.getParentStyle()
+    if (style !== '') {
+      node.setStyle(style)
+    }
+    actions.addAndStepInto(node)
   }
 }

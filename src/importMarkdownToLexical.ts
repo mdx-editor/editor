@@ -79,6 +79,15 @@ export interface MdastImportVisitor<UN extends Mdast.Nodes> {
        * Access the current formatting context.
        */
       getParentFormatting(): number
+      /**
+       * Adds styling as a context for the current node and its children.
+       * This is necessary due to mdast treating styling as a node, while lexical considering it an attribute of a node.
+       */
+      addStyle(style: string, node?: Mdast.Parent | null): void
+      /**
+       * Access the current style context.
+       */
+      getParentStyle(): string
     }
   }): void
   /**
@@ -186,6 +195,7 @@ export function importMarkdownToLexical({
 /** @internal */
 export function importMdastTreeToLexical({ root, mdastRoot, visitors, ...descriptors }: MdastTreeImportOptions): void {
   const formattingMap = new WeakMap<Mdast.Parent, number>()
+  const styleMap = new WeakMap<Mdast.Parent, string>()
 
   visitors = visitors.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0))
 
@@ -254,6 +264,19 @@ export function importMdastTreeToLexical({ root, mdastRoot, visitors, ...descrip
         },
         getParentFormatting() {
           return formattingMap.get(mdastParent!) ?? 0
+        },
+        addStyle(style, node) {
+          if (!node) {
+            if (isParent(mdastNode)) {
+              node = mdastNode
+            }
+          }
+          if (node) {
+            styleMap.set(node, style) // TODO: merge style,  | (styleMap.get(mdastParent!) ?? 0)
+          }
+        },
+        getParentStyle() {
+          return styleMap.get(mdastParent!) ?? ''
         }
       }
     })
