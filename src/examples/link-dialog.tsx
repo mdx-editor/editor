@@ -23,6 +23,41 @@ export function Basics() {
   )
 }
 
+export function ReadOnly() {
+  const [readOnly, setReadOnly] = React.useState(false)
+  return (
+    <div>
+      <label>
+        <input
+          type="checkbox"
+          onChange={(e) => {
+            setReadOnly(e.target.checked)
+          }}
+        />{' '}
+        Read only
+      </label>
+      <MDXEditor
+        readOnly={readOnly}
+        onChange={console.log}
+        markdown={`Hello world [link](https://google.com/)`}
+        plugins={[
+          linkPlugin(),
+          linkDialogPlugin({
+            linkAutocompleteSuggestions: ['https://msn.com/', 'https://virtuoso.dev/'],
+            onClickLinkCallback(url) {
+              console.log(`clicked ${url} in the edit link dialog`)
+            },
+            onReadOnlyClickLinkCallback(e, _node, url) {
+              e.preventDefault()
+              console.log(`clicked ${url} in the read-only editor mode`)
+            }
+          })
+        ]}
+      />
+    </div>
+  )
+}
+
 export function WithNestedEditors() {
   return (
     <MDXEditor

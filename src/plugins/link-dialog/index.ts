@@ -1,7 +1,8 @@
-import { $createLinkNode, $isLinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link'
+import { $createLinkNode, $isLinkNode, LinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link'
 import { Action, Cell, Signal, filter, map, withLatestFrom } from '@mdxeditor/gurx'
 import {
   $createTextNode,
+  $getNearestNodeFromDOMNode,
   $getSelection,
   $insertNodes,
   $isRangeSelection,
@@ -16,6 +17,7 @@ import { IS_APPLE } from '../../utils/detectMac'
 import { getSelectedNode, getSelectionRectangle } from '../../utils/lexicalHelpers'
 import { activeEditor$, addComposerChild$, createActiveEditorSubscription$, currentSelection$, readOnly$, viewMode$ } from '../core'
 import { LinkDialog } from './LinkDialog'
+import { $findMatchingParent } from '@lexical/utils'
 
 /**
  * Describes the boundaries of the current selection so that the link dialog can position itself accordingly.
@@ -334,8 +336,39 @@ export const linkAutocompleteSuggestions$ = Cell<string[]>([])
 
 export type ClickLinkCallback = (url: string) => void
 
+export type ReadOnlyClickLinkCallback = (event: MouseEvent, node: LinkNode, url: string) => void
+
 /** @internal */
 export const onClickLinkCallback$ = Cell<ClickLinkCallback | null>(null)
+
+/** @internal */
+export const onReadOnlyClickLinkCallback$ = Cell<ReadOnlyClickLinkCallback | null>(null, (r) => {
+  r.pub(createActiveEditorSubscription$, (editor) => {
+    function onClick(event: MouseEvent) {
+      const [readOnly, callback] = r.getValues([readOnly$, onReadOnlyClickLinkCallback$])
+      if (!readOnly || callback === null) {
+        return
+      }
+      editor.update(() => {
+        const nearestNode = $getNearestNodeFromDOMNode(event.target as Element)
+        if (nearestNode !== null) {
+          const targetNode = $findMatchingParent(nearestNode, (node) => node instanceof LinkNode) as LinkNode | null
+          if (targetNode !== null) {
+            callback(event, targetNode, targetNode.getURL())
+          }
+        }
+      })
+    }
+    return editor.registerRootListener((rootElement, prevRoot) => {
+      if (rootElement) {
+        rootElement.addEventListener('click', onClick)
+      }
+      if (prevRoot) {
+        prevRoot.removeEventListener('click', onClick)
+      }
+    })
+  })
+})
 
 /**
  * @group Link Dialog
@@ -353,10 +386,16 @@ export const linkDialogPlugin = realmPlugin<{
    * If set, clicking on the link in the preview popup will call this callback instead of opening the link.
    */
   onClickLinkCallback?: ClickLinkCallback
+
+  /**
+   * Invoked when a link is clicked in read-only mode
+   */
+  onReadOnlyClickLinkCallback?: ReadOnlyClickLinkCallback
 }>({
   init(r, params) {
     r.pub(addComposerChild$, params?.LinkDialog ?? LinkDialog)
     r.pub(onClickLinkCallback$, params?.onClickLinkCallback ?? null)
+    r.pub(onReadOnlyClickLinkCallback$, params?.onReadOnlyClickLinkCallback ?? null)
   },
   update(r, params = {}) {
     r.pub(linkAutocompleteSuggestions$, params.linkAutocompleteSuggestions ?? [])
