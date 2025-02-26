@@ -3,6 +3,7 @@ import { applyListType$, currentListType$ } from '../../lists'
 import { SingleChoiceToggleGroup } from '.././primitives/toolbar'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 import { iconComponentFor$, useTranslation } from '../../core'
+import styles from '@/styles/ui.module.css'
 
 const ICON_NAME_MAP = {
   bullet: 'format_list_bulleted',
@@ -17,7 +18,9 @@ const ICON_NAME_MAP = {
  * @group Toolbar Components
  * @param options - The list types that the user can toggle between. Defaults to `['bullet', 'number', 'check']`.
  */
-export const ListsToggle: React.FC<{ options?: ('bullet' | 'number' | 'check')[] }> = ({ options = ['bullet', 'number', 'check'] }) => {
+export const ListsToggle: React.FC<{
+  options?: ('bullet' | 'number' | 'check')[]
+}> = ({ options = ['bullet', 'number', 'check'] }) => {
   const [currentListType, iconComponentFor] = useCellValues(currentListType$, iconComponentFor$)
   const applyListType = usePublisher(applyListType$)
   const t = useTranslation()
@@ -34,5 +37,14 @@ export const ListsToggle: React.FC<{ options?: ('bullet' | 'number' | 'check')[]
     contents: iconComponentFor(ICON_NAME_MAP[type])
   }))
 
-  return <SingleChoiceToggleGroup value={currentListType || ''} items={items} onChange={applyListType} />
+  return (
+    <div className={styles.toolbarGroupOfGroups}>
+      <SingleChoiceToggleGroup
+        aria-label={t('toolbar.toggleGroup', 'toggle group')}
+        value={currentListType || ''}
+        items={items}
+        onChange={applyListType}
+      />
+    </div>
+  )
 }
