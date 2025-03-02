@@ -20,8 +20,9 @@ import { SingleChoiceToggleGroup } from '.././primitives/toolbar'
  *
  * @group Toolbar Components
  */
-export const DiffSourceToggleWrapper: React.FC<{ children: React.ReactNode; options?: ViewMode[] }> = ({
+export const DiffSourceToggleWrapper: React.FC<{ children: React.ReactNode; options?: ViewMode[]; SourceToolbar?: React.ReactNode }> = ({
   children,
+  SourceToolbar,
   options = ['rich-text', 'diff', 'source']
 }) => {
   const [viewMode, iconComponentFor] = useCellValues(viewMode$, iconComponentFor$)
@@ -51,7 +52,7 @@ export const DiffSourceToggleWrapper: React.FC<{ children: React.ReactNode; opti
       ) : viewMode === 'diff' ? (
         <span className={styles.toolbarTitleMode}>{t('toolbar.diffMode', 'Diff mode')}</span>
       ) : (
-        <span className={styles.toolbarTitleMode}>{t('toolbar.source', 'Source mode')}</span>
+        SourceToolbar ?? <span className={styles.toolbarTitleMode}>{t('toolbar.source', 'Source mode')}</span>
       )}
 
       <div style={{ marginLeft: 'auto', pointerEvents: 'auto', opacity: 1 }}>
