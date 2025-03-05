@@ -263,8 +263,7 @@ export interface MDXEditorProps {
    */
   plugins?: RealmPlugin[]
   /**
-   * The class name to apply to the root component element. Use this if you want to change the editor dimensions, maximum height, etc.
-   * For a content-specific styling, Use `contentEditableClassName` property.
+   * The class name to apply to the root component element, including the toolbar and the popups. For styling the content editable area,  Use `contentEditableClassName` property.
    */
   className?: string
   /**
