@@ -5,7 +5,6 @@ import { NestedLexicalEditor, useNestedEditorContext } from '../plugins/core/Nes
 import { DirectiveDescriptor } from '../plugins/directives'
 import { ContainerDirective } from 'mdast-util-directive'
 
-/** @internal */
 export const ADMONITION_TYPES = ['note', 'tip', 'danger', 'info', 'caution'] as const
 /** @internal */
 export type AdmonitionKind = (typeof ADMONITION_TYPES)[number]
