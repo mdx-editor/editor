@@ -2,8 +2,8 @@ import React from 'react'
 
 import type { BaseSelection, LexicalEditor } from 'lexical'
 
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext.js'
-import { useLexicalNodeSelection } from '@lexical/react/useLexicalNodeSelection.js'
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import { useLexicalNodeSelection } from '@lexical/react/useLexicalNodeSelection'
 import { mergeRegister } from '@lexical/utils'
 import classNames from 'classnames'
 import {

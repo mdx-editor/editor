@@ -1,7 +1,7 @@
-import { ContentEditable } from '@lexical/react/LexicalContentEditable.js'
-import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary.js'
-import { LexicalNestedComposer } from '@lexical/react/LexicalNestedComposer.js'
-import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin.js'
+import { ContentEditable } from '@lexical/react/LexicalContentEditable'
+import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary'
+import { LexicalNestedComposer } from '@lexical/react/LexicalNestedComposer'
+import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import * as RadixPopover from '@radix-ui/react-popover'
 import {
   $createParagraphNode,
@@ -23,7 +23,7 @@ import { importMdastTreeToLexical } from '../../importMarkdownToLexical'
 import { lexicalTheme } from '../../styles/lexicalTheme'
 import { TableNode } from './TableNode'
 
-import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin.js'
+import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
 import { mergeRegister } from '@lexical/utils'
 import * as RadixToolbar from '@radix-ui/react-toolbar'
 import classNames from 'classnames'

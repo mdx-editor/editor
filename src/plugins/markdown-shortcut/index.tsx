@@ -16,19 +16,15 @@ import {
   Transformer,
   UNORDERED_LIST
 } from '@lexical/markdown'
-import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin.js'
+import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin'
 import { $createHeadingNode, $isHeadingNode, HeadingNode, HeadingTagType } from '@lexical/rich-text'
-import { ElementNode } from 'lexical'
+import { ElementNode, LexicalNode } from 'lexical'
 import React from 'react'
 import { realmPlugin } from '../../RealmWithPlugins'
 import { $createCodeBlockNode, CodeBlockNode } from '../codeblock/CodeBlockNode'
 import { activePlugins$, addComposerChild$, addNestedEditorChild$ } from '../core'
 import { HEADING_LEVEL, allowedHeadingLevels$ } from '../headings'
-import {
-  $createHorizontalRuleNode,
-  $isHorizontalRuleNode,
-  HorizontalRuleNode
-} from '@lexical/react/LexicalHorizontalRuleNode'
+import { $createHorizontalRuleNode, $isHorizontalRuleNode, HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode'
 
 /**
  * A plugin that adds markdown shortcuts to the editor.
@@ -61,13 +57,12 @@ const THEMATIC_BREAK: ElementTransformer = {
     return $isHorizontalRuleNode(node) ? '***' : null
   },
   regExp: /^(---|\*\*\*|___)?/,
-  replace: (parentNode, children, match) => {
+  replace: (parentNode) => {
     const node = $createHorizontalRuleNode()
     parentNode.replace(node)
   },
   type: 'element'
 }
-
 
 function pickTransformersForActivePlugins(pluginIds: string[], allowedHeadingLevels: readonly HEADING_LEVEL[]) {
   const transformers: Transformer[] = [

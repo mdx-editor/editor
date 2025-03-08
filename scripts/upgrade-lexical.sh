@@ -1,6 +1,6 @@
 #!/bin/sh
 
-npm i --force @lexical/clipboard@latest \
+npm i @lexical/clipboard@latest \
   @lexical/link@latest \
   @lexical/list@latest \
   @lexical/markdown@latest \

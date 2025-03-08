@@ -21,9 +21,8 @@ import {
   contentEditableRef$
 } from './plugins/core'
 
-import { ContentEditable } from '@lexical/react/LexicalContentEditable.js'
-import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary.js'
-import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin.js'
+import { ContentEditable } from '@lexical/react/LexicalContentEditable'
+import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import classNames from 'classnames'
 import { ToMarkdownOptions } from './exportMarkdownFromLexical'
 import { lexicalTheme } from './styles/lexicalTheme'
@@ -32,6 +31,7 @@ import { noop } from './utils/fp'
 import { createLexicalComposerContext, LexicalComposerContext, LexicalComposerContextType } from '@lexical/react/LexicalComposerContext'
 import { EditorThemeClasses, LexicalEditor } from 'lexical'
 import { IconKey, defaultSvgIcons } from './defaultSvgIcons'
+import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary'
 
 const LexicalProvider: React.FC<{
   children: JSX.Element | string | (JSX.Element | string)[]
