@@ -24,6 +24,11 @@ import { realmPlugin } from '../../RealmWithPlugins'
 import { $createCodeBlockNode, CodeBlockNode } from '../codeblock/CodeBlockNode'
 import { activePlugins$, addComposerChild$, addNestedEditorChild$ } from '../core'
 import { HEADING_LEVEL, allowedHeadingLevels$ } from '../headings'
+import {
+  $createHorizontalRuleNode,
+  $isHorizontalRuleNode,
+  HorizontalRuleNode
+} from '@lexical/react/LexicalHorizontalRuleNode'
 
 /**
  * A plugin that adds markdown shortcuts to the editor.
@@ -49,6 +54,20 @@ const createBlockNode = (createNode: (match: string[]) => ElementNode): ElementT
     node.select(0, 0)
   }
 }
+
+const THEMATIC_BREAK: ElementTransformer = {
+  dependencies: [HorizontalRuleNode],
+  export: (node: LexicalNode) => {
+    return $isHorizontalRuleNode(node) ? '***' : null
+  },
+  regExp: /^(---|\*\*\*|___)?/,
+  replace: (parentNode, children, match) => {
+    const node = $createHorizontalRuleNode()
+    parentNode.replace(node)
+  },
+  type: 'element'
+}
+
 
 function pickTransformersForActivePlugins(pluginIds: string[], allowedHeadingLevels: readonly HEADING_LEVEL[]) {
   const transformers: Transformer[] = [
@@ -87,6 +106,10 @@ function pickTransformersForActivePlugins(pluginIds: string[], allowedHeadingLev
       type: 'element'
     }
     transformers.push(HEADING)
+  }
+
+  if (pluginIds.includes('thematicBreak')) {
+    transformers.push(THEMATIC_BREAK)
   }
 
   if (pluginIds.includes('quote')) {
