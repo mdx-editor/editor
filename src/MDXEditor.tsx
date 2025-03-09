@@ -16,6 +16,7 @@ import {
   rootEditor$,
   setMarkdown$,
   topAreaChildren$,
+  bottomAreaChildren$,
   useTranslation,
   viewMode$,
   contentEditableRef$
@@ -51,14 +52,16 @@ const RichTextEditor: React.FC = () => {
     setContentEditableRef({ current: _contentEditableRef })
   }
 
-  const [contentEditableClassName, spellCheck, composerChildren, topAreaChildren, editorWrappers, placeholder] = useCellValues(
-    contentEditableClassName$,
-    spellCheck$,
-    composerChildren$,
-    topAreaChildren$,
-    editorWrappers$,
-    placeholder$
-  )
+  const [contentEditableClassName, spellCheck, composerChildren, topAreaChildren, editorWrappers, placeholder, bottomAreaChildren] =
+    useCellValues(
+      contentEditableClassName$,
+      spellCheck$,
+      composerChildren$,
+      topAreaChildren$,
+      editorWrappers$,
+      placeholder$,
+      bottomAreaChildren$
+    )
   return (
     <>
       {topAreaChildren.map((Child, index) => (
@@ -86,6 +89,9 @@ const RichTextEditor: React.FC = () => {
         </div>
       </RenderRecursiveWrappers>
       {composerChildren.map((Child, index) => (
+        <Child key={index} />
+      ))}
+      {bottomAreaChildren.map((Child, index) => (
         <Child key={index} />
       ))}
     </>
