@@ -6,7 +6,7 @@ position: 0.2
 
 # Toolbar
 
-MDXEditor includes a toolbar plugin and a set of toolbar components that you can arrange up to your preferences and the features you have enabled. Most toolbar components need their respective plugins to be enabled in order to work correctly. The next example enables a simple toolbar with undo/redo and bold/italic/underline components in it. Following the same pattern, you can add, rearrange, or add custom toolbar components.
+MDXEditor includes a toolbar plugin and a set of toolbar components that you can arrange based on your preferences and the features you have enabled. Most toolbar components need their respective plugins to be enabled in order to work correctly. The next example enables a simple toolbar with undo/redo and bold/italic/underline components in it. Following the same pattern, you can add, rearrange, or add custom toolbar components.
 
 Note: Most of the components do not accept any properties, but some read the configuration parameters of their respective plugins. A notable exception is the `DiffSourceToggleWrapper` which requires its children to be the toolbar contents.
 
@@ -23,7 +23,6 @@ function App() {
           toolbarClassName: 'my-classname',
           toolbarContents: () => (
             <>
-              {' '}
               <UndoRedo />
               <BoldItalicUnderlineToggles />
             </>

@@ -1,7 +1,7 @@
 import { realmPlugin } from '../../RealmWithPlugins'
 import { Cell, useCellValues } from '@mdxeditor/gurx'
 import React from 'react'
-import { addTopAreaChild$, readOnly$ } from '../core'
+import { addTopAreaChild$, addBottomAreaChild$, readOnly$ } from '../core'
 import { Root } from './primitives/toolbar'
 
 /**
@@ -19,12 +19,26 @@ const DEFAULT_TOOLBAR_CONTENTS = () => {
  * A plugin that adds a toolbar to the editor.
  * @group Toolbar
  */
-export const toolbarPlugin = realmPlugin<{ toolbarContents: () => React.ReactNode; toolbarClassName?: string }>({
+export const toolbarPlugin = realmPlugin<{
+  /**
+   * Contents of the toolbar
+   */
+  toolbarContents: () => React.ReactNode
+  /**
+   * The class name to apply to the toolbar element
+   */
+  toolbarClassName?: string
+  /**
+   * Controls the position of the toolbar (top by default)
+   */
+  toolbarPosition?: 'top' | 'bottom'
+}>({
   init(realm, params) {
+    const toolbarPositionSymbol = params?.toolbarPosition === 'bottom' ? addBottomAreaChild$ : addTopAreaChild$
     realm.pubIn({
       [toolbarContents$]: params?.toolbarContents ?? DEFAULT_TOOLBAR_CONTENTS,
       [toolbarClassName$]: params?.toolbarClassName ?? '',
-      [addTopAreaChild$]: () => {
+      [toolbarPositionSymbol]: () => {
         const [toolbarContents, readOnly, toolbarClassName] = useCellValues(toolbarContents$, readOnly$, toolbarClassName$)
         return (
           <Root className={toolbarClassName} readOnly={readOnly}>

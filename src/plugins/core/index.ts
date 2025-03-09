@@ -697,6 +697,15 @@ export const topAreaChildren$ = Cell<React.ComponentType[]>([])
 export const addTopAreaChild$ = Appender(topAreaChildren$)
 
 /** @internal */
+export const bottomAreaChildren$ = Cell<React.ComponentType[]>([])
+
+/**
+ * Lets you add React components below the editor.
+ * @group Core
+ */
+export const addBottomAreaChild$ = Appender(bottomAreaChildren$)
+
+/** @internal */
 export const editorWrappers$ = Cell<React.ComponentType<{ children: React.ReactNode }>[]>([])
 
 /**
