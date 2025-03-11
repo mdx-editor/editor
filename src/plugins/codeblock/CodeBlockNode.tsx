@@ -1,5 +1,15 @@
 import { useCellValue } from '@mdxeditor/gurx'
-import { DecoratorNode, EditorConfig, LexicalEditor, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
+import {
+  DecoratorNode,
+  DOMConversionMap,
+  DOMConversionOutput,
+  EditorConfig,
+  LexicalEditor,
+  LexicalNode,
+  NodeKey,
+  SerializedLexicalNode,
+  Spread
+} from 'lexical'
 import React from 'react'
 import { CodeBlockEditorProps, defaultCodeBlockLanguage$ } from '.'
 import { voidEmitter } from '../../utils/voidEmitter'
@@ -55,6 +65,17 @@ export class CodeBlockNode extends DecoratorNode<JSX.Element> {
       language,
       meta
     })
+  }
+
+  static importDOM(): DOMConversionMap {
+    return {
+      pre: () => {
+        return {
+          conversion: $convertPreElement,
+          priority: 3
+        }
+      }
+    }
   }
 
   constructor(code: string, language: string, meta: string, key?: NodeKey) {
@@ -262,4 +283,28 @@ export function $createCodeBlockNode(options: Partial<CreateCodeBlockNodeOptions
  */
 export function $isCodeBlockNode(node: LexicalNode | null | undefined): node is CodeBlockNode {
   return node instanceof CodeBlockNode
+}
+
+/**
+ * Converts a <pre> HTML element into a CodeBlockNode.
+ * Extracts the code content, language, and meta information from the element's attributes.
+ * The language is determined from the class attribute (e.g., class="language-javascript") or
+ * the data-language attribute if available.
+ *
+ * @param element - The <pre> HTML element to convert.
+ * @returns A DOMConversionOutput containing the created CodeBlockNode.
+ * @group Code Block
+ */
+export function $convertPreElement(element: Element): DOMConversionOutput {
+  const preElement = element as HTMLPreElement
+  const code = preElement.textContent || ''
+  // Get language from class if available (e.g., class="language-javascript")
+  const classAttribute = element.getAttribute('class') || ''
+  const dataLanguageAttribute = element.getAttribute('data-language') || ''
+  const languageMatch = classAttribute.match(/language-(\w+)/)
+  const language = languageMatch ? languageMatch[1] : dataLanguageAttribute
+  const meta = preElement.getAttribute('data-meta') || ''
+  return {
+    node: $createCodeBlockNode({ code, language, meta })
+  }
 }
