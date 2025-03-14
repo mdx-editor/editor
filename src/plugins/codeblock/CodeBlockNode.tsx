@@ -297,13 +297,13 @@ export function $isCodeBlockNode(node: LexicalNode | null | undefined): node is 
  */
 export function $convertPreElement(element: Element): DOMConversionOutput {
   const preElement = element as HTMLPreElement
-  const code = preElement.textContent || ''
+  const code = preElement.textContent ?? ''
   // Get language from class if available (e.g., class="language-javascript")
-  const classAttribute = element.getAttribute('class') || ''
-  const dataLanguageAttribute = element.getAttribute('data-language') || ''
+  const classAttribute = element.getAttribute('class') ?? ''
+  const dataLanguageAttribute = element.getAttribute('data-language') ?? ''
   const languageMatch = classAttribute.match(/language-(\w+)/)
   const language = languageMatch ? languageMatch[1] : dataLanguageAttribute
-  const meta = preElement.getAttribute('data-meta') || ''
+  const meta = preElement.getAttribute('data-meta') ?? ''
   return {
     node: $createCodeBlockNode({ code, language, meta })
   }
