@@ -1,8 +1,18 @@
-import { DecoratorNode, LexicalEditor, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
+import {
+  DecoratorNode,
+  DOMConversionMap,
+  DOMConversionOutput,
+  LexicalEditor,
+  LexicalNode,
+  NodeKey,
+  SerializedLexicalNode,
+  Spread
+} from 'lexical'
 import * as Mdast from 'mdast'
 import React from 'react'
 import { noop } from '../../utils/fp'
 import { TableEditor } from './TableEditor'
+import { TableCell, TableRow } from 'mdast-util-gfm-table/lib'
 
 /**
  * A serialized representation of a {@link TableNode}.
@@ -56,6 +66,18 @@ export class TableNode extends DecoratorNode<JSX.Element> {
   /** @internal */
   static importJSON(serializedNode: SerializedTableNode): TableNode {
     return $createTableNode(serializedNode.mdastNode)
+  }
+
+  /** @internal */
+  static importDOM(): DOMConversionMap | null {
+    return {
+      table: () => {
+        return {
+          conversion: $convertTableElement,
+          priority: 3
+        }
+      }
+    }
   }
 
   /** @internal */
@@ -221,4 +243,40 @@ export function $isTableNode(node: LexicalNode | null | undefined): node is Tabl
  */
 export function $createTableNode(mdastNode: Mdast.Table): TableNode {
   return new TableNode(mdastNode)
+}
+
+/**
+ * Converts an HTML table element into a {@link TableNode}.
+ * This function is used to transform a DOM table element into a format that can be used by Lexical.
+ * It extracts the rows and cells from the table, converting them into MDAST-compatible nodes.
+ *
+ * @param element - The HTML table element to convert.
+ * @returns A {@link DOMConversionOutput} containing the converted {@link TableNode}.
+ * @group Table
+ */
+export function $convertTableElement(element: HTMLElement): DOMConversionOutput {
+  const rows = element.querySelectorAll('tr')
+  const children = Array.from(rows).map((row) => {
+    return {
+      type: 'tableRow',
+      children: Array.from(row.querySelectorAll('td, th')).map((cell) => {
+        return {
+          type: 'tableCell' as const,
+          children: [
+            {
+              type: 'text' as const,
+              value: cell.textContent ?? ''
+            }
+          ]
+        } satisfies TableCell
+      })
+    } satisfies TableRow
+  })
+
+  return {
+    node: new TableNode({
+      type: 'table',
+      children
+    })
+  }
 }
