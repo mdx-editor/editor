@@ -102,12 +102,12 @@ export const directivesPlugin = realmPlugin<{
   /**
    * Use this to register your custom directive editors. You can also use the built-in {@link GenericDirectiveEditor}.
    */
-  directiveDescriptors: DirectiveDescriptor<any>[],
+  directiveDescriptors: DirectiveDescriptor<any>[]
   /**
    * Set this option to display unknown text-directives as normal text nodes.
    * This is handy when colons are used to separate words, e.g. in german "Schüler:in"
    */
-  escapeUnknownTextDirectives?: boolean;
+  escapeUnknownTextDirectives?: boolean
 }>({
   update: (realm, params) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
