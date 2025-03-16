@@ -118,7 +118,7 @@ export const CatchAll: React.FC = () => {
   return <MDXEditor markdown={genericMarkdown} plugins={[directivesPlugin({ directiveDescriptors: [GenericDirectiveDescriptor] })]} />
 }
 
-export const EscapeUnknownTextDirectivesAll: React.FC = () => {
+export const EscapeUnknownTextDirectives: React.FC = () => {
   const [mdSource, setMdSource] = React.useState('');
   return (
     <div>
