@@ -118,6 +118,22 @@ export const CatchAll: React.FC = () => {
   return <MDXEditor markdown={genericMarkdown} plugins={[directivesPlugin({ directiveDescriptors: [GenericDirectiveDescriptor] })]} />
 }
 
+export const EscapeUnknownTextDirectives: React.FC = () => {
+  const [mdSource, setMdSource] = React.useState('')
+  return (
+    <div>
+      <MDXEditor
+        markdown={`She:he arrived at the party wearing her:his favorite dress:suit.`}
+        plugins={[directivesPlugin({ escapeUnknownTextDirectives: true, directiveDescriptors: [] })]}
+        onChange={setMdSource}
+      />
+      <pre>
+        <code>{mdSource}</code>
+      </pre>
+    </div>
+  )
+}
+
 export const Admonitions: React.FC = () => {
   return (
     <MDXEditor
