@@ -7,7 +7,7 @@ import { toolbarPlugin } from '../plugins/toolbar'
 import { Button } from '../plugins/toolbar/primitives/toolbar'
 import { NestedLexicalEditor } from '../plugins/core/NestedLexicalEditor'
 import { MdxJsxTextElement } from 'mdast-util-mdx'
-import { headingsPlugin } from '..'
+import { AdmonitionDirectiveDescriptor, directivesPlugin, headingsPlugin } from '..'
 import { usePublisher } from '@mdxeditor/gurx'
 
 const jsxComponentDescriptors: JsxComponentDescriptor[] = [
@@ -210,6 +210,98 @@ export const ExpressionAttributes = () => {
           toolbarPlugin({ toolbarContents: InsertBlockNodeWithExpressionAttribute })
         ]}
       />
+    </div>
+  )
+}
+
+const CatchAllDescriptor: JsxComponentDescriptor[] = [
+  {
+    name: '*',
+    kind: 'flow',
+    props: [],
+    Editor: GenericJsxEditor
+  }
+]
+
+export const ImportStatements = () => {
+  const rawMd = React.useRef(`
+import { Foo } from '@bar/foo';
+import Bar from '@foo/bar';
+
+<Foo />
+<Bar />
+        `)
+  const [md, setMd] = React.useState('')
+  return (
+    <div>
+      <h3>Original Source</h3>
+      <pre>
+        <code>
+          {rawMd.current}
+        </code>
+      </pre>
+      <h3>MDXEditor</h3>
+      <MDXEditor
+        onChange={(e) => {
+          setMd(e);
+        }}
+        markdown={rawMd.current}
+        plugins={[
+          jsxPlugin({ jsxComponentDescriptors: CatchAllDescriptor })
+        ]}
+      />
+      <h3>Serialized MDX Editor</h3>
+      <pre>
+        <code>
+          {md}
+        </code>
+      </pre>
+    </div>
+  )
+}
+export const ImportStatementsNested = () => {
+  const rawMd = React.useRef(`
+import { Foo } from '@bar/foo';
+import Bar from '@foo/bar';
+
+<Foo />
+
+<Bar />
+
+:::info
+import Buzz from '@buzz';
+
+Hello from <Buzz />
+:::
+
+        `)
+  const [md, setMd] = React.useState('')
+  return (
+    <div>
+      <h3>Original Source</h3>
+      <pre>
+        <code>
+          {rawMd.current}
+        </code>
+      </pre>
+      <h3>MDXEditor</h3>
+      <MDXEditor
+        onChange={(e) => {
+          setMd(e);
+        }}
+        markdown={rawMd.current}
+        plugins={[
+          directivesPlugin({ directiveDescriptors: [AdmonitionDirectiveDescriptor] }),
+          headingsPlugin(),
+          jsxPlugin({ jsxComponentDescriptors: CatchAllDescriptor })
+        ]}
+      />
+      <h3>Serialized MDX Editor</h3>
+      <pre>
+        <code>
+          {md}
+        </code>
+      </pre>
     </div>
   )
 }

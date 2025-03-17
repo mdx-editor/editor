@@ -69,6 +69,7 @@ import { comment, commentFromMarkdown } from '../../mdastUtilHtmlComment'
 import { lexicalTheme } from '../../styles/lexicalTheme'
 import { FORMAT } from '../../FormatConstants'
 import { IconKey } from '../../defaultSvgIcons'
+import { MetaDataNode } from './LexicalMetadataNode'
 export * from './MdastHTMLNode'
 export * from './GenericHTMLNode'
 
@@ -894,7 +895,7 @@ export const corePlugin = realmPlugin<{
       [initialMarkdown$]: params?.trim ? initialMarkdown.trim() : initialMarkdown,
       [iconComponentFor$]: params?.iconComponentFor,
       [addImportVisitor$]: [MdastRootVisitor, MdastParagraphVisitor, MdastTextVisitor, MdastBreakVisitor, ...formattingVisitors],
-      [addLexicalNode$]: [ParagraphNode, TextNode, GenericHTMLNode],
+      [addLexicalNode$]: [ParagraphNode, TextNode, GenericHTMLNode, MetaDataNode],
       [addExportVisitor$]: [
         LexicalRootVisitor,
         LexicalParagraphVisitor,
