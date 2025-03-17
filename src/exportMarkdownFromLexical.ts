@@ -118,7 +118,7 @@ export function exportLexicalTreeToMdast({
 }: ExportLexicalTreeOptions): Mdast.Root {
   let unistRoot: Mdast.Root | null = null
   const referredComponents = new Set<string>()
-  const rawImports: Map<string, ImportStatement> = new Map();
+  const rawImports: Map<string, ImportStatement> = new Map()
 
   visitors = visitors.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0))
 
@@ -187,7 +187,7 @@ export function exportLexicalTreeToMdast({
     } else {
       if ($isMetaDataNode(lexicalNode)) {
         Object.entries(lexicalNode.getMetaData().importDeclarations).forEach(([key, val]) => {
-          rawImports.set(key, val);
+          rawImports.set(key, val)
         })
       } else {
         throw new Error(`no lexical visitor found for ${lexicalNode.getType()}`, {
@@ -236,18 +236,18 @@ export function exportLexicalTreeToMdast({
   if (!addImportStatements) {
     // filter out new imports
     importsMap.entries().forEach(([path, names]) => {
-      const cleaned = names.filter(n => rawImports.has(n));
+      const cleaned = names.filter((n) => rawImports.has(n))
       if (cleaned.length > 0) {
-        importsMap.set(path, cleaned);
+        importsMap.set(path, cleaned)
       } else {
-        importsMap.delete(path);
+        importsMap.delete(path)
       }
-    });
-    defaultImportsMap.keys().forEach(key => {
+    })
+    defaultImportsMap.keys().forEach((key) => {
       if (!rawImports.has(key)) {
-        defaultImportsMap.delete(key);
+        defaultImportsMap.delete(key)
       }
-    });
+    })
   }
 
   const imports = Array.from(importsMap).map(([source, componentNames]) => {
@@ -269,13 +269,12 @@ export function exportLexicalTreeToMdast({
   const typedRoot = unistRoot as Mdast.Root
 
   const frontmatter = typedRoot.children.find((child) => child.type === 'yaml')
-  console.log('add import', addImportStatements, imports);
+  console.log('add import', addImportStatements, imports)
   if (frontmatter) {
     typedRoot.children.splice(typedRoot.children.indexOf(frontmatter) + 1, 0, ...imports)
   } else {
     typedRoot.children.unshift(...imports)
   }
-  
 
   fixWrappingWhitespace(typedRoot, [])
   collapseNestedHtmlTags(typedRoot)

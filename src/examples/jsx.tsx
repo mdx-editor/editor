@@ -236,25 +236,19 @@ import Bar from '@foo/bar';
     <div>
       <h3>Original Source</h3>
       <pre>
-        <code>
-          {rawMd.current}
-        </code>
+        <code>{rawMd.current}</code>
       </pre>
       <h3>MDXEditor</h3>
       <MDXEditor
         onChange={(e) => {
-          setMd(e);
+          setMd(e)
         }}
         markdown={rawMd.current}
-        plugins={[
-          jsxPlugin({ jsxComponentDescriptors: CatchAllDescriptor })
-        ]}
+        plugins={[jsxPlugin({ jsxComponentDescriptors: CatchAllDescriptor })]}
       />
       <h3>Serialized MDX Editor</h3>
       <pre>
-        <code>
-          {md}
-        </code>
+        <code>{md}</code>
       </pre>
     </div>
   )
@@ -279,14 +273,12 @@ Hello from <Buzz />
     <div>
       <h3>Original Source</h3>
       <pre>
-        <code>
-          {rawMd.current}
-        </code>
+        <code>{rawMd.current}</code>
       </pre>
       <h3>MDXEditor</h3>
       <MDXEditor
         onChange={(e) => {
-          setMd(e);
+          setMd(e)
         }}
         markdown={rawMd.current}
         plugins={[
@@ -303,7 +295,8 @@ Hello from <Buzz />
                 hasChildren: true,
                 Editor: GenericJsxEditor
               },
-              ...CatchAllDescriptor]
+              ...CatchAllDescriptor
+            ]
           }),
           toolbarPlugin({
             toolbarContents: () => {
@@ -316,7 +309,7 @@ Hello from <Buzz />
                         name: 'Zazz',
                         kind: 'flow',
                         props: {},
-                        children: [{ type: 'paragraph', children: [{ type: 'text', value: 'Hello from Zazz' }]}]
+                        children: [{ type: 'paragraph', children: [{ type: 'text', value: 'Hello from Zazz' }] }]
                       })
                     }}
                   >
@@ -330,9 +323,7 @@ Hello from <Buzz />
       />
       <h3>Serialized MDX Editor</h3>
       <pre>
-        <code>
-          {md}
-        </code>
+        <code>{md}</code>
       </pre>
     </div>
   )

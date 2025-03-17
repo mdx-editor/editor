@@ -1,20 +1,16 @@
-import { DecoratorNode, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from "lexical";
-import {ReactNode} from 'react';
+import { DecoratorNode, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
+import { ReactNode } from 'react'
 
 export interface ImportStatement {
-    source: string;
-    defaultExport: boolean;
+  source: string
+  defaultExport: boolean
 }
 
 interface MetaData {
-    importDeclarations: Record<string, ImportStatement>
+  importDeclarations: Record<string, ImportStatement>
 }
 
-export type SerializedMetaDataNode = Spread<
-    {type: 'metaData'} & MetaData,
-    SerializedLexicalNode
->;
-
+export type SerializedMetaDataNode = Spread<{ type: 'metaData' } & MetaData, SerializedLexicalNode>
 
 /**
  * A lexical node that represents meta data. This node has no visual representation
@@ -28,70 +24,66 @@ export type SerializedMetaDataNode = Spread<
  *  gathers all import statements on the root level and stores them in a MetaDataNode.
  */
 export class MetaDataNode extends DecoratorNode<ReactNode> {
-    __importDeclarations: Record<string, ImportStatement>;
-  
-    static getType(): string {
-      return 'metaData';
-    }
-  
-    static clone(node: MetaDataNode): MetaDataNode {
-      return new MetaDataNode(node.getMetaData(), node.__key);
-    }
-  
-    constructor(metaData?: MetaData, key?: NodeKey) {
-      super(key);
-      this.__importDeclarations = {...(metaData?.importDeclarations || {})};
-    }
-  
-    createDOM(): HTMLElement {
-      return document.createElement('div');
-    }
-  
-    updateDOM(): false {
-      return false;
-    }
-  
-    decorate(): ReactNode {
-      return null;
-    }
-    
-    getMetaData(): MetaData {
-        return {
-            importDeclarations: {...this.__importDeclarations}
-        }
-    }
+  __importDeclarations: Record<string, ImportStatement>
 
-    setImportDeclarations(declarations: Record<string, ImportStatement>) {
-        this.getWritable().__importDeclarations = declarations;
-    }
+  static getType(): string {
+    return 'metaData'
+  }
 
-    
-    /** @internal */
-    exportJSON(): SerializedMetaDataNode {
-        return {
-            type: 'metaData',
-            version: 1,
-            ...this.getMetaData(),
-        };
-    }
+  static clone(node: MetaDataNode): MetaDataNode {
+    return new MetaDataNode(node.getMetaData(), node.__key)
+  }
 
-    
-    /** @internal */
-    static importJSON(serializedNode: SerializedMetaDataNode): MetaDataNode {
-        const { importDeclarations } = serializedNode;
-        const node = $createMetaDataNode({
-            importDeclarations
-        });
-        return node;
+  constructor(metaData?: MetaData, key?: NodeKey) {
+    super(key)
+    this.__importDeclarations = { ...(metaData?.importDeclarations || {}) }
+  }
+
+  createDOM(): HTMLElement {
+    return document.createElement('div')
+  }
+
+  updateDOM(): false {
+    return false
+  }
+
+  decorate(): ReactNode {
+    return null
+  }
+
+  getMetaData(): MetaData {
+    return {
+      importDeclarations: { ...this.__importDeclarations }
     }
   }
-  
-  export function $createMetaDataNode(metaData: MetaData): MetaDataNode {
-    return new MetaDataNode(metaData);
+
+  setImportDeclarations(declarations: Record<string, ImportStatement>) {
+    this.getWritable().__importDeclarations = declarations
   }
-  
-  export function $isMetaDataNode(
-    node: LexicalNode | null | undefined,
-  ): node is MetaDataNode {
-    return node instanceof MetaDataNode;
+
+  /** @internal */
+  exportJSON(): SerializedMetaDataNode {
+    return {
+      type: 'metaData',
+      version: 1,
+      ...this.getMetaData()
+    }
   }
+
+  /** @internal */
+  static importJSON(serializedNode: SerializedMetaDataNode): MetaDataNode {
+    const { importDeclarations } = serializedNode
+    const node = $createMetaDataNode({
+      importDeclarations
+    })
+    return node
+  }
+}
+
+export function $createMetaDataNode(metaData: MetaData): MetaDataNode {
+  return new MetaDataNode(metaData)
+}
+
+export function $isMetaDataNode(node: LexicalNode | null | undefined): node is MetaDataNode {
+  return node instanceof MetaDataNode
+}
