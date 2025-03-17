@@ -228,6 +228,8 @@ export const ImportStatements = () => {
 import { Foo } from '@bar/foo';
 import Bar from '@foo/bar';
 
+Hello
+
 <Foo />
 <Bar />
         `)

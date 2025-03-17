@@ -20,7 +20,8 @@ export const LexicalJsxVisitor: LexicalExportVisitor<LexicalJsxNode, MdxJsxFlowE
     }
 
     const mdastNode = lexicalNode.getMdastNode()
-    actions.registerReferredComponent(mdastNode.name!)
+    const importStatement = lexicalNode.getImportStatement();
+    actions.registerReferredComponent(mdastNode.name!, importStatement)
     traverseNestedJsxNodes(mdastNode)
     actions.appendToParent(mdastParent, mdastNode)
   },

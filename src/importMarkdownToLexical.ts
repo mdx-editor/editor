@@ -9,7 +9,18 @@ import { JsxComponentDescriptor } from './plugins/jsx'
 import { DirectiveDescriptor } from './plugins/directives'
 import { CodeBlockEditorDescriptor } from './plugins/codeblock'
 import { MdxjsEsm } from 'mdast-util-mdx'
-import { $createMetaDataNode, ImportStatement } from './plugins/core/LexicalMetadataNode'
+
+export interface ImportStatement {
+  source: string
+  defaultExport: boolean
+}
+
+/**
+ * Metadata that is provided to the visitors
+ */
+interface MetaData {
+  importDeclarations: Record<string, ImportStatement>
+}
 
 /**
  * The registered descriptors for composite nodes (jsx, directives, code blocks).
@@ -52,6 +63,10 @@ export interface MdastImportVisitor<UN extends Mdast.Nodes> {
      * The descriptors for composite nodes (jsx, directives, code blocks).
      */
     descriptors: Descriptors
+    /**
+     * metaData: import statements from the source 
+     */
+    metaData: MetaData,
     /**
      * A set of convenience utilities that can be used to add nodes to the lexical tree.
      */
@@ -159,6 +174,34 @@ export class UnrecognizedMarkdownConstructError extends Error {
   }
 }
 
+function gatherMetadata(mdastNode: Mdast.RootContent | Mdast.Root): MetaData {
+  const importsMap = new Map<string, ImportStatement>()
+  if (mdastNode.type !== 'root') {
+    return {
+      importDeclarations: {}
+    };
+  }
+  const importStatements = mdastNode.children
+    .filter<MdxjsEsm>((n) => n.type === 'mdxjsEsm')
+    .filter((n) => n.value.startsWith('import '))
+  importStatements.forEach((imp) => {
+    ; (imp.data?.estree?.body || []).forEach((declaration) => {
+      if (declaration.type !== 'ImportDeclaration') {
+        return
+      }
+      declaration.specifiers.forEach((specifier) => {
+        importsMap.set(specifier.local.name, {
+          source: `${declaration.source.value}`,
+          defaultExport: specifier.type === 'ImportDefaultSpecifier'
+        })
+      })
+    })
+  });
+  return {
+    importDeclarations: Object.fromEntries(importsMap.entries())
+  }
+}
+
 /** @internal */
 export function importMarkdownToLexical({
   root,
@@ -198,6 +241,8 @@ export function importMarkdownToLexical({
 export function importMdastTreeToLexical({ root, mdastRoot, visitors, ...descriptors }: MdastTreeImportOptions): void {
   const formattingMap = new WeakMap<Mdast.Parent, number>()
   const styleMap = new WeakMap<Mdast.Parent, string>()
+  const metaData: MetaData = gatherMetadata(mdastRoot);
+  console.log('metadata', metaData)
 
   visitors = visitors.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0))
 
@@ -236,10 +281,11 @@ export function importMdastTreeToLexical({ root, mdastRoot, visitors, ...descrip
       lexicalParent,
       mdastParent,
       descriptors,
+      metaData,
       actions: {
         visitChildren,
         addAndStepInto(lexicalNode) {
-          ;(lexicalParent as ElementNode).append(lexicalNode)
+          ; (lexicalParent as ElementNode).append(lexicalNode)
           if (isParent(mdastNode)) {
             visitChildren(mdastNode, lexicalNode)
           }
@@ -284,32 +330,5 @@ export function importMdastTreeToLexical({ root, mdastRoot, visitors, ...descrip
     })
   }
 
-  function gatherMetadata(mdastNode: Mdast.RootContent | Mdast.Root, lexicalParent: LexicalNode, mdastParent: Mdast.Parent | null) {
-    if (mdastNode.type === 'root') {
-      const importStatements = mdastNode.children
-        .filter<MdxjsEsm>((n) => n.type === 'mdxjsEsm')
-        .filter((n) => n.value.startsWith('import '))
-      const importsMap = new Map<string, ImportStatement>()
-      importStatements.forEach((imp) => {
-        ;(imp.data?.estree?.body || []).forEach((declaration) => {
-          if (declaration.type !== 'ImportDeclaration') {
-            return
-          }
-          declaration.specifiers.forEach((specifier) => {
-            importsMap.set(specifier.local.name, {
-              source: `${declaration.source.value}`,
-              defaultExport: specifier.type === 'ImportDefaultSpecifier'
-            })
-          })
-        })
-      })
-      if (lexicalParent.getType() === 'root') {
-        const metaData = $createMetaDataNode({ importDeclarations: Object.fromEntries(importsMap.entries()) })
-        ;(lexicalParent as RootNode).splice(0, 0, [metaData])
-      }
-    }
-  }
-
   visit(mdastRoot, root as unknown as LexicalNode, null)
-  gatherMetadata(mdastRoot, root as unknown as LexicalNode, null)
 }

@@ -7,6 +7,7 @@ import { MdastJsx } from '.'
 import { VoidEmitter, voidEmitter } from '../../utils/voidEmitter'
 import { useCellValue } from '@mdxeditor/gurx'
 import { jsxComponentDescriptors$ } from '../core'
+import { ImportStatement } from '../../importMarkdownToLexical'
 
 /**
  * A serialized representation of an {@link LexicalJsxNode}.
@@ -14,6 +15,7 @@ import { jsxComponentDescriptors$ } from '../core'
 export type SerializedLexicalJsxNode = Spread<
   {
     mdastNode: MdastJsx
+    importStatement: ImportStatement | undefined
     type: 'jsx'
     version: 1
   },
@@ -26,31 +28,38 @@ export type SerializedLexicalJsxNode = Spread<
 export class LexicalJsxNode extends DecoratorNode<JSX.Element> {
   __mdastNode: MdastJsx
   __focusEmitter = voidEmitter()
+  __importStatement?: ImportStatement;
 
   static getType(): string {
     return 'jsx'
   }
 
   static clone(node: LexicalJsxNode): LexicalJsxNode {
-    return new LexicalJsxNode(structuredClone(node.__mdastNode), node.__key)
+    return new LexicalJsxNode(structuredClone(node.__mdastNode), structuredClone(node.__importStatement), node.__key)
   }
 
   static importJSON(serializedNode: SerializedLexicalJsxNode): LexicalJsxNode {
-    return $createLexicalJsxNode(serializedNode.mdastNode)
+    return $createLexicalJsxNode(serializedNode.mdastNode, serializedNode.importStatement)
   }
 
-  constructor(mdastNode: MdastJsx, key?: NodeKey) {
+  constructor(mdastNode: MdastJsx, importStatement?: ImportStatement, key?: NodeKey) {
     super(key)
     this.__mdastNode = mdastNode
+    this.__importStatement = importStatement;
   }
 
   getMdastNode(): MdastJsx {
     return this.__mdastNode
   }
 
+  getImportStatement(): ImportStatement | undefined {
+    return this.__importStatement
+  }
+
   exportJSON(): SerializedLexicalJsxNode {
     return {
       mdastNode: this.getMdastNode(),
+      importStatement: this.getImportStatement(),
       type: 'jsx',
       version: 1
     }
@@ -132,8 +141,8 @@ export function JsxEditorContainer(props: {
 /**
  * Creates an {@link LexicalJsxNode}.
  */
-export function $createLexicalJsxNode(mdastNode: MdastJsx): LexicalJsxNode {
-  return new LexicalJsxNode(mdastNode)
+export function $createLexicalJsxNode(mdastNode: MdastJsx, importStatement?: ImportStatement): LexicalJsxNode {
+  return new LexicalJsxNode(mdastNode, importStatement)
 }
 
 /**

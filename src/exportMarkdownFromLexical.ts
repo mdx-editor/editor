@@ -5,7 +5,7 @@ import { Options as ToMarkdownOptions, toMarkdown } from 'mdast-util-to-markdown
 import type { JsxComponentDescriptor } from './plugins/jsx'
 import { isMdastHTMLNode } from './plugins/core/MdastHTMLNode'
 import { mergeStyleAttributes } from './utils/mergeStyleAttributes'
-import { $isMetaDataNode, ImportStatement } from './plugins/core/LexicalMetadataNode'
+import { ImportStatement } from './plugins/core/LexicalMetadataNode'
 
 export type { Options as ToMarkdownOptions } from 'mdast-util-to-markdown'
 
@@ -59,7 +59,7 @@ export interface LexicalExportVisitor<LN extends LexicalNode, UN extends Mdast.N
        * @param componentName - the name of the component that has to be imported.
        * @see {@link JsxComponentDescriptor}
        */
-      registerReferredComponent(componentName: string): void
+      registerReferredComponent(componentName: string, importStatement?: ImportStatement): void
       /**
        * visits the specified lexical node
        */
@@ -118,14 +118,17 @@ export function exportLexicalTreeToMdast({
 }: ExportLexicalTreeOptions): Mdast.Root {
   let unistRoot: Mdast.Root | null = null
   const referredComponents = new Set<string>()
-  const rawImports: Map<string, ImportStatement> = new Map()
+  const knwonImportSources = new Map<string, ImportStatement>
 
   visitors = visitors.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0))
 
   visit(root, null)
 
-  function registerReferredComponent(componentName: string) {
-    referredComponents.add(componentName)
+  function registerReferredComponent(componentName: string, importStatement?: ImportStatement) {
+    referredComponents.add(componentName);
+    if (importStatement) {
+      knwonImportSources.set(componentName, {...importStatement})
+    }
   }
 
   function appendToParent<T extends Mdast.Parent, C extends Mdast.RootContent>(parentNode: T, node: C): C | Mdast.Root {
@@ -162,39 +165,32 @@ export function exportLexicalTreeToMdast({
 
   function visit(lexicalNode: LexicalNode, mdastParent: Mdast.Parent | null) {
     const visitor = visitors.find((visitor) => visitor.testLexicalNode?.(lexicalNode))
-    if (visitor) {
-      visitor.visitLexicalNode?.({
-        lexicalNode,
-        mdastParent: mdastParent!,
-        actions: {
-          addAndStepInto(type: string, props = {}, hasChildren = true) {
-            const newNode = {
-              type,
-              ...props,
-              ...(hasChildren ? { children: [] } : {})
-            }
-            appendToParent(mdastParent!, newNode as unknown as Mdast.RootContent)
-            if ($isElementNode(lexicalNode) && hasChildren) {
-              visitChildren(lexicalNode, newNode as Mdast.Parent)
-            }
-          },
-          appendToParent,
-          visitChildren,
-          visit,
-          registerReferredComponent
-        }
+    if (!visitor) {
+      throw new Error(`no lexical visitor found for ${lexicalNode.getType()}`, {
+        cause: lexicalNode
       })
-    } else {
-      if ($isMetaDataNode(lexicalNode)) {
-        Object.entries(lexicalNode.getMetaData().importDeclarations).forEach(([key, val]) => {
-          rawImports.set(key, val)
-        })
-      } else {
-        throw new Error(`no lexical visitor found for ${lexicalNode.getType()}`, {
-          cause: lexicalNode
-        })
-      }
     }
+    visitor.visitLexicalNode?.({
+      lexicalNode,
+      mdastParent: mdastParent!,
+      actions: {
+        addAndStepInto(type: string, props = {}, hasChildren = true) {
+          const newNode = {
+            type,
+            ...props,
+            ...(hasChildren ? { children: [] } : {})
+          }
+          appendToParent(mdastParent!, newNode as unknown as Mdast.RootContent)
+          if ($isElementNode(lexicalNode) && hasChildren) {
+            visitChildren(lexicalNode, newNode as Mdast.Parent)
+          }
+        },
+        appendToParent,
+        visitChildren,
+        visit,
+        registerReferredComponent
+      }
+    })
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -208,7 +204,7 @@ export function exportLexicalTreeToMdast({
   for (const componentName of referredComponents) {
     const descriptor =
       jsxComponentDescriptors.find((descriptor) => descriptor.name === componentName) ??
-      rawImports.get(componentName) ??
+      knwonImportSources.get(componentName) ??
       jsxComponentDescriptors.find((descriptor) => descriptor.name === '*')
     if (!descriptor) {
       throw new Error(`Component ${componentName} is used but not imported`)
@@ -236,7 +232,7 @@ export function exportLexicalTreeToMdast({
   if (!addImportStatements) {
     // filter out new imports
     importsMap.entries().forEach(([path, names]) => {
-      const cleaned = names.filter((n) => rawImports.has(n))
+      const cleaned = names.filter((n) => knwonImportSources.has(n))
       if (cleaned.length > 0) {
         importsMap.set(path, cleaned)
       } else {
@@ -244,7 +240,7 @@ export function exportLexicalTreeToMdast({
       }
     })
     defaultImportsMap.keys().forEach((key) => {
-      if (!rawImports.has(key)) {
+      if (!knwonImportSources.has(key)) {
         defaultImportsMap.delete(key)
       }
     })
@@ -269,7 +265,6 @@ export function exportLexicalTreeToMdast({
   const typedRoot = unistRoot as Mdast.Root
 
   const frontmatter = typedRoot.children.find((child) => child.type === 'yaml')
-  console.log('add import', addImportStatements, imports)
   if (frontmatter) {
     typedRoot.children.splice(typedRoot.children.indexOf(frontmatter) + 1, 0, ...imports)
   } else {
