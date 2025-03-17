@@ -261,12 +261,11 @@ import Bar from '@foo/bar';
 }
 export const ImportStatementsNested = () => {
   const rawMd = React.useRef(`
-import { Foo } from '@bar/foo';
-import Bar from '@foo/bar';
+Hello
+
+import Foo from '@bar';
 
 <Foo />
-
-<Bar />
 
 :::info
 import Buzz from '@buzz';
@@ -293,7 +292,40 @@ Hello from <Buzz />
         plugins={[
           directivesPlugin({ directiveDescriptors: [AdmonitionDirectiveDescriptor] }),
           headingsPlugin(),
-          jsxPlugin({ jsxComponentDescriptors: CatchAllDescriptor })
+          jsxPlugin({
+            jsxComponentDescriptors: [
+              {
+                name: 'Zazz',
+                kind: 'flow',
+                source: '@zazz',
+                defaultExport: true,
+                props: [],
+                hasChildren: true,
+                Editor: GenericJsxEditor
+              },
+              ...CatchAllDescriptor]
+          }),
+          toolbarPlugin({
+            toolbarContents: () => {
+              const insertJsx = usePublisher(insertJsx$)
+              return (
+                <>
+                  <Button
+                    onClick={() => {
+                      insertJsx({
+                        name: 'Zazz',
+                        kind: 'flow',
+                        props: {},
+                        children: [{ type: 'paragraph', children: [{ type: 'text', value: 'Hello from Zazz' }]}]
+                      })
+                    }}
+                  >
+                    Zazz
+                  </Button>
+                </>
+              )
+            }
+          })
         ]}
       />
       <h3>Serialized MDX Editor</h3>

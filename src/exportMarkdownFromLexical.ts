@@ -229,6 +229,27 @@ export function exportLexicalTreeToMdast({
     }
   }
 
+  /**
+   * even when the import statements should not be added,
+   * raw import statements should not be removed.
+   */
+  if (!addImportStatements) {
+    // filter out new imports
+    importsMap.entries().forEach(([path, names]) => {
+      const cleaned = names.filter(n => rawImports.has(n));
+      if (cleaned.length > 0) {
+        importsMap.set(path, cleaned);
+      } else {
+        importsMap.delete(path);
+      }
+    });
+    defaultImportsMap.keys().forEach(key => {
+      if (!rawImports.has(key)) {
+        defaultImportsMap.delete(key);
+      }
+    });
+  }
+
   const imports = Array.from(importsMap).map(([source, componentNames]) => {
     return {
       type: 'mdxjsEsm',
@@ -248,16 +269,13 @@ export function exportLexicalTreeToMdast({
   const typedRoot = unistRoot as Mdast.Root
 
   const frontmatter = typedRoot.children.find((child) => child.type === 'yaml')
-
-  console.log(typedRoot.children)
-
-  if (addImportStatements) {
-    if (frontmatter) {
-      typedRoot.children.splice(typedRoot.children.indexOf(frontmatter) + 1, 0, ...imports)
-    } else {
-      typedRoot.children.unshift(...imports)
-    }
+  console.log('add import', addImportStatements, imports);
+  if (frontmatter) {
+    typedRoot.children.splice(typedRoot.children.indexOf(frontmatter) + 1, 0, ...imports)
+  } else {
+    typedRoot.children.unshift(...imports)
   }
+  
 
   fixWrappingWhitespace(typedRoot, [])
   collapseNestedHtmlTags(typedRoot)
