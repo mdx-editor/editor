@@ -118,16 +118,16 @@ export function exportLexicalTreeToMdast({
 }: ExportLexicalTreeOptions): Mdast.Root {
   let unistRoot: Mdast.Root | null = null
   const referredComponents = new Set<string>()
-  const knwonImportSources = new Map<string, ImportStatement>
+  const knwonImportSources = new Map<string, ImportStatement>()
 
   visitors = visitors.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0))
 
   visit(root, null)
 
   function registerReferredComponent(componentName: string, importStatement?: ImportStatement) {
-    referredComponents.add(componentName);
+    referredComponents.add(componentName)
     if (importStatement) {
-      knwonImportSources.set(componentName, {...importStatement})
+      knwonImportSources.set(componentName, { ...importStatement })
     }
   }
 

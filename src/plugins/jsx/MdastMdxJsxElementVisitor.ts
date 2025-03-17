@@ -26,7 +26,9 @@ export const MdastMdxJsxElementVisitor: MdastImportVisitor<MdxJsxTextElement | M
       paragraph.append($createLexicalJsxNode(patchedNode, mdastNode.name ? metaData.importDeclarations[mdastNode.name] : undefined))
       ;(lexicalParent as RootNode).append(paragraph)
     } else {
-      ;(lexicalParent as ElementNode).append($createLexicalJsxNode(mdastNode, mdastNode.name ? metaData.importDeclarations[mdastNode.name] : undefined))
+      ;(lexicalParent as ElementNode).append(
+        $createLexicalJsxNode(mdastNode, mdastNode.name ? metaData.importDeclarations[mdastNode.name] : undefined)
+      )
     }
   },
   priority: -200

@@ -64,9 +64,9 @@ export interface MdastImportVisitor<UN extends Mdast.Nodes> {
      */
     descriptors: Descriptors
     /**
-     * metaData: import statements from the source 
+     * metaData: context data provided from the import visitor. 
      */
-    metaData: MetaData,
+    metaData: MetaData
     /**
      * A set of convenience utilities that can be used to add nodes to the lexical tree.
      */
@@ -179,13 +179,11 @@ function gatherMetadata(mdastNode: Mdast.RootContent | Mdast.Root): MetaData {
   if (mdastNode.type !== 'root') {
     return {
       importDeclarations: {}
-    };
+    }
   }
-  const importStatements = mdastNode.children
-    .filter<MdxjsEsm>((n) => n.type === 'mdxjsEsm')
-    .filter((n) => n.value.startsWith('import '))
+  const importStatements = mdastNode.children.filter<MdxjsEsm>((n) => n.type === 'mdxjsEsm').filter((n) => n.value.startsWith('import '))
   importStatements.forEach((imp) => {
-    ; (imp.data?.estree?.body || []).forEach((declaration) => {
+    ;(imp.data?.estree?.body || []).forEach((declaration) => {
       if (declaration.type !== 'ImportDeclaration') {
         return
       }
@@ -196,7 +194,7 @@ function gatherMetadata(mdastNode: Mdast.RootContent | Mdast.Root): MetaData {
         })
       })
     })
-  });
+  })
   return {
     importDeclarations: Object.fromEntries(importsMap.entries())
   }
@@ -241,7 +239,7 @@ export function importMarkdownToLexical({
 export function importMdastTreeToLexical({ root, mdastRoot, visitors, ...descriptors }: MdastTreeImportOptions): void {
   const formattingMap = new WeakMap<Mdast.Parent, number>()
   const styleMap = new WeakMap<Mdast.Parent, string>()
-  const metaData: MetaData = gatherMetadata(mdastRoot);
+  const metaData: MetaData = gatherMetadata(mdastRoot)
   console.log('metadata', metaData)
 
   visitors = visitors.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0))
@@ -285,7 +283,7 @@ export function importMdastTreeToLexical({ root, mdastRoot, visitors, ...descrip
       actions: {
         visitChildren,
         addAndStepInto(lexicalNode) {
-          ; (lexicalParent as ElementNode).append(lexicalNode)
+          ;(lexicalParent as ElementNode).append(lexicalNode)
           if (isParent(mdastNode)) {
             visitChildren(mdastNode, lexicalNode)
           }

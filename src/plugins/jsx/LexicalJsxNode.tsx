@@ -28,7 +28,7 @@ export type SerializedLexicalJsxNode = Spread<
 export class LexicalJsxNode extends DecoratorNode<JSX.Element> {
   __mdastNode: MdastJsx
   __focusEmitter = voidEmitter()
-  __importStatement?: ImportStatement;
+  __importStatement?: ImportStatement
 
   static getType(): string {
     return 'jsx'
@@ -45,7 +45,7 @@ export class LexicalJsxNode extends DecoratorNode<JSX.Element> {
   constructor(mdastNode: MdastJsx, importStatement?: ImportStatement, key?: NodeKey) {
     super(key)
     this.__mdastNode = mdastNode
-    this.__importStatement = importStatement;
+    this.__importStatement = importStatement
   }
 
   getMdastNode(): MdastJsx {
