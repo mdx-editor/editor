@@ -64,7 +64,7 @@ export interface MdastImportVisitor<UN extends Mdast.Nodes> {
      */
     descriptors: Descriptors
     /**
-     * metaData: context data provided from the import visitor. 
+     * metaData: context data provided from the import visitor.
      */
     metaData: MetaData
     /**
@@ -240,7 +240,6 @@ export function importMdastTreeToLexical({ root, mdastRoot, visitors, ...descrip
   const formattingMap = new WeakMap<Mdast.Parent, number>()
   const styleMap = new WeakMap<Mdast.Parent, string>()
   const metaData: MetaData = gatherMetadata(mdastRoot)
-  console.log('metadata', metaData)
 
   visitors = visitors.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0))
 

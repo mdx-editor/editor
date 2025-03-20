@@ -118,7 +118,7 @@ export function exportLexicalTreeToMdast({
 }: ExportLexicalTreeOptions): Mdast.Root {
   let unistRoot: Mdast.Root | null = null
   const referredComponents = new Set<string>()
-  const knwonImportSources = new Map<string, ImportStatement>()
+  const knownImportSources = new Map<string, ImportStatement>()
 
   visitors = visitors.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0))
 
@@ -127,7 +127,7 @@ export function exportLexicalTreeToMdast({
   function registerReferredComponent(componentName: string, importStatement?: ImportStatement) {
     referredComponents.add(componentName)
     if (importStatement) {
-      knwonImportSources.set(componentName, { ...importStatement })
+      knownImportSources.set(componentName, { ...importStatement })
     }
   }
 
@@ -204,7 +204,7 @@ export function exportLexicalTreeToMdast({
   for (const componentName of referredComponents) {
     const descriptor =
       jsxComponentDescriptors.find((descriptor) => descriptor.name === componentName) ??
-      knwonImportSources.get(componentName) ??
+      knownImportSources.get(componentName) ??
       jsxComponentDescriptors.find((descriptor) => descriptor.name === '*')
     if (!descriptor) {
       throw new Error(`Component ${componentName} is used but not imported`)
@@ -232,7 +232,7 @@ export function exportLexicalTreeToMdast({
   if (!addImportStatements) {
     // filter out new imports
     importsMap.entries().forEach(([path, names]) => {
-      const cleaned = names.filter((n) => knwonImportSources.has(n))
+      const cleaned = names.filter((n) => knownImportSources.has(n))
       if (cleaned.length > 0) {
         importsMap.set(path, cleaned)
       } else {
@@ -240,7 +240,7 @@ export function exportLexicalTreeToMdast({
       }
     })
     defaultImportsMap.keys().forEach((key) => {
-      if (!knwonImportSources.has(key)) {
+      if (!knownImportSources.has(key)) {
         defaultImportsMap.delete(key)
       }
     })
