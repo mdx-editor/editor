@@ -62,32 +62,12 @@ export const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text | Mda
       }) as Mdast.Parent
     }
 
-    if (prevFormat & format & IS_ITALIC) {
-      localParentNode = actions.appendToParent(localParentNode, {
-        type: 'emphasis',
-        children: []
-      }) as Mdast.Parent
-    }
-    if (prevFormat & format & IS_BOLD) {
-      localParentNode = actions.appendToParent(localParentNode, {
-        type: 'strong',
-        children: []
-      }) as Mdast.Parent
-    }
-
     if (prevFormat & format & IS_UNDERLINE) {
       localParentNode = actions.appendToParent(localParentNode, {
         type: 'mdxJsxTextElement',
         name: 'u',
         children: [],
         attributes: []
-      }) as Mdast.Parent
-    }
-
-    if (prevFormat & format & IS_STRIKETHROUGH) {
-      localParentNode = actions.appendToParent(localParentNode, {
-        type: 'delete',
-        children: []
       }) as Mdast.Parent
     }
 
@@ -109,20 +89,27 @@ export const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text | Mda
       }) as Mdast.Parent
     }
 
-    // repeat the same sequence as above for formatting introduced with this node
-    if (format & IS_ITALIC && !(prevFormat & IS_ITALIC)) {
+    if (prevFormat & format & IS_ITALIC) {
       localParentNode = actions.appendToParent(localParentNode, {
         type: 'emphasis',
         children: []
       }) as Mdast.Parent
     }
-
-    if (format & IS_BOLD && !(prevFormat & IS_BOLD)) {
+    if (prevFormat & format & IS_BOLD) {
       localParentNode = actions.appendToParent(localParentNode, {
         type: 'strong',
         children: []
       }) as Mdast.Parent
     }
+
+    if (prevFormat & format & IS_STRIKETHROUGH) {
+      localParentNode = actions.appendToParent(localParentNode, {
+        type: 'delete',
+        children: []
+      }) as Mdast.Parent
+    }
+
+    // repeat the same sequence as above for formatting introduced with this node
 
     if (format & IS_UNDERLINE && !(prevFormat & IS_UNDERLINE)) {
       localParentNode = actions.appendToParent(localParentNode, {
@@ -130,13 +117,6 @@ export const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text | Mda
         name: 'u',
         children: [],
         attributes: []
-      }) as Mdast.Parent
-    }
-
-    if (format & IS_STRIKETHROUGH && !(prevFormat & IS_STRIKETHROUGH)) {
-      localParentNode = actions.appendToParent(localParentNode, {
-        type: 'delete',
-        children: []
       }) as Mdast.Parent
     }
 
@@ -155,6 +135,27 @@ export const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text | Mda
         name: 'sub',
         children: [],
         attributes: []
+      }) as Mdast.Parent
+    }
+
+    if (format & IS_ITALIC && !(prevFormat & IS_ITALIC)) {
+      localParentNode = actions.appendToParent(localParentNode, {
+        type: 'emphasis',
+        children: []
+      }) as Mdast.Parent
+    }
+
+    if (format & IS_BOLD && !(prevFormat & IS_BOLD)) {
+      localParentNode = actions.appendToParent(localParentNode, {
+        type: 'strong',
+        children: []
+      }) as Mdast.Parent
+    }
+
+    if (format & IS_STRIKETHROUGH && !(prevFormat & IS_STRIKETHROUGH)) {
+      localParentNode = actions.appendToParent(localParentNode, {
+        type: 'delete',
+        children: []
       }) as Mdast.Parent
     }
 

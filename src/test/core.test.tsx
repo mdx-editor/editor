@@ -46,6 +46,10 @@ describe('markdown import export', () => {
     testIdenticalMarkdown(`<u>Hello</u> World`)
   })
 
+  it('works with underline', () => {
+    testIdenticalMarkdown(`a<u>***Hello***</u>a World`)
+  })
+
   it('works with code', () => {
     testIdenticalMarkdown('`Hello` World')
   })
