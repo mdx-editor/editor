@@ -5,6 +5,7 @@ import { Options as ToMarkdownOptions, toMarkdown } from 'mdast-util-to-markdown
 import type { JsxComponentDescriptor } from './plugins/jsx'
 import { isMdastHTMLNode } from './plugins/core/MdastHTMLNode'
 import { mergeStyleAttributes } from './utils/mergeStyleAttributes'
+import { ImportStatement } from './importMarkdownToLexical'
 
 export type { Options as ToMarkdownOptions } from 'mdast-util-to-markdown'
 
@@ -58,7 +59,7 @@ export interface LexicalExportVisitor<LN extends LexicalNode, UN extends Mdast.N
        * @param componentName - the name of the component that has to be imported.
        * @see {@link JsxComponentDescriptor}
        */
-      registerReferredComponent(componentName: string): void
+      registerReferredComponent(componentName: string, importStatement?: ImportStatement): void
       /**
        * visits the specified lexical node
        */
@@ -117,13 +118,17 @@ export function exportLexicalTreeToMdast({
 }: ExportLexicalTreeOptions): Mdast.Root {
   let unistRoot: Mdast.Root | null = null
   const referredComponents = new Set<string>()
+  const knownImportSources = new Map<string, ImportStatement>()
 
   visitors = visitors.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0))
 
   visit(root, null)
 
-  function registerReferredComponent(componentName: string) {
+  function registerReferredComponent(componentName: string, importStatement?: ImportStatement) {
     referredComponents.add(componentName)
+    if (importStatement) {
+      knownImportSources.set(componentName, { ...importStatement })
+    }
   }
 
   function appendToParent<T extends Mdast.Parent, C extends Mdast.RootContent>(parentNode: T, node: C): C | Mdast.Root {
@@ -165,7 +170,6 @@ export function exportLexicalTreeToMdast({
         cause: lexicalNode
       })
     }
-
     visitor.visitLexicalNode?.({
       lexicalNode,
       mdastParent: mdastParent!,
@@ -197,10 +201,10 @@ export function exportLexicalTreeToMdast({
   // iterate over all referred components and construct import statements, then append them to the root
   const importsMap = new Map<string, string[]>()
   const defaultImportsMap = new Map<string, string>()
-
   for (const componentName of referredComponents) {
     const descriptor =
       jsxComponentDescriptors.find((descriptor) => descriptor.name === componentName) ??
+      knownImportSources.get(componentName) ??
       jsxComponentDescriptors.find((descriptor) => descriptor.name === '*')
     if (!descriptor) {
       throw new Error(`Component ${componentName} is used but not imported`)
@@ -217,6 +221,27 @@ export function exportLexicalTreeToMdast({
         existing.push(componentName)
       } else {
         importsMap.set(source, [componentName])
+      }
+    }
+  }
+
+  /**
+   * even when the import statements should not be added,
+   * raw import statements should not be removed.
+   */
+  if (!addImportStatements) {
+    // filter out new imports
+    for (const [path, names] of importsMap.entries()) {
+      const cleaned = names.filter((n) => knownImportSources.has(n))
+      if (cleaned.length > 0) {
+        importsMap.set(path, cleaned)
+      } else {
+        importsMap.delete(path)
+      }
+    }
+    for (const key of defaultImportsMap.keys()) {
+      if (!knownImportSources.has(key)) {
+        defaultImportsMap.delete(key)
       }
     }
   }
@@ -240,13 +265,10 @@ export function exportLexicalTreeToMdast({
   const typedRoot = unistRoot as Mdast.Root
 
   const frontmatter = typedRoot.children.find((child) => child.type === 'yaml')
-
-  if (addImportStatements) {
-    if (frontmatter) {
-      typedRoot.children.splice(typedRoot.children.indexOf(frontmatter) + 1, 0, ...imports)
-    } else {
-      typedRoot.children.unshift(...imports)
-    }
+  if (frontmatter) {
+    typedRoot.children.splice(typedRoot.children.indexOf(frontmatter) + 1, 0, ...imports)
+  } else {
+    typedRoot.children.unshift(...imports)
   }
 
   fixWrappingWhitespace(typedRoot, [])

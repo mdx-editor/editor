@@ -7,7 +7,7 @@ import { toolbarPlugin } from '../plugins/toolbar'
 import { Button } from '../plugins/toolbar/primitives/toolbar'
 import { NestedLexicalEditor } from '../plugins/core/NestedLexicalEditor'
 import { MdxJsxTextElement } from 'mdast-util-mdx'
-import { headingsPlugin } from '..'
+import { AdmonitionDirectiveDescriptor, directivesPlugin, headingsPlugin } from '..'
 import { usePublisher } from '@mdxeditor/gurx'
 
 const jsxComponentDescriptors: JsxComponentDescriptor[] = [
@@ -210,6 +210,124 @@ export const ExpressionAttributes = () => {
           toolbarPlugin({ toolbarContents: InsertBlockNodeWithExpressionAttribute })
         ]}
       />
+    </div>
+  )
+}
+
+const CatchAllDescriptor: JsxComponentDescriptor[] = [
+  {
+    name: '*',
+    kind: 'flow',
+    props: [],
+    Editor: GenericJsxEditor
+  }
+]
+
+export const ImportStatements = () => {
+  const rawMd = React.useRef(`
+import { Foo } from '@bar/foo';
+import Bar from '@foo/bar';
+
+Hello
+
+<Foo />
+<Bar />
+        `)
+  const [md, setMd] = React.useState('')
+  return (
+    <div>
+      <h3>Original Source</h3>
+      <pre>
+        <code>{rawMd.current}</code>
+      </pre>
+      <h3>MDXEditor</h3>
+      <MDXEditor
+        onChange={(e) => {
+          setMd(e)
+        }}
+        markdown={rawMd.current}
+        plugins={[jsxPlugin({ jsxComponentDescriptors: CatchAllDescriptor })]}
+      />
+      <h3>Serialized MDX Editor</h3>
+      <pre>
+        <code>{md}</code>
+      </pre>
+    </div>
+  )
+}
+export const ImportStatementsNested = () => {
+  const rawMd = React.useRef(`
+Hello
+
+import Foo from '@bar';
+
+<Foo />
+
+:::info
+import Buzz from '@buzz';
+
+Hello from <Buzz />
+:::
+
+        `)
+  const [md, setMd] = React.useState('')
+  return (
+    <div>
+      <h3>Original Source</h3>
+      <pre>
+        <code>{rawMd.current}</code>
+      </pre>
+      <h3>MDXEditor</h3>
+      <MDXEditor
+        onChange={(e) => {
+          setMd(e)
+        }}
+        markdown={rawMd.current}
+        plugins={[
+          directivesPlugin({ directiveDescriptors: [AdmonitionDirectiveDescriptor] }),
+          headingsPlugin(),
+          jsxPlugin({
+            jsxComponentDescriptors: [
+              {
+                name: 'Zazz',
+                kind: 'flow',
+                source: '@zazz',
+                defaultExport: true,
+                props: [],
+                hasChildren: true,
+                Editor: GenericJsxEditor
+              },
+              ...CatchAllDescriptor
+            ]
+          }),
+          toolbarPlugin({
+            toolbarContents: () => {
+              // eslint-disable-next-line react-hooks/rules-of-hooks
+              const insertJsx = usePublisher(insertJsx$)
+              return (
+                <>
+                  <Button
+                    onClick={() => {
+                      insertJsx({
+                        name: 'Zazz',
+                        kind: 'flow',
+                        props: {},
+                        children: [{ type: 'paragraph', children: [{ type: 'text', value: 'Hello from Zazz' }] }]
+                      })
+                    }}
+                  >
+                    Zazz
+                  </Button>
+                </>
+              )
+            }
+          })
+        ]}
+      />
+      <h3>Serialized MDX Editor</h3>
+      <pre>
+        <code>{md}</code>
+      </pre>
     </div>
   )
 }

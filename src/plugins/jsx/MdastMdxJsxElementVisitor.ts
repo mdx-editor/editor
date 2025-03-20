@@ -14,7 +14,7 @@ export const MdastMdxJsxElementVisitor: MdastImportVisitor<MdxJsxTextElement | M
     }
     return false
   },
-  visitNode({ lexicalParent, mdastNode, descriptors: { jsxComponentDescriptors } }) {
+  visitNode({ lexicalParent, mdastNode, descriptors: { jsxComponentDescriptors }, metaData }) {
     const descriptor =
       jsxComponentDescriptors.find((descriptor) => descriptor.name === mdastNode.name) ??
       jsxComponentDescriptors.find((descriptor) => descriptor.name === '*')
@@ -23,10 +23,12 @@ export const MdastMdxJsxElementVisitor: MdastImportVisitor<MdxJsxTextElement | M
     if (descriptor?.kind === 'text' && mdastNode.type === 'mdxJsxFlowElement') {
       const patchedNode = { ...mdastNode, type: 'mdxJsxTextElement' } as MdxJsxTextElement
       const paragraph = $createParagraphNode()
-      paragraph.append($createLexicalJsxNode(patchedNode))
+      paragraph.append($createLexicalJsxNode(patchedNode, mdastNode.name ? metaData.importDeclarations[mdastNode.name] : undefined))
       ;(lexicalParent as RootNode).append(paragraph)
     } else {
-      ;(lexicalParent as ElementNode).append($createLexicalJsxNode(mdastNode))
+      ;(lexicalParent as ElementNode).append(
+        $createLexicalJsxNode(mdastNode, mdastNode.name ? metaData.importDeclarations[mdastNode.name] : undefined)
+      )
     }
   },
   priority: -200
