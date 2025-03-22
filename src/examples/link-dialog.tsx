@@ -17,7 +17,7 @@ export function Basics() {
   return (
     <MDXEditor
       onChange={console.log}
-      markdown={`Hello world [link](https://google.com/)`}
+      markdown={`Hello world [link](https://google.com/) https://test.digital should become a link`}
       plugins={[linkPlugin(), linkDialogPlugin({ linkAutocompleteSuggestions: ['https://msn.com/', 'https://virtuoso.dev/'] })]}
     />
   )
