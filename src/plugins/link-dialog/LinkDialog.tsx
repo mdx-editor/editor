@@ -144,20 +144,22 @@ export const LinkDialog: React.FC = () => {
 
   const t = useTranslation()
 
+  if (linkDialogState.type === 'inactive') return null
+
   const theRect = linkDialogState.rectangle
 
   const urlIsExternal = linkDialogState.type === 'preview' && linkDialogState.url.startsWith('http')
 
   return (
-    <Popover.Root open={linkDialogState.type !== 'inactive'}>
+    <Popover.Root open={true}>
       <Popover.Anchor
         data-visible={linkDialogState.type === 'edit'}
         className={styles.linkDialogAnchor}
         style={{
-          top: `${theRect?.top ?? 0}px`,
-          left: `${theRect?.left ?? 0}px`,
-          width: `${theRect?.width ?? 0}px`,
-          height: `${theRect?.height ?? 0}px`
+          top: `${theRect.top}px`,
+          left: `${theRect.left}px`,
+          width: `${theRect.width}px`,
+          height: `${theRect.height}px`
         }}
       />
 
