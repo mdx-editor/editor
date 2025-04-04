@@ -31,9 +31,11 @@ export const ImageDialog: React.FC = () => {
     values: state.type === 'editing' ? (state.initialValues as any) : {}
   })
 
+  if (state.type === 'inactive') return null
+
   return (
     <Dialog.Root
-      open={state.type !== 'inactive'}
+      open={true}
       onOpenChange={(open) => {
         if (!open) {
           closeImageDialog()
