@@ -31,6 +31,7 @@ import {
   addLexicalNode$,
   createActiveEditorSubscription$
 } from '../core'
+import { EditImageToolbar, EditImageToolbarProps } from './EditImageToolbar'
 import { ImageDialog } from './ImageDialog'
 import { $createImageNode, $isImageNode, CreateImageNodeParameters, ImageNode } from './ImageNode'
 import { LexicalImageVisitor } from './LexicalImageVisitor'
@@ -323,6 +324,12 @@ export const disableImageSettingsButton$ = Cell<boolean>(false)
 export const saveImage$ = Signal<SaveImageParameters>()
 
 /**
+ * Holds the custom EditImageToolbar component.
+ * @group Image
+ */
+export const editImageToolbarComponent$ = Cell<React.FC<EditImageToolbarProps>>(EditImageToolbar)
+
+/**
  * A plugin that adds support for images.
  * @group Image
  */
@@ -333,6 +340,7 @@ export const imagePlugin = realmPlugin<{
   disableImageSettingsButton?: boolean
   imagePreviewHandler?: ImagePreviewHandler
   ImageDialog?: (() => JSX.Element) | React.FC
+  EditImageToolbar?: (() => JSX.Element) | React.FC
 }>({
   init(realm, params) {
     realm.pubIn({
@@ -344,7 +352,8 @@ export const imagePlugin = realmPlugin<{
       [imageAutocompleteSuggestions$]: params?.imageAutocompleteSuggestions ?? [],
       [disableImageResize$]: Boolean(params?.disableImageResize),
       [disableImageSettingsButton$]: Boolean(params?.disableImageSettingsButton),
-      [imagePreviewHandler$]: params?.imagePreviewHandler ?? null
+      [imagePreviewHandler$]: params?.imagePreviewHandler ?? null,
+      [editImageToolbarComponent$]: params?.EditImageToolbar ?? EditImageToolbar
     })
   },
 
@@ -353,7 +362,8 @@ export const imagePlugin = realmPlugin<{
       [imageUploadHandler$]: params?.imageUploadHandler ?? null,
       [imageAutocompleteSuggestions$]: params?.imageAutocompleteSuggestions ?? [],
       [disableImageResize$]: Boolean(params?.disableImageResize),
-      [imagePreviewHandler$]: params?.imagePreviewHandler ?? null
+      [imagePreviewHandler$]: params?.imagePreviewHandler ?? null,
+      [editImageToolbarComponent$]: params?.EditImageToolbar ?? EditImageToolbar
     })
   }
 })
