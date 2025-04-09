@@ -59,6 +59,7 @@ export * from './jsx-editors/GenericJsxEditor'
 
 // code blocks
 export * from './plugins/sandpack'
+export * from './plugins/sandpack/SandpackEditor'
 export * from './plugins/codemirror'
 export * from './plugins/codemirror/CodeMirrorEditor'
 export * from './plugins/codeblock'
