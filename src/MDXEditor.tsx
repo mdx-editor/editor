@@ -171,7 +171,8 @@ const RenderRecursiveWrappers: React.FC<{
 const EditorRootElement: React.FC<{
   children: React.ReactNode
   className?: string
-}> = ({ children, className }) => {
+  overlayContainer?: HTMLElement | null
+}> = ({ children, className, overlayContainer }) => {
   const editorRootElementRef = React.useRef<HTMLDivElement | null>(null)
   const setEditorRootElementRef = usePublisher(editorRootElementRef$)
 
@@ -183,13 +184,14 @@ const EditorRootElement: React.FC<{
       styles.popupContainer,
       ...(className ?? '').trim().split(' ').filter(Boolean)
     )
-    document.body.appendChild(popupContainer)
+    const container = overlayContainer ?? document.body
+    container.appendChild(popupContainer)
     editorRootElementRef.current = popupContainer
     setEditorRootElementRef(editorRootElementRef)
     return () => {
       popupContainer.remove()
     }
-  }, [className, editorRootElementRef, setEditorRootElementRef])
+  }, [className, editorRootElementRef, overlayContainer, setEditorRootElementRef])
   return <div className={classNames('mdxeditor', styles.editorRoot, styles.editorWrapper, className)}>{children}</div>
 }
 
@@ -310,6 +312,12 @@ export interface MDXEditorProps {
    * A custom lexical theme to use for the editor.
    */
   lexicalTheme?: EditorThemeClasses
+
+  /**
+   * Optional container element to use for rendering editor popups.
+   * Defaults to document.body.
+   */
+  overlayContainer?: HTMLElement | null
 }
 
 /**
@@ -340,7 +348,7 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>((pro
         ...(props.plugins ?? [])
       ]}
     >
-      <EditorRootElement className={props.className}>
+      <EditorRootElement className={props.className} overlayContainer={props.overlayContainer}>
         <LexicalProvider>
           <RichTextEditor />
         </LexicalProvider>
