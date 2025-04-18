@@ -94,7 +94,7 @@ export const ToggleSingleGroupWithItem = React.forwardRef<
       value={on ? 'on' : 'off'}
       ref={forwardedRef}
     >
-      <ToolbarToggleItem title={title} value="on" disabled={disabled}>
+      <ToolbarToggleItem aria-label={title} value="on" disabled={disabled}>
         <TooltipWrap title={title}>{children}</TooltipWrap>
       </ToolbarToggleItem>
     </RadixToolbar.ToggleGroup>
