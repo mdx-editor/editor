@@ -234,12 +234,18 @@ export const linkDialogState$ = Cell<InactiveLinkDialog | PreviewLinkDialog | Ed
           const node = getLinkNodeInSelection(selection)
 
           if (node) {
+            const rect = getSelectionRectangle(activeEditor)
+
+            if (!rect) {
+              return { type: 'inactive' } as InactiveLinkDialog
+            }
+
             return {
               type: 'preview',
               url: node.getURL(),
               linkNodeKey: node.getKey(),
               title: node.getTitle(),
-              rectangle: getSelectionRectangle(activeEditor)
+              rectangle: rect
             } as PreviewLinkDialog
           } else {
             return { type: 'inactive' } as InactiveLinkDialog
