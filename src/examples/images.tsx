@@ -78,6 +78,20 @@ export const ImageWithBackend: Story<{ readOnly: boolean }> = () => {
   )
 }
 
+export function FakeImage() {
+  return (
+    <MDXEditor
+      markdown="Hello world"
+      plugins={[
+        imagePlugin({ imageUploadHandler: async () => Promise.resolve('https://placehold.co/600x400') }),
+        toolbarPlugin({
+          toolbarContents: () => <InsertImage />
+        })
+      ]}
+    />
+  )
+}
+
 function InsertCustomImage() {
   const insertImage = usePublisher(insertImage$)
   return (

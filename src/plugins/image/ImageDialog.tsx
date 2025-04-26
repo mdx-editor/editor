@@ -53,11 +53,11 @@ export const ImageDialog: React.FC = () => {
         >
           <Dialog.Title>{t('uploadImage.dialogTitle', 'Upload an image')}</Dialog.Title>
           <form
-            onSubmit={(e) => {
-              void handleSubmit(saveImage)(e)
-              reset({ src: '', title: '', altText: '' })
+            onSubmit={async (e) => {
               e.preventDefault()
               e.stopPropagation()
+              await handleSubmit(saveImage)(e)
+              reset({ src: '', title: '', altText: '' })
             }}
             className={styles.multiFieldForm}
           >

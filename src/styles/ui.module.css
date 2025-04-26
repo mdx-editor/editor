@@ -9,7 +9,7 @@
 }
 
 @define-mixin drop-shadow-sm {
-  filter: drop-shadow(0 2px 2px rgb(0 0 0 / 0.20));
+  filter: drop-shadow(0 2px 2px rgb(0 0 0 / 0.2));
 }
 
 @define-mixin nested-editor-toolbar {
@@ -43,7 +43,7 @@
     transform: translate(1px, 1px);
   }
 
-  &[data-state=on],
+  &[data-state='on'],
   &:active {
     background-color: var(--baseBg);
     color: var(--baseTextContrast);
@@ -139,8 +139,9 @@
   --radius-extra-large: var(--spacing-3);
   --radius-full: 9999px;
 
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  --font-body: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  --font-body: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue',
+    sans-serif;
 
   --text-base: 1rem;
   --text-sm: 0.875rem;
@@ -151,7 +152,8 @@
   color: var(--baseText);
 }
 
-.editorWrapper {}
+.editorWrapper {
+}
 
 .nestedListItem {
   list-style: none;
@@ -171,7 +173,7 @@
   background-color: var(--baseBg);
   width: inherit;
 
-  & div[role=separator] {
+  & div[role='separator'] {
     margin: var(--spacing-2) var(--spacing-1);
     border-left: 1px solid var(--baseBorder);
     border-right: 1px solid var(--baseBase);
@@ -188,7 +190,7 @@
   pointer-events: none;
   background: var(--baseBase);
 
-  &>div {
+  & > div {
     opacity: 0.5;
   }
 }
@@ -208,7 +210,7 @@
     padding-inline-start: var(--spacing-4);
 
     &:active,
-    &[data-state=on] {
+    &[data-state='on'] {
       background-color: var(--baseBorder);
     }
   }
@@ -238,7 +240,6 @@
   @mixin clear-form-element;
   padding: var(--spacing-0_5);
 
-
   @media (hover: hover) {
     &:hover {
       background-color: var(--baseBgActive);
@@ -249,7 +250,7 @@
     transform: translate(1px, 1px);
   }
 
-  &[data-state=on],
+  &[data-state='on'],
   &:active {
     color: var(--baseTextContrast);
     background-color: var(--baseBgActive);
@@ -320,14 +321,14 @@
   background-color: var(--basePageBg);
   margin: 0 var(--spacing-1);
 
-  &[data-state=open] {
+  &[data-state='open'] {
     @mixin drop-shadow-sm;
     border-bottom-right-radius: var(--radius-none);
     border-bottom-left-radius: var(--radius-none);
   }
 }
 
-.selectTrigger[data-placeholder]>span:first-child {
+.selectTrigger[data-placeholder] > span:first-child {
   color: var(--baseBorderHover);
 }
 
@@ -354,7 +355,7 @@
     background-color: var(--baseBg);
   }
 
-  &[data-state=checked] {
+  &[data-state='checked'] {
     color: var(--baseTextContrast);
     background-color: var(--baseBg);
   }
@@ -414,7 +415,7 @@
   padding: var(--spacing-3);
   background-color: var(--baseBgSubtle);
 
-  &[data-expanded=true] {
+  &[data-expanded='true'] {
     margin-bottom: var(--spacing-10);
   }
 }
@@ -559,13 +560,13 @@
   border-radius: var(--radius-base);
   border: 1px solid var(--baseBorder);
 
-  &[data-visible-dropdown=true] {
+  &[data-visible-dropdown='true'] {
     border-bottom-left-radius: var(--radius-none);
     border-bottom-right-radius: var(--radius-none);
     border-bottom-width: 0;
   }
 
-  &>button {
+  & > button {
     @mixin clear-form-element;
     padding-right: var(--spacing-2);
   }
@@ -588,11 +589,11 @@
   background-color: highlight;
   z-index: -1;
 
-  &[data-visible=true] {
+  &[data-visible='true'] {
     visibility: visible;
   }
 
-  &[data-visible=false] {
+  &[data-visible='false'] {
     visibility: hidden;
   }
 }
@@ -717,25 +718,25 @@
   border-spacing: 0;
   border-collapse: collapse;
 
-  & thead>tr>th {
+  & thead > tr > th {
     text-align: right;
   }
 
-  &>tbody>tr>td:not(.toolCell),
-  &>tbody>tr>th:not(.toolCell):not([data-tool-cell="true"]) {
+  & > tbody > tr > td:not(.toolCell),
+  & > tbody > tr > th:not(.toolCell):not([data-tool-cell='true']) {
     border: 1px solid var(--baseBgActive);
     padding: var(--spacing-1) var(--spacing-2);
     white-space: normal;
 
-    &>div {
+    & > div {
       outline: none;
 
-      &>p {
+      & > p {
         margin: 0;
       }
     }
 
-    &[data-active=true] {
+    &[data-active='true'] {
       outline: solid 1px var(--baseSolid);
     }
   }
@@ -745,12 +746,11 @@
   .addRowButton,
   .addColumnButton,
   .iconButton {
-    opacity: .15;
+    opacity: 0.15;
   }
 
   @media (hover: hover) {
     &:hover {
-
       .tableColumnEditorTrigger,
       .tableRowEditorTrigger,
       .addRowButton,
@@ -781,7 +781,7 @@
   border-radius: var(--radius-full);
   opacity: 0.2;
 
-  &[data-active=true] {
+  &[data-active='true'] {
     opacity: 1 !important;
   }
 }
@@ -789,16 +789,15 @@
 .tableColumnEditorToolbar {
   display: flex;
 
-  &>button {
+  & > button {
     @mixin icon-button;
   }
 
-  & [role=separator] {
+  & [role='separator'] {
     margin-left: var(--spacing-1);
     margin-right: var(--spacing-1);
   }
 }
-
 
 .toggleGroupRoot {
   display: inline-flex;
@@ -892,14 +891,13 @@
   outline: none;
 }
 
-
 @keyframes overlayShow {
   from {
     opacity: 0;
   }
 
   to {
-    opacity: .5;
+    opacity: 0.5;
   }
 }
 
@@ -924,7 +922,7 @@
   position: relative;
 }
 
-.imageWrapper[draggable=true] {
+.imageWrapper[draggable='true'] {
   cursor: move;
   /* fallback if grab cursor is unsupported */
   cursor: grab;
@@ -970,7 +968,7 @@
   padding: var(--spacing-1) var(--spacing-2);
   border-radius: var(--radius-medium);
 
-  &>p {
+  & > p {
     margin: 0;
   }
 
@@ -985,14 +983,26 @@
   padding-right: var(--spacing-2);
 }
 
+.diffSourceToggleWrapper {
+  margin-left: auto;
+  pointer-events: auto;
+  opacity: 1;
+  position: sticky;
+  right: 0;
+}
+
+.ggDiffSourceToggle {
+}
+
 .diffSourceToggle {
   border-radius: var(--radius-medium);
+  background-color: var(--baseBase);
   display: flex;
 
   .toolbarToggleItem {
     padding: 0;
 
-    &>span {
+    & > span {
       display: block;
       padding: var(--spacing-1) var(--spacing-1);
     }
@@ -1005,7 +1015,7 @@
   gap: var(--spacing-2);
   margin-left: var(--spacing-2);
 
-  &>label {
+  & > label {
     font-size: var(--text-sm);
   }
 
@@ -1018,7 +1028,6 @@
   font-size: var(--text-sm);
   margin-left: var(--spacing-2);
 }
-
 
 .imageControlWrapperResizing {
   touch-action: none;
@@ -1098,8 +1107,6 @@
   position: relative;
 }
 
-
-
 .downshiftContainer {
   display: flex;
   flex-direction: column;
@@ -1114,13 +1121,13 @@
   border-radius: var(--radius-base);
   border: 1px solid var(--baseBorder);
 
-  &[data-visible-dropdown=true] {
+  &[data-visible-dropdown='true'] {
     border-bottom-left-radius: var(--radius-none);
     border-bottom-right-radius: var(--radius-none);
     border-bottom-width: 0;
   }
 
-  &>button {
+  & > button {
     @mixin clear-form-element;
     padding-right: var(--spacing-2);
   }
@@ -1156,7 +1163,7 @@
     border-top-width: 0;
     background-color: var(--baseBase);
 
-    &[data-visible=true] {
+    &[data-visible='true'] {
       display: block;
     }
 
@@ -1167,11 +1174,11 @@
       overflow-x: hidden;
       text-overflow: ellipsis;
 
-      &[data-selected=true] {
+      &[data-selected='true'] {
         background-color: var(--baseBgSubtle);
       }
 
-      &[data-highlighted=true] {
+      &[data-highlighted='true'] {
         background-color: var(--baseBgHover);
       }
 

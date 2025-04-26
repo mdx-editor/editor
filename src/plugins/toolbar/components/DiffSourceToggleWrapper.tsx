@@ -55,11 +55,10 @@ export const DiffSourceToggleWrapper: React.FC<{ children: React.ReactNode; opti
         SourceToolbar ?? <span className={styles.toolbarTitleMode}>{t('toolbar.source', 'Source mode')}</span>
       )}
 
-      <div
-        style={{ marginLeft: 'auto', pointerEvents: 'auto', opacity: 1, position: 'sticky', right: 0, backgroundColor: 'var(--baseBase)' }}
-      >
+      <div className={styles.diffSourceToggleWrapper}>
         <SingleChoiceToggleGroup
           className={styles.diffSourceToggle}
+          ggClassName={styles.ggDiffSourceToggle}
           value={viewMode}
           items={toggleGroupItems}
           onChange={(value) => {
