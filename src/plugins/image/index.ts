@@ -77,7 +77,7 @@ export type InsertImageParameters = FileImageParameters | SrcImageParameters
  */
 export interface SaveImageParameters extends BaseImageParameters {
   src?: string
-  file: FileList
+  file?: FileList
 }
 
 /**
@@ -191,7 +191,7 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
                 r.pub(imageDialogState$, { type: 'inactive' })
               }
 
-        if (values.file.length > 0) {
+        if (values.file && values.file.length > 0) {
           imageUploadHandler?.(values.file.item(0)!)
             .then(handler)
             .catch((e: unknown) => {
