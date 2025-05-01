@@ -1090,6 +1090,14 @@
   cursor: nw-resize;
 }
 
+.imagePlaceholder {
+  border: 2px dashed;
+  padding: 48px;
+  margin: 12px;
+  width: fit-content;
+  height: fit-content;
+}
+
 .placeholder {
   color: var(--baseSolid);
   overflow: hidden;

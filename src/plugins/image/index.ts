@@ -1,3 +1,4 @@
+import { ImagePlaceholder } from '@/plugins/image/ImageEditor'
 import { $wrapNodeInElement, mergeRegister } from '@lexical/utils'
 import { Action, Cell, Signal, map, mapTo, withLatestFrom } from '@mdxeditor/gurx'
 import {
@@ -162,6 +163,12 @@ export const imageUploadHandler$ = Cell<ImageUploadHandler>(null)
  * @group Image
  */
 export const imagePreviewHandler$ = Cell<ImagePreviewHandler>(null)
+
+/**
+ * Holds the image placeholder.
+ * @group Image
+ */
+export const imagePlaceholder$ = Cell<typeof ImagePlaceholder | null>(null)
 
 /**
  * Holds the current state of the image dialog.
@@ -341,6 +348,7 @@ export const imagePlugin = realmPlugin<{
   imagePreviewHandler?: ImagePreviewHandler
   ImageDialog?: (() => JSX.Element) | React.FC
   EditImageToolbar?: (() => JSX.Element) | React.FC
+  imagePlaceholder?: (() => JSX.Element) | null
 }>({
   init(realm, params) {
     realm.pubIn({
@@ -353,7 +361,8 @@ export const imagePlugin = realmPlugin<{
       [disableImageResize$]: Boolean(params?.disableImageResize),
       [disableImageSettingsButton$]: Boolean(params?.disableImageSettingsButton),
       [imagePreviewHandler$]: params?.imagePreviewHandler ?? null,
-      [editImageToolbarComponent$]: params?.EditImageToolbar ?? EditImageToolbar
+      [editImageToolbarComponent$]: params?.EditImageToolbar ?? EditImageToolbar,
+      [imagePlaceholder$]: params?.imagePlaceholder ?? ImagePlaceholder
     })
   },
 
@@ -363,7 +372,8 @@ export const imagePlugin = realmPlugin<{
       [imageAutocompleteSuggestions$]: params?.imageAutocompleteSuggestions ?? [],
       [disableImageResize$]: Boolean(params?.disableImageResize),
       [imagePreviewHandler$]: params?.imagePreviewHandler ?? null,
-      [editImageToolbarComponent$]: params?.EditImageToolbar ?? EditImageToolbar
+      [editImageToolbarComponent$]: params?.EditImageToolbar ?? EditImageToolbar,
+      [imagePlaceholder$]: params?.imagePlaceholder ?? ImagePlaceholder
     })
   }
 })

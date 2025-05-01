@@ -6,6 +6,7 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { useLexicalNodeSelection } from '@lexical/react/useLexicalNodeSelection'
 import { mergeRegister } from '@lexical/utils'
 import { useCellValues } from '@mdxeditor/gurx'
+import { ImageIcon } from '@radix-ui/react-icons'
 import classNames from 'classnames'
 import {
   $getNodeByKey,
@@ -22,7 +23,7 @@ import {
   SELECTION_CHANGE_COMMAND
 } from 'lexical'
 import { MdxJsxAttribute, MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx'
-import { disableImageResize$, editImageToolbarComponent$, imagePreviewHandler$ } from '.'
+import { disableImageResize$, editImageToolbarComponent$, imagePlaceholder$ as imagePlaceholderComponent$, imagePreviewHandler$ } from '.'
 import styles from '../../styles/ui.module.css'
 import { readOnly$ } from '../core'
 import { $isImageNode } from './ImageNode'
@@ -38,19 +39,29 @@ export interface ImageEditorProps {
   rest: (MdxJsxAttribute | MdxJsxExpressionAttribute)[]
 }
 
-const imageCache = new Set()
-
-function useSuspenseImage(src: string) {
-  if (!imageCache.has(src)) {
-    // eslint-disable-next-line @typescript-eslint/no-throw-literal, @typescript-eslint/only-throw-error
-    throw new Promise((resolve) => {
-      const img = new Image()
-      img.src = src
-      img.onerror = img.onload = () => {
-        imageCache.add(src)
-        resolve(null)
-      }
-    })
+interface ImgCache {
+  __cache: Record<string, boolean | Promise<void>>
+  read(src: string): boolean
+}
+// https://css-tricks.com/pre-caching-image-with-react-suspense/
+const imgCache: ImgCache = {
+  __cache: {},
+  read(src: string) {
+    if (!this.__cache[src]) {
+      this.__cache[src] = new Promise<void>((resolve) => {
+        const img = new Image()
+        img.onload = () => {
+          this.__cache[src] = true
+          resolve()
+        }
+        img.src = src
+      })
+    }
+    if (this.__cache[src] instanceof Promise) {
+      // eslint-disable-next-line @typescript-eslint/no-throw-literal, @typescript-eslint/only-throw-error
+      throw this.__cache[src]
+    }
+    return this.__cache[src]
   }
 }
 
@@ -71,7 +82,7 @@ function LazyImage({
   width: number | 'inherit'
   height: number | 'inherit'
 }): JSX.Element {
-  useSuspenseImage(src)
+  imgCache.read(src)
   return (
     <img
       className={className ?? undefined}
@@ -87,7 +98,8 @@ function LazyImage({
 }
 
 export function ImageEditor({ src, title, alt, nodeKey, width, height, rest }: ImageEditorProps): JSX.Element | null {
-  const [disableImageResize, imagePreviewHandler, readOnly, EditImageToolbar] = useCellValues(
+  const [ImagePlaceholderComponent, disableImageResize, imagePreviewHandler, readOnly, EditImageToolbar] = useCellValues(
+    imagePlaceholderComponent$,
     disableImageResize$,
     imagePreviewHandler$,
     readOnly$,
@@ -263,7 +275,7 @@ export function ImageEditor({ src, title, alt, nodeKey, width, height, rest }: I
   }, [rest])
 
   return imageSource !== null ? (
-    <React.Suspense fallback={null}>
+    <React.Suspense fallback={ImagePlaceholderComponent ? <ImagePlaceholderComponent /> : null}>
       <div className={styles.imageWrapper} data-editor-block-type="image">
         <div draggable={draggable}>
           <LazyImage
@@ -296,4 +308,12 @@ export function ImageEditor({ src, title, alt, nodeKey, width, height, rest }: I
       </div>
     </React.Suspense>
   ) : null
+}
+
+export function ImagePlaceholder(): JSX.Element {
+  return (
+    <div className={styles.imagePlaceholder}>
+      <ImageIcon />
+    </div>
+  )
 }
