@@ -39,13 +39,9 @@ export interface ImageEditorProps {
   rest: (MdxJsxAttribute | MdxJsxExpressionAttribute)[]
 }
 
-interface ImgCache {
-  __cache: Record<string, boolean | Promise<void>>
-  read(src: string): boolean
-}
 // https://css-tricks.com/pre-caching-image-with-react-suspense/
-const imgCache: ImgCache = {
-  __cache: {},
+const imgCache = {
+  __cache: {} as Record<string, boolean | Promise<void>>,
   read(src: string) {
     if (!this.__cache[src]) {
       this.__cache[src] = new Promise<void>((resolve) => {
@@ -82,7 +78,7 @@ function LazyImage({
   width: number | 'inherit'
   height: number | 'inherit'
 }): JSX.Element {
-  imgCache.read(src)
+  void imgCache.read(src)
   return (
     <img
       className={className ?? undefined}
