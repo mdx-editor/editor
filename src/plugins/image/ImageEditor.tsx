@@ -6,7 +6,6 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { useLexicalNodeSelection } from '@lexical/react/useLexicalNodeSelection'
 import { mergeRegister } from '@lexical/utils'
 import { useCellValues } from '@mdxeditor/gurx'
-import { ImageIcon } from '@radix-ui/react-icons'
 import classNames from 'classnames'
 import {
   $getNodeByKey,
@@ -304,12 +303,4 @@ export function ImageEditor({ src, title, alt, nodeKey, width, height, rest }: I
       </div>
     </React.Suspense>
   ) : null
-}
-
-export function ImagePlaceholder(): JSX.Element {
-  return (
-    <div className={styles.imagePlaceholder}>
-      <ImageIcon />
-    </div>
-  )
 }

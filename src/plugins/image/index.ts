@@ -1,4 +1,4 @@
-import { ImagePlaceholder } from '@/plugins/image/ImageEditor'
+import { ImagePlaceholder } from '@/plugins/image/ImagePlaceholder'
 import { $wrapNodeInElement, mergeRegister } from '@lexical/utils'
 import { Action, Cell, Signal, map, mapTo, withLatestFrom } from '@mdxeditor/gurx'
 import {
