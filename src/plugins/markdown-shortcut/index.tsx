@@ -56,10 +56,18 @@ const THEMATIC_BREAK: ElementTransformer = {
   export: (node: LexicalNode) => {
     return $isHorizontalRuleNode(node) ? '***' : null
   },
-  regExp: /^(---|\*\*\*|___)?/,
-  replace: (parentNode) => {
-    const node = $createHorizontalRuleNode()
-    parentNode.replace(node)
+  regExp: /^(---|\*\*\*|___)\s?$/,
+  replace: (parentNode, _1, _2, isImport) => {
+    const line = $createHorizontalRuleNode()
+
+    // TODO: Get rid of isImport flag
+    if (isImport || parentNode.getNextSibling() != null) {
+      parentNode.replace(line)
+    } else {
+      parentNode.insertBefore(line)
+    }
+
+    line.selectNext()
   },
   type: 'element'
 }
