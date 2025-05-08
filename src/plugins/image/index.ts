@@ -450,7 +450,16 @@ function onDrop(event: DragEvent, editor: LexicalEditor, imageUploadHandler: Ima
   if (cbPayload.length > 0) {
     if (imageUploadHandler !== null) {
       event.preventDefault()
-      Promise.all(cbPayload.map((image) => imageUploadHandler(image.getAsFile()!)))
+      Promise.all(
+        cbPayload.map((image) => {
+          if (image.kind === 'string') {
+            return new Promise<string>((rs) => {
+              image.getAsString(rs)
+            })
+          }
+          return imageUploadHandler(image.getAsFile()!)
+        })
+      )
         .then((urls) => {
           urls.forEach((url) => {
             editor.dispatchCommand(INSERT_IMAGE_COMMAND, {
