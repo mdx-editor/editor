@@ -81,25 +81,62 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
   }, [readOnly, language])
 
   React.useEffect(() => {
-    const handleTabKey = (e: KeyboardEvent) => {
-      if (e.key === 'Tab') {
-        e.preventDefault()
-        e.stopPropagation()
+    const handleTabKey = (e: Event) => {
+      const keyboardEvent = e as KeyboardEvent
+      console.log('Key pressed:', keyboardEvent.key) // Log the key pressed
+      if (keyboardEvent.key === 'Tab') {
+        console.log('Tab key detected, preventing default behavior.') // Log Tab key detection
+        keyboardEvent.preventDefault()
+        keyboardEvent.stopPropagation()
         const state = editorViewRef.current?.state
         if (state) {
+          console.log('Editor state found.') // Log state availability
+          console.log('Selection details:', {
+            from: state.selection.main.from,
+            to: state.selection.main.to,
+            empty: state.selection.main.empty
+          }) // Log selection details
+
+          const changes = {
+            from: state.selection.main.from,
+            to: state.selection.main.empty ? state.selection.main.from : state.selection.main.to,
+            insert: '\t'
+          }
+          console.log('Changes to apply:', changes) // Log changes
+
           const transaction = state.update({
-            changes: { from: state.selection.main.from, insert: '\t' }
+            changes,
+            selection: { anchor: changes.from + 1, head: changes.from + 1 } // Move cursor after the tab character
           })
           editorViewRef.current?.dispatch(transaction)
+
+          console.log('Transaction dispatched:', transaction) // Log transaction details
+        } else {
+          console.log('No editor state available.') // Log missing state
         }
       }
     }
 
-    const codeMirrorElement = elRef.current?.querySelector('.cm-content')
-    codeMirrorElement?.addEventListener('keydown', handleTabKey)
+    const observer = new MutationObserver(() => {
+      const codeMirrorElement = elRef.current?.querySelector('.cm-content')
+      if (codeMirrorElement) {
+        console.log('CodeMirror element found, adding event listener.') // Log element availability
+        codeMirrorElement.addEventListener('keydown', handleTabKey as EventListener)
+        observer.disconnect() // Stop observing once the element is found
+      }
+    })
+
+    if (elRef.current) {
+      observer.observe(elRef.current, { childList: true, subtree: true })
+    }
 
     return () => {
-      codeMirrorElement?.removeEventListener('keydown', handleTabKey)
+      observer.disconnect()
+      const codeMirrorElement = elRef.current?.querySelector('.cm-content')
+      if (codeMirrorElement) {
+        console.log('Removing event listener from CodeMirror element.') // Log cleanup
+        codeMirrorElement.removeEventListener('keydown', handleTabKey as EventListener)
+      }
     }
   }, [editorViewRef])
 
