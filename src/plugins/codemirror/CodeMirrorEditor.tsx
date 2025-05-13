@@ -80,6 +80,51 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [readOnly, language])
 
+  React.useEffect(() => {
+    const handleTabKey = (e: Event) => {
+      const keyboardEvent = e as KeyboardEvent
+      if (keyboardEvent.key === 'Tab') {
+        keyboardEvent.preventDefault()
+        keyboardEvent.stopPropagation()
+        const state = editorViewRef.current?.state
+        if (state) {
+          const changes = {
+            from: state.selection.main.from,
+            to: state.selection.main.empty ? state.selection.main.from : state.selection.main.to,
+            insert: '\t'
+          }
+          
+          const transaction = state.update({
+            changes,
+            selection: { anchor: changes.from + 1, head: changes.from + 1 } // Move cursor after the tab character
+          })
+          editorViewRef.current?.dispatch(transaction)
+
+        }
+      }
+    }
+
+    const observer = new MutationObserver(() => {
+      const codeMirrorElement = elRef.current?.querySelector('.cm-content')
+      if (codeMirrorElement) {
+        codeMirrorElement.addEventListener('keydown', handleTabKey as EventListener)
+        observer.disconnect() // Stop observing once the element is found
+      }
+    })
+
+    if (elRef.current) {
+      observer.observe(elRef.current, { childList: true, subtree: true })
+    }
+
+    return () => {
+      observer.disconnect()
+      const codeMirrorElement = elRef.current?.querySelector('.cm-content')
+      if (codeMirrorElement) {
+        codeMirrorElement.removeEventListener('keydown', handleTabKey as EventListener)
+      }
+    }
+  }, [editorViewRef])
+
   return (
     <div
       className={styles.codeMirrorWrapper}
