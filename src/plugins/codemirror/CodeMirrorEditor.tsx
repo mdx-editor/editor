@@ -80,6 +80,29 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [readOnly, language])
 
+  React.useEffect(() => {
+    const handleTabKey = (e: KeyboardEvent) => {
+      if (e.key === 'Tab') {
+        e.preventDefault()
+        e.stopPropagation()
+        const state = editorViewRef.current?.state
+        if (state) {
+          const transaction = state.update({
+            changes: { from: state.selection.main.from, insert: '\t' }
+          })
+          editorViewRef.current?.dispatch(transaction)
+        }
+      }
+    }
+
+    const codeMirrorElement = elRef.current?.querySelector('.cm-content')
+    codeMirrorElement?.addEventListener('keydown', handleTabKey)
+
+    return () => {
+      codeMirrorElement?.removeEventListener('keydown', handleTabKey)
+    }
+  }, [editorViewRef])
+
   return (
     <div
       className={styles.codeMirrorWrapper}
