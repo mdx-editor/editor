@@ -28,6 +28,15 @@ import { readOnly$ } from '../core'
 import { $isImageNode } from './ImageNode'
 import ImageResizer from './ImageResizer'
 
+const BROKEN_IMG_URI =
+  'data:image/svg+xml;charset=utf-8,' +
+  encodeURIComponent(/* xml */ `
+    <svg id="imgLoadError" xmlns="http://www.w3.org/2000/svg" width="100" height="100">
+      <rect x="0" y="0" width="100" height="100" fill="none" stroke="red" stroke-width="4" stroke-dasharray="4" />
+      <text x="50" y="55" text-anchor="middle" font-size="20" fill="red">⚠️</text>
+    </svg>
+`)
+
 export interface ImageEditorProps {
   nodeKey: string
   src: string
@@ -40,13 +49,17 @@ export interface ImageEditorProps {
 
 // https://css-tricks.com/pre-caching-image-with-react-suspense/
 const imgCache = {
-  __cache: {} as Record<string, boolean | Promise<void>>,
+  __cache: {} as Record<string, string | Promise<void>>,
   read(src: string) {
     if (!this.__cache[src]) {
       this.__cache[src] = new Promise<void>((resolve) => {
         const img = new Image()
+        img.onerror = () => {
+          this.__cache[src] = BROKEN_IMG_URI
+          resolve()
+        }
         img.onload = () => {
-          this.__cache[src] = true
+          this.__cache[src] = src
           resolve()
         }
         img.src = src
@@ -77,12 +90,11 @@ function LazyImage({
   width: number | 'inherit'
   height: number | 'inherit'
 }): JSX.Element {
-  void imgCache.read(src)
   return (
     <img
       className={className ?? undefined}
       alt={alt}
-      src={src}
+      src={imgCache.read(src)}
       title={title}
       ref={imageRef}
       draggable="false"
