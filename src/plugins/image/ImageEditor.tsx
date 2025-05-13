@@ -45,7 +45,7 @@ const imgCache = {
     if (!this.__cache[src]) {
       this.__cache[src] = new Promise<void>((resolve) => {
         const img = new Image()
-        img.onload = () => {
+        img.onerror = img.onload = () => {
           this.__cache[src] = true
           resolve()
         }
