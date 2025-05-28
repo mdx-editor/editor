@@ -69,7 +69,7 @@ const imgCache = {
       // eslint-disable-next-line @typescript-eslint/no-throw-literal, @typescript-eslint/only-throw-error
       throw this.__cache[src]
     }
-    return this.__cache[src]
+    return this.__cache[src] as string
   }
 }
 
@@ -89,7 +89,7 @@ function LazyImage({
   src: string
   width: number | 'inherit'
   height: number | 'inherit'
-}): JSX.Element {
+}) {
   return (
     <img
       className={className ?? undefined}
