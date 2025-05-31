@@ -95,7 +95,7 @@ export const Select = <T extends string>(props: {
   items: ({ label: string | JSX.Element; value: T } | 'separator')[]
 }) => {
   return (
-    <RadixSelect.Root value={props.value || undefined} onValueChange={props.onChange} disabled={props.disabled}>
+    <RadixSelect.Root value={props.value || ''} onValueChange={props.onChange} disabled={props.disabled}>
       <SelectTrigger title={props.triggerTitle} placeholder={props.placeholder} />
       <SelectContent>
         {props.items.map((item, index) => {
