@@ -1,0 +1,107 @@
+{
+  "frontmatterEditor": {
+    "title": "Modifier les métadonnées du document",
+    "key": "Clé",
+    "value": "Valeur",
+    "addEntry": "Ajouter une entrée"
+  },
+  "dialogControls": {
+    "save": "Enregistrer",
+    "cancel": "Annuler"
+  },
+  "uploadImage": {
+    "dialogTitle": "Téléverser une image",
+    "uploadInstructions": "Téléverser une image depuis votre appareil :",
+    "addViaUrlInstructions": "Ou ajouter une image depuis une URL :",
+    "autoCompletePlaceholder": "Sélectionner ou coller la source de l’image",
+    "alt": "Texte alternatif :",
+    "title": "Titre :"
+  },
+  "imageEditor": {
+    "deleteImage": "Supprimer l’image",
+    "editImage": "Modifier l’image"
+  },
+  "createLink": {
+    "url": "URL",
+    "urlPlaceholder": "Sélectionner ou coller une URL",
+    "title": "Titre",
+    "saveTooltip": "Définir l’URL",
+    "cancelTooltip": "Annuler les modifications"
+  },
+  "linkPreview": {
+    "open": "Ouvrir {{url}} dans une nouvelle fenêtre",
+    "edit": "Modifier l’URL du lien",
+    "copyToClipboard": "Copier dans le presse-papiers",
+    "copied": "Copié !",
+    "remove": "Supprimer le lien"
+  },
+  "table": {
+    "deleteTable": "Supprimer le tableau",
+    "columnMenu": "Menu colonne",
+    "textAlignment": "Alignement du texte",
+    "alignLeft": "Aligner à gauche",
+    "alignCenter": "Centrer",
+    "alignRight": "Aligner à droite",
+    "insertColumnLeft": "Insérer une colonne à gauche",
+    "insertColumnRight": "Insérer une colonne à droite",
+    "deleteColumn": "Supprimer cette colonne",
+    "rowMenu": "Menu ligne",
+    "insertRowAbove": "Insérer une ligne au-dessus",
+    "insertRowBelow": "Insérer une ligne en dessous",
+    "deleteRow": "Supprimer cette ligne"
+  },
+  "toolbar": {
+    "blockTypes": {
+      "paragraph": "Paragraphe",
+      "quote": "Citation",
+      "heading": "Titre {{level}}"
+    },
+    "blockTypeSelect": {
+      "selectBlockTypeTooltip": "Sélectionner un type de bloc",
+      "placeholder": "Type de bloc"
+    },
+    "toggleGroup": "Groupe à bascule",
+    "removeBold": "Retirer le gras",
+    "bold": "Gras",
+    "removeItalic": "Retirer l’italique",
+    "italic": "Italique",
+    "underline": "Souligné",
+    "removeUnderline": "Retirer le soulignement",
+    "removeInlineCode": "Retirer le format code",
+    "inlineCode": "Code en ligne",
+    "link": "Créer un lien",
+    "richText": "Texte enrichi",
+    "diffMode": "Mode de comparaison",
+    "source": "Mode source",
+    "admonition": "Insérer une admonition",
+    "codeBlock": "Insérer un bloc de code",
+    "editFrontmatter": "Modifier les métadonnées",
+    "insertFrontmatter": "Insérer les métadonnées",
+    "image": "Insérer une image",
+    "insertSandpack": "Insérer un Sandpack",
+    "table": "Insérer un tableau",
+    "thematicBreak": "Insérer une séparation thématique",
+    "bulletedList": "Liste à puces",
+    "numberedList": "Liste numérotée",
+    "checkList": "Liste de tâches",
+    "deleteSandpack": "Supprimer ce bloc de code",
+    "undo": "Annuler {{shortcut}}",
+    "redo": "Rétablir {{shortcut}}"
+  },
+  "admonitions": {
+    "note": "Note",
+    "tip": "Astuce",
+    "danger": "Danger",
+    "info": "Info",
+    "caution": "Attention",
+    "changeType": "Sélectionner le type d’admonition",
+    "placeholder": "Type d’admonition"
+  },
+  "codeBlock": {
+    "language": "Langage du bloc de code",
+    "selectLanguage": "Sélectionner un langage"
+  },
+  "contentArea": {
+    "editableMarkdown": "Markdown modifiable"
+  }
+}
