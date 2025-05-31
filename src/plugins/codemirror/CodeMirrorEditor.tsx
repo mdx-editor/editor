@@ -7,7 +7,8 @@ import { iconComponentFor$, readOnly$, useTranslation } from '../core'
 
 import { languages } from '@codemirror/language-data'
 import { EditorState, Extension } from '@codemirror/state'
-import { EditorView, lineNumbers } from '@codemirror/view'
+import { EditorView, lineNumbers, keymap } from '@codemirror/view'
+import { indentWithTab } from '@codemirror/commands'
 import { basicLight } from 'cm6-theme-basic-light'
 import { basicSetup } from 'codemirror'
 import { codeBlockLanguages$, codeMirrorAutoLoadLanguageSupport$, codeMirrorExtensions$ } from '.'
@@ -40,12 +41,14 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
   }
 
   React.useEffect(() => {
+    const el = elRef.current!
     void (async () => {
       const extensions = [
         ...codeMirrorExtensions,
         basicSetup,
         basicLight,
         lineNumbers(),
+        keymap.of([indentWithTab]),
         EditorView.lineWrapping,
         EditorView.updateListener.of(({ state }) => {
           setCodeRef.current(state.doc.toString())
@@ -67,26 +70,24 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
           }
         }
       }
-      elRef.current!.innerHTML = ''
+      el.innerHTML = ''
       editorViewRef.current = new EditorView({
-        parent: elRef.current!,
+        parent: el,
         state: EditorState.create({ doc: code, extensions })
       })
+
+      el.addEventListener('keydown', stopPropagationHandler)
     })()
     return () => {
       editorViewRef.current?.destroy()
       editorViewRef.current = null
+      el.removeEventListener('keydown', stopPropagationHandler)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [readOnly, language])
 
   return (
-    <div
-      className={styles.codeMirrorWrapper}
-      onKeyDown={(e) => {
-        e.stopPropagation()
-      }}
-    >
+    <div className={styles.codeMirrorWrapper}>
       <div className={styles.codeMirrorToolbar}>
         <Select
           disabled={readOnly}
@@ -123,4 +124,7 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
       <div ref={elRef} />
     </div>
   )
+}
+function stopPropagationHandler(this: HTMLDivElement, ev: KeyboardEvent) {
+  ev.stopPropagation()
 }
