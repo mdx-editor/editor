@@ -60,7 +60,7 @@
       "selectBlockTypeTooltip": "Sélectionner un type de bloc",
       "placeholder": "Type de bloc"
     },
-    "toggleGroup": "groupe à bascule",
+    "toggleGroup": "Groupe à bascule",
     "removeBold": "Retirer le gras",
     "bold": "Gras",
     "removeItalic": "Retirer l’italique",
@@ -102,6 +102,6 @@
     "selectLanguage": "Sélectionner un langage"
   },
   "contentArea": {
-    "editableMarkdown": "markdown modifiable"
+    "editableMarkdown": "Markdown modifiable"
   }
 }
