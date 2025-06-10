@@ -203,7 +203,8 @@ const Methods: React.FC<{ mdxRef: React.ForwardedRef<MDXEditorMethods> }> = ({ m
     () => {
       return {
         getMarkdown: () => {
-          if (realm.getValue(viewMode$) === 'source') {
+          const viewMode = realm.getValue(viewMode$)
+          if (viewMode === 'source' || viewMode === 'diff') {
             return realm.getValue(markdownSourceEditorValue$)
           }
 
