@@ -361,9 +361,24 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>((pro
 
 /**
  * The MDXEditor React component without the realm and plugins.
- * This is useful if you want to expand the reach of the Realm context by including it's
+ * This is useful if you want to expand the reach of the Realm context by including its
  * instantiation in your own code. Therefore by using this component, you must be sure to then
  * provide the `RealmWithPlugins` component at a higher level in your component tree.
+ *
+ * @example
+ * ```tsx
+ *
+ * import { RealmWithPlugins, MDXEditorWithoutRealmAndPlugins } from 'mdxeditor'
+ *
+ * function MyEditor() {
+ *   return (
+ *     <RealmWithPlugins plugins={[Plugin1, Plugin2, Plugin3]} realm={myRealm}>
+ *       <MDXEditorWithoutRealmAndPlugins markdown="Hello, world!" />
+ *     </RealmWithPlugins>
+ *   )
+ * }
+ * ```
+ *
  * @group MDXEditor
  */
 export const MDXEditorWithoutRealmAndPlugins = React.forwardRef<MDXEditorMethods, MDXEditorProps>((props, ref) => {
