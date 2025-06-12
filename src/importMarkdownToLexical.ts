@@ -105,6 +105,10 @@ export interface MdastImportVisitor<UN extends Mdast.Nodes> {
        * Access the current style context.
        */
       getParentStyle(): string
+      /**
+       * Skip the visitor to move along the visitors chain for potential processing from a different visitor with a lower priority
+       */
+      skip(): void
     }
   }): void
   /**
@@ -254,8 +258,16 @@ export function importMdastTreeToLexical({ root, mdastRoot, visitors, ...descrip
     })
   }
 
-  function visit(mdastNode: Mdast.RootContent | Mdast.Root, lexicalParent: LexicalNode, mdastParent: Mdast.Parent | null) {
+  function visit(
+    mdastNode: Mdast.RootContent | Mdast.Root,
+    lexicalParent: LexicalNode,
+    mdastParent: Mdast.Parent | null,
+    skipVisitor?: MdastImportVisitor<Mdast.RootContent>
+  ) {
     const visitor = visitors.find((visitor) => {
+      if (skipVisitor && visitor === skipVisitor) {
+        return false
+      }
       if (typeof visitor.testNode === 'string') {
         return visitor.testNode === mdastNode.type
       }
@@ -283,6 +295,9 @@ export function importMdastTreeToLexical({ root, mdastRoot, visitors, ...descrip
       metaData,
       actions: {
         visitChildren,
+        skip() {
+          visit(mdastNode, lexicalParent, mdastParent, visitor)
+        },
         addAndStepInto(lexicalNode) {
           ;(lexicalParent as ElementNode).append(lexicalNode)
           if (isParent(mdastNode)) {
