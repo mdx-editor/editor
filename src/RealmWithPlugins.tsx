@@ -41,7 +41,14 @@ export function realmPlugin<Params>(plugin: {
   }
 }
 
-/** @internal */
+/**
+ * Provides a Realm instance and connects plugins to use it as well as run init, post init and
+ * update hooks of plugins
+ * @param children - The children to render within the realm context.
+ * @param plugins - The plugins to use.
+ * @returns A React component that provides the realm context.
+ * @group Core
+ */
 export function RealmWithPlugins({ children, plugins }: { children: React.ReactNode; plugins: RealmPlugin[] }) {
   const theRealm = React.useMemo(() => {
     return tap(new Realm(), (r) => {
