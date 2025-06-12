@@ -121,3 +121,6 @@ export * from './RealmWithPlugins'
 export * from './FormatConstants'
 
 export * from './styles/lexicalTheme'
+
+import * as lexical from 'lexical'
+export { lexical }
