@@ -2,10 +2,10 @@ import { $isElementNode, ElementNode as LexicalElementNode, LexicalNode, RootNod
 import * as Mdast from 'mdast'
 import type { MdxjsEsm } from 'mdast-util-mdx'
 import { Options as ToMarkdownOptions, toMarkdown } from 'mdast-util-to-markdown'
-import type { JsxComponentDescriptor } from './plugins/jsx'
-import { isMdastHTMLNode } from './plugins/core/MdastHTMLNode'
-import { mergeStyleAttributes } from './utils/mergeStyleAttributes'
 import { ImportStatement } from './importMarkdownToLexical'
+import { isMdastHTMLNode } from './plugins/core/MdastHTMLNode'
+import type { JsxComponentDescriptor } from './plugins/jsx'
+import { mergeStyleAttributes } from './utils/mergeStyleAttributes'
 
 export type { Options as ToMarkdownOptions } from 'mdast-util-to-markdown'
 
@@ -167,9 +167,9 @@ export function exportLexicalTreeToMdast({
     })
   }
 
-  function visit(lexicalNode: LexicalNode, mdastParent: Mdast.Parent | null, visitorToSkip?: LexicalVisitor) {
-    const visitor = visitors.find((visitor) => {
-      if (visitor === visitorToSkip) {
+  function visit(lexicalNode: LexicalNode, mdastParent: Mdast.Parent | null, skipVisitors = new Set<number>()) {
+    const visitor = visitors.find((visitor, index) => {
+      if (skipVisitors.has(index)) {
         return false
       }
       return visitor.testLexicalNode?.(lexicalNode)
@@ -199,7 +199,7 @@ export function exportLexicalTreeToMdast({
         visit,
         registerReferredComponent,
         nextVisitor() {
-          visit(lexicalNode, mdastParent, visitor)
+          visit(lexicalNode, mdastParent, skipVisitors.add(visitors.indexOf(visitor)))
           return
         }
       }
