@@ -65,9 +65,9 @@ export interface LexicalExportVisitor<LN extends LexicalNode, UN extends Mdast.N
        */
       visit(node: LexicalNode, parent: Mdast.Parent): void
       /**
-       * Skip the visitor to move along the visitors chain for potential processing from a different visitor with a lower priority
+       * Go to next visitor in the visitors chain for potential processing from a different visitor with a lower priority
        */
-      skip(): void
+      nextVisitor(): void
     }
   }): void
 
@@ -167,9 +167,9 @@ export function exportLexicalTreeToMdast({
     })
   }
 
-  function visit(lexicalNode: LexicalNode, mdastParent: Mdast.Parent | null, skipVisitor?: LexicalVisitor) {
+  function visit(lexicalNode: LexicalNode, mdastParent: Mdast.Parent | null, visitorToSkip?: LexicalVisitor) {
     const visitor = visitors.find((visitor) => {
-      if (visitor === skipVisitor) {
+      if (visitor === visitorToSkip) {
         return false
       }
       return visitor.testLexicalNode?.(lexicalNode)
@@ -198,7 +198,7 @@ export function exportLexicalTreeToMdast({
         visitChildren,
         visit,
         registerReferredComponent,
-        skip() {
+        nextVisitor() {
           visit(lexicalNode, mdastParent, visitor)
           return
         }
