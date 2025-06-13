@@ -167,9 +167,9 @@ export function exportLexicalTreeToMdast({
     })
   }
 
-  function visit(lexicalNode: LexicalNode, mdastParent: Mdast.Parent | null, skipVisitors = new Set<number>()) {
+  function visit(lexicalNode: LexicalNode, mdastParent: Mdast.Parent | null, skipVisitors: Set<number> | null = null) {
     const visitor = visitors.find((visitor, index) => {
-      if (skipVisitors.has(index)) {
+      if (skipVisitors?.has(index)) {
         return false
       }
       return visitor.testLexicalNode?.(lexicalNode)
@@ -199,7 +199,7 @@ export function exportLexicalTreeToMdast({
         visit,
         registerReferredComponent,
         nextVisitor() {
-          visit(lexicalNode, mdastParent, skipVisitors.add(visitors.indexOf(visitor)))
+          visit(lexicalNode, mdastParent, (skipVisitors ?? new Set()).add(visitors.indexOf(visitor)))
           return
         }
       }

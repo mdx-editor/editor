@@ -262,10 +262,10 @@ export function importMdastTreeToLexical({ root, mdastRoot, visitors, ...descrip
     mdastNode: Mdast.RootContent | Mdast.Root,
     lexicalParent: LexicalNode,
     mdastParent: Mdast.Parent | null,
-    skipVisitors = new Set<number>()
+    skipVisitors: Set<number> | null = null
   ) {
     const visitor = visitors.find((visitor, index) => {
-      if (skipVisitors.has(index)) {
+      if (skipVisitors?.has(index)) {
         return false
       }
       if (typeof visitor.testNode === 'string') {
@@ -296,7 +296,7 @@ export function importMdastTreeToLexical({ root, mdastRoot, visitors, ...descrip
       actions: {
         visitChildren,
         nextVisitor() {
-          visit(mdastNode, lexicalParent, mdastParent, skipVisitors.add(visitors.indexOf(visitor)))
+          visit(mdastNode, lexicalParent, mdastParent, (skipVisitors ?? new Set()).add(visitors.indexOf(visitor)))
         },
         addAndStepInto(lexicalNode) {
           ;(lexicalParent as ElementNode).append(lexicalNode)
