@@ -2,10 +2,10 @@ import { $isElementNode, ElementNode as LexicalElementNode, LexicalNode, RootNod
 import * as Mdast from 'mdast'
 import type { MdxjsEsm } from 'mdast-util-mdx'
 import { Options as ToMarkdownOptions, toMarkdown } from 'mdast-util-to-markdown'
-import type { JsxComponentDescriptor } from './plugins/jsx'
-import { isMdastHTMLNode } from './plugins/core/MdastHTMLNode'
-import { mergeStyleAttributes } from './utils/mergeStyleAttributes'
 import { ImportStatement } from './importMarkdownToLexical'
+import { isMdastHTMLNode } from './plugins/core/MdastHTMLNode'
+import type { JsxComponentDescriptor } from './plugins/jsx'
+import { mergeStyleAttributes } from './utils/mergeStyleAttributes'
 
 export type { Options as ToMarkdownOptions } from 'mdast-util-to-markdown'
 
@@ -64,6 +64,10 @@ export interface LexicalExportVisitor<LN extends LexicalNode, UN extends Mdast.N
        * visits the specified lexical node
        */
       visit(node: LexicalNode, parent: Mdast.Parent): void
+      /**
+       * Go to next visitor in the visitors chain for potential processing from a different visitor with a lower priority
+       */
+      nextVisitor(): void
     }
   }): void
 
@@ -163,8 +167,13 @@ export function exportLexicalTreeToMdast({
     })
   }
 
-  function visit(lexicalNode: LexicalNode, mdastParent: Mdast.Parent | null) {
-    const visitor = visitors.find((visitor) => visitor.testLexicalNode?.(lexicalNode))
+  function visit(lexicalNode: LexicalNode, mdastParent: Mdast.Parent | null, usedVisitors: Set<number> | null = null) {
+    const visitor = visitors.find((visitor, index) => {
+      if (usedVisitors?.has(index)) {
+        return false
+      }
+      return visitor.testLexicalNode?.(lexicalNode)
+    })
     if (!visitor) {
       throw new Error(`no lexical visitor found for ${lexicalNode.getType()}`, {
         cause: lexicalNode
@@ -188,7 +197,11 @@ export function exportLexicalTreeToMdast({
         appendToParent,
         visitChildren,
         visit,
-        registerReferredComponent
+        registerReferredComponent,
+        nextVisitor() {
+          visit(lexicalNode, mdastParent, (usedVisitors ?? new Set()).add(visitors.indexOf(visitor)))
+          return
+        }
       }
     })
   }
