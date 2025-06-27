@@ -1,4 +1,3 @@
-import '@mdxeditor/editor/style.css'
 import React, { useRef, useState } from 'react'
 
 import { GenericJsxEditor, JsxComponentDescriptor, MDXEditor, MDXEditorMethods, jsxPlugin } from '..'
