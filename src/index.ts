@@ -106,6 +106,7 @@ export * from './plugins/toolbar/primitives/select'
 // Build your own editor
 export * from './plugins/core/NestedLexicalEditor'
 export * from './plugins/core/PropertyPopover'
+export * from './plugins/remote'
 
 // Helpers & utilities
 export * from './utils/detectMac'
