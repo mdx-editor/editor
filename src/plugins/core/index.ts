@@ -237,7 +237,7 @@ const mutableMarkdownSignal$ = Signal<string>((r) => {
     ),
     mutableMarkdownSignal$
   )
-})
+}, true)
 
 // import configuration
 /** @internal */
@@ -841,10 +841,14 @@ export const viewMode$ = Cell<ViewMode>('rich-text', (r) => {
  * The current value of the source/diff editors.
  * @group Diff/Source
  */
-export const markdownSourceEditorValue$ = Cell('', (r) => {
-  r.link(markdown$, markdownSourceEditorValue$)
-  r.link(markdownSourceEditorValue$, markdownSignal$)
-})
+export const markdownSourceEditorValue$ = Cell(
+  '',
+  (r) => {
+    r.link(markdown$, markdownSourceEditorValue$)
+    r.link(markdownSourceEditorValue$, markdownSignal$)
+  },
+  true
+)
 
 /**
  * The names of the plugins that are currently active.
@@ -890,6 +894,7 @@ export const corePlugin = realmPlugin<{
     r.register(createRootEditorSubscription$)
     r.register(createActiveEditorSubscription$)
     r.register(markdownSignal$)
+    r.register(markdownSourceEditorValue$)
     r.pubIn({
       [initialMarkdown$]: params?.trim ? initialMarkdown.trim() : initialMarkdown,
       [iconComponentFor$]: params?.iconComponentFor,
