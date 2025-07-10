@@ -88,7 +88,9 @@
     "checkList": "Lista de verificación",
     "deleteSandpack": "Borrar este bloque de código",
     "undo": "Deshacer {{shortcut}}",
-    "redo": "Rehacer {{shortcut}}"
+    "redo": "Rehacer {{shortcut}}",
+    "highlight": "Resaltar",
+    "removeHighlight": "Quitar resaltado"
   },
   "admonitions": {
     "note": "Nota",

@@ -89,6 +89,8 @@
         "deleteSandpack": "Удалить этот блок кода",
         "undo": "Отменить {{shortcut}}",
         "redo": "Вернуть {{shortcut}}",
+        "highlight": "Выделить",
+        "removeHighlight": "Убрать выделение",
         "superscript": "Надстрочный",
         "subscript": "Подстрочный",
         "strikethrough": "Зачёркнутый",

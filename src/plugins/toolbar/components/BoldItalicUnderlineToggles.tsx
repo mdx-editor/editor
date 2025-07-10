@@ -2,7 +2,7 @@ import { applyFormat$, currentFormat$, iconComponentFor$, useTranslation } from 
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 import React from 'react'
 import { FORMAT, IS_BOLD, IS_ITALIC, IS_STRIKETHROUGH, IS_SUBSCRIPT, IS_SUPERSCRIPT, IS_UNDERLINE } from '../../../FormatConstants'
-import { ToggleSingleGroupWithItem } from '.././primitives/toolbar'
+import { ToggleSingleGroupWithItem } from '../primitives/toolbar'
 import { TextFormatType } from 'lexical'
 import styles from '../../../styles/ui.module.css'
 import { IconKey } from '../../../defaultSvgIcons'

@@ -89,6 +89,8 @@
     "deleteSandpack": "删除 Sandpack",
     "undo": "撤销 {{shortcut}}",
     "redo": "重做 {{shortcut}}",
+    "highlight": "高亮",
+    "removeHighlight": "移除高亮",
     "superscript": "上标",
     "subscript": "下标",
     "strikethrough": "删除线",
