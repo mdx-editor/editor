@@ -6,11 +6,21 @@ position: 0.85
 
 # Search and Replace
 
+This search is for the rich-text mode of the editor. The code-mirror source editor already has its own search functionality and api. 
+
 The search plugin provides a comprehensive find-and-replace functionality for the editor. It's built for performance, using the native `CSS.highlights` API to mark search results without interfering with the editor's rendering logic.
 
 The plugin itself works in the background to index text and find matches. To add a user interface for search, you can use the `useEditorSearch` hook. This hook provides all the necessary state and actions to build a search bar, like the one included in the official `MdxSearchToolbar` component.
 
 To get started, add the `searchPlugin` to your editor's plugins array. Then, you can render a search UI component (like the provided `MdxSearchToolbar`) which uses the `useEditorSearch` hook to interact with the editor.
+
+
+**A couple of things to note**:
+- Regex and wild card support searches across newlines; `.*`
+- The [`CSS.highlights`](https://caniuse.com/mdn-api_highlight_has) only recently (July 2025) became widely supported in browsers, so you may want to check compatibility if you're targeting older browsers.
+- This plugin **_currently_** does not search embedded editors; like code mirror, well or at all.
+- The search manages to search across styles and formatting, so it can find matches in bold, italic, and other styled text. As well as newlines with 
+
 
 ```tsx
 import {
@@ -38,7 +48,6 @@ function App() {
         }),
       ]}
     >
-      {/* 3. Render the search UI component. It will appear when toggled. */}
       <MdxSearchToolbar />
     </MDXEditor>
   );
@@ -90,4 +99,17 @@ export const SimpleSearchUI = () => {
     </div>
   );
 };
+```
+
+## Styling highlights
+
+The highlights need to be styled using the following CSS selectors. You can customize the styles to fit your application's design.
+
+```css
+::highlight(MdxSearch) {
+  background: yellow;
+}
+::highlight(MdxFocusSearch) {
+  background: fuchsia;
+}
 ```
