@@ -60,13 +60,15 @@
       "selectBlockTypeTooltip": "Select block type",
       "placeholder": "Block type"
     },
-    "toggleGroup":"toggle group",
+    "toggleGroup": "toggle group",
     "removeBold": "Remove bold",
     "bold": "Bold",
     "removeItalic": "Remove italic",
     "italic": "Italic",
     "underline": "Remove underline",
     "removeUnderline": "Underline",
+    "highlight": "Highlight",
+    "removeHighlight": "Remove highlight",
     "removeInlineCode": "Remove code format",
     "inlineCode": "Inline code format",
     "link": "Create link",
@@ -101,7 +103,7 @@
     "language": "Code block language",
     "selectLanguage": "Select code block language"
   },
-  "contentArea":{
+  "contentArea": {
     "editableMarkdown": "editable markdown"
   }
 }

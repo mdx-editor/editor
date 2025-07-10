@@ -34,8 +34,10 @@ import * as Mdast from 'mdast'
 
 import { gfmStrikethrough } from 'micromark-extension-gfm-strikethrough'
 import { gfmStrikethroughFromMarkdown, gfmStrikethroughToMarkdown } from 'mdast-util-gfm-strikethrough'
+import { highlightMarkFromMarkdown, highlightMarkToMarkdown } from 'mdast-util-highlight-mark'
 
 import { mdxJsxFromMarkdown, mdxJsxToMarkdown } from 'mdast-util-mdx-jsx'
+import { highlightMark } from 'micromark-extension-highlight-mark'
 import { mdxJsx } from 'micromark-extension-mdx-jsx'
 import { mdxMd } from 'micromark-extension-mdx-md'
 import React from 'react'
@@ -916,9 +918,9 @@ export const corePlugin = realmPlugin<{
       [placeholder$]: params?.placeholder,
       [readOnly$]: params?.readOnly,
       [translation$]: params?.translation,
-      [addMdastExtension$]: gfmStrikethroughFromMarkdown(),
-      [addSyntaxExtension$]: gfmStrikethrough(),
-      [addToMarkdownExtension$]: [mdxJsxToMarkdown(), gfmStrikethroughToMarkdown()],
+      [addMdastExtension$]: [gfmStrikethroughFromMarkdown(), highlightMarkFromMarkdown],
+      [addSyntaxExtension$]: [gfmStrikethrough(), highlightMark()],
+      [addToMarkdownExtension$]: [mdxJsxToMarkdown(), gfmStrikethroughToMarkdown(), highlightMarkToMarkdown],
       [lexicalTheme$]: params?.lexicalTheme ?? lexicalTheme
     })
 

@@ -283,7 +283,7 @@ function isConditionalContentsOption(option: ConditionalContentsOption | Fallbac
  *          fallback: () => (
  *            <>
  *              <UndoRedo />
- *              <BoldItalicUnderlineToggles />
+ *              <BoldItalicUnderlineHighlightToggles />
  *              <InsertCodeBlock />
  *            </>
  *          )

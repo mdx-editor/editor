@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react'
 import {
-  BoldItalicUnderlineToggles,
+  BoldItalicUnderlineHighlightToggles,
   DiffSourceToggleWrapper,
   ListsToggle,
   MDXEditor,
@@ -24,7 +24,7 @@ export function App() {
           toolbarPlugin({
             toolbarContents: () => (
               <>
-                <BoldItalicUnderlineToggles />
+                <BoldItalicUnderlineHighlightToggles />
                 <ListsToggle />
                 <DiffSourceToggleWrapper>
                   <Fragment />

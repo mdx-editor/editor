@@ -60,13 +60,15 @@
       "selectBlockTypeTooltip": "Selecciona el tipo de bloque",
       "placeholder": "Tipo de bloque"
     },
-    "toggleGroup":"Conmutar grupo",
+    "toggleGroup": "Conmutar grupo",
     "removeBold": "Borrar negrita",
     "bold": "Negrita",
     "removeItalic": "Borrar cursiva",
     "italic": "Cursiva",
     "underline": "Borrar subrayado",
     "removeUnderline": "Subrayado",
+    "highlight": "Resaltar",
+    "removeHighlight": "Quitar resaltado",
     "removeInlineCode": "Borrar formato de código",
     "inlineCode": "Formato de código en línea",
     "link": "Crear enlace",
@@ -101,7 +103,7 @@
     "language": "Lenguaje del bloque de código",
     "selectLanguage": "Seleccionar el lenguaje del bloque de código"
   },
-  "contentArea":{
+  "contentArea": {
     "editableMarkdown": "Markdown editable"
   }
 }

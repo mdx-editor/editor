@@ -80,6 +80,7 @@ export function MoreFormatting() {
         ref={ref}
         markdown={`
 ~~scratch this~~ *and <sup>sup this</sup> and <sub>sub this</sub> all in italic*  and<u>***something***</u>foo.
+okay ==**highlight** _this_ and <sup>this</sup>==
 `}
         onChange={console.log}
       />
