@@ -44,11 +44,11 @@ function App() {
         toolbarPlugin({
           // 2. In a real app, you would have a button here
           // that toggles the visibility of the search bar.
-          toolbarContents: () => <MyToolbarContents />,
+          toolbarContents: () => <><MdxSearchToolbar /><MyToolbarContents /></>,
         }),
       ]}
     >
-      <MdxSearchToolbar />
+      
     </MDXEditor>
   );
 }
