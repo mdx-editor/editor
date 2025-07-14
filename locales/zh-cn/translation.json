@@ -67,6 +67,8 @@
     "italic": "斜体",
     "underline": "移除下划线",
     "removeUnderline": "下划线",
+    "highlight": "高亮",
+    "removeHighlight": "移除高亮",
     "removeInlineCode": "移除内联代码样式",
     "inlineCode": "内联代码样式",
     "link": "创建链接",
@@ -107,7 +109,7 @@
     "language": "代码块语言",
     "selectLanguage": "选择代码块语言"
   },
-  "contentArea":{
+  "contentArea": {
     "editableMarkdown": "可编辑的 Markdown"
   }
 }

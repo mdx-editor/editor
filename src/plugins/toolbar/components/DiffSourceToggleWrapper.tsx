@@ -13,7 +13,7 @@ import { SingleChoiceToggleGroup } from '.././primitives/toolbar'
  * ```tsx
  *  <MDXEditor markdown='Hello world'
  *    plugins={[toolbarPlugin({
- *      toolbarContents: () => ( <> <DiffSourceToggleWrapper><UndoRedo /><BoldItalicUnderlineToggles /></DiffSourceToggleWrapper></>)
+ *      toolbarContents: () => ( <> <DiffSourceToggleWrapper><UndoRedo /><BoldItalicUnderlineHighlightToggles /></DiffSourceToggleWrapper></>)
  *    }), diffSourcePlugin()]}
  *  />
  * ```

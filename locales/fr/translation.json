@@ -67,6 +67,8 @@
     "italic": "Italique",
     "underline": "Souligné",
     "removeUnderline": "Retirer le soulignement",
+    "highlight": "Surligner",
+    "removeHighlight": "Supprimer le surlignage",
     "removeInlineCode": "Retirer le format code",
     "inlineCode": "Code en ligne",
     "link": "Créer un lien",

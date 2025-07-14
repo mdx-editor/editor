@@ -1,5 +1,5 @@
 import React, { useRef, useState, useCallback } from 'react'
-import { BlockTypeSelect, BoldItalicUnderlineToggles, CreateLink, linkDialogPlugin, MDXEditor } from '../'
+import { BlockTypeSelect, BoldItalicUnderlineHighlightToggles, CreateLink, linkDialogPlugin, MDXEditor } from '../'
 import { headingsPlugin, toolbarPlugin } from '../'
 
 export function WithinDialog() {
@@ -29,7 +29,7 @@ export function WithinDialog() {
               toolbarPlugin({
                 toolbarContents: () => (
                   <>
-                    <BoldItalicUnderlineToggles />
+                    <BoldItalicUnderlineHighlightToggles />
                     <BlockTypeSelect />
                     <CreateLink />
                   </>
