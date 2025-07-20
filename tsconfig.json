@@ -1,10 +1,7 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    "lib": [
-      "dom",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "jsx": "react",
     "module": "esnext",
     "moduleResolution": "node",
@@ -13,20 +10,10 @@
     "strict": true,
     "skipLibCheck": true,
     "rootDir": "./src",
-    "typeRoots": [
-      "./node_modules/@types",
-      "./src/@types",
-      "./node_modules"
-    ],
-    "types": [
-      "vite/client",
-      "vite-plugin-svgr/client",
-      "@testing-library/jest-dom",
-    ],
+    "typeRoots": ["./node_modules/@types", "./src/@types", "./node_modules"],
+    "types": ["vite/client", "vite-plugin-svgr/client", "@testing-library/jest-dom"],
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"]
     },
     "plugins": [
       {
@@ -34,7 +21,5 @@
       }
     ]
   },
-  "include": [
-    "src"
-  ]
+  "include": ["src"]
 }

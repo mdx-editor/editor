@@ -77,6 +77,8 @@ export * from './plugins/toolbar'
 export * from './plugins/diff-source'
 export * from './plugins/markdown-shortcut'
 
+export * from './plugins/search'
+
 // Toolbar components
 export * from './plugins/toolbar/components/BlockTypeSelect'
 export * from './plugins/toolbar/components/BoldItalicUnderlineToggles'
