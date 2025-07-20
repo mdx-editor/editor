@@ -1,6 +1,6 @@
 import React from 'react'
 import {
-  BoldItalicUnderlineToggles,
+  BoldItalicUnderlineHighlightToggles,
   ChangeCodeMirrorLanguage,
   ConditionalContents,
   DiffSourceToggleWrapper,
@@ -55,7 +55,7 @@ export function MissingPlugins() {
                     fallback: () => (
                       <>
                         <UndoRedo />
-                        <BoldItalicUnderlineToggles />
+                        <BoldItalicUnderlineHighlightToggles />
                       </>
                     )
                   }
@@ -108,7 +108,7 @@ export function CatchAllPlugin() {
                     fallback: () => (
                       <>
                         <UndoRedo />
-                        <BoldItalicUnderlineToggles />
+                        <BoldItalicUnderlineHighlightToggles />
                       </>
                     )
                   }

@@ -67,6 +67,8 @@
     "italic": "기울임",
     "underline": "밑줄 제거",
     "removeUnderline": "밑줄",
+    "highlight": "하이라이트",
+    "removeHighlight": "하이라이트 제거",
     "removeInlineCode": "코드 형식 제거",
     "inlineCode": "인라인 코드 형식",
     "link": "링크 삽입",

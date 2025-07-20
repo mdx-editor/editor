@@ -81,7 +81,7 @@ export * from './plugins/search'
 
 // Toolbar components
 export * from './plugins/toolbar/components/BlockTypeSelect'
-export * from './plugins/toolbar/components/BoldItalicUnderlineToggles'
+export * from './plugins/toolbar/components/BoldItalicUnderlineHighlightToggles'
 export * from './plugins/toolbar/components/ChangeAdmonitionType'
 export * from './plugins/toolbar/components/ChangeCodeMirrorLanguage'
 export * from './plugins/toolbar/components/CodeToggle'

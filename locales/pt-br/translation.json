@@ -67,6 +67,8 @@
     "italic": "Itálico",
     "underline": "Sublinhado",
     "removeUnderline": "Remover sublinhado",
+    "highlight": "Destacar",
+    "removeHighlight": "Remover destaque",
     "removeInlineCode": "Remover linha de código",
     "inlineCode": "Linha de código",
     "link": "Criar link",
@@ -104,7 +106,7 @@
     "language": "Linguagem do bloco de código",
     "selectLanguage": "Selecionar linguagem do bloco de código"
   },
-  "contentArea":{
+  "contentArea": {
     "editableMarkdown": "Markdown editável"
   }
 }
