@@ -24,8 +24,8 @@ export const maxLengthPlugin = realmPlugin<number>({
           return
         }
         const prevEditorState = editor.getEditorState()
-        const prevTextContentSize = prevEditorState.read(() => rootNode.getTextContentSize())
-        const textContentSize = rootNode.getTextContentSize()
+        const prevTextContentSize = prevEditorState.read(() => Array.from([...rootNode.getTextContent()]).length)
+        const textContentSize = Array.from([...rootNode.getTextContent()]).length
         if (prevTextContentSize !== textContentSize) {
           const delCount = textContentSize - maxLength
           const anchor = selection.anchor
