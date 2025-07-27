@@ -1,7 +1,16 @@
 import { applyFormat$, currentFormat$, iconComponentFor$, useTranslation } from '../../core'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 import React from 'react'
-import { FORMAT, IS_BOLD, IS_ITALIC, IS_STRIKETHROUGH, IS_SUBSCRIPT, IS_SUPERSCRIPT, IS_UNDERLINE } from '../../../FormatConstants'
+import {
+  FORMAT,
+  IS_BOLD,
+  IS_HIGHLIGHT,
+  IS_ITALIC,
+  IS_STRIKETHROUGH,
+  IS_SUBSCRIPT,
+  IS_SUPERSCRIPT,
+  IS_UNDERLINE
+} from '../../../FormatConstants'
 import { ToggleSingleGroupWithItem } from '.././primitives/toolbar'
 import { TextFormatType } from 'lexical'
 import styles from '../../../styles/ui.module.css'
@@ -33,15 +42,15 @@ const FormatButton: React.FC<FormatButtonProps> = ({ format, addTitle, removeTit
   )
 }
 
-export interface BoldItalicUnderlineTogglesProps {
-  options?: ('Bold' | 'Italic' | 'Underline')[]
+export interface BoldItalicUnderlineHighlightTogglesProps {
+  options?: ('Bold' | 'Italic' | 'Underline' | 'Highlight')[]
 }
 
 /**
  * A toolbar component that lets the user toggle bold, italic and underline formatting.
  * @group Toolbar Components
  */
-export const BoldItalicUnderlineToggles: React.FC<BoldItalicUnderlineTogglesProps> = ({ options }) => {
+export const BoldItalicUnderlineHighlightToggles: React.FC<BoldItalicUnderlineHighlightTogglesProps> = ({ options }) => {
   const t = useTranslation()
 
   const showAllButtons = typeof options === 'undefined'
@@ -72,6 +81,16 @@ export const BoldItalicUnderlineToggles: React.FC<BoldItalicUnderlineTogglesProp
           removeTitle={t('toolbar.removeUnderline', 'Remove underline')}
           icon="format_underlined"
           formatName="underline"
+        />
+      ) : null}
+
+      {showAllButtons || options.includes('Highlight') ? (
+        <FormatButton
+          format={IS_HIGHLIGHT}
+          addTitle={t('toolbar.highlight', 'Highlight')}
+          removeTitle={t('toolbar.removeHighlight', 'Remove highlight')}
+          icon="format_highlight"
+          formatName="highlight"
         />
       ) : null}
     </div>

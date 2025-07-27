@@ -1,6 +1,16 @@
 import * as Mdast from 'mdast'
 import { MdxJsxTextElement } from 'mdast-util-mdx'
-import { FORMAT, IS_BOLD, IS_CODE, IS_ITALIC, IS_STRIKETHROUGH, IS_SUBSCRIPT, IS_SUPERSCRIPT, IS_UNDERLINE } from '../../FormatConstants'
+import {
+  FORMAT,
+  IS_BOLD,
+  IS_CODE,
+  IS_HIGHLIGHT,
+  IS_ITALIC,
+  IS_STRIKETHROUGH,
+  IS_SUBSCRIPT,
+  IS_SUPERSCRIPT,
+  IS_UNDERLINE
+} from '../../FormatConstants'
 import { MdastImportVisitor } from '../../importMarkdownToLexical'
 import { $createTextNode } from 'lexical'
 
@@ -32,6 +42,14 @@ const StrikeThroughVisitor: MdastImportVisitor<Mdast.Delete> = {
   testNode: 'delete',
   visitNode({ mdastNode, actions, lexicalParent }) {
     actions.addFormatting(IS_STRIKETHROUGH)
+    actions.visitChildren(mdastNode, lexicalParent)
+  }
+}
+
+const HighlightVisitor: MdastImportVisitor<Mdast.Highlight> = {
+  testNode: 'highlight',
+  visitNode({ mdastNode, actions, lexicalParent }) {
+    actions.addFormatting(IS_HIGHLIGHT)
     actions.visitChildren(mdastNode, lexicalParent)
   }
 }
@@ -75,6 +93,9 @@ export const formattingVisitors = [
 
   // strikethrough
   StrikeThroughVisitor,
+
+  // highlight
+  HighlightVisitor,
 
   // superscript
   ...buildFormattingVisitors('sup', IS_SUPERSCRIPT),

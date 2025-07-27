@@ -67,6 +67,8 @@
     "italic": "斜體",
     "underline": "移除底線",
     "removeUnderline": "底線",
+    "highlight": "標註",
+    "removeHighlight": "移除標註",
     "removeInlineCode": "移除程式碼格式",
     "inlineCode": "內聯程式碼格式",
     "link": "建立連結",
@@ -101,7 +103,7 @@
     "language": "程式碼區塊語言",
     "selectLanguage": "選擇程式碼區塊語言"
   },
-  "contentArea":{
+  "contentArea": {
     "editableMarkdown": "可編輯的 Markdown"
   }
 }
