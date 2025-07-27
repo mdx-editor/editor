@@ -132,6 +132,8 @@ function pickTransformersForActivePlugins(pluginIds: string[], allowedHeadingLev
       dependencies: [CodeBlockNode],
       replace: (parentNode, _children, match) => {
         const codeBlockNode = $createCodeBlockNode({ code: '', language: match[1] ?? '', meta: '' })
+        // this is necessary for lexical to not complain about lost selection. The selection is really lost, but it will get restored in the setTimeout below
+        parentNode.selectPrevious()
         parentNode.replace(codeBlockNode)
         setTimeout(() => {
           codeBlockNode.select()
