@@ -1098,6 +1098,11 @@
   height: fit-content;
 }
 
+.imageDimensionsContainer {
+  display: flex;
+  gap: var(--spacing-4);
+}
+
 .placeholder {
   color: var(--baseSolid);
   overflow: hidden;

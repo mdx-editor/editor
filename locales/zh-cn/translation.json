@@ -15,7 +15,9 @@
     "addViaUrlInstructions": "或从网址新增图片：",
     "autoCompletePlaceholder": "选择或粘贴图片",
     "alt": "替代文本：",
-    "title": "标题："
+    "title": "标题：",
+    "width": "宽度：",
+    "height": "高度："
   },
   "imageEditor": {
     "deleteImage": "删除图片",

@@ -242,3 +242,28 @@ export function ImageDialogButtonExample() {
     </>
   )
 }
+
+export const ImageDimensionsExample: Story = () => {
+  return (
+    <>
+      <MDXEditor
+        markdown=""
+        plugins={[
+          imagePlugin({
+            imageUploadHandler: async () => Promise.resolve('https://picsum.photos/200/300'),
+            allowSetImageDimensions: true
+          }),
+          diffSourcePlugin(),
+          toolbarPlugin({
+            toolbarContents: () => (
+              <DiffSourceToggleWrapper>
+                <InsertImage />
+              </DiffSourceToggleWrapper>
+            )
+          })
+        ]}
+        onChange={console.log}
+      />
+    </>
+  )
+}

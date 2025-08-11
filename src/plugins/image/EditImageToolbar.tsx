@@ -3,7 +3,7 @@ import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 import classNames from 'classnames'
 import { $getNodeByKey } from 'lexical'
 import React from 'react'
-import { disableImageSettingsButton$, openEditImageDialog$ } from '.'
+import { disableImageSettingsButton$, openEditImageDialog$, parseImageDimension } from '.'
 import styles from '../../styles/ui.module.css'
 import { iconComponentFor$, readOnly$, useTranslation } from '../core'
 
@@ -13,9 +13,12 @@ export interface EditImageToolbarProps {
   initialImagePath: string | null
   title: string
   alt: string
+  width?: number | 'inherit'
+  height?: number | 'inherit'
 }
 
-export function EditImageToolbar({ nodeKey, imageSource, initialImagePath, title, alt }: EditImageToolbarProps): JSX.Element {
+export function EditImageToolbar(props: EditImageToolbarProps): JSX.Element {
+  const { nodeKey, imageSource, initialImagePath, title, alt, width, height } = props
   const [disableImageSettingsButton, iconComponentFor, readOnly] = useCellValues(disableImageSettingsButton$, iconComponentFor$, readOnly$)
   const [editor] = useLexicalComposerContext()
   const openEditImageDialog = usePublisher(openEditImageDialog$)
@@ -49,7 +52,9 @@ export function EditImageToolbar({ nodeKey, imageSource, initialImagePath, title
               initialValues: {
                 src: !initialImagePath ? imageSource : initialImagePath,
                 title,
-                altText: alt
+                altText: alt,
+                width: parseImageDimension(width),
+                height: parseImageDimension(height)
               }
             })
           }}

@@ -15,7 +15,9 @@
       "addViaUrlInstructions": "Або додайте зображення з URL посилання:",
       "autoCompletePlaceholder": "Виберіть або вставте джерело зображення",
       "alt": "Альтернативна назва:",
-      "title": "Назва:"
+      "title": "Назва:",
+      "width": "Ширина:",
+      "height": "Висота:"
     },
     "imageEditor": {
       "deleteImage": "Видалити зображення",

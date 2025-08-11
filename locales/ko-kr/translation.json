@@ -15,7 +15,9 @@
     "addViaUrlInstructions": "URL로 이미지 가져오기:",
     "autoCompletePlaceholder": "이미지 소스를 선택하거나 붙여넣으세요.",
     "alt": "Alt:",
-    "title": "제목:"
+    "title": "제목:",
+    "width": "너비:",
+    "height": "높이:"
   },
   "imageEditor": {
     "deleteImage": "이미지 삭제",
