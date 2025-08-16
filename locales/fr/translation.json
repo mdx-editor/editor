@@ -15,7 +15,9 @@
     "addViaUrlInstructions": "Ou ajouter une image depuis une URL :",
     "autoCompletePlaceholder": "Sélectionner ou coller la source de l’image",
     "alt": "Texte alternatif :",
-    "title": "Titre :"
+    "title": "Titre :",
+    "width": "Largeur :",
+    "height": "Hauteur :"
   },
   "imageEditor": {
     "deleteImage": "Supprimer l’image",

@@ -53,6 +53,8 @@ export type ImagePreviewHandler = ((imageSource: string) => Promise<string>) | n
 interface BaseImageParameters {
   altText?: string
   title?: string
+  width?: number
+  height?: number
 }
 
 /**
@@ -110,7 +112,13 @@ export interface EditingImageDialogState {
 const internalInsertImage$ = Signal<SrcImageParameters>((r) => {
   r.sub(r.pipe(internalInsertImage$, withLatestFrom(activeEditor$)), ([values, theEditor]) => {
     theEditor?.update(() => {
-      const imageNode = $createImageNode({ altText: values.altText ?? '', src: values.src, title: values.title ?? '' })
+      const imageNode = $createImageNode({
+        altText: values.altText ?? '',
+        src: values.src,
+        title: values.title ?? '',
+        width: parseImageDimension(values.width),
+        height: parseImageDimension(values.height)
+      })
       $insertNodes([imageNode])
       if ($isRootOrShadowRoot(imageNode.getParentOrThrow())) {
         $wrapNodeInElement(imageNode, $createParagraphNode).selectEnd()
@@ -178,8 +186,8 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
   { type: 'inactive' },
   (r) => {
     r.sub(
-      r.pipe(saveImage$, withLatestFrom(activeEditor$, imageUploadHandler$, imageDialogState$)),
-      ([values, theEditor, imageUploadHandler, dialogState]) => {
+      r.pipe(saveImage$, withLatestFrom(activeEditor$, imageUploadHandler$, imageDialogState$, allowSetImageDimensions$)),
+      ([values, theEditor, imageUploadHandler, dialogState, allowSetImageDimensions]) => {
         const handler =
           dialogState.type === 'editing'
             ? (src: string) => {
@@ -190,6 +198,13 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
                   imageNode.setTitle(values.title)
                   imageNode.setAltText(values.altText)
                   imageNode.setSrc(src)
+
+                  if (allowSetImageDimensions) {
+                    const width = parseImageDimension(values.width)
+                    const height = parseImageDimension(values.height)
+
+                    imageNode.setWidthAndHeight(width ?? 'inherit', height ?? 'inherit')
+                  }
                 })
                 r.pub(imageDialogState$, { type: 'inactive' })
               }
@@ -325,6 +340,13 @@ export const closeImageDialog$ = Action((r) => {
 export const disableImageSettingsButton$ = Cell<boolean>(false)
 
 /**
+ * Allow to set width and height of image through dialog window
+ * @group Image
+ */
+
+export const allowSetImageDimensions$ = Cell<boolean>(false)
+
+/**
  * Saves the data from the image dialog
  * @group Image
  */
@@ -336,6 +358,13 @@ export const saveImage$ = Signal<SaveImageParameters>()
  */
 export const editImageToolbarComponent$ = Cell<React.FC<EditImageToolbarProps>>(EditImageToolbar)
 
+export const parseImageDimension = (value: string | number | undefined) => {
+  if (typeof value === 'undefined') return undefined
+  const parsed = parseInt(String(value), 10)
+
+  return Number.isNaN(parsed) ? undefined : parsed
+}
+
 /**
  * A plugin that adds support for images.
  * @group Image
@@ -345,6 +374,7 @@ export const imagePlugin = realmPlugin<{
   imageAutocompleteSuggestions?: string[]
   disableImageResize?: boolean
   disableImageSettingsButton?: boolean
+  allowSetImageDimensions?: boolean
   imagePreviewHandler?: ImagePreviewHandler
   ImageDialog?: (() => JSX.Element) | React.FC
   EditImageToolbar?: (() => JSX.Element) | React.FC
@@ -360,6 +390,7 @@ export const imagePlugin = realmPlugin<{
       [imageAutocompleteSuggestions$]: params?.imageAutocompleteSuggestions ?? [],
       [disableImageResize$]: Boolean(params?.disableImageResize),
       [disableImageSettingsButton$]: Boolean(params?.disableImageSettingsButton),
+      [allowSetImageDimensions$]: Boolean(params?.allowSetImageDimensions),
       [imagePreviewHandler$]: params?.imagePreviewHandler ?? null,
       [editImageToolbarComponent$]: params?.EditImageToolbar ?? EditImageToolbar,
       [imagePlaceholder$]: params?.imagePlaceholder ?? ImagePlaceholder
@@ -372,6 +403,7 @@ export const imagePlugin = realmPlugin<{
       [imageAutocompleteSuggestions$]: params?.imageAutocompleteSuggestions ?? [],
       [disableImageResize$]: Boolean(params?.disableImageResize),
       [imagePreviewHandler$]: params?.imagePreviewHandler ?? null,
+      [allowSetImageDimensions$]: Boolean(params?.allowSetImageDimensions),
       [editImageToolbarComponent$]: params?.EditImageToolbar ?? EditImageToolbar,
       [imagePlaceholder$]: params?.imagePlaceholder ?? ImagePlaceholder
     })

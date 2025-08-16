@@ -22,7 +22,13 @@ import {
   SELECTION_CHANGE_COMMAND
 } from 'lexical'
 import { MdxJsxAttribute, MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx'
-import { disableImageResize$, editImageToolbarComponent$, imagePlaceholder$ as imagePlaceholderComponent$, imagePreviewHandler$ } from '.'
+import {
+  disableImageResize$,
+  editImageToolbarComponent$,
+  imagePlaceholder$ as imagePlaceholderComponent$,
+  imagePreviewHandler$,
+  allowSetImageDimensions$
+} from '.'
 import styles from '../../styles/ui.module.css'
 import { readOnly$ } from '../core'
 import { $isImageNode } from './ImageNode'
@@ -105,13 +111,15 @@ function LazyImage({
 }
 
 export function ImageEditor({ src, title, alt, nodeKey, width, height, rest }: ImageEditorProps): JSX.Element | null {
-  const [ImagePlaceholderComponent, disableImageResize, imagePreviewHandler, readOnly, EditImageToolbar] = useCellValues(
-    imagePlaceholderComponent$,
-    disableImageResize$,
-    imagePreviewHandler$,
-    readOnly$,
-    editImageToolbarComponent$
-  )
+  const [ImagePlaceholderComponent, disableImageResize, allowSetImageDimensions, imagePreviewHandler, readOnly, EditImageToolbar] =
+    useCellValues(
+      imagePlaceholderComponent$,
+      disableImageResize$,
+      allowSetImageDimensions$,
+      imagePreviewHandler$,
+      readOnly$,
+      editImageToolbarComponent$
+    )
 
   const imageRef = React.useRef<null | HTMLImageElement>(null)
   const buttonRef = React.useRef<HTMLButtonElement | null>(null)
@@ -186,6 +194,15 @@ export function ImageEditor({ src, title, alt, nodeKey, width, height, rest }: I
       setImageSource(src)
     }
   }, [src, imagePreviewHandler, initialImagePath])
+
+  React.useEffect(() => {
+    if (allowSetImageDimensions && imageRef.current) {
+      const { current: image } = imageRef
+
+      syncDimensionWithImageResizer(image, 'width', width)
+      syncDimensionWithImageResizer(image, 'height', height)
+    }
+  }, [allowSetImageDimensions, width, height])
 
   React.useEffect(() => {
     let isMounted = true
@@ -310,9 +327,19 @@ export function ImageEditor({ src, title, alt, nodeKey, width, height, rest }: I
             initialImagePath={initialImagePath}
             title={title ?? ''}
             alt={alt ?? ''}
+            width={width}
+            height={height}
           />
         )}
       </div>
     </React.Suspense>
   ) : null
+}
+
+const syncDimensionWithImageResizer = (image: HTMLImageElement, key: 'width' | 'height', value: number | 'inherit') => {
+  if (typeof value === 'number') {
+    image.style[key] = `${value}px`
+  } else {
+    image.style.removeProperty(key)
+  }
 }

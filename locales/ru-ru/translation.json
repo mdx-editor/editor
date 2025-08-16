@@ -15,7 +15,9 @@
         "addViaUrlInstructions": "Или добавить изображение по URL:",
         "autoCompletePlaceholder": "Выбрать или вставить ссылку на изображение",
         "alt": "Альтернативный заголовок:",
-        "title": "Заголовок:"
+        "title": "Заголовок:",
+        "width": "Ширина:",
+        "height": "Высота:"
     },
     "imageEditor": {
         "deleteImage": "Удалить изображение",

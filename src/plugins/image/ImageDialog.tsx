@@ -4,7 +4,14 @@ import React from 'react'
 import { useForm } from 'react-hook-form'
 import styles from '../../styles/ui.module.css'
 import { editorRootElementRef$, useTranslation } from '../core/index'
-import { closeImageDialog$, imageAutocompleteSuggestions$, imageDialogState$, imageUploadHandler$, saveImage$ } from './index'
+import {
+  closeImageDialog$,
+  imageAutocompleteSuggestions$,
+  imageDialogState$,
+  imageUploadHandler$,
+  saveImage$,
+  allowSetImageDimensions$
+} from './index'
 import { DownshiftAutoComplete } from '../core/ui/DownshiftAutoComplete'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 
@@ -12,15 +19,18 @@ interface ImageFormFields {
   src: string
   title: string
   altText: string
+  width?: number
+  height?: number
   file: FileList
 }
 
 export const ImageDialog: React.FC = () => {
-  const [imageAutocompleteSuggestions, state, editorRootElementRef, imageUploadHandler] = useCellValues(
+  const [imageAutocompleteSuggestions, state, editorRootElementRef, imageUploadHandler, allowSetImageDimensions] = useCellValues(
     imageAutocompleteSuggestions$,
     imageDialogState$,
     editorRootElementRef$,
-    imageUploadHandler$
+    imageUploadHandler$,
+    allowSetImageDimensions$
   )
   const saveImage = usePublisher(saveImage$)
   const closeImageDialog = usePublisher(closeImageDialog$)
@@ -31,6 +41,10 @@ export const ImageDialog: React.FC = () => {
     values: state.type === 'editing' ? (state.initialValues as any) : {}
   })
 
+  const resetFormState = () => {
+    reset({ src: '', title: '', altText: '', width: undefined, height: undefined })
+  }
+
   if (state.type === 'inactive') return null
 
   return (
@@ -39,7 +53,7 @@ export const ImageDialog: React.FC = () => {
       onOpenChange={(open) => {
         if (!open) {
           closeImageDialog()
-          reset({ src: '', title: '', altText: '' })
+          resetFormState()
         }
       }}
     >
@@ -57,7 +71,7 @@ export const ImageDialog: React.FC = () => {
               e.preventDefault()
               e.stopPropagation()
               await handleSubmit(saveImage)(e)
-              reset({ src: '', title: '', altText: '' })
+              resetFormState()
             }}
             className={styles.multiFieldForm}
           >
@@ -96,6 +110,20 @@ export const ImageDialog: React.FC = () => {
               <label htmlFor="title">{t('uploadImage.title', 'Title:')}</label>
               <input type="text" {...register('title')} className={styles.textInput} />
             </div>
+
+            {allowSetImageDimensions && (
+              <div className={styles.imageDimensionsContainer}>
+                <div className={styles.formField}>
+                  <label htmlFor="width">{t('uploadImage.width', 'Width:')}</label>
+                  <input type="number" min={0} {...register('width')} className={styles.textInput} />
+                </div>
+
+                <div className={styles.formField}>
+                  <label htmlFor="height">{t('uploadImage.height', 'Height:')}</label>
+                  <input type="number" min={0} {...register('height')} className={styles.textInput} />
+                </div>
+              </div>
+            )}
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--spacing-2)' }}>
               <button
