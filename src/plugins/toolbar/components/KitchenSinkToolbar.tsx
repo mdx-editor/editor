@@ -20,6 +20,7 @@ import { ListsToggle } from './ListsToggle'
 import { ShowSandpackInfo } from './ShowSandpackInfo'
 import { UndoRedo } from './UndoRedo'
 import { CreateLink } from './CreateLink'
+import { HighlightToggle } from './HighlightToggle'
 
 function whenInAdmonition(editorInFocus: EditorInFocus | null) {
   const node = editorInFocus?.rootNode
@@ -50,6 +51,7 @@ export const KitchenSinkToolbar: React.FC = () => {
                 <Separator />
                 <BoldItalicUnderlineToggles />
                 <CodeToggle />
+                <HighlightToggle />
                 <Separator />
                 <StrikeThroughSupSubToggles />
                 <Separator />

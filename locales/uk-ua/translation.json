@@ -88,7 +88,9 @@
       "checkList": "Контрольний список",
       "deleteSandpack": "Видалити цей блок коду",
       "undo": "Скасувати {{shortcut}}",
-      "redo": "Повторити скасоване {{shortcut}}"
+      "redo": "Повторити скасоване {{shortcut}}",
+      "highlight": "Виділити",
+      "removeHighlight": "Прибрати виділення"
     },
     "admonitions": {
       "note": "Примітка",

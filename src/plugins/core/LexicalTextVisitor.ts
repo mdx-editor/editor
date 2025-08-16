@@ -1,18 +1,26 @@
 import { $isTextNode, TextNode } from 'lexical'
 import * as Mdast from 'mdast'
-import { IS_BOLD, IS_CODE, IS_ITALIC, IS_STRIKETHROUGH, IS_SUBSCRIPT, IS_SUPERSCRIPT, IS_UNDERLINE } from '../../FormatConstants'
+import {
+  IS_BOLD,
+  IS_CODE,
+  IS_HIGHLIGHT,
+  IS_ITALIC,
+  IS_STRIKETHROUGH,
+  IS_SUBSCRIPT,
+  IS_SUPERSCRIPT,
+  IS_UNDERLINE
+} from '../../FormatConstants'
 import { LexicalExportVisitor } from '../../exportMarkdownFromLexical'
 import { type MdxJsxTextElement } from 'mdast-util-mdx-jsx'
 
 export function isMdastText(mdastNode: Mdast.Nodes): mdastNode is Mdast.Text {
   return mdastNode.type === 'text'
 }
-
 const JOINABLE_TAGS = ['u', 'span', 'sub', 'sup']
 
 export const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text | Mdast.Html | MdxJsxTextElement> = {
   shouldJoin: (prevNode, currentNode) => {
-    if (['text', 'emphasis', 'strong'].includes(prevNode.type)) {
+    if (['text', 'emphasis', 'strong', 'highlight'].includes(prevNode.type)) {
       return prevNode.type === currentNode.type
     }
 
@@ -109,6 +117,12 @@ export const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text | Mda
       }) as Mdast.Parent
     }
 
+    if (prevFormat & format & IS_HIGHLIGHT) {
+      localParentNode = actions.appendToParent(localParentNode, {
+        type: 'highlight',
+        children: []
+      }) as Mdast.Parent
+    }
     // repeat the same sequence as above for formatting introduced with this node
 
     if (format & IS_UNDERLINE && !(prevFormat & IS_UNDERLINE)) {
@@ -155,6 +169,13 @@ export const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text | Mda
     if (format & IS_STRIKETHROUGH && !(prevFormat & IS_STRIKETHROUGH)) {
       localParentNode = actions.appendToParent(localParentNode, {
         type: 'delete',
+        children: []
+      }) as Mdast.Parent
+    }
+
+    if (format & IS_HIGHLIGHT && !(prevFormat & IS_HIGHLIGHT)) {
+      localParentNode = actions.appendToParent(localParentNode, {
+        type: 'highlight',
         children: []
       }) as Mdast.Parent
     }

@@ -88,7 +88,9 @@
     "checkList": "核取清單",
     "deleteSandpack": "刪除 Sandpack",
     "undo": "復原 {{shortcut}}",
-    "redo": "重做 {{shortcut}}"
+    "redo": "重做 {{shortcut}}",
+    "highlight": "螢光標示",
+    "removeHighlight": "移除螢光標示"
   },
   "admonitions": {
     "note": "注意",

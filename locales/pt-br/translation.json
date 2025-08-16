@@ -89,6 +89,8 @@
     "deleteSandpack": "Deletar esse bloco de código",
     "undo": "Desfazer {{shortcut}}",
     "redo": "Refazer {{shortcut}}",
+    "highlight": "Destacar",
+    "removeHighlight": "Remover destaque",
     "superscript": "Sobrescrito",
     "subscript": "Subscrito",
     "strikethrough": "Riscado"

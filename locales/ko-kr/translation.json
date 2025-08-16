@@ -88,7 +88,9 @@
     "checkList": "체크 리스트",
     "deleteSandpack": "이 코드 블록 삭제",
     "undo": "취소 {{shortcut}}",
-    "redo": "다시 {{shortcut}}"
+    "redo": "다시 {{shortcut}}",
+    "highlight": "강조",
+    "removeHighlight": "강조 제거"
   },
   "admonitions": {
     "note": "메모",
