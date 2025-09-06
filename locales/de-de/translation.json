@@ -1,0 +1,111 @@
+{
+  "frontmatterEditor": {
+    "title": "Titelei bearbeiten",
+    "key": "Schlüssel",
+    "value": "Wert",
+    "addEntry": "Eintrag hinzufügen"
+  },
+  "dialogControls": {
+    "save": "Speichern",
+    "cancel": "Abbrechen"
+  },
+  "uploadImage": {
+    "dialogTitle": "Bild hochladen",
+    "uploadInstructions": "Bild von Gerät hochladen>",
+    "addViaUrlInstructions": "Oder Bild von einer URL hinzufügen:",
+    "autoCompletePlaceholder": "Bildquelle auswählen oder einfügen",
+    "alt": "Alt:",
+    "title": "Titel:",
+    "width": "Breite:",
+    "height": "Höhe:"
+  },
+  "imageEditor": {
+    "deleteImage": "Bild löschen",
+    "editImage": "Bild bearbeiten"
+  },
+  "createLink": {
+    "url": "URL",
+    "urlPlaceholder": "URL auswählen oder einfügen",
+    "title": "Titel",
+    "saveTooltip": "URL setzen",
+    "cancelTooltip": "Bearbeitung abbrechen"
+  },
+  "linkPreview": {
+    "open": "{{url}} in einem neuen Fenster öffnen",
+    "edit": "Link URL Bearbeiten",
+    "copyToClipboard": "In Zwischenablage kopieren",
+    "copied": "Kopiert!",
+    "remove": "Link entfernen"
+  },
+  "table": {
+    "deleteTable": "Tabelle löschen",
+    "columnMenu": "Spaltenmenü",
+    "textAlignment": "Text Ausrichtung",
+    "alignLeft": "Links ausrichten",
+    "alignCenter": "Zentriert ausrichten",
+    "alignRight": "Rechts ausrichten",
+    "insertColumnLeft": "Eine neue Spalte links von dieser einfügen",
+    "insertColumnRight": "Eine neue Spalte rechts von dieser einfügen",
+    "deleteColumn": "Diese Spalte löschen",
+    "rowMenu": "Zeilenmenü",
+    "insertRowAbove": "Eine Zeile über dieser einfügen",
+    "insertRowBelow": "Eine Zeile unter dieser einfügen",
+    "deleteRow": "Diese Zeile entfernen"
+  },
+  "toolbar": {
+    "blockTypes": {
+      "paragraph": "Absatz",
+      "quote": "Zitat",
+      "heading": "Überschrift {{level}}"
+    },
+    "blockTypeSelect": {
+      "selectBlockTypeTooltip": "Blocktyp auswählen",
+      "placeholder": "Blocktyp"
+    },
+    "toggleGroup": "Gruppe umschalten",
+    "removeBold": "Fettdruck entfernen",
+    "bold": "Fettdruck",
+    "removeItalic": "Kursivdruck entfernen",
+    "italic": "Kursivdruck",
+    "underline": "Unterstreichung entfernen",
+    "removeUnderline": "Unterstreichung",
+    "removeInlineCode": "Codeformat entfernen",
+    "inlineCode": "Inline Codeformatierung",
+    "link": "Link erstellen",
+    "richText": "Rich text",
+    "diffMode": "Differenzmodus",
+    "source": "Quellenmodus",
+    "admonition": "Call-out einfügen",
+    "codeBlock": "Codeblock einfügen",
+    "editFrontmatter": "Titelei bearbeiten",
+    "insertFrontmatter": "Titelei einfügen",
+    "image": "Bild einfügen",
+    "insertSandpack": "Sandpack einfügen",
+    "table": "Tabelle einfügen",
+    "thematicBreak": "Themenbruch einfügen",
+    "bulletedList": "Strickpunktliste",
+    "numberedList": "Nummerierte Liste",
+    "checkList": "Checkliste",
+    "deleteSandpack": "Diesen Codeblock löschen",
+    "undo": "Rückgängig {{shortcut}}",
+    "redo": "Wiederholen {{shortcut}}",
+    "highlight": "Markieren",
+    "removeHighlight": "Markierung entfernen"
+  },
+  "admonitions": {
+    "note": "Notiz",
+    "tip": "Tipp",
+    "danger": "Gefahr",
+    "info": "Info",
+    "caution": "Warnung",
+    "changeType": "Call-out Typ auswählen",
+    "placeholder": "Call0out Typ"
+  },
+  "codeBlock": {
+    "language": "Codeblock Sprache",
+    "selectLanguage": "Codeblock Sprache auswählen"
+  },
+  "contentArea": {
+    "editableMarkdown": "bearbeitbares markdown"
+  }
+}
