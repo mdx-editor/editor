@@ -360,7 +360,8 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
   const [editor] = React.useState(() => {
     const editor = createEditor({
       nodes: usedLexicalNodes,
-      theme: lexicalTheme
+      theme: lexicalTheme,
+      namespace: 'TableCellEditor'
     })
 
     editor.update(() => {

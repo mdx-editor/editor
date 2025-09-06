@@ -212,7 +212,8 @@ export const NestedLexicalEditor = function <T extends Mdast.RootContent>(props:
   const [editor] = React.useState(() => {
     const editor = createEditor({
       nodes: usedLexicalNodes,
-      theme: realm.getValue(lexicalTheme$)
+      theme: realm.getValue(lexicalTheme$),
+      namespace: 'NestedEditor'
     })
     return editor
   })
