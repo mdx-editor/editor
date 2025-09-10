@@ -15,6 +15,7 @@ import {
   BLUR_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
   DecoratorNode,
+  EditorState,
   EditorThemeClasses,
   ElementNode,
   FOCUS_COMMAND,
@@ -889,6 +890,8 @@ export const corePlugin = realmPlugin<{
   translation: Translation
   trim?: boolean
   lexicalTheme?: EditorThemeClasses
+  editorState?: EditorState | undefined
+  suppressSharedHistory?: boolean
 }>({
   init(r, params) {
     const initialMarkdown = params?.initialMarkdown ?? ''
@@ -910,7 +913,6 @@ export const corePlugin = realmPlugin<{
         LexicalGenericHTMLVisitor
       ],
 
-      [addComposerChild$]: SharedHistoryPlugin,
       [contentEditableClassName$]: params?.contentEditableClassName,
       [spellCheck$]: params?.spellCheck,
       [toMarkdownOptions$]: params?.toMarkdownOptions,
@@ -938,10 +940,15 @@ export const corePlugin = realmPlugin<{
         [addImportVisitor$]: MdastHTMLVisitor
       })
     }
+
+    if (!params?.suppressSharedHistory) {
+      r.pub(addComposerChild$, SharedHistoryPlugin)
+    }
   },
 
   postInit(r, params) {
     const newEditor = createEditor({
+      ...(params?.editorState ? { editorState: params.editorState } : {}),
       editable: params?.readOnly !== true,
       namespace: 'MDXEditor',
       nodes: r.getValue(usedLexicalNodes$),

@@ -30,7 +30,7 @@ import { lexicalTheme } from './styles/lexicalTheme'
 import styles from './styles/ui.module.css'
 import { noop } from './utils/fp'
 import { createLexicalComposerContext, LexicalComposerContext, LexicalComposerContextType } from '@lexical/react/LexicalComposerContext'
-import { EditorThemeClasses, LexicalEditor } from 'lexical'
+import { EditorState, EditorThemeClasses, LexicalEditor } from 'lexical'
 import { IconKey, defaultSvgIcons } from './defaultSvgIcons'
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary'
 
@@ -319,6 +319,14 @@ export interface MDXEditorProps {
    * Defaults to document.body.
    */
   overlayContainer?: HTMLElement | null
+  /**
+   * Certain collaboration plugins require that the history is disabled for the editor.
+   */
+  suppressSharedHistory?: boolean
+  /**
+   * The initial state of the lexical editor.
+   */
+  editorState?: EditorState | undefined
 }
 
 /**
@@ -344,7 +352,9 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>((pro
           onError: props.onError ?? noop,
           translation: props.translation ?? defaultTranslation,
           trim: props.trim ?? true,
-          lexicalTheme: props.lexicalTheme
+          lexicalTheme: props.lexicalTheme,
+          ...('editorState' in props ? { editorState: props.editorState } : {}),
+          suppressSharedHistory: props.suppressSharedHistory ?? false
         }),
         ...(props.plugins ?? [])
       ]}
