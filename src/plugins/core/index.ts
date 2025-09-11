@@ -95,6 +95,7 @@ export type BlockType = 'paragraph' | 'quote' | HeadingTagType | ''
 export interface EditorInFocus {
   editorType: string
   rootNode: LexicalNode | null
+  editorRef: unknown
 }
 
 /** @internal */
@@ -436,7 +437,9 @@ export const rootEditorSubscriptions$ = Cell<EditorSubscription[]>([], (r) => {
  * The currently focused editor
  * @group Core
  */
-export const editorInFocus$ = Cell<EditorInFocus | null>(null)
+export const editorInFocus$ = Cell<EditorInFocus | null>(null, noop, (prev, next) => {
+  return Boolean(prev && next && prev.editorRef === next.editorRef)
+})
 
 /**
  * Emits when the editor loses focus
@@ -510,7 +513,8 @@ export const createRootEditorSubscription$ = Appender(rootEditorSubscriptions$, 
             theActiveEditor.getEditorState().read(() => {
               r.pub(editorInFocus$, {
                 rootNode: $getRoot(),
-                editorType: 'lexical'
+                editorType: 'lexical',
+                editorRef: theActiveEditor
               })
             })
           }

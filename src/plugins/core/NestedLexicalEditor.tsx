@@ -270,7 +270,7 @@ export const NestedLexicalEditor = function <T extends Mdast.RootContent>(props:
       editor.registerCommand(
         FOCUS_COMMAND,
         () => {
-          setEditorInFocus({ editorType: 'lexical', rootNode: lexicalNode })
+          setEditorInFocus({ editorType: 'lexical', rootNode: lexicalNode, editorRef: editor })
           return false
         },
         COMMAND_PRIORITY_LOW
@@ -300,7 +300,7 @@ export const NestedLexicalEditor = function <T extends Mdast.RootContent>(props:
       editor.registerCommand(
         SELECTION_CHANGE_COMMAND,
         () => {
-          setEditorInFocus({ editorType: 'lexical', rootNode: lexicalNode })
+          setEditorInFocus({ editorType: 'lexical', rootNode: lexicalNode, editorRef: editor })
           return false
         },
         COMMAND_PRIORITY_HIGH
