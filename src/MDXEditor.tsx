@@ -324,9 +324,9 @@ export interface MDXEditorProps {
    */
   suppressSharedHistory?: boolean
   /**
-   * The initial state of the lexical editor.
+   * The initial state of the lexical editor. Pass null to disable any initiation.
    */
-  editorState?: EditorState | undefined
+  editorState?: EditorState | undefined | null
 }
 
 /**

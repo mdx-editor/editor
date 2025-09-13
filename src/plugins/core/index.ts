@@ -893,7 +893,7 @@ export const corePlugin = realmPlugin<{
   translation: Translation
   trim?: boolean
   lexicalTheme?: EditorThemeClasses
-  editorState?: EditorState | undefined
+  editorState?: EditorState | null | undefined
   suppressSharedHistory?: boolean
 }>({
   init(r, params) {
@@ -951,7 +951,7 @@ export const corePlugin = realmPlugin<{
 
   postInit(r, params) {
     const newEditor = createEditor({
-      ...(params?.editorState ? { editorState: params.editorState } : {}),
+      // ...(params?.editorState ? { editorState: params.editorState } : {}),
       editable: params?.readOnly !== true,
       namespace: 'MDXEditor',
       nodes: r.getValue(usedLexicalNodes$),
@@ -961,26 +961,28 @@ export const corePlugin = realmPlugin<{
       theme: r.getValue(lexicalTheme$)
     })
 
-    newEditor.update(() => {
-      const markdown = params?.initialMarkdown.trim() ?? ''
-      tryImportingMarkdown(r, $getRoot(), markdown)
+    if (params?.editorState !== null) {
+      newEditor.update(() => {
+        const markdown = params?.initialMarkdown.trim() ?? ''
+        tryImportingMarkdown(r, $getRoot(), markdown)
 
-      const autoFocusValue = params?.autoFocus
-      if (autoFocusValue) {
-        if (autoFocusValue === true) {
-          // Default 'on' state
+        const autoFocusValue = params?.autoFocus
+        if (autoFocusValue) {
+          if (autoFocusValue === true) {
+            // Default 'on' state
+            setTimeout(() => {
+              newEditor.focus(noop, { defaultSelection: 'rootStart' })
+            })
+            return
+          }
           setTimeout(() => {
-            newEditor.focus(noop, { defaultSelection: 'rootStart' })
+            newEditor.focus(noop, {
+              defaultSelection: autoFocusValue.defaultSelection ?? 'rootStart'
+            })
           })
-          return
         }
-        setTimeout(() => {
-          newEditor.focus(noop, {
-            defaultSelection: autoFocusValue.defaultSelection ?? 'rootStart'
-          })
-        })
-      }
-    })
+      })
+    }
 
     r.pub(rootEditor$, newEditor)
     r.pub(activeEditor$, newEditor)
