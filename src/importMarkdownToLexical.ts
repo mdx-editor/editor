@@ -241,7 +241,6 @@ export function importMarkdownToLexical({
   importMdastTreeToLexical({ root, mdastRoot, visitors, ...descriptors })
 }
 
-/** @internal */
 export function importMdastTreeToLexical({ root, mdastRoot, visitors, ...descriptors }: MdastTreeImportOptions): void {
   const formattingMap = new WeakMap<Mdast.Parent, number>()
   const styleMap = new WeakMap<Mdast.Parent, string>()

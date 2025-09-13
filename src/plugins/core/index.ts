@@ -98,7 +98,6 @@ export interface EditorInFocus {
   editorRef: unknown
 }
 
-/** @internal */
 export const NESTED_EDITOR_UPDATED_COMMAND = createCommand<undefined>('NESTED_EDITOR_UPDATED_COMMAND')
 
 /**

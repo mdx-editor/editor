@@ -110,9 +110,6 @@ function isParent(node: unknown): node is Mdast.Parent {
   return (node as { children?: any[] }).children instanceof Array
 }
 
-/**
- * @internal
- */
 export function exportLexicalTreeToMdast({
   root,
   visitors,
