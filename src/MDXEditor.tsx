@@ -81,7 +81,7 @@ const RichTextEditor: React.FC = () => {
             }
             placeholder={
               <div className={classNames(styles.contentEditable, styles.placeholder, contentEditableClassName)}>
-                <p>{placeholder}</p>
+                {placeholder}
               </div>
             }
             ErrorBoundary={LexicalErrorBoundary}
