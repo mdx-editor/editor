@@ -11,6 +11,7 @@ import { EditorView, lineNumbers, keymap } from '@codemirror/view'
 import { indentWithTab } from '@codemirror/commands'
 import { basicLight } from 'cm6-theme-basic-light'
 import { basicSetup } from 'codemirror'
+import { $setSelection } from 'lexical'
 import { codeBlockLanguages$, codeMirrorAutoLoadLanguageSupport$, codeMirrorExtensions$ } from '.'
 import { useCodeMirrorRef } from '../sandpack/useCodeMirrorRef'
 import { Select } from '../toolbar/primitives/select'
@@ -52,6 +53,13 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
         EditorView.lineWrapping,
         EditorView.updateListener.of(({ state }) => {
           setCodeRef.current(state.doc.toString())
+        }),
+        EditorView.domEventHandlers({
+          focus: () => {
+            parentEditor.update(() => {
+              $setSelection(null)
+            })
+          }
         })
       ]
       if (readOnly) {
