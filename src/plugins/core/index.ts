@@ -21,8 +21,10 @@ import {
   FOCUS_COMMAND,
   FORMAT_TEXT_COMMAND,
   Klass,
+  KlassConstructor,
   LexicalEditor,
   LexicalNode,
+  LexicalNodeReplacement,
   ParagraphNode,
   RangeSelection,
   SELECTION_CHANGE_COMMAND,
@@ -74,6 +76,8 @@ import { FORMAT } from '../../FormatConstants'
 import { IconKey } from '../../defaultSvgIcons'
 export * from './MdastHTMLNode'
 export * from './GenericHTMLNode'
+
+export type AdditionalLexicalNode = KlassConstructor<typeof LexicalNode> | LexicalNodeReplacement
 
 /**
  * A function that subscribes to Lexical editor updates or events, and retursns an unsubscribe function.
@@ -895,6 +899,8 @@ export const corePlugin = realmPlugin<{
   lexicalTheme?: EditorThemeClasses
   editorState?: EditorState | null | undefined
   suppressSharedHistory?: boolean
+  additionalLexicalNodes?: AdditionalLexicalNode[]
+  lexicalEditorNamespace?: string
 }>({
   init(r, params) {
     const initialMarkdown = params?.initialMarkdown ?? ''
@@ -953,8 +959,8 @@ export const corePlugin = realmPlugin<{
     const newEditor = createEditor({
       // ...(params?.editorState ? { editorState: params.editorState } : {}),
       editable: params?.readOnly !== true,
-      namespace: 'MDXEditor',
-      nodes: r.getValue(usedLexicalNodes$),
+      namespace: params?.lexicalEditorNamespace ?? 'MDXEditor',
+      nodes: [...r.getValue(usedLexicalNodes$), ...(params?.additionalLexicalNodes ?? [])],
       onError: (error) => {
         throw error
       },

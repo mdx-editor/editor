@@ -1,11 +1,11 @@
 import { useCellValue, useCellValues, usePublisher, useRealm } from '@mdxeditor/gurx'
 import React from 'react'
-import { RealmPlugin, RealmWithPlugins } from './RealmWithPlugins'
 import {
-  Translation,
+  AdditionalLexicalNode,
+  bottomAreaChildren$,
   composerChildren$,
   contentEditableClassName$,
-  spellCheck$,
+  contentEditableRef$,
   corePlugin,
   editorRootElementRef$,
   editorWrappers$,
@@ -15,24 +15,25 @@ import {
   placeholder$,
   rootEditor$,
   setMarkdown$,
+  spellCheck$,
   topAreaChildren$,
-  bottomAreaChildren$,
+  Translation,
   useTranslation,
-  viewMode$,
-  contentEditableRef$
+  viewMode$
 } from './plugins/core'
+import { RealmPlugin, RealmWithPlugins } from './RealmWithPlugins'
 
+import { createLexicalComposerContext, LexicalComposerContext, LexicalComposerContextType } from '@lexical/react/LexicalComposerContext'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
+import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import classNames from 'classnames'
+import { EditorState, EditorThemeClasses, LexicalEditor } from 'lexical'
+import { defaultSvgIcons, IconKey } from './defaultSvgIcons'
 import { ToMarkdownOptions } from './exportMarkdownFromLexical'
 import { lexicalTheme } from './styles/lexicalTheme'
 import styles from './styles/ui.module.css'
 import { noop } from './utils/fp'
-import { createLexicalComposerContext, LexicalComposerContext, LexicalComposerContextType } from '@lexical/react/LexicalComposerContext'
-import { EditorState, EditorThemeClasses, LexicalEditor } from 'lexical'
-import { IconKey, defaultSvgIcons } from './defaultSvgIcons'
-import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary'
 
 const LexicalProvider: React.FC<{
   children: JSX.Element | string | (JSX.Element | string)[]
@@ -327,6 +328,16 @@ export interface MDXEditorProps {
    * The initial state of the lexical editor. Pass null to disable any initiation.
    */
   editorState?: EditorState | undefined | null
+
+  /**
+   * Additional lexical nodes to include in the editor.
+   */
+  additionalLexicalNodes?: AdditionalLexicalNode[]
+
+  /**
+   * The lexical editor namespace.
+   */
+  lexicalEditorNamespace?: string
 }
 
 /**
@@ -354,7 +365,9 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>((pro
           trim: props.trim ?? true,
           lexicalTheme: props.lexicalTheme,
           ...('editorState' in props ? { editorState: props.editorState } : {}),
-          suppressSharedHistory: props.suppressSharedHistory ?? false
+          suppressSharedHistory: props.suppressSharedHistory ?? false,
+          additionalLexicalNodes: props.additionalLexicalNodes ?? [],
+          lexicalEditorNamespace: props.lexicalEditorNamespace ?? 'MDXEditor'
         }),
         ...(props.plugins ?? [])
       ]}
