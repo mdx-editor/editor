@@ -724,7 +724,10 @@ export const editorWrappers$ = Cell<React.ComponentType<{ children: React.ReactN
  */
 export const addEditorWrapper$ = Appender(editorWrappers$)
 
-/** @internal */
+/**
+ * React Components registered to be rendered inside `LexicalNestedComposer`. Useful if you're using lexical editor plugins that are wrapped as react components.
+ * @group Core
+ */
 export const nestedEditorChildren$ = Cell<React.ComponentType[]>([])
 
 /**
