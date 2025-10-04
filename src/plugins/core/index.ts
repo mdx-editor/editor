@@ -426,6 +426,8 @@ function rebind() {
   }, [] as Teardowns)
 }
 
+export const contentEditableWrapperElement$ = Cell<HTMLDivElement | null>(null)
+
 /** @internal */
 export const activeEditorSubscriptions$ = Cell<EditorSubscription[]>([], (r) => {
   r.pipe(r.combine(activeEditorSubscriptions$, activeEditor$), rebind())

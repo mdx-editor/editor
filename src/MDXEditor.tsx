@@ -14,6 +14,7 @@ import {
   markdownSourceEditorValue$,
   placeholder$,
   rootEditor$,
+  contentEditableWrapperElement$,
   setMarkdown$,
   spellCheck$,
   topAreaChildren$,
@@ -49,8 +50,10 @@ const LexicalProvider: React.FC<{
 const RichTextEditor: React.FC = () => {
   const t = useTranslation()
   const setContentEditableRef = usePublisher(contentEditableRef$)
-  const onRef = (_contentEditableRef: HTMLDivElement) => {
-    setContentEditableRef({ current: _contentEditableRef })
+  const setEditorRootWrapperElement = usePublisher(contentEditableWrapperElement$)
+  const onRef = (el: HTMLDivElement | null) => {
+    setEditorRootWrapperElement(el)
+    setContentEditableRef({ current: el })
   }
 
   const [contentEditableClassName, spellCheck, composerChildren, topAreaChildren, editorWrappers, placeholder, bottomAreaChildren] =
