@@ -29,10 +29,13 @@ export function WithoutLinkTitleField() {
       <MDXEditor
         onChange={console.log}
         markdown={`Hello world [link](https://google.com/)`}
-        plugins={[linkPlugin(), linkDialogPlugin({
-          linkAutocompleteSuggestions: ['https://msn.com/', 'https://virtuoso.dev/'],
-          showLinkTitleField: false
-        })]}
+        plugins={[
+          linkPlugin(),
+          linkDialogPlugin({
+            linkAutocompleteSuggestions: ['https://msn.com/', 'https://virtuoso.dev/'],
+            showLinkTitleField: false
+          })
+        ]}
       />
     </div>
   )
