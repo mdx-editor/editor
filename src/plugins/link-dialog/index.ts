@@ -54,7 +54,7 @@ export interface PreviewLinkDialog {
 export interface EditLinkDialog {
   type: 'edit'
   initialUrl: string
-  initialTitle?: string
+  hasInitialText: boolean
   url: string
   title: string
   linkNodeKey: string
@@ -142,6 +142,7 @@ export const linkDialogState$ = Cell<InactiveLinkDialog | PreviewLinkDialog | Ed
           return {
             type: 'edit' as const,
             initialUrl: state.url,
+            hasInitialText: true,
             url: state.url,
             title: state.title,
             linkNodeKey: state.linkNodeKey,
@@ -156,12 +157,13 @@ export const linkDialogState$ = Cell<InactiveLinkDialog | PreviewLinkDialog | Ed
   )
 
   r.sub(r.pipe(updateLink$, withLatestFrom(activeEditor$, linkDialogState$, currentSelection$)), ([payload, editor, state, selection]) => {
+    const text = payload.text?.trim() ?? ''
     const url = payload.url?.trim() ?? ''
     const title = payload.title?.trim() ?? ''
 
     if (url !== '') {
       if (selection?.isCollapsed()) {
-        const linkContent = title || url
+        const linkContent = text || title || url
         editor?.update(
           () => {
             const linkNode = getLinkNodeInSelection(selection)
@@ -263,7 +265,7 @@ export const linkDialogState$ = Cell<InactiveLinkDialog | PreviewLinkDialog | Ed
  * A signal that updates the current link with the published payload.
  * @group Link Dialog
  */
-export const updateLink$ = Signal<{ url: string | undefined; title: string | undefined }>()
+export const updateLink$ = Signal<{ text: string | undefined; url: string | undefined; title: string | undefined }>()
 /**
  * An action that cancel the edit of the current link.
  * @group Link Dialog
@@ -313,7 +315,7 @@ export const openLinkEditDialog$ = Action((r) => {
               r.pub(linkDialogState$, {
                 type: 'edit',
                 initialUrl: node.getURL(),
-                initialTitle: node.getTitle() ?? '',
+                hasInitialText: true,
                 url: node.getURL(),
                 title: node.getTitle() ?? '',
                 linkNodeKey: node.getKey(),
@@ -323,7 +325,7 @@ export const openLinkEditDialog$ = Action((r) => {
               r.pub(linkDialogState$, {
                 type: 'edit',
                 initialUrl: '',
-                initialTitle: '',
+                hasInitialText: !selection?.isCollapsed(),
                 title: '',
                 url: '',
                 linkNodeKey: '',
@@ -376,6 +378,9 @@ export const onReadOnlyClickLinkCallback$ = Cell<ReadOnlyClickLinkCallback | nul
   })
 })
 
+/** @internal */
+export const showLinkTitleField$ = Cell<boolean>(true)
+
 /**
  * @group Link Dialog
  */
@@ -397,11 +402,17 @@ export const linkDialogPlugin = realmPlugin<{
    * Invoked when a link is clicked in read-only mode
    */
   onReadOnlyClickLinkCallback?: ReadOnlyClickLinkCallback
+
+  /**
+   * If true, show the "Link title" field in link dialogs (this sets mouseover text, NOT anchor text)
+   */
+  showLinkTitleField?: boolean
 }>({
   init(r, params) {
     r.pub(addComposerChild$, params?.LinkDialog ?? LinkDialog)
     r.pub(onClickLinkCallback$, params?.onClickLinkCallback ?? null)
     r.pub(onReadOnlyClickLinkCallback$, params?.onReadOnlyClickLinkCallback ?? null)
+    r.pub(showLinkTitleField$, params?.showLinkTitleField ?? true)
   },
   update(r, params = {}) {
     r.pub(linkAutocompleteSuggestions$, params.linkAutocompleteSuggestions ?? [])
