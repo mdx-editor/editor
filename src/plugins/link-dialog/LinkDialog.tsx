@@ -19,7 +19,8 @@ import {
   removeLink$,
   switchFromPreviewToLinkEdit$,
   updateLink$,
-  onClickLinkCallback$
+  onClickLinkCallback$,
+  showLinkTitleField$
 } from '.'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 
@@ -28,17 +29,28 @@ export const OPEN_LINK_DIALOG: LexicalCommand<undefined> = createCommand()
 interface LinkEditFormProps {
   url: string
   title: string
-  onSubmit: (link: { url: string; title: string }) => void
+  onSubmit: (link: { url: string; title: string; text: string }) => void
   onCancel: () => void
   linkAutocompleteSuggestions: string[]
+  showLinkTitleField: boolean
+  showAnchorTextField: boolean
 }
 
 interface LinkFormFields {
+  text: string
   url: string
   title: string
 }
 
-export function LinkEditForm({ url, title, onSubmit, onCancel, linkAutocompleteSuggestions }: LinkEditFormProps) {
+export function LinkEditForm({
+  url,
+  title,
+  onSubmit,
+  onCancel,
+  linkAutocompleteSuggestions,
+  showLinkTitleField,
+  showAnchorTextField
+}: LinkEditFormProps) {
   const {
     register,
     handleSubmit,
@@ -48,7 +60,8 @@ export function LinkEditForm({ url, title, onSubmit, onCancel, linkAutocompleteS
   } = useForm<LinkFormFields>({
     values: {
       url,
-      title
+      title,
+      text: '' // text is only for freshly created links with no content, it always starts empty
     }
   })
   const t = useTranslation()
@@ -80,10 +93,23 @@ export function LinkEditForm({ url, title, onSubmit, onCancel, linkAutocompleteS
         />
       </div>
 
-      <div className={styles.formField}>
-        <label htmlFor="link-title">{t('createLink.title', 'Title')}</label>
-        <input id="link-title" className={styles.textInput} size={40} {...register('title')} />
-      </div>
+      {showAnchorTextField ? (
+        <div className={styles.formField}>
+          <label htmlFor="link-text" title={t('createLink.textTooltip', 'The text to be displayed for the link')}>
+            {t('createLink.text', 'Anchor text')}
+          </label>
+          <input id="link-text" className={styles.textInput} size={40} {...register('text')} />
+        </div>
+      ) : null}
+
+      {showLinkTitleField ? (
+        <div className={styles.formField}>
+          <label htmlFor="link-title" title={t('createLink.titleTooltip', "The link's title attribute, shown on hover")}>
+            {t('createLink.title', 'Link title')}
+          </label>
+          <input id="link-title" className={styles.textInput} size={40} {...register('title')} />
+        </div>
+      ) : null}
 
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--spacing-2)' }}>
         <button
@@ -109,15 +135,23 @@ export function LinkEditForm({ url, title, onSubmit, onCancel, linkAutocompleteS
 
 /** @internal */
 export const LinkDialog: React.FC = () => {
-  const [editorRootElementRef, activeEditor, iconComponentFor, linkDialogState, linkAutocompleteSuggestions, onClickLinkCallback] =
-    useCellValues(
-      editorRootElementRef$,
-      activeEditor$,
-      iconComponentFor$,
-      linkDialogState$,
-      linkAutocompleteSuggestions$,
-      onClickLinkCallback$
-    )
+  const [
+    editorRootElementRef,
+    activeEditor,
+    iconComponentFor,
+    linkDialogState,
+    linkAutocompleteSuggestions,
+    onClickLinkCallback,
+    showLinkTitleField
+  ] = useCellValues(
+    editorRootElementRef$,
+    activeEditor$,
+    iconComponentFor$,
+    linkDialogState$,
+    linkAutocompleteSuggestions$,
+    onClickLinkCallback$,
+    showLinkTitleField$
+  )
   const publishWindowChange = usePublisher(onWindowChange$)
   const updateLink = usePublisher(updateLink$)
   const cancelLinkEdit = usePublisher(cancelLinkEdit$)
@@ -179,6 +213,8 @@ export const LinkDialog: React.FC = () => {
               onSubmit={updateLink}
               onCancel={cancelLinkEdit.bind(null)}
               linkAutocompleteSuggestions={linkAutocompleteSuggestions}
+              showLinkTitleField={showLinkTitleField}
+              showAnchorTextField={!linkDialogState.hasInitialText}
             />
           )}
 

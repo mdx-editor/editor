@@ -23,6 +23,24 @@ export function Basics() {
   )
 }
 
+export function WithoutLinkTitleField() {
+  return (
+    <div style={{ position: 'relative', marginTop: '100px', marginLeft: '200px' }}>
+      <MDXEditor
+        onChange={console.log}
+        markdown={`Hello world [link](https://google.com/)`}
+        plugins={[
+          linkPlugin(),
+          linkDialogPlugin({
+            linkAutocompleteSuggestions: ['https://msn.com/', 'https://virtuoso.dev/'],
+            showLinkTitleField: false
+          })
+        ]}
+      />
+    </div>
+  )
+}
+
 export function ReadOnly() {
   const [readOnly, setReadOnly] = React.useState(false)
   return (

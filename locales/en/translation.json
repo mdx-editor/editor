@@ -26,7 +26,10 @@
   "createLink": {
     "url": "URL",
     "urlPlaceholder": "Select or paste an URL",
-    "title": "Title",
+    "text": "Anchor text",
+    "textTooltip": "The text to be displayed for the link",
+    "title": "Link title",
+    "titleTooltip": "The link's title attribute, shown on hover",
     "saveTooltip": "Set URL",
     "cancelTooltip": "Cancel change"
   },
