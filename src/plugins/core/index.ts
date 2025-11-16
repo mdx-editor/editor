@@ -156,7 +156,10 @@ export const inFocus$ = Cell(false)
  */
 export const currentFormat$ = Cell(0 as FORMAT)
 
-/** @internal */
+/**
+ * Emits a processing error when such happens
+ * @group Core
+ */
 export const markdownProcessingError$ = Cell<{ error: string; source: string } | null>(null)
 
 /** @internal */
