@@ -56,11 +56,11 @@ function seedTable(rows = 1, columns = 1): Mdast.Table {
  */
 export const insertTable$ = Signal<{
   /**
-   * The nunber of rows of the table.
+   * The number of rows of the table.
    */
   rows?: number
   /**
-   * The nunber of columns of the table.
+   * The number of columns of the table.
    */
   columns?: number
 }>((r) => {

@@ -229,7 +229,7 @@ export class TableNode extends DecoratorNode<JSX.Element> {
 }
 
 /**
- * Retruns true if the given node is a {@link TableNode}.
+ * Returns true if the given node is a {@link TableNode}.
  * @group Table
  */
 export function $isTableNode(node: LexicalNode | null | undefined): node is TableNode {

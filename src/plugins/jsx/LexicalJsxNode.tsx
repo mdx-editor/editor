@@ -146,7 +146,7 @@ export function $createLexicalJsxNode(mdastNode: MdastJsx, importStatement?: Imp
 }
 
 /**
- * Retruns true if the node is an {@link LexicalJsxNode}.
+ * Returns true if the node is an {@link LexicalJsxNode}.
  */
 export function $isLexicalJsxNode(node: LexicalNode | null | undefined): node is LexicalJsxNode {
   return node instanceof LexicalJsxNode

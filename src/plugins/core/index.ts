@@ -252,7 +252,7 @@ const mutableMarkdownSignal$ = Signal<string>((r) => {
 // import configuration
 /** @internal */
 /**
- * Contains the currently registered import vistors.
+ * Contains the currently registered import visitors.
  * @group Core
  */
 export const importVisitors$ = Cell<MdastImportVisitor<Mdast.Nodes>[]>([])
@@ -267,7 +267,7 @@ export const mdastExtensions$ = Cell<NonNullable<MarkdownParseOptions['mdastExte
 
 // export configuration
 /**
- * Contains the currently registered export vistors.
+ * Contains the currently registered export visitors.
  * @group Core
  */
 export const exportVisitors$ = Cell<NonNullable<LexicalConvertOptions['visitors']>>([])

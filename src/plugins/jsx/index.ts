@@ -45,7 +45,7 @@ export interface JsxPropertyDescriptor {
    */
   type: 'string' | 'number' | 'expression'
   /**
-   * Wether the property is required
+   * Whether the property is required
    */
   required?: boolean
 }
@@ -62,7 +62,7 @@ export interface JsxComponentDescriptor {
    */
   name: string | null
   /**
-   * Wether the component is a flow or text component (inline or block)
+   * Whether the component is a flow or text component (inline or block)
    */
   kind: 'flow' | 'text'
   /**
@@ -71,7 +71,7 @@ export interface JsxComponentDescriptor {
    */
   source?: string
   /**
-   * Wether the component is the default export of the module
+   * Whether the component is the default export of the module
    */
   defaultExport?: boolean
   /**
@@ -79,7 +79,7 @@ export interface JsxComponentDescriptor {
    */
   props: JsxPropertyDescriptor[]
   /**
-   * Wether or not the component has children
+   * Whether or not the component has children
    */
   hasChildren?: boolean
 
@@ -101,7 +101,7 @@ export interface JsxEditorProps {
 }
 
 /**
- * Determines wether the given node is a JSX node.
+ * Determines whether the given node is a JSX node.
  * @group JSX
  */
 export function isMdastJsxNode(node: Mdast.Nodes): node is MdastJsx {
@@ -192,7 +192,7 @@ export interface JsxPluginParams {
    */
   jsxComponentDescriptors: JsxComponentDescriptor[]
   /**
-   * Wether or not to allow default React fragments <></> processing in MDX.
+   * Whether or not to allow default React fragments <></> processing in MDX.
    */
   allowFragment?: boolean
 }
