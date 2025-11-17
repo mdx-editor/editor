@@ -255,7 +255,7 @@ export function $createImageNode(params: CreateImageNodeParameters): ImageNode {
 }
 
 /**
- * Retruns true if the node is an {@link ImageNode}.
+ * Returns true if the node is an {@link ImageNode}.
  * @group Image
  */
 export function $isImageNode(node: LexicalNode | null | undefined): node is ImageNode {

@@ -35,7 +35,7 @@ export interface Descriptors {
 export type MdastExtensions = Options['mdastExtensions']
 
 /**
- * Implement this interface to convert certian mdast nodes into lexical nodes.
+ * Implement this interface to convert certain mdast nodes into lexical nodes.
  * @typeParam UN - The type of the mdast node that is being visited.
  * @group Markdown Processing
  */

@@ -149,7 +149,7 @@ export function $createDirectiveNode(mdastNode: Directives, key?: NodeKey): Dire
 }
 
 /**
- * Retruns true if the node is an {@link DirectiveNode}.
+ * Returns true if the node is an {@link DirectiveNode}.
  * @group Directive
  */
 export function $isDirectiveNode(node: LexicalNode | null | undefined): node is DirectiveNode {

@@ -131,9 +131,9 @@ export class LexicalMdxExpressionNode extends DecoratorNode<JSX.Element> {
   /*
   // Mutation
   insertNewAfter(selection?: RangeSelection, restoreSelection = true): ParagraphNode | GenericHTMLNode {
-    const anchorOffet = selection ? selection.anchor.offset : 0
+    const anchorOffset = selection ? selection.anchor.offset : 0
     const newElement =
-      anchorOffet > 0 && anchorOffet < this.getTextContentSize() ? $createHeadingNode(this.getTag()) : $createParagraphNode()
+      anchorOffset > 0 && anchorOffset < this.getTextContentSize() ? $createHeadingNode(this.getTag()) : $createParagraphNode()
     const direction = this.getDirection()
     newElement.setDirection(direction)
     this.insertAfter(newElement, restoreSelection)
