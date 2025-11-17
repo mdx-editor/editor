@@ -21,6 +21,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext .ts,.tsx",
     "test": "NODE_ENV=development vitest",
+    "test:once": "NODE_ENV=development vitest --run",
     "semantic-release": "semantic-release",
     "image-upload-backend": "node ./src/examples/file-backend.js",
     "export-icons": "node ./scripts/export-figma-icons.mjs"
