@@ -1,6 +1,7 @@
 import { useCellValue, useCellValues, usePublisher, useRealm } from '@mdxeditor/gurx'
 import React from 'react'
 import {
+  activeEditor$,
   AdditionalLexicalNode,
   bottomAreaChildren$,
   composerChildren$,
@@ -9,7 +10,10 @@ import {
   corePlugin,
   editorRootElementRef$,
   editorWrappers$,
+  exportVisitors$,
   insertMarkdown$,
+  jsxComponentDescriptors$,
+  jsxIsAvailable$,
   markdown$,
   markdownSourceEditorValue$,
   placeholder$,
@@ -17,6 +21,8 @@ import {
   contentEditableWrapperElement$,
   setMarkdown$,
   spellCheck$,
+  toMarkdownExtensions$,
+  toMarkdownOptions$,
   topAreaChildren$,
   Translation,
   useTranslation,
@@ -35,6 +41,7 @@ import { ToMarkdownOptions } from './exportMarkdownFromLexical'
 import { lexicalTheme } from './styles/lexicalTheme'
 import styles from './styles/ui.module.css'
 import { noop } from './utils/fp'
+import { getSelectionAsMarkdown } from './utils/lexicalHelpers'
 
 const LexicalProvider: React.FC<{
   children: JSX.Element | string | (JSX.Element | string)[]
@@ -155,6 +162,17 @@ export interface MDXEditorMethods {
       preventScroll?: boolean
     }
   ) => void
+
+  /**
+   * gets the underlying Lexical contentEditable HTML content
+   */
+  getContentEditableHTML: () => string
+
+  /**
+   * Gets the markdown representation of the current selection.
+   * Returns an empty string if there is no selection, if selection is collapsed, or if editor is in source/diff mode.
+   */
+  getSelectionMarkdown: () => string
 }
 
 const RenderRecursiveWrappers: React.FC<{
@@ -228,6 +246,37 @@ const Methods: React.FC<{ mdxRef: React.ForwardedRef<MDXEditorMethods> }> = ({ m
           }
         ) => {
           realm.getValue(rootEditor$)?.focus(callbackFn, opts)
+        },
+        getContentEditableHTML: () => {
+          return realm.getValue(contentEditableRef$)?.current?.innerHTML ?? ''
+        },
+        getSelectionMarkdown: () => {
+          // Return empty string in source/diff mode
+          const viewMode = realm.getValue(viewMode$)
+          if (viewMode === 'source' || viewMode === 'diff') {
+            return ''
+          }
+
+          // Use activeEditor$ for nested editor support
+          const activeEditor = realm.getValue(activeEditor$)
+          if (!activeEditor) {
+            return ''
+          }
+
+          // Get all export parameters from realm
+          const visitors = realm.getValue(exportVisitors$)
+          const toMarkdownExtensions = realm.getValue(toMarkdownExtensions$)
+          const toMarkdownOptions = realm.getValue(toMarkdownOptions$)
+          const jsxComponentDescriptors = realm.getValue(jsxComponentDescriptors$)
+          const jsxIsAvailable = realm.getValue(jsxIsAvailable$)
+
+          return getSelectionAsMarkdown(activeEditor, {
+            visitors,
+            toMarkdownExtensions,
+            toMarkdownOptions,
+            jsxComponentDescriptors,
+            jsxIsAvailable
+          })
         }
       }
     },
