@@ -18,9 +18,9 @@ export const searchOpen$ = Cell<boolean>(false)
 export const editorSearchTermDebounced$ = Cell<string>('', (realm) => {
   realm.link(editorSearchTermDebounced$, realm.pipe(editorSearchTerm$, realm.transformer(debounceTime(250))))
 })
-export const editorSearchScollableContent$ = Cell<HTMLElement | null>(null, (r) =>
+export const editorSearchScrollableContent$ = Cell<HTMLElement | null>(null, (r) =>
   r.sub(contentEditableRef$, (cref) => {
-    r.pub(editorSearchScollableContent$, cref?.current?.parentNode ?? null)
+    r.pub(editorSearchScrollableContent$, cref?.current?.parentNode ?? null)
   })
 )
 
@@ -242,7 +242,7 @@ export function useEditorSearch() {
   const cursor = useCellValue(editorSearchCursor$)
   const search = useCellValue(editorSearchTerm$)
   const currentRange = ranges[cursor - 1] ?? null
-  const contentEditable = useCellValue(editorSearchScollableContent$)
+  const contentEditable = useCellValue(editorSearchScrollableContent$)
   const [isSearchOpen, setIsSearchOpen] = useCell(searchOpen$)
 
   const openSearch = () => {
@@ -381,7 +381,7 @@ export const searchPlugin = realmPlugin({
         realm.pub(editorSearchCursor$, currentCursor)
         const scrollRange = ranges[currentCursor - 1]
         if (!scrollRange) throw new Error('error updating highlights, scroll range does not exist')
-        const contentEditable = realm.getValue(editorSearchScollableContent$)
+        const contentEditable = realm.getValue(editorSearchScrollableContent$)
         scrollToRange(scrollRange, contentEditable!, {
           ignoreIfInView: true
         })
