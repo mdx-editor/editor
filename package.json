@@ -67,7 +67,7 @@
     "cm6-theme-basic-light": "^0.2.0",
     "codemirror": "^6.0.1",
     "downshift": "^7.6.0",
-    "js-yaml": "4.1.0",
+    "js-yaml": "4.1.1",
     "lexical": "^0.35.0",
     "mdast-util-directive": "^3.0.0",
     "mdast-util-from-markdown": "^2.0.0",
