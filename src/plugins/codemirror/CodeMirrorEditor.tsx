@@ -92,7 +92,7 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
       el.removeEventListener('keydown', stopPropagationHandler)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [readOnly, language])
+  }, [readOnly, language, ...codeMirrorExtensions])
 
   return (
     <div className={styles.codeMirrorWrapper}>
