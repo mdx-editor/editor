@@ -307,6 +307,11 @@ export const codeBlockEditorDescriptors$ = Cell<CodeBlockEditorDescriptor[]>([])
 export const editorRootElementRef$ = Cell<React.RefObject<HTMLDivElement> | null>(null)
 
 /**
+ * @group Core
+ */
+export const editorWrapperElementRef$ = Cell<React.RefObject<HTMLDivElement> | null>(null)
+
+/**
  * A reference to the content editable element.
  * @group Core
  */

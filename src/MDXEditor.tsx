@@ -26,7 +26,8 @@ import {
   topAreaChildren$,
   Translation,
   useTranslation,
-  viewMode$
+  viewMode$,
+  editorWrapperElementRef$
 } from './plugins/core'
 import { RealmPlugin, RealmWithPlugins } from './RealmWithPlugins'
 
@@ -196,7 +197,9 @@ const EditorRootElement: React.FC<{
   overlayContainer?: HTMLElement | null
 }> = ({ children, className, overlayContainer }) => {
   const editorRootElementRef = React.useRef<HTMLDivElement | null>(null)
+  const wrapperElementRef = React.useRef<HTMLDivElement | null>(null)
   const setEditorRootElementRef = usePublisher(editorRootElementRef$)
+  const setEditorWrapperElementRef = usePublisher(editorWrapperElementRef$)
 
   React.useEffect(() => {
     const popupContainer = document.createElement('div')
@@ -210,11 +213,16 @@ const EditorRootElement: React.FC<{
     container.appendChild(popupContainer)
     editorRootElementRef.current = popupContainer
     setEditorRootElementRef(editorRootElementRef)
+    setEditorWrapperElementRef(wrapperElementRef)
     return () => {
       popupContainer.remove()
     }
-  }, [className, editorRootElementRef, overlayContainer, setEditorRootElementRef])
-  return <div className={classNames('mdxeditor', styles.editorRoot, styles.editorWrapper, className)}>{children}</div>
+  }, [className, editorRootElementRef, overlayContainer, setEditorRootElementRef, setEditorWrapperElementRef])
+  return (
+    <div className={classNames('mdxeditor', styles.editorRoot, styles.editorWrapper, className)} ref={wrapperElementRef}>
+      {children}
+    </div>
+  )
 }
 
 const Methods: React.FC<{ mdxRef: React.ForwardedRef<MDXEditorMethods> }> = ({ mdxRef }) => {
