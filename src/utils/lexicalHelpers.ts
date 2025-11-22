@@ -1,4 +1,15 @@
-import { $getRoot, $getSelection, $isRangeSelection, $isTextNode, $isElementNode, ElementNode, LexicalEditor, LexicalNode, RangeSelection, TextNode } from 'lexical'
+import {
+  $getRoot,
+  $getSelection,
+  $isRangeSelection,
+  $isTextNode,
+  $isElementNode,
+  ElementNode,
+  LexicalEditor,
+  LexicalNode,
+  RangeSelection,
+  TextNode
+} from 'lexical'
 import { $isLinkNode } from '@lexical/link'
 import { $isHeadingNode } from '@lexical/rich-text'
 import { $isListNode, $isListItemNode } from '@lexical/list'
@@ -130,16 +141,13 @@ export function getSelectionAsMarkdown(editor: LexicalEditor, _exportParams: Omi
 
     // Get unique block-level parent nodes to preserve structure (headings, lists, paragraphs, etc.)
     const parentNodes = new Set<ElementNode>()
-    nodes.forEach(node => {
+    nodes.forEach((node) => {
       let current: LexicalNode | null = node
 
       // Walk up to find the nearest block-level parent (heading, paragraph, list item, etc.)
       while (current) {
         // Check if current node is a block-level node
-        if ($isHeadingNode(current) ||
-            $isListItemNode(current) ||
-            current.getType() === 'paragraph' ||
-            current.getType() === 'quote') {
+        if ($isHeadingNode(current) || $isListItemNode(current) || current.getType() === 'paragraph' || current.getType() === 'quote') {
           if ($isElementNode(current)) {
             parentNodes.add(current)
           }
@@ -159,19 +167,19 @@ export function getSelectionAsMarkdown(editor: LexicalEditor, _exportParams: Omi
         // Handle heading nodes
         const level = parseInt(node.getTag().replace('h', ''))
         const children = node.getChildren()
-        const headingText = children.map(child => nodeToMarkdown(child)).join('')
+        const headingText = children.map((child) => nodeToMarkdown(child)).join('')
         return '#'.repeat(level) + ' ' + headingText + '\n\n'
       } else if ($isListItemNode(node)) {
         // Handle list item nodes
         const parent = node.getParent()
         const prefix = parent && $isListNode(parent) && parent.getListType() === 'number' ? '1. ' : '- '
         const children = node.getChildren()
-        const itemText = children.map(child => nodeToMarkdown(child)).join('')
+        const itemText = children.map((child) => nodeToMarkdown(child)).join('')
         return prefix + itemText + '\n'
       } else if ($isListNode(node)) {
         // Handle list nodes
         const children = node.getChildren()
-        return children.map(child => nodeToMarkdown(child)).join('') + '\n'
+        return children.map((child) => nodeToMarkdown(child)).join('') + '\n'
       } else if ($isTextNode(node)) {
         let text = node.getTextContent()
         const format = node.getFormat()
@@ -202,7 +210,7 @@ export function getSelectionAsMarkdown(editor: LexicalEditor, _exportParams: Omi
         const url = node.getURL()
         const title = node.getTitle()
         const children = node.getChildren()
-        const linkText = children.map(child => nodeToMarkdown(child)).join('')
+        const linkText = children.map((child) => nodeToMarkdown(child)).join('')
 
         if (title) {
           return `[${linkText}](${url} "${title}")`
@@ -211,7 +219,7 @@ export function getSelectionAsMarkdown(editor: LexicalEditor, _exportParams: Omi
       } else if ($isElementNode(node)) {
         // For other element nodes, process their children
         const children = node.getChildren()
-        return children.map(child => nodeToMarkdown(child)).join('')
+        return children.map((child) => nodeToMarkdown(child)).join('')
       }
 
       // Fallback: return text content
@@ -219,7 +227,7 @@ export function getSelectionAsMarkdown(editor: LexicalEditor, _exportParams: Omi
     }
 
     // Convert all selected nodes to markdown and concatenate
-    markdown = nodesToProcess.map(node => nodeToMarkdown(node)).join('')
+    markdown = nodesToProcess.map((node) => nodeToMarkdown(node)).join('')
   })
 
   return markdown.trim()
