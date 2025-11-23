@@ -7,7 +7,12 @@
       "Bash(npm test:*)",
       "mcp__serena__find_symbol",
       "mcp__serena__replace_symbol_body",
-      "Bash(npm run test:once:*)"
+      "Bash(npm run test:once:*)",
+      "mcp__serena__list_dir",
+      "Skill(prp-workflow)",
+      "Bash(tree:*)",
+      "WebSearch",
+      "Bash(npm run dev:*)"
     ],
     "deny": [],
     "ask": []
