@@ -26,7 +26,10 @@
   "createLink": {
     "url": "網址",
     "urlPlaceholder": "選擇或貼上網址",
+    "text": "錨文本",
+    "textTooltip": "用於顯示連結的文字",
     "title": "標題",
+    "titleTooltip": "連結的 title 屬性，於滑鼠懸停時顯示",
     "saveTooltip": "設定網址",
     "cancelTooltip": "取消修改"
   },

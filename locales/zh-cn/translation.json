@@ -26,7 +26,10 @@
   "createLink": {
     "url": "网址",
     "urlPlaceholder": "选择或粘贴网址",
+    "text": "锚文本",
+    "textTooltip": "用于显示链接的文本",
     "title": "标题",
+    "titleTooltip": "链接的 title 属性，鼠标悬停时显示",
     "saveTooltip": "设置网址",
     "cancelTooltip": "取消更改"
   },

@@ -26,7 +26,10 @@
   "createLink": {
     "url": "URL",
     "urlPlaceholder": "URL을 선택하거나 붙여넣으세요.",
+    "text": "앵커 텍스트",
+    "textTooltip": "링크에 표시될 텍스트",
     "title": "제목",
+    "titleTooltip": "마우스를 올리면 표시되는 링크의 제목 속성",
     "saveTooltip": "URL 설정",
     "cancelTooltip": "변경 취소"
   },

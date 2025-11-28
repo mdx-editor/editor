@@ -29,6 +29,7 @@ export const OPEN_LINK_DIALOG: LexicalCommand<undefined> = createCommand()
 interface LinkEditFormProps {
   url: string
   title: string
+  text: string
   onSubmit: (link: { url: string; title: string; text: string }) => void
   onCancel: () => void
   linkAutocompleteSuggestions: string[]
@@ -45,6 +46,7 @@ interface LinkFormFields {
 export function LinkEditForm({
   url,
   title,
+  text,
   onSubmit,
   onCancel,
   linkAutocompleteSuggestions,
@@ -61,7 +63,7 @@ export function LinkEditForm({
     values: {
       url,
       title,
-      text: '' // text is only for freshly created links with no content, it always starts empty
+      text
     }
   })
   const t = useTranslation()
@@ -210,11 +212,12 @@ export const LinkDialog: React.FC = () => {
             <LinkEditForm
               url={linkDialogState.url}
               title={linkDialogState.title}
+              text={linkDialogState.text}
               onSubmit={updateLink}
               onCancel={cancelLinkEdit.bind(null)}
               linkAutocompleteSuggestions={linkAutocompleteSuggestions}
               showLinkTitleField={showLinkTitleField}
-              showAnchorTextField={!linkDialogState.hasInitialText}
+              showAnchorTextField={linkDialogState.withAnchorText}
             />
           )}
 

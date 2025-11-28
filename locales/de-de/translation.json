@@ -26,7 +26,10 @@
   "createLink": {
     "url": "URL",
     "urlPlaceholder": "URL auswählen oder einfügen",
+    "text": "Ankertext",
+    "textTooltip": "Der Text, der für den Link angezeigt wird",
     "title": "Titel",
+    "titleTooltip": "Das Title-Attribut des Links, das beim Hover angezeigt wird",
     "saveTooltip": "URL setzen",
     "cancelTooltip": "Bearbeitung abbrechen"
   },
