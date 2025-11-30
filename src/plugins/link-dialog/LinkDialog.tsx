@@ -79,6 +79,12 @@ export function LinkEditForm({
         e.stopPropagation()
         onCancel()
       }}
+      onKeyDown={(e) => {
+        if (e.key === 'Escape') {
+          e.stopPropagation()
+          onCancel()
+        }
+      }}
       className={classNames(styles.multiFieldForm, styles.linkDialogEditForm)}
     >
       <div className={styles.formField}>

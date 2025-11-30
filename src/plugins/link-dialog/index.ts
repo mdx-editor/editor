@@ -142,8 +142,8 @@ export const linkDialogState$ = Cell<InactiveLinkDialog | PreviewLinkDialog | Ed
       setTimeout(() => {
         editor?.getEditorState().read(() => {
           const node = $getNodeByKey(state.linkNodeKey)
-          const text = node ? node.getTextContent() : ''
-          const withAnchorText = Boolean(text)
+          const withAnchorText = $isLinkNode(node) ? node.getTextContent().length > 0 && node.getChildrenSize() <= 1 : false
+          const text = withAnchorText && node ? node.getTextContent() : ''
 
           r.pub(linkDialogState$, {
             type: 'edit' as const,
@@ -319,7 +319,6 @@ export const openLinkEditDialog$ = Action((r) => {
     ),
     ([, selection, editor]) => {
       editor?.focus(() => {
-        // needs to be done due to a change in v0.22
         setTimeout(() => {
           editor.getEditorState().read(() => {
             const linkNode = getLinkNodeInSelection(selection)
@@ -328,14 +327,19 @@ export const openLinkEditDialog$ = Action((r) => {
             const url = linkNode?.getURL() ?? ''
             const title = linkNode?.getTitle() ?? ''
             const linkNodeKey = linkNode?.getKey() ?? ''
-            const withAnchorText = Boolean(selection?.isCollapsed())
+
+            const withAnchorText = linkNode
+              ? linkNode.getTextContent().length > 0 && linkNode.getChildrenSize() <= 1
+              : Boolean(selection?.isCollapsed())
+
+            const text = withAnchorText && linkNode ? linkNode.getTextContent() : ''
 
             r.pub(linkDialogState$, {
               type: 'edit',
               initialUrl,
               url,
               title,
-              text: '',
+              text,
               withAnchorText,
               linkNodeKey,
               rectangle
