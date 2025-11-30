@@ -3,14 +3,17 @@ import { Action, Cell, Signal, filter, map, withLatestFrom } from '@mdxeditor/gu
 import {
   $createTextNode,
   $getNearestNodeFromDOMNode,
+  $getNodeByKey,
   $getSelection,
   $insertNodes,
   $isRangeSelection,
+  $isTextNode,
   COMMAND_PRIORITY_HIGH,
   COMMAND_PRIORITY_LOW,
   KEY_ESCAPE_COMMAND,
   KEY_MODIFIER_COMMAND,
-  RangeSelection
+  type LexicalNode,
+  type RangeSelection
 } from 'lexical'
 import { realmPlugin } from '../../RealmWithPlugins'
 import { IS_APPLE } from '../../utils/detectMac'
@@ -54,9 +57,10 @@ export interface PreviewLinkDialog {
 export interface EditLinkDialog {
   type: 'edit'
   initialUrl: string
-  hasInitialText: boolean
   url: string
   title: string
+  text: string
+  withAnchorText: boolean
   linkNodeKey: string
   rectangle: RectData
 }
@@ -133,28 +137,30 @@ export const linkDialogState$ = Cell<InactiveLinkDialog | PreviewLinkDialog | Ed
     )
   })
 
-  r.link(
-    r.pipe(
-      switchFromPreviewToLinkEdit$,
-      withLatestFrom(linkDialogState$),
-      map(([, state]) => {
-        if (state.type === 'preview') {
-          return {
+  r.sub(r.pipe(switchFromPreviewToLinkEdit$, withLatestFrom(linkDialogState$, activeEditor$)), ([, state, editor]) => {
+    if (state.type === 'preview') {
+      setTimeout(() => {
+        editor?.getEditorState().read(() => {
+          const node = $getNodeByKey(state.linkNodeKey)
+          const withAnchorText = $isLinkNode(node) ? node.getTextContent().length > 0 && node.getChildrenSize() <= 1 : false
+          const text = withAnchorText && node ? node.getTextContent() : ''
+
+          r.pub(linkDialogState$, {
             type: 'edit' as const,
             initialUrl: state.url,
-            hasInitialText: true,
             url: state.url,
             title: state.title,
+            text,
+            withAnchorText,
             linkNodeKey: state.linkNodeKey,
             rectangle: state.rectangle
-          } as EditLinkDialog
-        } else {
-          throw new Error('Cannot switch to edit mode when not in preview mode')
-        }
+          } as EditLinkDialog)
+        })
       })
-    ),
-    linkDialogState$
-  )
+    } else {
+      throw new Error('Cannot switch to edit mode when not in preview mode')
+    }
+  })
 
   r.sub(r.pipe(updateLink$, withLatestFrom(activeEditor$, linkDialogState$, currentSelection$)), ([payload, editor, state, selection]) => {
     const text = payload.text?.trim() ?? ''
@@ -164,22 +170,29 @@ export const linkDialogState$ = Cell<InactiveLinkDialog | PreviewLinkDialog | Ed
     if (url !== '') {
       if (selection?.isCollapsed()) {
         const linkContent = text || title || url
+
         editor?.update(
           () => {
             const linkNode = getLinkNodeInSelection(selection)
+
             if (!linkNode) {
               const node = $createLinkNode(url, { title })
+
               node.append($createTextNode(linkContent))
               $insertNodes([node])
               node.select()
             } else {
               linkNode.setURL(url)
               linkNode.setTitle(title)
+              updateLinkText(linkNode.getFirstChild(), text)
             }
           },
           { discrete: true }
         )
       } else {
+        editor?.update(() => {
+          updateLinkText(selection?.anchor.getNode(), text)
+        })
         editor?.dispatchCommand(TOGGLE_LINK_COMMAND, { url, title })
       }
 
@@ -306,32 +319,31 @@ export const openLinkEditDialog$ = Action((r) => {
     ),
     ([, selection, editor]) => {
       editor?.focus(() => {
-        // needs to be done due to a change in v0.22
         setTimeout(() => {
           editor.getEditorState().read(() => {
-            const node = getLinkNodeInSelection(selection)
+            const linkNode = getLinkNodeInSelection(selection)
             const rectangle = getSelectionRectangle(editor)!
-            if (node) {
-              r.pub(linkDialogState$, {
-                type: 'edit',
-                initialUrl: node.getURL(),
-                hasInitialText: true,
-                url: node.getURL(),
-                title: node.getTitle() ?? '',
-                linkNodeKey: node.getKey(),
-                rectangle
-              })
-            } else {
-              r.pub(linkDialogState$, {
-                type: 'edit',
-                initialUrl: '',
-                hasInitialText: !selection?.isCollapsed(),
-                title: '',
-                url: '',
-                linkNodeKey: '',
-                rectangle
-              })
-            }
+            const initialUrl = linkNode?.getURL() ?? ''
+            const url = linkNode?.getURL() ?? ''
+            const title = linkNode?.getTitle() ?? ''
+            const linkNodeKey = linkNode?.getKey() ?? ''
+
+            const withAnchorText = linkNode
+              ? linkNode.getTextContent().length > 0 && linkNode.getChildrenSize() <= 1
+              : Boolean(selection?.isCollapsed())
+
+            const text = withAnchorText && linkNode ? linkNode.getTextContent() : ''
+
+            r.pub(linkDialogState$, {
+              type: 'edit',
+              initialUrl,
+              url,
+              title,
+              text,
+              withAnchorText,
+              linkNodeKey,
+              rectangle
+            })
           })
         })
       })
@@ -379,6 +391,13 @@ export const onReadOnlyClickLinkCallback$ = Cell<ReadOnlyClickLinkCallback | nul
 })
 
 /** @internal */
+function updateLinkText(node: LexicalNode | null | undefined, text: string) {
+  if ($isTextNode(node) && text) {
+    node.setTextContent(text)
+    node.selectStart()
+  }
+}
+
 export const showLinkTitleField$ = Cell<boolean>(true)
 
 /**

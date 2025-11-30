@@ -26,7 +26,10 @@
   "createLink": {
     "url": "URL",
     "urlPlaceholder": "Insira um URL",
+    "text": "Texto âncora",
+    "textTooltip": "O texto que será exibido para o link",
     "title": "Título",
+    "titleTooltip": "O atributo de título do link, exibido ao passar o mouse",
     "saveTooltip": "Definir URL",
     "cancelTooltip": "Cancelar"
   },

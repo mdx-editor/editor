@@ -26,7 +26,10 @@
     "createLink": {
       "url": "URL",
       "urlPlaceholder": "Виберіть або вставте URL",
+      "text": "Текст посилання",
+      "textTooltip": "Текст, який буде відображатися для посилання",
       "title": "Назва",
+      "titleTooltip": "Атрибут title посилання, який показується при наведенні",
       "saveTooltip": "Установити URL",
       "cancelTooltip": "Скасувати зміну"
     },
