@@ -1,0 +1,114 @@
+{
+  "frontmatterEditor": {
+    "title": "Redigera dokument frontmatter",
+    "key": "Nyckel",
+    "value": "Värde",
+    "addEntry": "Lägg till post"
+  },
+  "dialogControls": {
+    "save": "Spara",
+    "cancel": "Avbryt"
+  },
+  "uploadImage": {
+    "dialogTitle": "Ladda upp en bild",
+    "uploadInstructions": "Ladda upp en bild från din enhet:",
+    "addViaUrlInstructions": "Eller lägg till en bild från en URL:",
+    "autoCompletePlaceholder": "Välj eller klistra in en bild src",
+    "alt": "Alt:",
+    "title": "Titel:",
+    "width": "Bredd:",
+    "height": "Höjd:"
+  },
+  "imageEditor": {
+    "deleteImage": "Ta bort bild",
+    "editImage": "Redigera bild"
+  },
+  "createLink": {
+    "url": "URL",
+    "urlPlaceholder": "Välj eller klistra in en URL",
+    "text": "Ankartext",
+    "textTooltip": "Texten som ska visas för länken",
+    "title": "Länk titel",
+    "titleTooltip": "Länkens titelattribut, visas vid hovring",
+    "saveTooltip": "Ställ in URL",
+    "cancelTooltip": "Avbryt ändring"
+  },
+  "linkPreview": {
+    "open": "Öppna {{url}} i nytt fönster",
+    "edit": "Redigera länk-URL",
+    "copyToClipboard": "Kopiera till urklipp",
+    "copied": "Kopierad!",
+    "remove": "Ta bort länk"
+  },
+  "table": {
+    "deleteTable": "Ta bort tabell",
+    "columnMenu": "Kolumnmeny",
+    "textAlignment": "Textjustering",
+    "alignLeft": "Justera vänster",
+    "alignCenter": "Justera mitten",
+    "alignRight": "Justera höger",
+    "insertColumnLeft": "Infoga en kolumn till vänster om denna",
+    "insertColumnRight": "Infoga en kolumn till höger om denna",
+    "deleteColumn": "Ta bort denna kolumn",
+    "rowMenu": "Radmeny",
+    "insertRowAbove": "Infoga en rad ovanför denna",
+    "insertRowBelow": "Infoga en rad under denna",
+    "deleteRow": "Ta bort denna rad"
+  },
+  "toolbar": {
+    "blockTypes": {
+      "paragraph": "Paragraf",
+      "quote": "Citat",
+      "heading": "Rubrik {{level}}"
+    },
+    "blockTypeSelect": {
+      "selectBlockTypeTooltip": "Välj blocktyp",
+      "placeholder": "Blocktyp"
+    },
+    "toggleGroup": "Växla grupp",
+    "removeBold": "Ta bort fetstil",
+    "bold": "Fetstil",
+    "removeItalic": "Ta bort kursiv",
+    "italic": "Kursiv",
+    "underline": "Understrykning",
+    "removeUnderline": "Ta bort understrykning",
+    "removeInlineCode": "Ta bort kodformat",
+    "inlineCode": "Inline kodformat",
+    "link": "Skapa länk",
+    "richText": "Rik text",
+    "diffMode": "Diff-läge",
+    "source": "Källläge",
+    "admonition": "Infoga anmärkning",
+    "codeBlock": "Infoga kodblock",
+    "editFrontmatter": "Redigera frontmatter",
+    "insertFrontmatter": "Infoga frontmatter",
+    "image": "Infoga bild",
+    "insertSandpack": "Infoga Sandpack",
+    "table": "Infoga tabell",
+    "thematicBreak": "Infoga tematisk paus",
+    "bulletedList": "Punktlista",
+    "numberedList": "Nummerlista",
+    "checkList": "Checklista",
+    "deleteSandpack": "Ta bort detta kodblock",
+    "undo": "Ångra {{shortcut}}",
+    "redo": "Gör om {{shortcut}}",
+    "highlight": "Markera",
+    "removeHighlight": "Ta bort markering"
+  },
+  "admonitions": {
+    "note": "Notera",
+    "tip": "Tips",
+    "danger": "Fara",
+    "info": "Info",
+    "caution": "Varning",
+    "changeType": "Välj anmärkningstyp",
+    "placeholder": "Anmärkningstyp"
+  },
+  "codeBlock": {
+    "language": "Kodblocksspråk",
+    "selectLanguage": "Välj kodblocksspråk"
+  },
+  "contentArea": {
+    "editableMarkdown": "Redigerbar markdown"
+  }
+}
