@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { JSX } from 'react'
 import * as RadixSelect from '@radix-ui/react-select'
 import classNames from 'classnames'
 import styles from '../../../styles/ui.module.css'

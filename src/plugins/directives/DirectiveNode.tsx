@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { JSX } from 'react'
 import type { EditorConfig, LexicalEditor, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
 import { DecoratorNode } from 'lexical'
 import { Directives } from 'mdast-util-directive'

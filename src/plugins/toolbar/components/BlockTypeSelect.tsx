@@ -1,7 +1,7 @@
 import { $createHeadingNode, $createQuoteNode } from '@lexical/rich-text'
 import { useCellValue, usePublisher } from '@mdxeditor/gurx'
 import { $createParagraphNode } from 'lexical'
-import React from 'react'
+import React, { JSX } from 'react'
 import { BlockType, activePlugins$, convertSelectionToNode$, currentBlockType$, useTranslation } from '../../core'
 import { allowedHeadingLevels$ } from '../../headings'
 import { Select } from '.././primitives/select'

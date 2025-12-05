@@ -9,7 +9,7 @@ import {
   Spread
 } from 'lexical'
 import * as Mdast from 'mdast'
-import React from 'react'
+import React, { JSX } from 'react'
 import { noop } from '../../utils/fp'
 import { TableEditor } from './TableEditor'
 import { TableCell, TableRow } from 'mdast-util-gfm-table/lib'

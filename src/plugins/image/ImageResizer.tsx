@@ -9,6 +9,7 @@
 import type { LexicalEditor } from 'lexical'
 
 import * as React from 'react'
+import { JSX } from 'react'
 import { useRef } from 'react'
 import styles from '../../styles/ui.module.css'
 import classNames from 'classnames'

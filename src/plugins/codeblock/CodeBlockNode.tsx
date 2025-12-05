@@ -1,4 +1,5 @@
 import { useCellValue } from '@mdxeditor/gurx'
+import { JSX } from 'react'
 import {
   DecoratorNode,
   DOMConversionMap,

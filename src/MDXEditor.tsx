@@ -1,5 +1,5 @@
 import { useCellValue, useCellValues, usePublisher, useRealm } from '@mdxeditor/gurx'
-import React from 'react'
+import React, { JSX } from 'react'
 import {
   activeEditor$,
   AdditionalLexicalNode,
@@ -61,7 +61,7 @@ const RichTextEditor: React.FC = () => {
   const setEditorRootWrapperElement = usePublisher(contentEditableWrapperElement$)
   const onRef = (el: HTMLDivElement | null) => {
     setEditorRootWrapperElement(el)
-    setContentEditableRef({ current: el })
+    setContentEditableRef(el ? ({ current: el } as React.RefObject<HTMLDivElement>) : null)
   }
 
   const [contentEditableClassName, spellCheck, composerChildren, topAreaChildren, editorWrappers, placeholder, bottomAreaChildren] =
@@ -212,8 +212,8 @@ const EditorRootElement: React.FC<{
     const container = overlayContainer ?? document.body
     container.appendChild(popupContainer)
     editorRootElementRef.current = popupContainer
-    setEditorRootElementRef(editorRootElementRef)
-    setEditorWrapperElementRef(wrapperElementRef)
+    setEditorRootElementRef(editorRootElementRef as React.RefObject<HTMLDivElement>)
+    setEditorWrapperElementRef(wrapperElementRef as React.RefObject<HTMLDivElement>)
     return () => {
       popupContainer.remove()
     }
@@ -256,7 +256,7 @@ const Methods: React.FC<{ mdxRef: React.ForwardedRef<MDXEditorMethods> }> = ({ m
           realm.getValue(rootEditor$)?.focus(callbackFn, opts)
         },
         getContentEditableHTML: () => {
-          return realm.getValue(contentEditableRef$)?.current?.innerHTML ?? ''
+          return realm.getValue(contentEditableRef$)?.current.innerHTML ?? ''
         },
         getSelectionMarkdown: () => {
           // Return empty string in source/diff mode

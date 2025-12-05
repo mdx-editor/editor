@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 import type { EditorConfig, LexicalEditor, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
 import { DecoratorNode } from 'lexical'
-import React from 'react'
+import React, { JSX } from 'react'
 import { NestedEditorsContext } from '../core/NestedLexicalEditor'
 import { MdastJsx } from '.'
 import { VoidEmitter, voidEmitter } from '../../utils/voidEmitter'

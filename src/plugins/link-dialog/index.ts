@@ -1,5 +1,6 @@
 import { $createLinkNode, $isLinkNode, LinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link'
 import { Action, Cell, Signal, filter, map, withLatestFrom } from '@mdxeditor/gurx'
+import { JSX } from 'react'
 import {
   $createTextNode,
   $getNearestNodeFromDOMNode,

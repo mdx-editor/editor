@@ -1,7 +1,7 @@
 import * as RadixSelect from '@radix-ui/react-select'
 import * as RadixToolbar from '@radix-ui/react-toolbar'
 import classNames from 'classnames'
-import React from 'react'
+import React, { JSX } from 'react'
 import styles from '../../../styles/ui.module.css'
 import { TooltipWrap } from './TooltipWrap'
 import { SelectButtonTrigger, SelectContent, SelectItem } from './select'
@@ -21,10 +21,10 @@ function decorateWithRef<P extends { className?: string | undefined }>(
   Component: React.ForwardRefExoticComponent<P>,
   decoratedProps: Partial<React.PropsWithoutRef<P>> & { 'data-toolbar-item'?: boolean }
 ) {
-  return React.forwardRef<object, P>((props: P, ref) => {
+  return React.forwardRef<object, P>((props, ref) => {
     const className = classNames(decoratedProps.className, props.className)
-    return <Component {...decoratedProps} {...props} className={className} ref={ref} />
-  })
+    return <Component {...(decoratedProps as any)} {...(props as any)} className={className} ref={ref} />
+  }) as React.ForwardRefExoticComponent<P>
 }
 
 function addTooltipToChildren<C extends React.ComponentType<{ children: React.ReactNode }>>(Component: C) {

@@ -1,5 +1,5 @@
 import { SandpackProvider } from '@codesandbox/sandpack-react'
-import React from 'react'
+import React, { JSX } from 'react'
 import { CodeBlockEditorDescriptor, appendCodeBlockEditorDescriptor$, insertCodeBlock$ } from '../codeblock'
 import { SandpackEditor } from './SandpackEditor'
 import { Cell, Signal, map, useCellValue, withLatestFrom } from '@mdxeditor/gurx'

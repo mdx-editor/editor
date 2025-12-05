@@ -2,7 +2,7 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 import classNames from 'classnames'
 import { $getNodeByKey } from 'lexical'
-import React from 'react'
+import React, { JSX } from 'react'
 import { disableImageSettingsButton$, openEditImageDialog$, parseImageDimension } from '.'
 import styles from '../../styles/ui.module.css'
 import { iconComponentFor$, readOnly$, useTranslation } from '../core'
