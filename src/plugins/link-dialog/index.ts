@@ -248,7 +248,7 @@ export const linkDialogState$ = Cell<InactiveLinkDialog | PreviewLinkDialog | Ed
       map(([[selection], activeEditor, _, readOnly]) => {
         if ($isRangeSelection(selection) && activeEditor && !readOnly) {
           const node = getLinkNodeInSelection(selection)
-
+          if (!selection.isCollapsed()) return { type: 'inactive' } as InactiveLinkDialog
           if (node) {
             const rect = getSelectionRectangle(activeEditor)
 
