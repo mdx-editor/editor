@@ -1,4 +1,4 @@
-import { $createLinkNode, $isLinkNode, LinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link'
+import { $createLinkNode, $isAutoLinkNode, $isLinkNode, LinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link'
 import { Action, Cell, Signal, filter, map, withLatestFrom } from '@mdxeditor/gurx'
 import { JSX } from 'react'
 import {
@@ -183,9 +183,16 @@ export const linkDialogState$ = Cell<InactiveLinkDialog | PreviewLinkDialog | Ed
               $insertNodes([node])
               node.select()
             } else {
-              linkNode.setURL(url)
-              linkNode.setTitle(title)
-              updateLinkText(linkNode.getFirstChild(), text)
+              if ($isAutoLinkNode(linkNode)) {
+                const newLinkNode = $createLinkNode(url, { title })
+                newLinkNode.append($createTextNode(text))
+                linkNode.replace(newLinkNode)
+                newLinkNode.select()
+              } else {
+                linkNode.setURL(url)
+                linkNode.setTitle(title)
+                updateLinkText(linkNode.getFirstChild(), text)
+              }
             }
           },
           { discrete: true }
