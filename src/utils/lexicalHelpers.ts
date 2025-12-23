@@ -55,6 +55,24 @@ export function getSelectedNode(selection: RangeSelection): TextNode | ElementNo
 }
 
 /**
+ * Finds the nearest ancestor element that creates a containing block due to CSS properties like transform or perspective.
+ */
+function getFixedContainingBlock(element: HTMLElement | null): HTMLElement | null {
+  let current = element?.parentElement
+  while (current) {
+    const style = window.getComputedStyle(current)
+    const createsContainingBlock =
+      style.transform !== 'none' ||
+      style.perspective !== 'none' ||
+      style.willChange.includes('transform') ||
+      style.willChange.includes('perspective')
+    if (createsContainingBlock) return current
+    current = current.parentElement
+  }
+  return null
+}
+
+/**
  * Gets the coordinates of the selection in the Lexical editor.
  * @group Utils
  */
@@ -64,6 +82,7 @@ export function getSelectionRectangle(editor: LexicalEditor) {
   const activeElement = document.activeElement
 
   const rootElement = editor.getRootElement()
+  const fixedContainer = getFixedContainingBlock(rootElement)
 
   if (
     selection !== null &&
@@ -93,6 +112,17 @@ export function getSelectionRectangle(editor: LexicalEditor) {
         rect = domRange.getBoundingClientRect()
       }
     }
+
+    if (fixedContainer) {
+      const containerRect = fixedContainer.getBoundingClientRect()
+      return {
+        top: Math.round(rect.top - containerRect.top),
+        left: Math.round(rect.left - containerRect.left),
+        width: Math.round(rect.width),
+        height: Math.round(rect.height)
+      }
+    }
+
     return {
       top: Math.round(rect.top),
       left: Math.round(rect.left),
