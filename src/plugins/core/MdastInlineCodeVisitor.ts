@@ -3,12 +3,12 @@ import * as Mdast from 'mdast'
 import { IS_CODE } from '../../FormatConstants'
 import { MdastImportVisitor } from '../../importMarkdownToLexical'
 
-interface OpeningHTMLCodeNode extends Mdast.HTML {
+interface OpeningHTMLCodeNode extends Mdast.Html {
   type: 'html'
   value: '<code>'
 }
 
-interface ClosingHTMLCodeNode extends Mdast.HTML {
+interface ClosingHTMLCodeNode extends Mdast.Html {
   type: 'html'
   value: '</code>'
 }

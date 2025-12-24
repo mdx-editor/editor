@@ -10,6 +10,7 @@ import {
   COMMAND_PRIORITY_CRITICAL,
   COMMAND_PRIORITY_EDITOR,
   COMMAND_PRIORITY_LOW,
+  EditorThemeClasses,
   FOCUS_COMMAND,
   KEY_ENTER_COMMAND,
   KEY_TAB_COMMAND,
@@ -78,9 +79,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
   const [iconComponentFor, readOnly] = useCellValues(iconComponentFor$, readOnly$)
   const getCellKey = React.useMemo(() => {
     return (cell: Mdast.TableCell & { __cacheKey?: string }) => {
-      if (!cell.__cacheKey) {
-        cell.__cacheKey = uuidv4()
-      }
+      cell.__cacheKey ??= uuidv4()
       return cell.__cacheKey
     }
   }, [])
@@ -363,7 +362,7 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
   const [editor] = React.useState(() => {
     const editor = createEditor({
       nodes: usedLexicalNodes,
-      theme: lexicalTheme,
+      theme: lexicalTheme as EditorThemeClasses,
       namespace: 'TableCellEditor'
     })
 
@@ -463,7 +462,9 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
   }, [colIndex, editor, rootEditor, rowIndex, saveAndFocus, setActiveCell])
 
   React.useEffect(() => {
-    focus && editor.focus()
+    if (focus) {
+      editor.focus()
+    }
   }, [focus, editor])
 
   return (

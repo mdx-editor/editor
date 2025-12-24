@@ -202,9 +202,7 @@ export const currentSelection$ = Cell<RangeSelection | null>(null, (r) => {
             return parent !== null && $isRootOrShadowRoot(parent)
           })
 
-    if (element === null) {
-      element = anchorNode.getTopLevelElementOrThrow()
-    }
+    element ??= anchorNode.getTopLevelElementOrThrow()
 
     const elementKey = element.getKey()
     const elementDOM = theEditor.getElementByKey(elementKey)

@@ -157,7 +157,7 @@ export interface MDXEditorMethods {
    * Sets focus on input
    */
   focus: (
-    callbackFn?: (() => void) | undefined,
+    callbackFn?: () => void,
     opts?: {
       defaultSelection?: 'rootStart' | 'rootEnd'
       preventScroll?: boolean
@@ -247,7 +247,7 @@ const Methods: React.FC<{ mdxRef: React.ForwardedRef<MDXEditorMethods> }> = ({ m
           realm.pub(insertMarkdown$, markdown)
         },
         focus: (
-          callbackFn?: (() => void) | undefined,
+          callbackFn?: () => void,
           opts?: {
             defaultSelection?: 'rootStart' | 'rootEnd'
             preventScroll?: boolean

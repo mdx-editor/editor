@@ -59,6 +59,14 @@ export class CodeBlockNode extends DecoratorNode<JSX.Element> {
     return new CodeBlockNode(node.__code, node.__language, node.__meta, node.__key)
   }
 
+  afterCloneFrom(prevNode: this): void {
+    super.afterCloneFrom(prevNode)
+    this.__code = prevNode.__code
+    this.__meta = prevNode.__meta
+    this.__language = prevNode.__language
+    this.__focusEmitter = voidEmitter()
+  }
+
   static importJSON(serializedNode: SerializedCodeBlockNode): CodeBlockNode {
     const { code, meta, language } = serializedNode
     return $createCodeBlockNode({
@@ -97,7 +105,7 @@ export class CodeBlockNode extends DecoratorNode<JSX.Element> {
   }
 
   // View
-  createDOM(_config: EditorConfig): HTMLDivElement {
+  createDOM(_config: EditorConfig, _editor: LexicalEditor): HTMLDivElement {
     return document.createElement('div')
   }
 
@@ -249,9 +257,7 @@ const CodeBlockEditorContainer: React.FC<
     .sort((a, b) => b.priority - a.priority)
     .find((descriptor) => descriptor.match(props.language || '', props.meta || ''))
 
-  if (!descriptor) {
-    descriptor = codeBlockEditorDescriptors.find((descriptor) => descriptor.match(defaultCodeBlockLanguage || '', props.meta || ''))
-  }
+  descriptor ??= codeBlockEditorDescriptors.find((descriptor) => descriptor.match(defaultCodeBlockLanguage || '', props.meta || ''))
 
   if (!descriptor) {
     throw new Error(`No CodeBlockEditor registered for language=${props.language} meta=${props.meta}`)
@@ -298,11 +304,11 @@ export function $isCodeBlockNode(node: LexicalNode | null | undefined): node is 
  */
 export function $convertPreElement(element: Element): DOMConversionOutput {
   const preElement = element as HTMLPreElement
-  const code = preElement.textContent ?? ''
+  const code = preElement.textContent
   // Get language from class if available (e.g., class="language-javascript")
   const classAttribute = element.getAttribute('class') ?? ''
   const dataLanguageAttribute = element.getAttribute('data-language') ?? ''
-  const languageMatch = classAttribute.match(/language-(\w+)/)
+  const languageMatch = /language-(\w+)/.exec(classAttribute)
   const language = languageMatch ? languageMatch[1] : dataLanguageAttribute
   const meta = preElement.getAttribute('data-meta') ?? ''
   return {

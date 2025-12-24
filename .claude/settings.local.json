@@ -12,7 +12,11 @@
       "Skill(prp-workflow)",
       "Bash(tree:*)",
       "WebSearch",
-      "Bash(npm run dev:*)"
+      "Bash(npm run dev:*)",
+      "Bash(npm view:*)",
+      "Bash(npm install:*)",
+      "Bash(npm ls:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []

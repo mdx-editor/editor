@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-deprecated */
 import { HeadingNode } from '@lexical/rich-text'
 import { $nodesOfType } from 'lexical'
 import React from 'react'

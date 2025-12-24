@@ -49,24 +49,43 @@ export function getSelectedNode(selection: RangeSelection): TextNode | ElementNo
     } else {
       return $isAtNodeEnd(anchor) ? anchorNode : focusNode
     }
-  } catch (e) {
+  } catch {
     return null
   }
 }
 
 /**
- * Finds the nearest ancestor element that creates a containing block due to CSS properties like transform or perspective.
+ * Finds the nearest ancestor element that creates a containing block for fixed/absolute positioned elements.
+ * @see https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_display/Containing_block
  */
 function getFixedContainingBlock(element: HTMLElement | null): HTMLElement | null {
   let current = element?.parentElement
   while (current) {
     const style = window.getComputedStyle(current)
+
+    const willChangeProps = style.willChange.split(',').map((v) => v.trim())
+    const hasRelevantWillChange = willChangeProps.some((prop) =>
+      ['transform', 'perspective', 'filter', 'backdrop-filter', 'contain', 'container-type'].includes(prop)
+    )
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+    const styleAny: any = style
     const createsContainingBlock =
       style.transform !== 'none' ||
       style.perspective !== 'none' ||
-      style.willChange.includes('transform') ||
-      style.willChange.includes('perspective')
-    if (createsContainingBlock) return current
+      style.filter !== 'none' ||
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      styleAny.backdropFilter !== 'none' ||
+      ['layout', 'paint', 'strict', 'content'].includes(style.contain) ||
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      styleAny.containerType !== 'normal' ||
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      styleAny.contentVisibility === 'auto' ||
+      hasRelevantWillChange
+
+    if (createsContainingBlock) {
+      return current
+    }
     current = current.parentElement
   }
   return null
@@ -82,7 +101,6 @@ export function getSelectionRectangle(editor: LexicalEditor) {
   const activeElement = document.activeElement
 
   const rootElement = editor.getRootElement()
-  const fixedContainer = getFixedContainingBlock(rootElement)
 
   if (
     selection !== null &&
@@ -113,6 +131,7 @@ export function getSelectionRectangle(editor: LexicalEditor) {
       }
     }
 
+    const fixedContainer = getFixedContainingBlock(rootElement)
     if (fixedContainer) {
       const containerRect = fixedContainer.getBoundingClientRect()
       return {
@@ -129,7 +148,7 @@ export function getSelectionRectangle(editor: LexicalEditor) {
       width: Math.round(rect.width),
       height: Math.round(rect.height)
     }
-  } else if (!activeElement || activeElement.className !== 'link-input') {
+  } else if (activeElement?.className !== 'link-input') {
     return null
   }
   return null

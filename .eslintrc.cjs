@@ -35,6 +35,7 @@ module.exports = {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/restrict-template-expressions': 'off',
     '@typescript-eslint/no-unnecessary-type-assertion': 'off',
+    '@typescript-eslint/no-useless-default-assignment': 'off',
     'no-console': ['warn', { allow: ['warn', 'error'] }],
     'react/prop-types': 'off',
     'react/display-name': 'off',

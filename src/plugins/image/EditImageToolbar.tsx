@@ -50,7 +50,7 @@ export function EditImageToolbar(props: EditImageToolbarProps): JSX.Element {
             openEditImageDialog({
               nodeKey: nodeKey,
               initialValues: {
-                src: !initialImagePath ? imageSource : initialImagePath,
+                src: initialImagePath ?? imageSource,
                 title,
                 altText: alt,
                 width: parseImageDimension(width),

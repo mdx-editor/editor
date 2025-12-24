@@ -38,7 +38,7 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
   const setCodeRef = React.useRef(setCode)
   setCodeRef.current = setCode
   codeMirrorRef.current = {
-    getCodemirror: () => editorViewRef.current!
+    getCodemirror: () => editorViewRef.current as any
   }
 
   React.useEffect(() => {
@@ -73,7 +73,7 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
           try {
             const languageSupport = await languageData.load()
             extensions.push(languageSupport.extension)
-          } catch (e) {
+          } catch (_e) {
             console.warn('failed to load language support for', language)
           }
         }

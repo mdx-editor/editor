@@ -11,8 +11,8 @@ import {
   $isTextNode,
   COMMAND_PRIORITY_HIGH,
   COMMAND_PRIORITY_LOW,
+  KEY_DOWN_COMMAND,
   KEY_ESCAPE_COMMAND,
-  KEY_MODIFIER_COMMAND,
   type LexicalNode,
   type RangeSelection
 } from 'lexical'
@@ -117,7 +117,7 @@ export const linkDialogState$ = Cell<InactiveLinkDialog | PreviewLinkDialog | Ed
 
   r.pub(createActiveEditorSubscription$, (editor) => {
     return editor.registerCommand(
-      KEY_MODIFIER_COMMAND,
+      KEY_DOWN_COMMAND,
       (event) => {
         if (event.key === 'k' && (IS_APPLE ? event.metaKey : event.ctrlKey) && !r.getValue(readOnly$)) {
           const selection = $getSelection()

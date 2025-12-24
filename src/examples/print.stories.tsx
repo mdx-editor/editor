@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-deprecated */
 import React from 'react'
 import { MDXEditor, MDXEditorMethods, directivesPlugin } from '../'
 
@@ -37,11 +38,9 @@ export function AsyncDirectiveProvider({ children }: { children: React.ReactNode
       return Promise.resolve()
     }
 
-    if (!promiseRef.current) {
-      promiseRef.current = new Promise<void>((resolve) => {
-        resolverRef.current = resolve
-      })
-    }
+    promiseRef.current ??= new Promise<void>((resolve) => {
+      resolverRef.current = resolve
+    })
 
     return promiseRef.current
   }, [])
