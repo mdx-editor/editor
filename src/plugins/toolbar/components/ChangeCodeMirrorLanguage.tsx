@@ -1,7 +1,7 @@
 import { useCellValues } from '@mdxeditor/gurx'
 import React from 'react'
 import styles from '../../../styles/ui.module.css'
-import { CodeBlockNode } from '../../codeblock/CodeBlockNode'
+import { $isCodeBlockNode } from '../../codeblock/CodeBlockNode'
 import { codeBlockLanguages$ } from '../../codemirror'
 import { activeEditor$, editorInFocus$, useTranslation } from '../../core'
 import { Select } from '.././primitives/select'
@@ -15,8 +15,12 @@ const EMPTY_VALUE = '__EMPTY_VALUE__'
  */
 export const ChangeCodeMirrorLanguage = () => {
   const [editorInFocus, theEditor, codeBlockLanguages] = useCellValues(editorInFocus$, activeEditor$, codeBlockLanguages$)
-  const codeBlockNode = editorInFocus!.rootNode as CodeBlockNode
+  const codeBlockNode = $isCodeBlockNode(editorInFocus!.rootNode) ? editorInFocus!.rootNode : null
   const t = useTranslation()
+
+  if (!codeBlockNode) {
+    return null
+  }
 
   let currentLanguage = codeBlockNode.getLanguage()
   if (currentLanguage === '') {

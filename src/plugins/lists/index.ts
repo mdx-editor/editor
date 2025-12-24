@@ -65,9 +65,7 @@ export const currentListType$ = Cell<ListType | ''>('', (r) => {
             return parent !== null && $isRootOrShadowRoot(parent)
           })
 
-    if (element === null) {
-      element = anchorNode.getTopLevelElementOrThrow()
-    }
+    element ??= anchorNode.getTopLevelElementOrThrow()
 
     const elementKey = element.getKey()
     const elementDOM = theEditor.getElementByKey(elementKey)

@@ -49,9 +49,42 @@ export function getSelectedNode(selection: RangeSelection): TextNode | ElementNo
     } else {
       return $isAtNodeEnd(anchor) ? anchorNode : focusNode
     }
-  } catch (e) {
+  } catch {
     return null
   }
+}
+
+const WILL_CHANGE_CONTAINING_BLOCK_PROPS = ['transform', 'perspective', 'filter', 'backdrop-filter', 'contain', 'container-type']
+const CONTAIN_VALUES_CREATING_CONTAINING_BLOCK = ['layout', 'paint', 'strict', 'content']
+
+/**
+ * Finds the nearest ancestor element that creates a containing block for fixed/absolute positioned elements.
+ * @see https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_display/Containing_block
+ */
+function getFixedContainingBlock(element: HTMLElement | null): HTMLElement | null {
+  let current = element?.parentElement
+  while (current) {
+    const style = window.getComputedStyle(current)
+
+    const willChangeProps = style.willChange.split(',').map((v) => v.trim())
+    const hasRelevantWillChange = willChangeProps.some((prop) => WILL_CHANGE_CONTAINING_BLOCK_PROPS.includes(prop))
+
+    const createsContainingBlock =
+      style.transform !== 'none' ||
+      style.perspective !== 'none' ||
+      style.filter !== 'none' ||
+      style.backdropFilter !== 'none' ||
+      CONTAIN_VALUES_CREATING_CONTAINING_BLOCK.includes(style.contain) ||
+      style.containerType !== 'normal' ||
+      style.contentVisibility === 'auto' ||
+      hasRelevantWillChange
+
+    if (createsContainingBlock) {
+      return current
+    }
+    current = current.parentElement
+  }
+  return null
 }
 
 /**
@@ -93,13 +126,25 @@ export function getSelectionRectangle(editor: LexicalEditor) {
         rect = domRange.getBoundingClientRect()
       }
     }
+
+    const fixedContainer = getFixedContainingBlock(rootElement)
+    if (fixedContainer) {
+      const containerRect = fixedContainer.getBoundingClientRect()
+      return {
+        top: Math.round(rect.top - containerRect.top),
+        left: Math.round(rect.left - containerRect.left),
+        width: Math.round(rect.width),
+        height: Math.round(rect.height)
+      }
+    }
+
     return {
       top: Math.round(rect.top),
       left: Math.round(rect.left),
       width: Math.round(rect.width),
       height: Math.round(rect.height)
     }
-  } else if (!activeElement || activeElement.className !== 'link-input') {
+  } else if (activeElement?.className !== 'link-input') {
     return null
   }
   return null

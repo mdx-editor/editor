@@ -33,7 +33,7 @@ export const AdmonitionDirectiveDescriptor: DirectiveDescriptor = {
       config: { theme }
     } = useNestedEditorContext()
     return (
-      <div className={theme.admonition[mdastNode.name]}>
+      <div className={theme.admonition?.[mdastNode.name as AdmonitionKind]}>
         <NestedLexicalEditor<ContainerDirective>
           block
           getContent={(node) => node.children}

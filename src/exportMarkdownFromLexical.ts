@@ -132,7 +132,7 @@ export function exportLexicalTreeToMdast({
     }
   }
 
-  function appendToParent<T extends Mdast.Parent, C extends Mdast.RootContent>(parentNode: T, node: C): C | Mdast.Root {
+  function appendToParent<C extends Mdast.RootContent>(parentNode: Mdast.Parent, node: C): C | Mdast.Root {
     if (unistRoot === null) {
       unistRoot = node as unknown as Mdast.Root
       return unistRoot
@@ -346,7 +346,7 @@ function fixWrappingWhitespace(node: Mdast.Parent | Mdast.RootContent, parentCha
   if (node.type === 'strong' || node.type === 'emphasis') {
     const lastChild = node.children.at(-1)
     if (lastChild?.type === 'text') {
-      const trailingWhitespace = lastChild.value.match(TRAILING_WHITESPACE_REGEXP)
+      const trailingWhitespace = TRAILING_WHITESPACE_REGEXP.exec(lastChild.value)
       if (trailingWhitespace) {
         lastChild.value = lastChild.value.replace(TRAILING_WHITESPACE_REGEXP, '')
         const parent = parentChain.at(-1)
@@ -361,7 +361,7 @@ function fixWrappingWhitespace(node: Mdast.Parent | Mdast.RootContent, parentCha
     }
     const firstChild = node.children.at(0)
     if (firstChild?.type === 'text') {
-      const leadingWhitespace = firstChild.value.match(LEADING_WHITESPACE_REGEXP)
+      const leadingWhitespace = LEADING_WHITESPACE_REGEXP.exec(firstChild.value)
       if (leadingWhitespace) {
         firstChild.value = firstChild.value.replace(LEADING_WHITESPACE_REGEXP, '')
 

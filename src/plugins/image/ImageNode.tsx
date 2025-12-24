@@ -72,6 +72,17 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
   }
 
   /** @internal */
+  afterCloneFrom(prevNode: this): void {
+    super.afterCloneFrom(prevNode)
+    this.__src = prevNode.__src
+    this.__altText = prevNode.__altText
+    this.__title = prevNode.__title
+    this.__width = prevNode.__width
+    this.__height = prevNode.__height
+    this.__rest = prevNode.__rest
+  }
+
+  /** @internal */
   static importJSON(serializedNode: SerializedImageNode): ImageNode {
     const { altText, title, src, width, rest, height } = serializedNode
     const node = $createImageNode({
@@ -129,8 +140,8 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     this.__src = src
     this.__title = title
     this.__altText = altText
-    this.__width = width ? width : 'inherit'
-    this.__height = height ? height : 'inherit'
+    this.__width = width ?? 'inherit'
+    this.__height = height ?? 'inherit'
     this.__rest = rest ?? []
   }
 
@@ -158,7 +169,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
   }
 
   /** @internal */
-  createDOM(config: EditorConfig): HTMLElement {
+  createDOM(config: EditorConfig, _editor: LexicalEditor): HTMLElement {
     const span = document.createElement('span')
     const theme = config.theme
     const className = theme.image

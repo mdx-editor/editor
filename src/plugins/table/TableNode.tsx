@@ -203,9 +203,7 @@ export class TableNode extends DecoratorNode<JSX.Element> {
   setColumnAlign(colIndex: number, align: Mdast.AlignType) {
     const self = this.getWritable()
     const table = self.__mdastNode
-    if (table.align == null) {
-      table.align = []
-    }
+    table.align ??= []
     table.align[colIndex] = align
   }
 
@@ -265,7 +263,7 @@ export function $convertTableElement(element: HTMLElement): DOMConversionOutput 
           children: [
             {
               type: 'text' as const,
-              value: cell.textContent ?? ''
+              value: cell.textContent
             }
           ]
         } satisfies TableCell

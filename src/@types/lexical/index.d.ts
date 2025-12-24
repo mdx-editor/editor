@@ -1,17 +1,13 @@
 import 'lexical'
-import { EditorConfig as LexicalEditorConfig, EditorThemeClasses as LexicalEditorThemeClasses } from 'lexical'
+
+export type AdmonitionKind = 'note' | 'tip' | 'danger' | 'info' | 'caution'
 
 declare module 'lexical' {
   export type AdmonitionKind = 'note' | 'tip' | 'danger' | 'info' | 'caution'
 
-  type EditorThemeClasses = LexicalEditorThemeClasses & {
-    admonition: {
-      [key in AdmonitionKind]: string
-    }
-    someMore: string
-  }
-
-  declare type EditorConfig = LexicalEditorConfig & {
-    theme: EditorThemeClasses
+  export interface EditorThemeClasses {
+    admonition?: Record<AdmonitionKind, string>
+    text?: Record<string, string>
+    list?: Record<string, string | Record<string, string>>
   }
 }

@@ -105,6 +105,27 @@ export function ParentOffsetOfAnchor() {
   )
 }
 
+export function WithinTranslatedParent() {
+  return (
+    <div>
+      <div
+        style={{
+          transform: 'translate(40px, 10px)',
+          width: '400px',
+          border: '1px solid gray',
+          borderRadius: '8px'
+        }}
+      >
+        <MDXEditor
+          onChange={console.log}
+          markdown={`This container has a translate transform applied [link](https://google.com/)`}
+          plugins={[linkPlugin(), linkDialogPlugin()]}
+        />
+      </div>
+    </div>
+  )
+}
+
 export function EditorInAForm() {
   return (
     <div className="App">

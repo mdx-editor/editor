@@ -117,7 +117,7 @@ export const YoutubeDirectiveDescriptor: DirectiveDescriptor<YoutubeDirectiveNod
           height="315"
           src={`https://www.youtube.com/embed/${mdastNode.attributes.id}`}
           title="YouTube video player"
-          frameBorder="0"
+          style={{ border: 0 }}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
         ></iframe>
       </div>

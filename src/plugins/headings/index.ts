@@ -14,7 +14,7 @@ import {
 import { LexicalHeadingVisitor } from './LexicalHeadingVisitor'
 import { MdastHeadingVisitor } from './MdastHeadingVisitor'
 
-const FORMATTING_KEYS = [48, 49, 50, 51, 52, 53, 54]
+const FORMATTING_KEYS = ['Digit0', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6']
 
 /**
  * @group Headings
@@ -27,12 +27,12 @@ export const ALL_HEADING_LEVELS = [1, 2, 3, 4, 5, 6] as const
 export type HEADING_LEVEL = 1 | 2 | 3 | 4 | 5 | 6
 
 const CODE_TO_HEADING_LEVEL_MAP: Record<string, HEADING_LEVEL> = {
-  49: 1,
-  50: 2,
-  51: 3,
-  52: 4,
-  53: 5,
-  54: 6
+  Digit1: 1,
+  Digit2: 2,
+  Digit3: 3,
+  Digit4: 4,
+  Digit5: 5,
+  Digit6: 6
 }
 
 /**
@@ -44,16 +44,16 @@ export const allowedHeadingLevels$ = Cell<readonly HEADING_LEVEL[]>(ALL_HEADING_
     return theRootEditor.registerCommand<KeyboardEvent>(
       KEY_DOWN_COMMAND,
       (event) => {
-        const { keyCode, ctrlKey, metaKey, altKey } = event
-        if (FORMATTING_KEYS.includes(keyCode) && controlOrMeta(metaKey, ctrlKey) && altKey) {
+        const { code, ctrlKey, metaKey, altKey } = event
+        if (FORMATTING_KEYS.includes(code) && controlOrMeta(metaKey, ctrlKey) && altKey) {
           event.preventDefault()
           theRootEditor.update(() => {
-            if (keyCode === 48) {
+            if (code === 'Digit0') {
               r.pub(convertSelectionToNode$, () => $createParagraphNode())
             } else {
               const allowedHeadingLevels = r.getValue(allowedHeadingLevels$)
-              const requestedHeadingLevel = CODE_TO_HEADING_LEVEL_MAP[keyCode]
-              if (!allowedHeadingLevels.includes(requestedHeadingLevel)) {
+              const requestedHeadingLevel = CODE_TO_HEADING_LEVEL_MAP[code]
+              if (allowedHeadingLevels.includes(requestedHeadingLevel)) {
                 r.pub(convertSelectionToNode$, () => $createHeadingNode(`h${requestedHeadingLevel}`))
               }
             }

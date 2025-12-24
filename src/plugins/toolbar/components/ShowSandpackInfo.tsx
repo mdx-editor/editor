@@ -1,6 +1,6 @@
 import React from 'react'
 import styles from '../../../styles/ui.module.css'
-import { CodeBlockNode } from '../../codeblock/CodeBlockNode'
+import { $isCodeBlockNode } from '../../codeblock/CodeBlockNode'
 import { activeEditor$, editorInFocus$, iconComponentFor$, useTranslation } from '../../core'
 import { sandpackConfig$ } from '../../sandpack'
 import { ButtonWithTooltip } from '.././primitives/toolbar'
@@ -19,8 +19,12 @@ export const ShowSandpackInfo = () => {
     iconComponentFor$,
     sandpackConfig$
   )
-  const sandpackNode = editorInFocus!.rootNode as CodeBlockNode
   const t = useTranslation()
+
+  const sandpackNode = $isCodeBlockNode(editorInFocus!.rootNode) ? editorInFocus!.rootNode : null
+  if (!sandpackNode) {
+    return null
+  }
 
   const preset = sandpackConfig.presets.find((preset) => preset.meta === sandpackNode.getMeta())!
 

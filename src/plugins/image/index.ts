@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-deprecated */
 import { ImagePlaceholder } from '@/plugins/image/ImagePlaceholder'
 import { $wrapNodeInElement, mergeRegister } from '@lexical/utils'
 import { JSX } from 'react'

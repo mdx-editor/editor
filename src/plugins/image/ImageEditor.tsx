@@ -72,7 +72,7 @@ const imgCache = {
       })
     }
     if (this.__cache[src] instanceof Promise) {
-      // eslint-disable-next-line @typescript-eslint/no-throw-literal, @typescript-eslint/only-throw-error
+      // eslint-disable-next-line @typescript-eslint/only-throw-error
       throw this.__cache[src]
     }
     return this.__cache[src] as string

@@ -87,7 +87,7 @@ export const codeMirrorPlugin = realmPlugin<{
 function buildCodeBlockDescriptor(codeBlockLanguages: Record<string, string>): CodeBlockEditorDescriptor {
   return {
     match(language, meta) {
-      return Boolean(Object.hasOwn(codeBlockLanguages, language ?? '')) && !meta
+      return Object.hasOwn(codeBlockLanguages, language ?? '') && !meta
     },
     priority: 1,
     Editor: CodeMirrorEditor

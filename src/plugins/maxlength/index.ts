@@ -1,4 +1,4 @@
-import { trimTextContentFromAnchor } from '@lexical/selection'
+import { $trimTextContentFromAnchor } from '@lexical/selection'
 import { $restoreEditorState } from '@lexical/utils'
 import { $getSelection, $isRangeSelection, EditorState, RootNode } from 'lexical'
 import { realmPlugin } from '../../RealmWithPlugins'
@@ -37,7 +37,7 @@ export const maxLengthPlugin = realmPlugin<number>({
               lastRestoredEditorState = prevEditorState
               $restoreEditorState(editor, prevEditorState)
             } else {
-              trimTextContentFromAnchor(editor, anchor, delCount)
+              $trimTextContentFromAnchor(editor, anchor, delCount)
             }
           }
         }
