@@ -54,6 +54,9 @@ export function getSelectedNode(selection: RangeSelection): TextNode | ElementNo
   }
 }
 
+const WILL_CHANGE_CONTAINING_BLOCK_PROPS = ['transform', 'perspective', 'filter', 'backdrop-filter', 'contain', 'container-type']
+const CONTAIN_VALUES_CREATING_CONTAINING_BLOCK = ['layout', 'paint', 'strict', 'content']
+
 /**
  * Finds the nearest ancestor element that creates a containing block for fixed/absolute positioned elements.
  * @see https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_display/Containing_block
@@ -64,23 +67,16 @@ function getFixedContainingBlock(element: HTMLElement | null): HTMLElement | nul
     const style = window.getComputedStyle(current)
 
     const willChangeProps = style.willChange.split(',').map((v) => v.trim())
-    const hasRelevantWillChange = willChangeProps.some((prop) =>
-      ['transform', 'perspective', 'filter', 'backdrop-filter', 'contain', 'container-type'].includes(prop)
-    )
+    const hasRelevantWillChange = willChangeProps.some((prop) => WILL_CHANGE_CONTAINING_BLOCK_PROPS.includes(prop))
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-    const styleAny: any = style
     const createsContainingBlock =
       style.transform !== 'none' ||
       style.perspective !== 'none' ||
       style.filter !== 'none' ||
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      styleAny.backdropFilter !== 'none' ||
-      ['layout', 'paint', 'strict', 'content'].includes(style.contain) ||
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      styleAny.containerType !== 'normal' ||
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      styleAny.contentVisibility === 'auto' ||
+      style.backdropFilter !== 'none' ||
+      CONTAIN_VALUES_CREATING_CONTAINING_BLOCK.includes(style.contain) ||
+      style.containerType !== 'normal' ||
+      style.contentVisibility === 'auto' ||
       hasRelevantWillChange
 
     if (createsContainingBlock) {
