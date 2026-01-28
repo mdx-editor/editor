@@ -83,13 +83,11 @@
     "editFrontmatter": "编辑前置元数据",
     "insertFrontmatter": "插入前置元数据",
     "image": "插入图片",
-    "insertSandpack": "插入 Sandpack",
     "table": "插入表格",
     "thematicBreak": "插入主题换行",
     "bulletedList": "无序列表",
     "numberedList": "有序列表",
     "checkList": "任务列表",
-    "deleteSandpack": "删除 Sandpack",
     "undo": "撤销 {{shortcut}}",
     "redo": "重做 {{shortcut}}",
     "highlight": "高亮",
@@ -114,7 +112,7 @@
     "language": "代码块语言",
     "selectLanguage": "选择代码块语言"
   },
-  "contentArea":{
+  "contentArea": {
     "editableMarkdown": "可编辑的 Markdown"
   }
 }

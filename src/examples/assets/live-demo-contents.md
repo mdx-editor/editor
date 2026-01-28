@@ -10,16 +10,16 @@ This is a **live demo** of MDXEditor with all default features on.
 
 In here, you <u>can find</u> the following markdown elements:
 
-* Headings
-* Lists
-  * Unordered
-  * Ordered
-  * And nested ;)
-* Links
-* Bold/Italic/Underline formatting
-* Tables
-* Code block editors
-* And much more.
+- Headings
+- Lists
+  - Unordered
+  - Ordered
+  - And nested ;)
+- Links
+- Bold/Italic/Underline formatting
+- Tables
+- Code block editors
+- And much more.
 
 The current editor content is styled using the `@tailwindcss/typography` [plugin](https://tailwindcss.com/docs/typography-plugin).
 
@@ -42,20 +42,7 @@ MDXEditor embeds CodeMirror for code editing.
 
 ```tsx
 export default function App() {
-  return (<div>Hello world</div>)
-}
-```
-
-## A live code example
-
-The block below is a live React component. You can configure multiple live code presets that specify the available npm packages and the default imports. You can also specify a default component that will be rendered in the live code block.
-
-```jsx live
-export default function App() {
-  return (<div>
-  <p>This is a live React component, that's being previewed in codesandbox. </p>
-  <p>Editing it will update the fenced codeblock in the markdown.</p>
-  </div>)
+  return <div>Hello world</div>
 }
 ```
 
@@ -68,5 +55,5 @@ you can navigate the cells with `enter`, `shift+enter`, `tab` and `shift+tab`.
 | :---------------- | :------: | ----: |
 | Python Hat        |   True   | 23.99 |
 | SQL Hat           |   True   | 23.99 |
-| Codecademy Tee    |   False  | 19.99 |
-| Codecademy Hoodie |   False  | 42.99 |
+| Codecademy Tee    |  False   | 19.99 |
+| Codecademy Hoodie |  False   | 42.99 |

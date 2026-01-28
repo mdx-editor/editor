@@ -65,7 +65,7 @@
       "selectBlockTypeTooltip": "Selecciona el tipo de bloque",
       "placeholder": "Tipo de bloque"
     },
-    "toggleGroup":"Conmutar grupo",
+    "toggleGroup": "Conmutar grupo",
     "removeBold": "Borrar negrita",
     "bold": "Negrita",
     "removeItalic": "Borrar cursiva",
@@ -83,13 +83,11 @@
     "editFrontmatter": "Editar frontmatter",
     "insertFrontmatter": "Insertar frontmatter",
     "image": "Insertar imagen",
-    "insertSandpack": "Insertar Sandpack",
     "table": "Insertar tabla",
     "thematicBreak": "Insertar salto de línea",
     "bulletedList": "Lista con viñetas",
     "numberedList": "Lista numerada",
     "checkList": "Lista de verificación",
-    "deleteSandpack": "Borrar este bloque de código",
     "undo": "Deshacer {{shortcut}}",
     "redo": "Rehacer {{shortcut}}",
     "highlight": "Resaltar",
@@ -108,7 +106,7 @@
     "language": "Lenguaje del bloque de código",
     "selectLanguage": "Seleccionar el lenguaje del bloque de código"
   },
-  "contentArea":{
+  "contentArea": {
     "editableMarkdown": "Markdown editable"
   }
 }

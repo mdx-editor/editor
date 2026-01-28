@@ -83,13 +83,11 @@
     "editFrontmatter": "編輯中繼資料",
     "insertFrontmatter": "插入中繼資料",
     "image": "插入圖片",
-    "insertSandpack": "插入 Sandpack",
     "table": "插入表格",
     "thematicBreak": "插入主題斷行",
     "bulletedList": "項目清單",
     "numberedList": "編號清單",
     "checkList": "核取清單",
-    "deleteSandpack": "刪除 Sandpack",
     "undo": "復原 {{shortcut}}",
     "redo": "重做 {{shortcut}}",
     "highlight": "螢光標示",
@@ -108,7 +106,7 @@
     "language": "程式碼區塊語言",
     "selectLanguage": "選擇程式碼區塊語言"
   },
-  "contentArea":{
+  "contentArea": {
     "editableMarkdown": "可編輯的 Markdown"
   }
 }

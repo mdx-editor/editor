@@ -1,120 +1,118 @@
 {
-    "frontmatterEditor": {
-        "title": "Редактировать метаданные документа",
-        "key": "Ключ",
-        "value": "Значение",
-        "addEntry": "Добавить запись"
+  "frontmatterEditor": {
+    "title": "Редактировать метаданные документа",
+    "key": "Ключ",
+    "value": "Значение",
+    "addEntry": "Добавить запись"
+  },
+  "dialogControls": {
+    "save": "Сохранить",
+    "cancel": "Отмена"
+  },
+  "uploadImage": {
+    "dialogTitle": "Загрузить изображение",
+    "uploadInstructions": "Загрузить изображение с устройства:",
+    "addViaUrlInstructions": "Или добавить изображение по URL:",
+    "autoCompletePlaceholder": "Выбрать или вставить ссылку на изображение",
+    "alt": "Альтернативный заголовок:",
+    "title": "Заголовок:",
+    "width": "Ширина:",
+    "height": "Высота:"
+  },
+  "imageEditor": {
+    "deleteImage": "Удалить изображение",
+    "editImage": "Редактировать изображение"
+  },
+  "createLink": {
+    "url": "URL",
+    "urlPlaceholder": "Выбрать или вставить URL",
+    "text": "Текст ссылки",
+    "textTooltip": "Текст, который будет отображаться для ссылки",
+    "title": "Заголовок",
+    "titleTooltip": "Атрибут title ссылки, отображаемый при наведении",
+    "saveTooltip": "Задать URL",
+    "cancelTooltip": "Отменить выбор"
+  },
+  "linkPreview": {
+    "open": "Открыть {{url}} в новом окне",
+    "edit": "Редактировать URL ссылку",
+    "copyToClipboard": "Скопировать в буфер",
+    "copied": "Скопировано!",
+    "remove": "Удалить ссылку"
+  },
+  "table": {
+    "deleteTable": "Удалить таблицу",
+    "columnMenu": "Меню столбца",
+    "textAlignment": "Выравнивание текста",
+    "alignLeft": "По левому краю",
+    "alignCenter": "По центру",
+    "alignRight": "По правому краю",
+    "insertColumnLeft": "Вставить столбец слева",
+    "insertColumnRight": "Вставить столбец справа",
+    "deleteColumn": "Удалить этот столбец",
+    "rowMenu": "Меню строки",
+    "insertRowAbove": "Вставить строку выше",
+    "insertRowBelow": "Вставить строку ниже",
+    "deleteRow": "Удалить эту строку"
+  },
+  "toolbar": {
+    "blockTypes": {
+      "paragraph": "Абзац",
+      "quote": "Цитата",
+      "heading": "Заголовок {{level}}"
     },
-    "dialogControls": {
-        "save": "Сохранить",
-        "cancel": "Отмена"
+    "blockTypeSelect": {
+      "selectBlockTypeTooltip": "Выбрать тип блока",
+      "placeholder": "Тип блока"
     },
-    "uploadImage": {
-        "dialogTitle": "Загрузить изображение",
-        "uploadInstructions": "Загрузить изображение с устройства:",
-        "addViaUrlInstructions": "Или добавить изображение по URL:",
-        "autoCompletePlaceholder": "Выбрать или вставить ссылку на изображение",
-        "alt": "Альтернативный заголовок:",
-        "title": "Заголовок:",
-        "width": "Ширина:",
-        "height": "Высота:"
-    },
-    "imageEditor": {
-        "deleteImage": "Удалить изображение",
-        "editImage": "Редактировать изображение"
-    },
-    "createLink": {
-        "url": "URL",
-        "urlPlaceholder": "Выбрать или вставить URL",
-        "text": "Текст ссылки",
-        "textTooltip": "Текст, который будет отображаться для ссылки",
-        "title": "Заголовок",
-        "titleTooltip": "Атрибут title ссылки, отображаемый при наведении",
-        "saveTooltip": "Задать URL",
-        "cancelTooltip": "Отменить выбор"
-    },
-    "linkPreview": {
-        "open": "Открыть {{url}} в новом окне",
-        "edit": "Редактировать URL ссылку",
-        "copyToClipboard": "Скопировать в буфер",
-        "copied": "Скопировано!",
-        "remove": "Удалить ссылку"
-    },
-    "table": {
-        "deleteTable": "Удалить таблицу",
-        "columnMenu": "Меню столбца",
-        "textAlignment": "Выравнивание текста",
-        "alignLeft": "По левому краю",
-        "alignCenter": "По центру",
-        "alignRight": "По правому краю",
-        "insertColumnLeft": "Вставить столбец слева",
-        "insertColumnRight": "Вставить столбец справа",
-        "deleteColumn": "Удалить этот столбец",
-        "rowMenu": "Меню строки",
-        "insertRowAbove": "Вставить строку выше",
-        "insertRowBelow": "Вставить строку ниже",
-        "deleteRow": "Удалить эту строку"
-    },
-    "toolbar": {
-        "blockTypes": {
-            "paragraph": "Абзац",
-            "quote": "Цитата",
-            "heading": "Заголовок {{level}}"
-        },
-        "blockTypeSelect": {
-            "selectBlockTypeTooltip": "Выбрать тип блока",
-            "placeholder": "Тип блока"
-        },
-        "toggleGroup": "Группа переключателей",
-        "removeBold": "Убрать жирный",
-        "bold": "Жирный",
-        "removeItalic": "Убрать курсив",
-        "italic": "Курсив",
-        "underline": "Подчеркнутый",
-        "removeUnderline": "Убрать подчеркивание",
-        "removeInlineCode": "Удалить форматирование кода",
-        "inlineCode": "Формат inline-кода",
-        "link": "Создать ссылку",
-        "richText": "Форматированный текст",
-        "diffMode": "Режим сравнения",
-        "source": "Исходный код",
-        "admonition": "Вставить примечание",
-        "codeBlock": "Вставить блок кода",
-        "editFrontmatter": "Редактировать метаданные",
-        "insertFrontmatter": "Вставить метаданные",
-        "image": "Вставить изображение",
-        "insertSandpack": "Вставить Sandpack",
-        "table": "Вставить таблицу",
-        "thematicBreak": "Вставить тематический разделитель",
-        "bulletedList": "Маркированный список",
-        "numberedList": "Нумерованный список",
-        "checkList": "Контрольный список",
-        "deleteSandpack": "Удалить этот блок кода",
-        "undo": "Отменить {{shortcut}}",
-        "redo": "Вернуть {{shortcut}}",
-        "highlight": "Выделить",
-        "removeHighlight": "Убрать выделение",
-        "superscript": "Надстрочный",
-        "subscript": "Подстрочный",
-        "strikethrough": "Зачёркнутый",
-        "removeSubscript": "Убрать подстрочный",
-        "removeSuperscript": "Убрать надстрочный",
-        "removeStrikethrough": "Убрать зачёркивание"
-    },
-    "admonitions": {
-        "note": "Примечание",
-        "tip": "Подсказка",
-        "danger": "Опасность",
-        "info": "Информация",
-        "caution": "Предостережение",
-        "changeType": "Выберите тип примечания",
-        "placeholder": "Тип примечания"
-    },
-    "codeBlock": {
-        "language": "Язык блока кода",
-        "selectLanguage": "Выбрать язык блока кода"
-    },
-    "contentArea": {
-        "editableMarkdown": "редактируемый markdown"
-    }
+    "toggleGroup": "Группа переключателей",
+    "removeBold": "Убрать жирный",
+    "bold": "Жирный",
+    "removeItalic": "Убрать курсив",
+    "italic": "Курсив",
+    "underline": "Подчеркнутый",
+    "removeUnderline": "Убрать подчеркивание",
+    "removeInlineCode": "Удалить форматирование кода",
+    "inlineCode": "Формат inline-кода",
+    "link": "Создать ссылку",
+    "richText": "Форматированный текст",
+    "diffMode": "Режим сравнения",
+    "source": "Исходный код",
+    "admonition": "Вставить примечание",
+    "codeBlock": "Вставить блок кода",
+    "editFrontmatter": "Редактировать метаданные",
+    "insertFrontmatter": "Вставить метаданные",
+    "image": "Вставить изображение",
+    "table": "Вставить таблицу",
+    "thematicBreak": "Вставить тематический разделитель",
+    "bulletedList": "Маркированный список",
+    "numberedList": "Нумерованный список",
+    "checkList": "Контрольный список",
+    "undo": "Отменить {{shortcut}}",
+    "redo": "Вернуть {{shortcut}}",
+    "highlight": "Выделить",
+    "removeHighlight": "Убрать выделение",
+    "superscript": "Надстрочный",
+    "subscript": "Подстрочный",
+    "strikethrough": "Зачёркнутый",
+    "removeSubscript": "Убрать подстрочный",
+    "removeSuperscript": "Убрать надстрочный",
+    "removeStrikethrough": "Убрать зачёркивание"
+  },
+  "admonitions": {
+    "note": "Примечание",
+    "tip": "Подсказка",
+    "danger": "Опасность",
+    "info": "Информация",
+    "caution": "Предостережение",
+    "changeType": "Выберите тип примечания",
+    "placeholder": "Тип примечания"
+  },
+  "codeBlock": {
+    "language": "Язык блока кода",
+    "selectLanguage": "Выбрать язык блока кода"
+  },
+  "contentArea": {
+    "editableMarkdown": "редактируемый markdown"
+  }
 }

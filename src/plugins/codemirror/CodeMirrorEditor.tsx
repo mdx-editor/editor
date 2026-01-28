@@ -13,7 +13,6 @@ import { basicLight } from 'cm6-theme-basic-light'
 import { basicSetup } from 'codemirror'
 import { $setSelection } from 'lexical'
 import { codeBlockLanguages$, codeMirrorAutoLoadLanguageSupport$, codeMirrorExtensions$ } from '.'
-import { useCodeMirrorRef } from '../sandpack/useCodeMirrorRef'
 import { Select } from '../toolbar/primitives/select'
 
 export const COMMON_STATE_CONFIG_EXTENSIONS: Extension[] = []
@@ -30,16 +29,12 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
     codeBlockLanguages$
   )
 
-  const codeMirrorRef = useCodeMirrorRef(nodeKey, 'codeblock', language, focusEmitter)
   const { setCode } = useCodeBlockEditorContext()
   const editorViewRef = React.useRef<EditorView | null>(null)
   const elRef = React.useRef<HTMLDivElement | null>(null)
 
   const setCodeRef = React.useRef(setCode)
   setCodeRef.current = setCode
-  codeMirrorRef.current = {
-    getCodemirror: () => editorViewRef.current as any
-  }
 
   React.useEffect(() => {
     const el = elRef.current!

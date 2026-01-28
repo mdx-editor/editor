@@ -19,7 +19,6 @@ import {
   listsPlugin,
   markdownShortcutPlugin,
   quotePlugin,
-  sandpackPlugin,
   tablePlugin,
   thematicBreakPlugin,
   toolbarPlugin,
@@ -29,8 +28,6 @@ import codeBlocksMarkdown from './assets/code-blocks.md?raw'
 import imageMarkdown from './assets/image.md?raw'
 import jsxMarkdown from './assets/jsx.md?raw'
 import tableMarkdown from './assets/table.md?raw'
-
-import { virtuosoSampleSandpackConfig } from './_boilerplate'
 
 const helloMarkdown = `Hello <u>world am **here**</u> more <u>under</u> line. Some \`code with backticks\` and <code>code tag</code> `
 
@@ -298,7 +295,6 @@ export function CodeBlock() {
       markdown={codeBlocksMarkdown}
       plugins={[
         codeBlockPlugin({ codeBlockEditorDescriptors: [PlainTextCodeEditorDescriptor] }),
-        sandpackPlugin({ sandpackConfig: virtuosoSampleSandpackConfig }),
         codeMirrorPlugin({
           codeBlockLanguages: { jsx: 'JavaScript (react)', js: 'JavaScript', css: 'CSS' }
           // codeMirrorExtensions: [basicDark]

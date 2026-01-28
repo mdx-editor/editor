@@ -278,7 +278,6 @@ function isConditionalContentsOption(option: ConditionalContentsOption | Fallbac
  *    <ConditionalContents
  *      options={[
  *        { when: (editor) => editor?.editorType === 'codeblock', contents: () => <ChangeCodeMirrorLanguage /> },
- *        { when: (editor) => editor?.editorType === 'sandpack', contents: () => <ShowSandpackInfo /> },
  *        {
  *          fallback: () => (
  *            <>

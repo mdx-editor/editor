@@ -83,13 +83,11 @@
     "editFrontmatter": "Editar frontmatter",
     "insertFrontmatter": "Inserir frontmatter",
     "image": "Inserir imagem",
-    "insertSandpack": "Inserir Sandpack",
     "table": "Inserir tabela",
     "thematicBreak": "Inserir quebra de seção",
     "bulletedList": "Lista com marcadores",
     "numberedList": "Lista numerada",
     "checkList": "Checklist",
-    "deleteSandpack": "Deletar esse bloco de código",
     "undo": "Desfazer {{shortcut}}",
     "redo": "Refazer {{shortcut}}",
     "highlight": "Destacar",
@@ -111,7 +109,7 @@
     "language": "Linguagem do bloco de código",
     "selectLanguage": "Selecionar linguagem do bloco de código"
   },
-  "contentArea":{
+  "contentArea": {
     "editableMarkdown": "Markdown editável"
   }
 }

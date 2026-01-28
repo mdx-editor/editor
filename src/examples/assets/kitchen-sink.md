@@ -4,15 +4,15 @@ title: Hello World
 
 Some informative text
 
-[A link](https://google.com/ "Googl Title")
+[A link](https://google.com/ 'Googl Title')
 
 horizontal rule
 
----------------
+---
 
 Block of code:
 
-JS: 
+JS:
 
 ```js
 export default function App() {
@@ -23,26 +23,27 @@ export default function App() {
 CSS:
 
 ```css
-html, body {
+html,
+body {
   font-weight: 400;
 }
 ```
 
-# Heading 1 
+# Heading 1
 
- - bullet 1 *italic*
- - bullet 2, **bold** some more text
-    - nested bullet
-    - nested bullet 2
+- bullet 1 _italic_
+- bullet 2, **bold** some more text
+  - nested bullet
+  - nested bullet 2
 
 1. Ordered bullet 1
 2. Ordered bullet 2
 
-World Some **nested *formatting* text some more <u>un *derl* ine</u>**.
+World Some **nested _formatting_ text some more <u>un _derl_ ine</u>**.
 
-And *some italic with nested **bold** text*.
+And _some italic with nested **bold** text_.
 
-> Quote with **bold** and *italic* text.
+> Quote with **bold** and _italic_ text.
 > and some more.
 
 ## Heading 2
@@ -53,14 +54,13 @@ And *some italic with nested **bold** text*.
 And note admonition
 :::
 
-[A link](https://google.com/ "Googl Title")
+[A link](https://google.com/ 'Google Title')
 
 Image:
 
 ![Shiprock](https://virtuoso.dev/img/logo.svg)
 
-React Sandpack:
-
+React:
 
 ```tsx
 export default function App() {
@@ -75,4 +75,3 @@ export default function App() {
 ```
 
 Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.
-

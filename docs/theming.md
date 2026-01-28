@@ -8,7 +8,7 @@ position: 0.999
 
 ## Styling the editor elements
 
-The structural styling of the component is done through CSS module class names, which have auto-generated suffixes that can change between versions. The key DOM elements of the component have "public" CSS classes that you can safely target with your own CSS. 
+The structural styling of the component is done through CSS module class names, which have auto-generated suffixes that can change between versions. The key DOM elements of the component have "public" CSS classes that you can safely target with your own CSS.
 
 - `mdxeditor` - Set at the root element of the editor and the container for the pop-ups/tooltips.
 - `mdxeditor-popup-container` assigned to the popup container. Use this if you're using MDXEditor with a framework like MUI and you need to override the z-index of the popups.
@@ -23,7 +23,7 @@ The structural styling of the component is done through CSS module class names, 
 The editor UI (toolbar, dialogs, etc) colors and fonts are defined as CSS variables attached to the editor root element.
 The color variables follow the [Radix semantic aliasing](https://www.radix-ui.com/colors/docs/overview/aliasing#semantic-aliases) convention.
 
-The example below swaps the editor gray/blue colors with tomato/mauve. In addition, assigning the `dark-theme` class to the editor also flips it to dark mode (this is a feature of the Radix colors). 
+The example below swaps the editor gray/blue colors with tomato/mauve. In addition, assigning the `dark-theme` class to the editor also flips it to dark mode (this is a feature of the Radix colors).
 
 ```css
 @import url('@radix-ui/colors/tomato-dark.css');
@@ -58,7 +58,7 @@ The example below swaps the editor gray/blue colors with tomato/mauve. In additi
 
   --admonitionTipBg: var(--cyan4);
   --admonitionTipBorder: var(--cyan8);
-  
+
   --admonitionInfoBg: var(--grass4);
   --admonitionInfoBorder: var(--grass8);
 
@@ -71,8 +71,19 @@ The example below swaps the editor gray/blue colors with tomato/mauve. In additi
   --admonitionNoteBg: var(--mauve-4);
   --admonitionNoteBorder: var(--mauve-8);
 
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    'Open Sans',
+    'Helvetica Neue',
+    sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
 
   color: var(--baseText);
   --basePageBg: black;
@@ -83,9 +94,9 @@ The example below swaps the editor gray/blue colors with tomato/mauve. In additi
 ```tsx
 export function CustomTheming() {
   return (
-    <MDXEditor 
-      className="dark-theme dark-editor" 
-      markdown={kitchenSinkMarkdown} 
+    <MDXEditor
+      className="dark-theme dark-editor"
+      markdown={kitchenSinkMarkdown}
       plugins={[
         toolbarPlugin({ toolbarContents: () => <KitchenSinkToolbar /> }),
         listsPlugin(),
@@ -98,12 +109,11 @@ export function CustomTheming() {
         thematicBreakPlugin(),
         frontmatterPlugin(),
         codeBlockPlugin({ defaultCodeBlockLanguage: 'txt' }),
-        sandpackPlugin({ sandpackConfig: virtuosoSampleSandpackConfig }),
         codeMirrorPlugin({ codeBlockLanguages: { js: 'JavaScript', css: 'CSS', txt: 'text', tsx: 'TypeScript' } }),
         directivesPlugin({ directiveDescriptors: [YoutubeDirectiveDescriptor, AdmonitionDirectiveDescriptor] }),
         diffSourcePlugin({ viewMode: 'rich-text', diffMarkdown: 'boo' }),
         markdownShortcutPlugin()
-      ]} 
+      ]}
     />
   )
 }

@@ -8,10 +8,8 @@ import {
   UndoRedo,
   codeBlockPlugin,
   codeMirrorPlugin,
-  sandpackPlugin,
   CodeMirrorEditor
 } from '..'
-import { virtuosoSampleSandpackConfig } from './_boilerplate'
 
 const listsMarkdown = `
 * hello
@@ -64,7 +62,6 @@ export function CodeInLists() {
         codeBlockPlugin({
           codeBlockEditorDescriptors: [{ priority: -10, match: (_) => true, Editor: CodeMirrorEditor }]
         }),
-        sandpackPlugin({ sandpackConfig: virtuosoSampleSandpackConfig }),
         codeMirrorPlugin({
           codeBlockLanguages: { jsx: 'JavaScript (react)', js: 'JavaScript', css: 'CSS', tsx: 'TypeScript (react)' }
         }),
