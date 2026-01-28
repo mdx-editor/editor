@@ -18,7 +18,7 @@ import { Select } from '../toolbar/primitives/select'
 export const COMMON_STATE_CONFIG_EXTENSIONS: Extension[] = []
 const EMPTY_VALUE = '__EMPTY_VALUE__'
 
-export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: CodeBlockEditorProps) => {
+export const CodeMirrorEditor = ({ language, code }: CodeBlockEditorProps) => {
   const t = useTranslation()
   const { parentEditor, lexicalNode } = useCodeBlockEditorContext()
   const [readOnly, codeMirrorExtensions, autoLoadLanguageSupport, iconComponentFor, codeBlockLanguages] = useCellValues(

@@ -21,18 +21,6 @@ import {
   codeMirrorPlugin,
   KitchenSinkToolbar
 } from '../'
-import dataCode from './assets/dataCode.ts?raw'
-
-const defaultSnippetContent = `
-export default function App() {
-  return (
-    <div className="App">
-      <h1>Hello</h1>
-      <h2>Start editing to see some magic happen!</h2>
-    </div>
-  );
-}
-`.trim()
 
 export async function expressImageUploadHandler(image: File) {
   const formData = new FormData()
