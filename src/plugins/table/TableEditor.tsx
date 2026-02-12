@@ -428,8 +428,9 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
       editor.registerCommand(
         KEY_ENTER_COMMAND,
         (payload) => {
+          if (payload?.shiftKey) return false
           payload?.preventDefault()
-          const nextCell: [number, number] = payload?.shiftKey ? [colIndex, rowIndex - 1] : [colIndex, rowIndex + 1]
+          const nextCell: [number, number] = [colIndex, rowIndex + 1]
           saveAndFocus(nextCell)
           return true
         },
