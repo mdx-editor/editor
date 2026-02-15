@@ -1,18 +1,8 @@
 import { ButtonWithTooltip } from '.././primitives/toolbar'
 import React from 'react'
 import { insertTable$ } from '../../table'
-import { Cell, map, useCellValue, usePublisher } from '@mdxeditor/gurx'
-import { activeEditor$, iconComponentFor$, useTranslation } from '../../core'
-
-const disableInsertTableButton$ = Cell<boolean>(false, (r) => {
-  r.link(
-    r.pipe(
-      activeEditor$,
-      map((editor) => ['td', 'th'].includes(editor?.getRootElement()?.parentNode?.nodeName.toLowerCase() ?? ''))
-    ),
-    disableInsertTableButton$
-  )
-})
+import { useCellValue, usePublisher } from '@mdxeditor/gurx'
+import { editorInTable$, iconComponentFor$, useTranslation } from '../../core'
 
 /**
  * A toolbar button that allows the user to insert a table.
@@ -25,7 +15,7 @@ export const InsertTable: React.FC = () => {
   const t = useTranslation()
 
   // Do not allow inserting a table inside a table cell, markdown does not support it
-  const isDisabled = useCellValue(disableInsertTableButton$)
+  const isDisabled = useCellValue(editorInTable$)
 
   return (
     <ButtonWithTooltip

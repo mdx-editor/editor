@@ -744,6 +744,33 @@ export const nestedEditorChildren$ = Cell<React.ComponentType[]>([])
  */
 export const addNestedEditorChild$ = Appender(nestedEditorChildren$)
 
+/**
+ * React Components registered to be rendered inside table cell editors. Use this instead of {@link addNestedEditorChild$} for components that should only appear in table cells.
+ * Plugins that should not be active in table cells (e.g. lists) should not register here.
+ * @group Core
+ */
+export const tableCellEditorChildren$ = Cell<React.ComponentType[]>([])
+
+/**
+ * Lets you add React components as children of table cell editors.
+ * @group Core
+ */
+export const addTableCellEditorChild$ = Appender(tableCellEditorChildren$)
+
+/**
+ * Whether the currently active editor is inside a table cell.
+ * @group Core
+ */
+export const editorInTable$ = Cell<boolean>(false, (r) => {
+  r.link(
+    r.pipe(
+      activeEditor$,
+      map((editor) => ['td', 'th'].includes(editor?.getRootElement()?.parentNode?.nodeName.toLowerCase() ?? ''))
+    ),
+    editorInTable$
+  )
+})
+
 /** @internal */
 export const historyState$ = Cell(createEmptyHistoryState())
 

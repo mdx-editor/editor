@@ -19,10 +19,9 @@ import {
 import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin'
 import { $createHeadingNode, $isHeadingNode, HeadingNode, HeadingTagType } from '@lexical/rich-text'
 import { ElementNode, LexicalNode } from 'lexical'
-import React from 'react'
 import { realmPlugin } from '../../RealmWithPlugins'
 import { $createCodeBlockNode, CodeBlockNode } from '../codeblock/CodeBlockNode'
-import { activePlugins$, addComposerChild$, addNestedEditorChild$ } from '../core'
+import { activePlugins$, addComposerChild$, addNestedEditorChild$, addTableCellEditorChild$ } from '../core'
 import { HEADING_LEVEL, allowedHeadingLevels$ } from '../headings'
 import { $createHorizontalRuleNode, $isHorizontalRuleNode, HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode'
 
@@ -35,9 +34,11 @@ export const markdownShortcutPlugin = realmPlugin({
     const pluginIds = realm.getValue(activePlugins$)
     const allowedHeadingLevels: readonly HEADING_LEVEL[] = pluginIds.includes('headings') ? realm.getValue(allowedHeadingLevels$) : []
     const transformers = pickTransformersForActivePlugins(pluginIds, allowedHeadingLevels)
+    const tableCellTransformers = transformers.filter((t) => !LIST_TRANSFORMERS.has(t))
     realm.pubIn({
       [addComposerChild$]: () => <MarkdownShortcutPlugin transformers={transformers} />,
-      [addNestedEditorChild$]: () => <MarkdownShortcutPlugin transformers={transformers} />
+      [addNestedEditorChild$]: () => <MarkdownShortcutPlugin transformers={transformers} />,
+      [addTableCellEditorChild$]: () => <MarkdownShortcutPlugin transformers={tableCellTransformers} />
     })
   }
 })
@@ -71,6 +72,8 @@ const THEMATIC_BREAK: ElementTransformer = {
   },
   type: 'element'
 }
+
+const LIST_TRANSFORMERS: ReadonlySet<Transformer> = new Set([ORDERED_LIST, UNORDERED_LIST, CHECK_LIST])
 
 function pickTransformersForActivePlugins(pluginIds: string[], allowedHeadingLevels: readonly HEADING_LEVEL[]) {
   const transformers: Transformer[] = [

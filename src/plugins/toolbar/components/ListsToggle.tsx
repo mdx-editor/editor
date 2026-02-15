@@ -2,7 +2,7 @@ import React from 'react'
 import { applyListType$, currentListType$ } from '../../lists'
 import { SingleChoiceToggleGroup } from '.././primitives/toolbar'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
-import { iconComponentFor$, useTranslation } from '../../core'
+import { editorInTable$, iconComponentFor$, useTranslation } from '../../core'
 
 const ICON_NAME_MAP = {
   bullet: 'format_list_bulleted',
@@ -18,7 +18,7 @@ const ICON_NAME_MAP = {
  * @param options - The list types that the user can toggle between. Defaults to `['bullet', 'number', 'check']`.
  */
 export const ListsToggle: React.FC<{ options?: ('bullet' | 'number' | 'check')[] }> = ({ options = ['bullet', 'number', 'check'] }) => {
-  const [currentListType, iconComponentFor] = useCellValues(currentListType$, iconComponentFor$)
+  const [currentListType, iconComponentFor, inTable] = useCellValues(currentListType$, iconComponentFor$, editorInTable$)
   const applyListType = usePublisher(applyListType$)
   const t = useTranslation()
 
@@ -34,5 +34,5 @@ export const ListsToggle: React.FC<{ options?: ('bullet' | 'number' | 'check')[]
     contents: iconComponentFor(ICON_NAME_MAP[type])
   }))
 
-  return <SingleChoiceToggleGroup value={currentListType || ''} items={items} onChange={applyListType} />
+  return <SingleChoiceToggleGroup value={currentListType || ''} items={items} onChange={applyListType} disabled={inTable} />
 }
