@@ -6,7 +6,15 @@ import { LinkPlugin as LexicalLinkPlugin } from '@lexical/react/LexicalLinkPlugi
 import { LexicalAutoLinkPlugin } from './AutoLinkPlugin'
 import { Cell } from '@mdxeditor/gurx'
 import { realmPlugin } from '../../RealmWithPlugins'
-import { addImportVisitor$, addLexicalNode$, addExportVisitor$, addComposerChild$, addActivePlugin$, addNestedEditorChild$, addTableCellEditorChild$ } from '../core'
+import {
+  addImportVisitor$,
+  addLexicalNode$,
+  addExportVisitor$,
+  addComposerChild$,
+  addActivePlugin$,
+  addNestedEditorChild$,
+  addTableCellEditorChild$
+} from '../core'
 
 /**
  * Holds whether the auto-linking of URLs and email addresses is disabled.

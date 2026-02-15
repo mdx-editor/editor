@@ -1,3 +1,4 @@
+import React from 'react'
 import {
   BOLD_ITALIC_STAR,
   BOLD_ITALIC_UNDERSCORE,
