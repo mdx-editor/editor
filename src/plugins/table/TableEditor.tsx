@@ -41,7 +41,7 @@ import {
   importVisitors$,
   jsxComponentDescriptors$,
   jsxIsAvailable$,
-  nestedEditorChildren$,
+  tableCellEditorChildren$,
   readOnly$,
   rootEditor$,
   useTranslation,
@@ -346,7 +346,7 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
     codeBlockEditorDescriptors,
     jsxIsAvailable,
     rootEditor,
-    nestedEditorChildren
+    tableCellEditorChildren
   ] = useCellValues(
     importVisitors$,
     exportVisitors$,
@@ -356,7 +356,7 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
     codeBlockEditorDescriptors$,
     jsxIsAvailable$,
     rootEditor$,
-    nestedEditorChildren$
+    tableCellEditorChildren$
   )
 
   const [editor] = React.useState(() => {
@@ -471,7 +471,7 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
     <LexicalNestedComposer initialEditor={editor}>
       <RichTextPlugin contentEditable={<ContentEditable />} placeholder={<div></div>} ErrorBoundary={LexicalErrorBoundary} />
 
-      {nestedEditorChildren.map((Child, index) => (
+      {tableCellEditorChildren.map((Child, index) => (
         <Child key={index} />
       ))}
       <HistoryPlugin />

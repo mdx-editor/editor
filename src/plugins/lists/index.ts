@@ -110,6 +110,7 @@ export const listsPlugin = realmPlugin({
       [addToMarkdownExtension$]: gfmTaskListItemToMarkdown(),
       [addComposerChild$]: [TabIndentationPlugin, ListPlugin, CheckListPlugin],
       [addNestedEditorChild$]: [TabIndentationPlugin, ListPlugin, CheckListPlugin]
+      // Note: intentionally not registered to addTableCellEditorChild$ — lists are not supported in table cells
     })
   }
 })

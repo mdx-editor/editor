@@ -142,7 +142,8 @@ export const SingleChoiceToggleGroup = <T extends string>({
   onChange,
   className,
   ggClassName,
-  items
+  items,
+  disabled
 }: {
   items: {
     title: string
@@ -153,6 +154,7 @@ export const SingleChoiceToggleGroup = <T extends string>({
   value: T | ''
   ggClassName?: string
   className?: string
+  disabled?: boolean
 }) => {
   const t = useTranslation()
 
@@ -164,6 +166,7 @@ export const SingleChoiceToggleGroup = <T extends string>({
         className={classNames(styles.toolbarToggleSingleGroup, className)}
         onValueChange={onChange}
         value={value || ''}
+        disabled={disabled}
         onFocus={(e) => {
           e.preventDefault()
         }}
