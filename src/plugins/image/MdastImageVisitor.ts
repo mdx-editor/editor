@@ -40,8 +40,8 @@ export const MdastHtmlImageVisitor: MdastImportVisitor<Mdast.Html> = {
       src: src || '',
       altText,
       title,
-      width,
-      height
+      width: width || undefined,
+      height: height || undefined
     })
 
     if (lexicalParent.getType() === 'root') {
