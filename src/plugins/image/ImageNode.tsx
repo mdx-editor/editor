@@ -18,7 +18,7 @@ import { MdxJsxAttribute, MdxJsxExpressionAttribute } from 'mdast-util-mdx-jsx'
 function convertImageElement(domNode: Node): null | DOMConversionOutput {
   if (domNode instanceof HTMLImageElement) {
     const { alt: altText, src, title, width, height } = domNode
-    const node = $createImageNode({ altText, src, title, width, height })
+    const node = $createImageNode({ altText, src, title, width: width || undefined, height: height || undefined })
     return { node }
   }
   return null
@@ -104,10 +104,10 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     if (this.__title) {
       element.setAttribute('title', this.__title)
     }
-    if (this.__width) {
+    if (this.__width !== 'inherit' && this.__width) {
       element.setAttribute('width', this.__width.toString())
     }
-    if (this.__height) {
+    if (this.__height !== 'inherit' && this.__height) {
       element.setAttribute('height', this.__height.toString())
     }
     return { element }
@@ -150,8 +150,8 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     return {
       altText: this.getAltText(),
       title: this.getTitle(),
-      height: this.__height === 'inherit' ? 0 : this.__height,
-      width: this.__width === 'inherit' ? 0 : this.__width,
+      height: this.__height === 'inherit' ? undefined : this.__height,
+      width: this.__width === 'inherit' ? undefined : this.__width,
       src: this.getSrc(),
       rest: this.__rest,
       type: 'image',
