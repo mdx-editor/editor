@@ -57,7 +57,9 @@ export const SelectContent: React.FC<{ children: React.ReactNode; className?: st
         }}
         position="popper"
       >
-        <RadixSelect.Viewport data-editor-dropdown={true}>{children}</RadixSelect.Viewport>
+        <RadixSelect.Viewport data-editor-dropdown={true} style={{ maxHeight: 'var(--radix-select-content-available-height)' }}>
+          {children}
+        </RadixSelect.Viewport>
       </RadixSelect.Content>
     </RadixSelect.Portal>
   )
