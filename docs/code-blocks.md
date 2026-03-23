@@ -101,6 +101,38 @@ export default function App() {
 
 The code mirror editor plugin enables editing of fenced code blocks with basic code editing features like syntax highlighting, indentation and bracket matching. A set of toolbar component utilities support the display of a language selector when the block is in focus, while hiding the rich text editor controls. The plugin accepts supported languages as a parameter option.
 
+### Language configuration
+
+The `codeBlockLanguages` option accepts two formats:
+
+**Record format** (simple key-to-label mapping):
+
+```tsx
+codeMirrorPlugin({ codeBlockLanguages: { js: 'JavaScript', css: 'CSS', tsx: 'TypeScript (React)' } })
+```
+
+**Array format** (with aliases and extensions, compatible with CodeMirror's `LanguageDescription`):
+
+```tsx
+codeMirrorPlugin({
+  codeBlockLanguages: [
+    { name: 'JavaScript', alias: ['js', 'javascript'] },
+    { name: 'TypeScript', alias: ['ts', 'typescript'], extensions: ['ts', 'mts'] },
+    { name: 'CSS', alias: ['css'] }
+  ]
+})
+```
+
+With the array format, all aliases and extensions are recognized when matching code blocks, but the language select dropdown shows only one entry per language. This is especially useful when your markdown may use different identifiers for the same language (e.g. `js` vs `javascript`).
+
+You can also pass the `languages` array from `@codemirror/language-data` directly to support all CodeMirror languages:
+
+```tsx
+import { languages } from '@codemirror/language-data'
+
+codeMirrorPlugin({ codeBlockLanguages: languages })
+```
+
 ## Configuring the Sandpack editor
 
 Compared to the code mirror editor, the Sandpack one is a bit more complex, as Sandpack needs to know the context of the code block in order to execute it correctly. Before diving in, it's good to [understand Sandpack configuration](https://sandpack.codesandbox.io/) itself. MDXEditor supports multiple Sandpack configurations, based on the meta data of the code block. To configure the supported presets, pass a `sandpackConfig` option in the plugin initialization. For more details, refer to the [SandpackConfig interface](../api/editor.sandpackconfig) and the [SandpackPreset interface](../api/editor.sandpackpreset).

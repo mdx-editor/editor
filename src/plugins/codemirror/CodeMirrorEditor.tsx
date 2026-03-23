@@ -99,7 +99,7 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
       <div className={styles.codeMirrorToolbar}>
         <Select
           disabled={readOnly}
-          value={language}
+          value={codeBlockLanguages.keyMap[language] ?? language}
           onChange={(language) => {
             parentEditor.update(() => {
               lexicalNode.setLanguage(language === EMPTY_VALUE ? '' : language)
@@ -112,7 +112,7 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
           }}
           triggerTitle={t('codeBlock.selectLanguage', 'Select code block language')}
           placeholder={t('codeBlock.inlineLanguage', 'Language')}
-          items={Object.entries(codeBlockLanguages).map(([value, label]) => ({ value: value ? value : EMPTY_VALUE, label }))}
+          items={codeBlockLanguages.items}
         />
         <button
           className={styles.iconButton}

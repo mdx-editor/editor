@@ -22,7 +22,8 @@ export const ChangeCodeMirrorLanguage = () => {
     return null
   }
 
-  let currentLanguage = codeBlockNode.getLanguage()
+  const rawLanguage = codeBlockNode.getLanguage()
+  let currentLanguage = codeBlockLanguages.keyMap[rawLanguage] ?? rawLanguage
   if (currentLanguage === '') {
     currentLanguage = EMPTY_VALUE
   }
@@ -43,7 +44,7 @@ export const ChangeCodeMirrorLanguage = () => {
         }}
         triggerTitle={t('codeBlock.selectLanguage', 'Select code block language')}
         placeholder={t('codeBlock.language', 'Code block language')}
-        items={Object.entries(codeBlockLanguages).map(([value, label]) => ({ value: value ? value : EMPTY_VALUE, label }))}
+        items={codeBlockLanguages.items}
       />
     </div>
   )
