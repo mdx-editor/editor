@@ -2,11 +2,10 @@ import { useCellValues } from '@mdxeditor/gurx'
 import React from 'react'
 import styles from '../../../styles/ui.module.css'
 import { $isCodeBlockNode } from '../../codeblock/CodeBlockNode'
-import { codeBlockLanguages$ } from '../../codemirror'
+import { EMPTY_VALUE, codeBlockLanguages$ } from '../../codemirror'
 import { activeEditor$, editorInFocus$, useTranslation } from '../../core'
 import { Select } from '.././primitives/select'
 
-const EMPTY_VALUE = '__EMPTY_VALUE__'
 /**
  * A component that allows the user to change the code block language of the current selection.
  * For this component to work, you must enable the `codeMirrorPlugin` for the editor.

@@ -12,12 +12,11 @@ import { indentWithTab } from '@codemirror/commands'
 import { basicLight } from 'cm6-theme-basic-light'
 import { basicSetup } from 'codemirror'
 import { $setSelection } from 'lexical'
-import { codeBlockLanguages$, codeMirrorAutoLoadLanguageSupport$, codeMirrorExtensions$ } from '.'
+import { EMPTY_VALUE, codeBlockLanguages$, codeMirrorAutoLoadLanguageSupport$, codeMirrorExtensions$ } from '.'
 import { useCodeMirrorRef } from '../sandpack/useCodeMirrorRef'
 import { Select } from '../toolbar/primitives/select'
 
 export const COMMON_STATE_CONFIG_EXTENSIONS: Extension[] = []
-const EMPTY_VALUE = '__EMPTY_VALUE__'
 
 export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: CodeBlockEditorProps) => {
   const t = useTranslation()

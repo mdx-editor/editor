@@ -5,6 +5,11 @@ import { CodeMirrorEditor } from './CodeMirrorEditor'
 import { Extension } from '@codemirror/state'
 
 /**
+ * @internal
+ */
+export const EMPTY_VALUE = '__EMPTY_VALUE__'
+
+/**
  * A code block language entry with a name and optional aliases/extensions.
  * Compatible with CodeMirror's `LanguageDescription` from `@codemirror/language-data`.
  * @group CodeMirror
@@ -61,9 +66,9 @@ export function normalizeCodeBlockLanguages(input: Record<string, string> | Code
     for (const [key, label] of Object.entries(input)) {
       if (!(label in firstKeyByLabel)) {
         firstKeyByLabel[label] = key
-        items.push({ value: key || '__EMPTY_VALUE__', label })
+        items.push({ value: key || EMPTY_VALUE, label })
       }
-      keyMap[key] = firstKeyByLabel[label] || '__EMPTY_VALUE__'
+      keyMap[key] = firstKeyByLabel[label] || EMPTY_VALUE
     }
   }
 
@@ -162,7 +167,7 @@ export const codeMirrorPlugin = realmPlugin<{
 function buildCodeBlockDescriptor(normalized: NormalizedCodeBlockLanguages): CodeBlockEditorDescriptor {
   return {
     match(language, meta) {
-      return (language ?? '') in normalized.keyMap && !meta
+      return Object.hasOwn(normalized.keyMap, language ?? '') && !meta
     },
     priority: 1,
     Editor: CodeMirrorEditor
