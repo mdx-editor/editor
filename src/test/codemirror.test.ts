@@ -22,8 +22,8 @@ describe('normalizeCodeBlockLanguages', () => {
         { value: 'js', label: 'JavaScript' },
         { value: 'css', label: 'CSS' }
       ])
-      expect(result.keyMap['js']).toBe('js')
-      expect(result.keyMap['javascript']).toBe('js')
+      expect(result.keyMap.js).toBe('js')
+      expect(result.keyMap.javascript).toBe('js')
     })
 
     it('handles empty string key using EMPTY_VALUE sentinel', () => {
@@ -46,31 +46,27 @@ describe('normalizeCodeBlockLanguages', () => {
         { value: 'js', label: 'JavaScript' },
         { value: 'css', label: 'CSS' }
       ])
-      expect(result.keyMap['js']).toBe('js')
-      expect(result.keyMap['javascript']).toBe('js')
-      expect(result.keyMap['css']).toBe('css')
+      expect(result.keyMap.js).toBe('js')
+      expect(result.keyMap.javascript).toBe('js')
+      expect(result.keyMap.css).toBe('css')
     })
 
     it('falls back to lowercased name when no aliases', () => {
       const result = normalizeCodeBlockLanguages([{ name: 'Python' }])
       expect(result.items).toEqual([{ value: 'python', label: 'Python' }])
-      expect(result.keyMap['python']).toBe('python')
+      expect(result.keyMap.python).toBe('python')
     })
 
     it('maps extensions into keyMap', () => {
-      const result = normalizeCodeBlockLanguages([
-        { name: 'TypeScript', alias: ['ts', 'typescript'], extensions: ['ts', 'mts'] }
-      ])
-      expect(result.keyMap['ts']).toBe('ts')
-      expect(result.keyMap['typescript']).toBe('ts')
-      expect(result.keyMap['mts']).toBe('ts')
+      const result = normalizeCodeBlockLanguages([{ name: 'TypeScript', alias: ['ts', 'typescript'], extensions: ['ts', 'mts'] }])
+      expect(result.keyMap.ts).toBe('ts')
+      expect(result.keyMap.typescript).toBe('ts')
+      expect(result.keyMap.mts).toBe('ts')
     })
 
     it('maps lowercased name into keyMap', () => {
-      const result = normalizeCodeBlockLanguages([
-        { name: 'JavaScript', alias: ['js'] }
-      ])
-      expect(result.keyMap['javascript']).toBe('js')
+      const result = normalizeCodeBlockLanguages([{ name: 'JavaScript', alias: ['js'] }])
+      expect(result.keyMap.javascript).toBe('js')
     })
   })
 
