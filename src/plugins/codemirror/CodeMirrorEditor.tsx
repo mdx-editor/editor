@@ -64,16 +64,22 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
       if (readOnly) {
         extensions.push(EditorState.readOnly.of(true))
       }
-      if (language !== '' && autoLoadLanguageSupport) {
-        const languageData = languages.find((l) => {
-          return l.name === language || l.alias.includes(language) || l.extensions.includes(language)
-        })
-        if (languageData) {
-          try {
-            const languageSupport = await languageData.load()
-            extensions.push(languageSupport.extension)
-          } catch (_e) {
-            console.warn('failed to load language support for', language)
+      if (language !== '') {
+        const canonical = codeBlockLanguages.keyMap[language] ?? language
+        const providedSupport = codeBlockLanguages.supportMap[canonical]
+        if (providedSupport) {
+          extensions.push(providedSupport.extension)
+        } else if (autoLoadLanguageSupport) {
+          const languageData = languages.find((l) => {
+            return l.name === language || l.alias.includes(language) || l.extensions.includes(language)
+          })
+          if (languageData) {
+            try {
+              const languageSupport = await languageData.load()
+              extensions.push(languageSupport.extension)
+            } catch (_e) {
+              console.warn('failed to load language support for', language)
+            }
           }
         }
       }

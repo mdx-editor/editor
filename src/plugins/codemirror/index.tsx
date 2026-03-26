@@ -3,6 +3,7 @@ import { Cell, Signal, map } from '@mdxeditor/gurx'
 import { CodeBlockEditorDescriptor, appendCodeBlockEditorDescriptor$, insertCodeBlock$ } from '../codeblock'
 import { CodeMirrorEditor } from './CodeMirrorEditor'
 import { Extension } from '@codemirror/state'
+import { LanguageSupport } from '@codemirror/language'
 
 /**
  * @internal
@@ -21,6 +22,8 @@ export interface CodeBlockLanguage {
   alias?: readonly string[]
   /** File extensions associated with this language (e.g. `["js", "mjs"]`). */
   extensions?: readonly string[]
+  /** Pre-loaded language support. When provided, this is used directly instead of auto-loading. */
+  support?: LanguageSupport
 }
 
 /**
@@ -32,6 +35,8 @@ export interface NormalizedCodeBlockLanguages {
   items: { value: string; label: string }[]
   /** Maps any known key (canonical, alias, extension) to the canonical key. */
   keyMap: Record<string, string>
+  /** Maps canonical keys to pre-loaded language support, when provided. */
+  supportMap: Record<string, LanguageSupport>
 }
 
 /**
@@ -41,6 +46,7 @@ export interface NormalizedCodeBlockLanguages {
 export function normalizeCodeBlockLanguages(input: Record<string, string> | CodeBlockLanguage[]): NormalizedCodeBlockLanguages {
   const items: { value: string; label: string }[] = []
   const keyMap: Record<string, string> = {}
+  const supportMap: Record<string, LanguageSupport> = {}
 
   if (Array.isArray(input)) {
     for (const lang of input) {
@@ -60,6 +66,9 @@ export function normalizeCodeBlockLanguages(input: Record<string, string> | Code
       }
       // Also map the lowercased name
       keyMap[lang.name.toLowerCase()] = canonical
+      if (lang.support) {
+        supportMap[canonical] = lang.support
+      }
     }
   } else {
     const firstKeyByLabel: Record<string, string> = {}
@@ -72,7 +81,7 @@ export function normalizeCodeBlockLanguages(input: Record<string, string> | Code
     }
   }
 
-  return { items, keyMap }
+  return { items, keyMap, supportMap }
 }
 
 /**

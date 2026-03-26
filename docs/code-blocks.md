@@ -133,6 +133,60 @@ import { languages } from '@codemirror/language-data'
 codeMirrorPlugin({ codeBlockLanguages: languages })
 ```
 
+### Pre-loaded language support
+
+When using the array format, you can provide a `support` property with a pre-loaded `LanguageSupport` instance. This is useful for languages that are not included in `@codemirror/language-data` and cannot be auto-loaded.
+
+When `support` is provided for a language, it takes priority over auto-loading. Languages without a `support` property will still be auto-loaded as usual, unless `autoLoadLanguageSupport` is set to `false` (see below).
+
+```tsx
+import { graphql } from 'cm6-graphql'
+
+codeMirrorPlugin({
+  codeBlockLanguages: [
+    { name: 'JavaScript', alias: ['js', 'javascript'] },
+    { name: 'CSS', alias: ['css'] },
+    { name: 'GraphQL', alias: ['graphql', 'gql'], support: graphql() }
+  ]
+})
+```
+
+### Custom CodeMirror extensions
+
+The `codeMirrorExtensions` option lets you pass additional CodeMirror extensions that will be applied to all code block editors. This can be used to add custom keymaps, themes, or other CodeMirror plugins.
+
+```tsx
+import { keymap, EditorView } from '@codemirror/view'
+import { toggleLineComment } from '@codemirror/commands'
+
+codeMirrorPlugin({
+  codeBlockLanguages: { js: 'JavaScript', css: 'CSS' },
+  codeMirrorExtensions: [
+    EditorView.theme({
+      '&': { backgroundColor: '#f5f5f5' },
+      '.cm-gutters': { backgroundColor: '#e8e8e8 !important' }
+    }),
+    keymap.of([{
+     key: 'Cmd-:', run: toggleLineComment
+    }]),
+  ]
+})
+```
+
+### Auto-loading language support
+
+By default, the plugin dynamically loads language support from `@codemirror/language-data` when a code block's language is recognized. You can disable this by setting `autoLoadLanguageSupport` to `false`. This is useful if you provide all language support manually via the `support` property or through `codeMirrorExtensions`.
+
+```tsx
+codeMirrorPlugin({
+  codeBlockLanguages: [
+    { name: 'Python', alias: ['py', 'python'], support: python() },
+    { name: 'GraphQL', alias: ['graphql', 'gql'], support: graphql() }
+  ],
+  autoLoadLanguageSupport: false
+})
+```
+
 ## Configuring the Sandpack editor
 
 Compared to the code mirror editor, the Sandpack one is a bit more complex, as Sandpack needs to know the context of the code block in order to execute it correctly. Before diving in, it's good to [understand Sandpack configuration](https://sandpack.codesandbox.io/) itself. MDXEditor supports multiple Sandpack configurations, based on the meta data of the code block. To configure the supported presets, pass a `sandpackConfig` option in the plugin initialization. For more details, refer to the [SandpackConfig interface](../api/editor.sandpackconfig) and the [SandpackPreset interface](../api/editor.sandpackpreset).
