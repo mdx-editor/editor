@@ -177,6 +177,16 @@ codeMirrorPlugin({
 
 By default, the plugin dynamically loads language support from `@codemirror/language-data` when a code block's language is recognized. You can disable this by setting `autoLoadLanguageSupport` to `false`. This is useful if you provide all language support manually via the `support` property or through `codeMirrorExtensions`.
 
+```tsx
+codeMirrorPlugin({
+  codeBlockLanguages: [
+    { name: 'Python', alias: ['py', 'python'], support: python() },
+    { name: 'GraphQL', alias: ['graphql', 'gql'], support: graphql() }
+  ],
+  autoLoadLanguageSupport: false
+})
+```
+
 ## Configuring the Sandpack editor
 
 Compared to the code mirror editor, the Sandpack one is a bit more complex, as Sandpack needs to know the context of the code block in order to execute it correctly. Before diving in, it's good to [understand Sandpack configuration](https://sandpack.codesandbox.io/) itself. MDXEditor supports multiple Sandpack configurations, based on the meta data of the code block. To configure the supported presets, pass a `sandpackConfig` option in the plugin initialization. For more details, refer to the [SandpackConfig interface](../api/editor.sandpackconfig) and the [SandpackPreset interface](../api/editor.sandpackpreset).
