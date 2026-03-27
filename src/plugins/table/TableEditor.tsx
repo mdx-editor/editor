@@ -290,7 +290,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
         <tfoot>
           <tr>
             <th></th>
-            <th colSpan={lexicalTable.getColCount()}>
+            <th colSpan={lexicalTable.getColCount()} data-tool-cell={true}>
               <button type="button" className={styles.addRowButton} onClick={addRowToBottom}>
                 {iconComponentFor('add_row')}
               </button>
