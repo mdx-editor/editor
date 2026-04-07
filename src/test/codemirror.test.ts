@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { normalizeCodeBlockLanguages, EMPTY_VALUE } from '../plugins/codemirror'
-import { LanguageSupport } from '@codemirror/language'
+import { normalizeCodeBlockLanguages, EMPTY_VALUE, type CodeBlockLanguageSupport } from '../plugins/codemirror'
 
 describe('normalizeCodeBlockLanguages', () => {
   describe('record format', () => {
@@ -73,25 +72,19 @@ describe('normalizeCodeBlockLanguages', () => {
 
   describe('supportMap', () => {
     it('stores support keyed by canonical key', () => {
-      const mockSupport = {} as LanguageSupport
-      const result = normalizeCodeBlockLanguages([
-        { name: 'JavaScript', alias: ['js', 'javascript'], support: mockSupport }
-      ])
+      const mockSupport: CodeBlockLanguageSupport = { extension: [] }
+      const result = normalizeCodeBlockLanguages([{ name: 'JavaScript', alias: ['js', 'javascript'], support: mockSupport }])
       expect(result.supportMap.js).toBe(mockSupport)
     })
 
     it('does not add entry when support is not provided', () => {
-      const result = normalizeCodeBlockLanguages([
-        { name: 'JavaScript', alias: ['js'] }
-      ])
+      const result = normalizeCodeBlockLanguages([{ name: 'JavaScript', alias: ['js'] }])
       expect(result.supportMap).toEqual({})
     })
 
     it('stores support using lowercased name when no aliases', () => {
-      const mockSupport = {} as LanguageSupport
-      const result = normalizeCodeBlockLanguages([
-        { name: 'Python', support: mockSupport }
-      ])
+      const mockSupport: CodeBlockLanguageSupport = { extension: [] }
+      const result = normalizeCodeBlockLanguages([{ name: 'Python', support: mockSupport }])
       expect(result.supportMap.python).toBe(mockSupport)
     })
 

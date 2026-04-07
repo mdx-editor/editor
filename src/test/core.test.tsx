@@ -4,8 +4,8 @@ import { MDXEditor, MDXEditorMethods } from '../'
 import { render } from '@testing-library/react'
 import { $getRoot, createEditor, ParagraphNode, TextNode } from 'lexical'
 import { QuoteNode } from '@lexical/rich-text'
-import { importMarkdownToLexical } from '../importMarkdownToLexical'
-import { exportMarkdownFromLexical } from '../exportMarkdownFromLexical'
+import { importMarkdownToLexical, type MarkdownParseOptions } from '../importMarkdownToLexical'
+import { exportMarkdownFromLexical, type ExportMarkdownFromLexicalOptions } from '../exportMarkdownFromLexical'
 import { MdastRootVisitor } from '../plugins/core/MdastRootVisitor'
 import { MdastParagraphVisitor } from '../plugins/core/MdastParagraphVisitor'
 import { MdastTextVisitor } from '../plugins/core/MdastTextVisitor'
@@ -49,6 +49,21 @@ describe('markdown import export', () => {
   })
 
   it('preserves empty lines inside blockquotes across lexical markdown round-trips', () => {
+    const mdastVisitors = [
+      MdastRootVisitor,
+      MdastParagraphVisitor,
+      MdastTextVisitor,
+      MdastBreakVisitor,
+      MdastBlockQuoteVisitor
+    ] as unknown as MarkdownParseOptions['visitors']
+    const lexicalVisitors = [
+      LexicalRootVisitor,
+      LexicalParagraphVisitor,
+      LexicalTextVisitor,
+      LexicalLinebreakVisitor,
+      LexicalQuoteVisitor
+    ] as unknown as ExportMarkdownFromLexicalOptions['visitors']
+
     const editor = createEditor({
       namespace: 'test-editor',
       nodes: [ParagraphNode, TextNode, QuoteNode],
@@ -66,7 +81,7 @@ describe('markdown import export', () => {
 > two
 >
 > three`,
-        visitors: [MdastRootVisitor, MdastParagraphVisitor, MdastTextVisitor, MdastBreakVisitor, MdastBlockQuoteVisitor] as any,
+        visitors: mdastVisitors,
         syntaxExtensions: [],
         mdastExtensions: [],
         jsxComponentDescriptors: [],
@@ -76,7 +91,7 @@ describe('markdown import export', () => {
 
       exportedMarkdown = exportMarkdownFromLexical({
         root: $getRoot(),
-        visitors: [LexicalRootVisitor, LexicalParagraphVisitor, LexicalTextVisitor, LexicalLinebreakVisitor, LexicalQuoteVisitor] as any,
+        visitors: lexicalVisitors,
         toMarkdownExtensions: [],
         toMarkdownOptions: {},
         jsxComponentDescriptors: [],

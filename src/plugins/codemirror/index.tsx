@@ -2,13 +2,20 @@ import { realmPlugin } from '../../RealmWithPlugins'
 import { Cell, Signal, map } from '@mdxeditor/gurx'
 import { CodeBlockEditorDescriptor, appendCodeBlockEditorDescriptor$, insertCodeBlock$ } from '../codeblock'
 import { CodeMirrorEditor } from './CodeMirrorEditor'
-import { Extension } from '@codemirror/state'
-import { LanguageSupport } from '@codemirror/language'
+import type { Extension } from '@codemirror/state'
 
 /**
  * @internal
  */
 export const EMPTY_VALUE = '__EMPTY_VALUE__'
+
+/**
+ * Compatible with CodeMirror `LanguageSupport` objects without exposing that package in the public API.
+ * @group CodeMirror
+ */
+export interface CodeBlockLanguageSupport {
+  extension: Extension
+}
 
 /**
  * A code block language entry with a name and optional aliases/extensions.
@@ -23,7 +30,7 @@ export interface CodeBlockLanguage {
   /** File extensions associated with this language (e.g. `["js", "mjs"]`). */
   extensions?: readonly string[]
   /** Pre-loaded language support. When provided, this is used directly instead of auto-loading. */
-  support?: LanguageSupport
+  support?: CodeBlockLanguageSupport
 }
 
 /**
@@ -36,7 +43,7 @@ export interface NormalizedCodeBlockLanguages {
   /** Maps any known key (canonical, alias, extension) to the canonical key. */
   keyMap: Record<string, string>
   /** Maps canonical keys to pre-loaded language support, when provided. */
-  supportMap: Record<string, LanguageSupport>
+  supportMap: Partial<Record<string, CodeBlockLanguageSupport>>
 }
 
 /**
@@ -46,7 +53,7 @@ export interface NormalizedCodeBlockLanguages {
 export function normalizeCodeBlockLanguages(input: Record<string, string> | CodeBlockLanguage[]): NormalizedCodeBlockLanguages {
   const items: { value: string; label: string }[] = []
   const keyMap: Record<string, string> = {}
-  const supportMap: Record<string, LanguageSupport> = {}
+  const supportMap: Partial<Record<string, CodeBlockLanguageSupport>> = {}
 
   if (Array.isArray(input)) {
     for (const lang of input) {

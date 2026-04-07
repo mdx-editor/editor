@@ -1,7 +1,7 @@
 import React from 'react'
 import { MDXEditor, codeBlockPlugin, codeMirrorPlugin } from '../'
 import { languages } from '@codemirror/language-data'
-import { python } from '@codemirror/lang-python'
+import { markdown } from '@codemirror/lang-markdown'
 import { EditorView, keymap } from '@codemirror/view'
 import { toggleLineComment } from '@codemirror/commands'
 
@@ -52,12 +52,13 @@ JS is **not** loaded:
 const x = 1
 \`\`\`
 
-Python support is loaded:
+Markdown support is loaded:
 
-\`\`\`python
-def greet(name):
-    message = f"Hello, {name}!"
-    print(message)
+\`\`\`markdown
+# Hello
+
+- one
+- two
 \`\`\`
 `
 
@@ -103,8 +104,7 @@ export function CodeMirrorLanguageArray() {
 }
 
 /**
- * Uses `CodeBlockLanguage[]` with pre-loaded `support` for Python.
- * JavaScript and CSS have no `support` and are auto-loaded as usual.
+ * Uses `CodeBlockLanguage[]` with pre-loaded `support` for Markdown.
  */
 export function CodeMirrorLanguageWithSupport() {
   return (
@@ -116,9 +116,9 @@ export function CodeMirrorLanguageWithSupport() {
         codeMirrorPlugin({
           codeBlockLanguages: [
             { name: 'JavaScript', alias: ['js', 'javascript'] },
-            { name: 'Python', alias: ['py', 'python'], support: python() }
+            { name: 'Markdown', alias: ['md', 'markdown'], support: markdown() }
           ],
-          // Disable auto-load to test support load is working well
+          // Disable auto-load to show only explicitly provided support is enabled.
           autoLoadLanguageSupport: false
         })
       ]}
