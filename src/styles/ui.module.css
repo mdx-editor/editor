@@ -64,7 +64,7 @@
   --accentText: var(--blue-11);
   --accentTextContrast: var(--blue-12);
 
-  --basePageBg: white;
+  --basePageBg: var(--slate-3);
   --baseBase: var(--slate-1);
   --baseBgSubtle: var(--slate-2);
   --baseBg: var(--slate-3);
