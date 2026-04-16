@@ -5,7 +5,7 @@ import React from 'react'
 
 import classNames from 'classnames'
 import { useCombobox } from 'downshift'
-import { editorRootElementRef$, iconComponentFor$, readOnly$ } from '../../core'
+import { editorRootElementRef$, iconComponentFor$, readOnly$, useTranslation } from '../../core'
 import styles from '../../../styles/ui.module.css'
 import { TooltipWrap } from './TooltipWrap'
 import { useCellValue, useCellValues } from '@mdxeditor/gurx'
@@ -63,7 +63,7 @@ export const DialogButton = React.forwardRef<
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Trigger asChild>
-        <RadixToolbar.Button className={styles.toolbarButton} ref={forwardedRef} disabled={readOnly}>
+        <RadixToolbar.Button aria-label={tooltipTitle} className={styles.toolbarButton} ref={forwardedRef} disabled={readOnly}>
           <TooltipWrap title={tooltipTitle}>{buttonContent}</TooltipWrap>
         </RadixToolbar.Button>
       </Dialog.Trigger>
@@ -90,6 +90,7 @@ const DialogForm: React.FC<{
 }> = ({ autocompleteSuggestions, onSubmitCallback, dialogInputPlaceholder, submitButtonTitle }) => {
   const [items, setItems] = React.useState(autocompleteSuggestions.slice(0, MAX_SUGGESTIONS))
   const iconComponentFor = useCellValue(iconComponentFor$)
+  const t = useTranslation()
 
   const enableAutoComplete = autocompleteSuggestions.length > 0
 
@@ -190,7 +191,9 @@ const DialogForm: React.FC<{
         {iconComponentFor('check')}
       </button>
 
-      <Dialog.Close className={styles.actionButton}>{iconComponentFor('close')}</Dialog.Close>
+      <Dialog.Close aria-label={t('dialog.close', 'Close dialog')} className={styles.actionButton}>
+        {iconComponentFor('close')}
+      </Dialog.Close>
     </form>
   )
 }

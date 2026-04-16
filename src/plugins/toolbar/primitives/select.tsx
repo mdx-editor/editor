@@ -76,7 +76,7 @@ export const SelectButtonTrigger: React.FC<{ children: React.ReactNode; title: s
   const [readOnly, iconComponentFor] = useCellValues(readOnly$, iconComponentFor$)
   return (
     <TooltipWrap title={title}>
-      <RadixSelect.Trigger className={classNames(styles.toolbarButtonSelectTrigger, className)} disabled={readOnly}>
+      <RadixSelect.Trigger aria-label={title} className={classNames(styles.toolbarButtonSelectTrigger, className)} disabled={readOnly}>
         {children}
         <RadixSelect.Icon className={styles.selectDropdownArrow}>{iconComponentFor('arrow_drop_down')}</RadixSelect.Icon>
       </RadixSelect.Trigger>
