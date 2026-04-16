@@ -30,7 +30,7 @@ function decorateWithRef<P extends { className?: string | undefined }>(
 function addTooltipToChildren<C extends React.ComponentType<{ children: React.ReactNode }>>(Component: C) {
   return ({ title, children, ...props }: React.ComponentProps<C> & { title: string }) => {
     return (
-      <Component {...(props as any)}>
+      <Component aria-label={title} {...(props as any)}>
         <TooltipWrap title={title}>{children}</TooltipWrap>
       </Component>
     )
