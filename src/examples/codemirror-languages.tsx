@@ -154,6 +154,49 @@ export function CodeMirrorExtensions() {
   )
 }
 
+const unknownLanguageSampleMarkdown = `
+Known \`js\` language:
+
+\`\`\`js
+const x = 1
+\`\`\`
+
+Unknown \`brainfuck\` language (rendered as plain text, no crash):
+
+\`\`\`brainfuck
+++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.
+\`\`\`
+
+No language at all:
+
+\`\`\`
+plain content
+\`\`\`
+`
+
+/**
+ * A code block whose language is not in the configured list falls back to a plain-text CodeMirror editor
+ * instead of crashing. The unknown language is shown as-is in the language select so the user can keep or change it.
+ */
+export function CodeMirrorUnknownLanguage() {
+  return (
+    <MDXEditor
+      onChange={console.log}
+      markdown={unknownLanguageSampleMarkdown}
+      plugins={[
+        codeBlockPlugin(),
+        codeMirrorPlugin({
+          codeBlockLanguages: [
+            { name: 'Plain text', alias: [''] },
+            { name: 'JavaScript', alias: ['js', 'javascript'] }
+          ],
+          autoLoadLanguageSupport: false
+        })
+      ]}
+    />
+  )
+}
+
 /**
  * Uses the legacy `Record<string, string>` format. Still works as before.
  */

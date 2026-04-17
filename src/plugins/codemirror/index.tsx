@@ -57,10 +57,13 @@ export function normalizeCodeBlockLanguages(input: Record<string, string> | Code
 
   if (Array.isArray(input)) {
     for (const lang of input) {
-      // The canonical key is the first alias, or the lowercased name
-      const canonical = lang.alias?.[0] ?? lang.name.toLowerCase()
+      // The canonical key is the first alias, or the lowercased name.
+      // Empty string canonical (e.g. Plain text with alias: ['']) is stored as EMPTY_VALUE
+      // because Radix Select does not accept items with an empty string value.
+      const rawCanonical = lang.alias?.[0] ?? lang.name.toLowerCase()
+      const canonical = rawCanonical || EMPTY_VALUE
       items.push({ value: canonical, label: lang.name })
-      keyMap[canonical] = canonical
+      keyMap[rawCanonical] = canonical
       if (lang.alias) {
         for (const alias of lang.alias) {
           keyMap[alias] = canonical
@@ -180,10 +183,10 @@ export const codeMirrorPlugin = realmPlugin<{
   }
 })
 
-function buildCodeBlockDescriptor(normalized: NormalizedCodeBlockLanguages): CodeBlockEditorDescriptor {
+function buildCodeBlockDescriptor(_normalized: NormalizedCodeBlockLanguages): CodeBlockEditorDescriptor {
   return {
-    match(language, meta) {
-      return Object.hasOwn(normalized.keyMap, language ?? '') && !meta
+    match(_language, meta) {
+      return !meta
     },
     priority: 1,
     Editor: CodeMirrorEditor

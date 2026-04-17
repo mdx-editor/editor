@@ -34,6 +34,17 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
   const editorViewRef = React.useRef<EditorView | null>(null)
   const elRef = React.useRef<HTMLDivElement | null>(null)
 
+  // Resolve the code block language to the canonical key used as the select item value.
+  // Falls back to the raw language when it is not configured, so unknown languages still appear
+  // as a (temporary) item in the dropdown instead of leaving the select unselected.
+  const selectValue = codeBlockLanguages.keyMap[language] ?? language
+  const selectItems = React.useMemo(() => {
+    if (!selectValue || codeBlockLanguages.items.some((item) => item.value === selectValue)) {
+      return codeBlockLanguages.items
+    }
+    return [...codeBlockLanguages.items, { value: selectValue, label: language }]
+  }, [codeBlockLanguages, selectValue, language])
+
   const setCodeRef = React.useRef(setCode)
   setCodeRef.current = setCode
   codeMirrorRef.current = {
@@ -104,7 +115,7 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
       <div className={styles.codeMirrorToolbar}>
         <Select
           disabled={readOnly}
-          value={codeBlockLanguages.keyMap[language] ?? language}
+          value={selectValue}
           onChange={(language) => {
             parentEditor.update(() => {
               lexicalNode.setLanguage(language === EMPTY_VALUE ? '' : language)
@@ -117,7 +128,7 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
           }}
           triggerTitle={t('codeBlock.selectLanguage', 'Select code block language')}
           placeholder={t('codeBlock.inlineLanguage', 'Language')}
-          items={codeBlockLanguages.items}
+          items={selectItems}
         />
         <button
           className={styles.iconButton}
