@@ -34,4 +34,27 @@ describe('jsx markdown import export', () => {
     const processedMarkdown = ref.current?.getMarkdown().trim()
     expect(processedMarkdown).toEqual(markdown.trim())
   })
+
+  it('routes capitalized jsx components sharing an html tag name to the jsx visitor', () => {
+    const descriptors: JsxComponentDescriptor[] = [
+      {
+        name: 'Section',
+        kind: 'text',
+        props: [],
+        hasChildren: true,
+        Editor: GenericJsxEditor
+      }
+    ]
+    const { container } = render(
+      <MDXEditor markdown={`<Section>Section content</Section>`} plugins={[jsxPlugin({ jsxComponentDescriptors: descriptors })]} />
+    )
+    expect(container.querySelector('section')).toBeNull()
+  })
+
+  it('keeps lowercase html tag names on the html path even with a jsx plugin', () => {
+    const { container } = render(
+      <MDXEditor markdown={`<section>Section content</section>`} plugins={[jsxPlugin({ jsxComponentDescriptors: [] })]} />
+    )
+    expect(container.querySelector('section')).not.toBeNull()
+  })
 })

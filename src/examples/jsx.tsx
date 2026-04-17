@@ -331,3 +331,29 @@ Hello from <Buzz />
     </div>
   )
 }
+
+const htmlTagNameDescriptors: JsxComponentDescriptor[] = [
+  {
+    name: 'Section',
+    kind: 'text',
+    source: './external',
+    props: [
+      { name: 'foo', type: 'string' },
+      { name: 'bar', type: 'string' }
+    ],
+    hasChildren: true,
+    Editor: GenericJsxEditor
+  }
+]
+
+export const HtmlTagNames = () => {
+  const markdown = `Known jsx component with name of HTML tag:
+
+<Section>Section content</Section>
+
+Unknown jsx component with name of HTML tag:
+
+<Button>Click me</Button>
+`
+  return <MDXEditor markdown={markdown} plugins={[jsxPlugin({ jsxComponentDescriptors: htmlTagNameDescriptors })]} />
+}
