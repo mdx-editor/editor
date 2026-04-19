@@ -1,5 +1,5 @@
 import React from 'react'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { GenericJsxEditor, JsxComponentDescriptor, MDXEditor, MDXEditorMethods, jsxPlugin } from '../'
 import { render, act } from '@testing-library/react'
 
@@ -18,6 +18,10 @@ const jsxComponentDescriptors: JsxComponentDescriptor[] = [
     Editor: GenericJsxEditor
   }
 ]
+
+afterEach(() => {
+  vi.restoreAllMocks()
+})
 
 describe('jsx markdown import export', () => {
   // produces a warning about act
@@ -56,5 +60,37 @@ describe('jsx markdown import export', () => {
       <MDXEditor markdown={`<section>Section content</section>`} plugins={[jsxPlugin({ jsxComponentDescriptors: [] })]} />
     )
     expect(container.querySelector('section')).not.toBeNull()
+  })
+
+  it('registers nested capitalized JSX children that share an html tag name on export', async () => {
+    const ref = React.createRef<MDXEditorMethods>()
+    const descriptors: JsxComponentDescriptor[] = [
+      {
+        name: 'Wrapper',
+        kind: 'text',
+        source: './components',
+        props: [],
+        hasChildren: true,
+        Editor: GenericJsxEditor
+      },
+      {
+        name: 'Section',
+        kind: 'text',
+        source: './components',
+        props: [],
+        hasChildren: false,
+        Editor: GenericJsxEditor
+      }
+    ]
+
+    act(() => {
+      render(<MDXEditor ref={ref} markdown={`<Wrapper><Section /></Wrapper>`} plugins={[jsxPlugin({ jsxComponentDescriptors: descriptors })]} />)
+    })
+    await new Promise((resolve) => setTimeout(resolve, 100))
+
+    const processedMarkdown = ref.current?.getMarkdown() ?? ''
+
+    expect(processedMarkdown).toContain(`import { Wrapper, Section } from './components'`)
+    expect(processedMarkdown).toContain(`<Wrapper><Section /></Wrapper>`)
   })
 })
