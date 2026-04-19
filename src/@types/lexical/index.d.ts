@@ -7,6 +7,7 @@ declare module 'lexical' {
 
   export interface EditorThemeClasses {
     admonition?: Record<AdmonitionKind, string>
+    quote?: string
     text?: Record<string, string>
     list?: Record<string, string | Record<string, string>>
   }
