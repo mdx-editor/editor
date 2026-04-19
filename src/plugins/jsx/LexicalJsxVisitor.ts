@@ -3,7 +3,7 @@ import { $isLexicalJsxNode, LexicalJsxNode } from './LexicalJsxNode'
 import { LexicalExportVisitor } from '../../exportMarkdownFromLexical'
 import * as Mdast from 'mdast'
 import { isMdastJsxNode } from '.'
-import { htmlTags } from '../core'
+import { isHtmlTagName } from './jsxTagName'
 
 export const LexicalJsxVisitor: LexicalExportVisitor<LexicalJsxNode, MdxJsxFlowElement | MdxJsxTextElement> = {
   testLexicalNode: $isLexicalJsxNode,
@@ -11,7 +11,7 @@ export const LexicalJsxVisitor: LexicalExportVisitor<LexicalJsxNode, MdxJsxFlowE
     function traverseNestedJsxNodes(node: Mdast.Nodes) {
       if ('children' in node && node.children instanceof Array) {
         node.children.forEach((child: Mdast.Nodes) => {
-          if (isMdastJsxNode(child) && !htmlTags.includes(child.name!.toLowerCase())) {
+          if (isMdastJsxNode(child) && !isHtmlTagName(child.name!)) {
             actions.registerReferredComponent(child.name!)
           }
           traverseNestedJsxNodes(child)
