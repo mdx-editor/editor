@@ -9,3 +9,4 @@ uploads
 tsdoc-metadata.json
 .vscode
 .env
+.vs
