@@ -12,7 +12,13 @@ import { indentWithTab } from '@codemirror/commands'
 import { basicLight } from 'cm6-theme-basic-light'
 import { basicSetup } from 'codemirror'
 import { $setSelection } from 'lexical'
-import { EMPTY_VALUE, codeBlockLanguages$, codeMirrorAutoLoadLanguageSupport$, codeMirrorExtensions$, getCodeBlockLanguageSelectData } from '.'
+import {
+  EMPTY_VALUE,
+  codeBlockLanguages$,
+  codeMirrorAutoLoadLanguageSupport$,
+  codeMirrorExtensions$,
+  getCodeBlockLanguageSelectData
+} from '.'
 import { useCodeMirrorRef } from '../sandpack/useCodeMirrorRef'
 import { Select } from '../toolbar/primitives/select'
 

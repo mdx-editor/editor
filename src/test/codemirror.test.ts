@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { getCodeBlockLanguageSelectData, normalizeCodeBlockLanguages, EMPTY_VALUE, type CodeBlockLanguageSupport } from '../plugins/codemirror'
+import {
+  getCodeBlockLanguageSelectData,
+  normalizeCodeBlockLanguages,
+  EMPTY_VALUE,
+  type CodeBlockLanguageSupport
+} from '../plugins/codemirror'
 
 describe('normalizeCodeBlockLanguages', () => {
   describe('record format', () => {

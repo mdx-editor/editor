@@ -1,7 +1,7 @@
 import React from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { GenericJsxEditor, JsxComponentDescriptor, MDXEditor, MDXEditorMethods, jsxPlugin } from '../'
-import { render, act } from '@testing-library/react'
+import { render, act, waitFor } from '@testing-library/react'
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 ;(globalThis as any).IS_REACT_ACT_ENVIRONMENT = true
@@ -23,6 +23,12 @@ afterEach(() => {
   vi.restoreAllMocks()
 })
 
+const flushEditorUpdates = async () => {
+  await act(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 0))
+  })
+}
+
 describe('jsx markdown import export', () => {
   // produces a warning about act
   it.todo('skips jsx import if not specified', async () => {
@@ -39,7 +45,7 @@ describe('jsx markdown import export', () => {
     expect(processedMarkdown).toEqual(markdown.trim())
   })
 
-  it('routes capitalized jsx components sharing an html tag name to the jsx visitor', () => {
+  it('routes capitalized jsx components sharing an html tag name to the jsx visitor', async () => {
     const descriptors: JsxComponentDescriptor[] = [
       {
         name: 'Section',
@@ -52,6 +58,7 @@ describe('jsx markdown import export', () => {
     const { container } = render(
       <MDXEditor markdown={`<Section>Section content</Section>`} plugins={[jsxPlugin({ jsxComponentDescriptors: descriptors })]} />
     )
+    await flushEditorUpdates()
     expect(container.querySelector('section')).toBeNull()
   })
 
@@ -84,9 +91,13 @@ describe('jsx markdown import export', () => {
     ]
 
     act(() => {
-      render(<MDXEditor ref={ref} markdown={`<Wrapper><Section /></Wrapper>`} plugins={[jsxPlugin({ jsxComponentDescriptors: descriptors })]} />)
+      render(
+        <MDXEditor ref={ref} markdown={`<Wrapper><Section /></Wrapper>`} plugins={[jsxPlugin({ jsxComponentDescriptors: descriptors })]} />
+      )
     })
-    await new Promise((resolve) => setTimeout(resolve, 100))
+    await waitFor(() => {
+      expect(ref.current?.getMarkdown() ?? '').toContain(`import { Wrapper, Section } from './components'`)
+    })
 
     const processedMarkdown = ref.current?.getMarkdown() ?? ''
 
