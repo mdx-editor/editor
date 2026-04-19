@@ -123,7 +123,9 @@ codeMirrorPlugin({
 })
 ```
 
-With the array format, all aliases and extensions are recognized when matching code blocks, but the language select dropdown shows only one entry per language. This is especially useful when your markdown may use different identifiers for the same language (e.g. `js` vs `javascript`).
+With the array format, all aliases and extensions are recognized when resolving code block languages, but the language select dropdown shows only one entry per language. This is especially useful when your markdown may use different identifiers for the same language (e.g. `js` vs `javascript`).
+
+If a fenced code block has no `meta`, the CodeMirror editor acts as the default editor even when its language is not listed in `codeBlockLanguages`. In that case, the block falls back to plain-text editing and the unknown language is shown as a temporary item in the language picker so the user can keep it or switch to a configured language.
 
 You can also pass the `languages` array from `@codemirror/language-data` directly to support all CodeMirror languages:
 

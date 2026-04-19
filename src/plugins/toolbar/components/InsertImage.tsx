@@ -18,6 +18,7 @@ export const InsertImage = React.forwardRef<HTMLButtonElement, Record<string, ne
 
   return (
     <RadixToolbar.Button
+      aria-label={t('toolbar.image', 'Insert image')}
       className={styles.toolbarButton}
       ref={forwardedRef}
       disabled={readOnly}

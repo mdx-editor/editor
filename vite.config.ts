@@ -16,8 +16,6 @@ const packageJson = JSON.parse(readFileSync('./package.json', 'utf-8')) as {
   peerDependencies: Record<string, string>
 }
 
-const IN_LADLE = process.env['LADLE']
-
 const externalPackages = [
   ...Object.keys(packageJson.dependencies),
   ...Object.keys(packageJson.peerDependencies),
@@ -29,7 +27,7 @@ const externalPackages = [
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    react(IN_LADLE ? {} : { jsxRuntime: 'classic' } as const),
+    react({ jsxRuntime: 'classic' } as const),
     dts({
       rollupTypes: true,
       staticImport: true,

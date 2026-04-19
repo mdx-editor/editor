@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { normalizeCodeBlockLanguages, EMPTY_VALUE, type CodeBlockLanguageSupport } from '../plugins/codemirror'
+import {
+  getCodeBlockLanguageSelectData,
+  normalizeCodeBlockLanguages,
+  EMPTY_VALUE,
+  type CodeBlockLanguageSupport
+} from '../plugins/codemirror'
 
 describe('normalizeCodeBlockLanguages', () => {
   describe('record format', () => {
@@ -68,6 +73,18 @@ describe('normalizeCodeBlockLanguages', () => {
       const result = normalizeCodeBlockLanguages([{ name: 'JavaScript', alias: ['js'] }])
       expect(result.keyMap.javascript).toBe('js')
     })
+
+    it('maps empty-string canonical to EMPTY_VALUE sentinel', () => {
+      const result = normalizeCodeBlockLanguages([
+        { name: 'Plain text', alias: [''] },
+        { name: 'JavaScript', alias: ['js'] }
+      ])
+      expect(result.items).toEqual([
+        { value: EMPTY_VALUE, label: 'Plain text' },
+        { value: 'js', label: 'JavaScript' }
+      ])
+      expect(result.keyMap['']).toBe(EMPTY_VALUE)
+    })
   })
 
   describe('supportMap', () => {
@@ -105,6 +122,60 @@ describe('normalizeCodeBlockLanguages', () => {
       const result = normalizeCodeBlockLanguages([])
       expect(result.items).toEqual([])
       expect(result.keyMap).toEqual({})
+    })
+  })
+
+  describe('unknown language', () => {
+    it('returns undefined from keyMap for an unknown language (record format)', () => {
+      const result = normalizeCodeBlockLanguages({ js: 'JavaScript' })
+      expect(result.keyMap.brainfuck).toBeUndefined()
+      expect(Object.hasOwn(result.keyMap, 'brainfuck')).toBe(false)
+    })
+
+    it('returns undefined from keyMap for an unknown language (array format)', () => {
+      const result = normalizeCodeBlockLanguages([{ name: 'JavaScript', alias: ['js'], extensions: ['js', 'mjs'] }])
+      expect(result.keyMap.brainfuck).toBeUndefined()
+      expect(Object.hasOwn(result.keyMap, 'brainfuck')).toBe(false)
+    })
+
+    it('returns undefined from supportMap for an unknown language', () => {
+      const mockSupport: CodeBlockLanguageSupport = { extension: [] }
+      const result = normalizeCodeBlockLanguages([{ name: 'JavaScript', alias: ['js'], support: mockSupport }])
+      expect(result.supportMap.brainfuck).toBeUndefined()
+    })
+
+    it('does not include an unknown language in items', () => {
+      const result = normalizeCodeBlockLanguages([{ name: 'JavaScript', alias: ['js'] }])
+      expect(result.items.find((item) => item.value === 'brainfuck')).toBeUndefined()
+    })
+  })
+})
+
+describe('getCodeBlockLanguageSelectData', () => {
+  it('returns configured items for a known language', () => {
+    const normalized = normalizeCodeBlockLanguages([{ name: 'JavaScript', alias: ['js'] }])
+    expect(getCodeBlockLanguageSelectData(normalized, 'js')).toEqual({
+      value: 'js',
+      items: [{ value: 'js', label: 'JavaScript' }]
+    })
+  })
+
+  it('adds a temporary item for an unknown language', () => {
+    const normalized = normalizeCodeBlockLanguages([{ name: 'JavaScript', alias: ['js'] }])
+    expect(getCodeBlockLanguageSelectData(normalized, 'brainfuck')).toEqual({
+      value: 'brainfuck',
+      items: [
+        { value: 'js', label: 'JavaScript' },
+        { value: 'brainfuck', label: 'brainfuck' }
+      ]
+    })
+  })
+
+  it('keeps the empty-language sentinel intact', () => {
+    const normalized = normalizeCodeBlockLanguages([{ name: 'Plain text', alias: [''] }])
+    expect(getCodeBlockLanguageSelectData(normalized, '')).toEqual({
+      value: EMPTY_VALUE,
+      items: [{ value: EMPTY_VALUE, label: 'Plain text' }]
     })
   })
 })
