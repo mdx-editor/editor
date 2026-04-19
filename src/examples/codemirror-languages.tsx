@@ -1,5 +1,5 @@
 import React from 'react'
-import { MDXEditor, codeBlockPlugin, codeMirrorPlugin } from '../'
+import { ChangeCodeMirrorLanguage, ConditionalContents, MDXEditor, codeBlockPlugin, codeMirrorPlugin, toolbarPlugin } from '../'
 import { languages } from '@codemirror/language-data'
 import { markdown } from '@codemirror/lang-markdown'
 import { EditorView, keymap } from '@codemirror/view'
@@ -62,6 +62,21 @@ Markdown support is loaded:
 \`\`\`
 `
 
+function codeBlockLanguageToolbar() {
+  return toolbarPlugin({
+    toolbarContents: () => (
+      <ConditionalContents
+        options={[
+          { when: (editor) => editor?.editorType === 'codeblock', contents: () => <ChangeCodeMirrorLanguage /> },
+          {
+            fallback: () => <span>Focus a code block to edit its language from the toolbar.</span>
+          }
+        ]}
+      />
+    )
+  })
+}
+
 /**
  * Uses the CodeMirror `languages` array directly from `@codemirror/language-data`.
  * All aliases and extensions are recognized in the language select.
@@ -72,6 +87,7 @@ export function CodeMirrorLanguageData() {
       onChange={console.log}
       markdown={aliasSampleMarkdown}
       plugins={[
+        codeBlockLanguageToolbar(),
         codeBlockPlugin(),
         codeMirrorPlugin({
           codeBlockLanguages: languages
@@ -91,6 +107,7 @@ export function CodeMirrorLanguageArray() {
       onChange={console.log}
       markdown={aliasSampleMarkdown}
       plugins={[
+        codeBlockLanguageToolbar(),
         codeBlockPlugin(),
         codeMirrorPlugin({
           codeBlockLanguages: [
@@ -112,6 +129,7 @@ export function CodeMirrorLanguageWithSupport() {
       onChange={console.log}
       markdown={supportSampleMarkdown}
       plugins={[
+        codeBlockLanguageToolbar(),
         codeBlockPlugin(),
         codeMirrorPlugin({
           codeBlockLanguages: [
@@ -136,6 +154,7 @@ export function CodeMirrorExtensions() {
       onChange={console.log}
       markdown={simpleSampleMarkdown}
       plugins={[
+        codeBlockLanguageToolbar(),
         codeBlockPlugin(),
         codeMirrorPlugin({
           codeBlockLanguages: { js: 'JavaScript', ts: 'TypeScript' },
@@ -184,6 +203,7 @@ export function CodeMirrorUnknownLanguage() {
       onChange={console.log}
       markdown={unknownLanguageSampleMarkdown}
       plugins={[
+        codeBlockLanguageToolbar(),
         codeBlockPlugin(),
         codeMirrorPlugin({
           codeBlockLanguages: [
@@ -206,6 +226,7 @@ export function CodeMirrorLanguageRecord() {
       onChange={console.log}
       markdown={aliasSampleMarkdown}
       plugins={[
+        codeBlockLanguageToolbar(),
         codeBlockPlugin(),
         codeMirrorPlugin({
           codeBlockLanguages: { js: 'JavaScript', javascript: 'JavaScript', ts: 'TypeScript', typescript: 'TypeScript' }

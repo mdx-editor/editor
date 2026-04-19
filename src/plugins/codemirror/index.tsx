@@ -95,6 +95,25 @@ export function normalizeCodeBlockLanguages(input: Record<string, string> | Code
 }
 
 /**
+ * Resolves the current language to the select value and items used by CodeMirror language pickers.
+ * Unknown languages are added as a temporary item so the picker remains in sync with the code block value.
+ */
+export function getCodeBlockLanguageSelectData(
+  normalized: NormalizedCodeBlockLanguages,
+  language: string
+): { value: string; items: { value: string; label: string }[] } {
+  const value = normalized.keyMap[language] ?? language
+  if (!value || normalized.items.some((item) => item.value === value)) {
+    return { value, items: normalized.items }
+  }
+
+  return {
+    value,
+    items: [...normalized.items, { value, label: language }]
+  }
+}
+
+/**
  * The normalized code block languages used by the CodeMirror editor.
  * @group CodeMirror
  */

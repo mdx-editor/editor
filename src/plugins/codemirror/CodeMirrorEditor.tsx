@@ -12,7 +12,7 @@ import { indentWithTab } from '@codemirror/commands'
 import { basicLight } from 'cm6-theme-basic-light'
 import { basicSetup } from 'codemirror'
 import { $setSelection } from 'lexical'
-import { EMPTY_VALUE, codeBlockLanguages$, codeMirrorAutoLoadLanguageSupport$, codeMirrorExtensions$ } from '.'
+import { EMPTY_VALUE, codeBlockLanguages$, codeMirrorAutoLoadLanguageSupport$, codeMirrorExtensions$, getCodeBlockLanguageSelectData } from '.'
 import { useCodeMirrorRef } from '../sandpack/useCodeMirrorRef'
 import { Select } from '../toolbar/primitives/select'
 
@@ -34,16 +34,10 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
   const editorViewRef = React.useRef<EditorView | null>(null)
   const elRef = React.useRef<HTMLDivElement | null>(null)
 
-  // Resolve the code block language to the canonical key used as the select item value.
-  // Falls back to the raw language when it is not configured, so unknown languages still appear
-  // as a (temporary) item in the dropdown instead of leaving the select unselected.
-  const selectValue = codeBlockLanguages.keyMap[language] ?? language
-  const selectItems = React.useMemo(() => {
-    if (!selectValue || codeBlockLanguages.items.some((item) => item.value === selectValue)) {
-      return codeBlockLanguages.items
-    }
-    return [...codeBlockLanguages.items, { value: selectValue, label: language }]
-  }, [codeBlockLanguages, selectValue, language])
+  const { value: selectValue, items: selectItems } = React.useMemo(
+    () => getCodeBlockLanguageSelectData(codeBlockLanguages, language),
+    [codeBlockLanguages, language]
+  )
 
   const setCodeRef = React.useRef(setCode)
   setCodeRef.current = setCode
