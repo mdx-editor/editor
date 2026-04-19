@@ -2,7 +2,7 @@ import { useCellValues } from '@mdxeditor/gurx'
 import React from 'react'
 import styles from '../../../styles/ui.module.css'
 import { $isCodeBlockNode } from '../../codeblock/CodeBlockNode'
-import { EMPTY_VALUE, codeBlockLanguages$ } from '../../codemirror'
+import { EMPTY_VALUE, codeBlockLanguages$, getCodeBlockLanguageSelectData } from '../../codemirror'
 import { activeEditor$, editorInFocus$, useTranslation } from '../../core'
 import { Select } from '.././primitives/select'
 
@@ -22,15 +22,12 @@ export const ChangeCodeMirrorLanguage = () => {
   }
 
   const rawLanguage = codeBlockNode.getLanguage()
-  let currentLanguage = codeBlockLanguages.keyMap[rawLanguage] ?? rawLanguage
-  if (currentLanguage === '') {
-    currentLanguage = EMPTY_VALUE
-  }
+  const { value: currentLanguage, items } = getCodeBlockLanguageSelectData(codeBlockLanguages, rawLanguage)
   return (
     <div className={styles.selectWithLabel}>
       <label>{t('codeBlock.language', 'Code block language')}</label>
       <Select
-        value={currentLanguage}
+        value={currentLanguage || EMPTY_VALUE}
         onChange={(language) => {
           theEditor?.update(() => {
             codeBlockNode.setLanguage(language === EMPTY_VALUE ? '' : language)
@@ -43,7 +40,7 @@ export const ChangeCodeMirrorLanguage = () => {
         }}
         triggerTitle={t('codeBlock.selectLanguage', 'Select code block language')}
         placeholder={t('codeBlock.language', 'Code block language')}
-        items={codeBlockLanguages.items}
+        items={items}
       />
     </div>
   )

@@ -14,8 +14,8 @@ export const MdastCodeVisitor: MdastImportVisitor<Mdast.Code> = {
     actions.addAndStepInto(
       $createCodeBlockNode({
         code: mdastNode.value,
-        language: mdastNode.lang!,
-        meta: mdastNode.meta!
+        language: mdastNode.lang ?? '',
+        meta: mdastNode.meta ?? ''
       })
     )
   }

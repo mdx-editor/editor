@@ -12,7 +12,7 @@ import { indentWithTab } from '@codemirror/commands'
 import { basicLight } from 'cm6-theme-basic-light'
 import { basicSetup } from 'codemirror'
 import { $setSelection } from 'lexical'
-import { EMPTY_VALUE, codeBlockLanguages$, codeMirrorAutoLoadLanguageSupport$, codeMirrorExtensions$ } from '.'
+import { EMPTY_VALUE, codeBlockLanguages$, codeMirrorAutoLoadLanguageSupport$, codeMirrorExtensions$, getCodeBlockLanguageSelectData } from '.'
 import { useCodeMirrorRef } from '../sandpack/useCodeMirrorRef'
 import { Select } from '../toolbar/primitives/select'
 
@@ -33,6 +33,11 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
   const { setCode } = useCodeBlockEditorContext()
   const editorViewRef = React.useRef<EditorView | null>(null)
   const elRef = React.useRef<HTMLDivElement | null>(null)
+
+  const { value: selectValue, items: selectItems } = React.useMemo(
+    () => getCodeBlockLanguageSelectData(codeBlockLanguages, language),
+    [codeBlockLanguages, language]
+  )
 
   const setCodeRef = React.useRef(setCode)
   setCodeRef.current = setCode
@@ -104,7 +109,7 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
       <div className={styles.codeMirrorToolbar}>
         <Select
           disabled={readOnly}
-          value={codeBlockLanguages.keyMap[language] ?? language}
+          value={selectValue}
           onChange={(language) => {
             parentEditor.update(() => {
               lexicalNode.setLanguage(language === EMPTY_VALUE ? '' : language)
@@ -117,7 +122,7 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
           }}
           triggerTitle={t('codeBlock.selectLanguage', 'Select code block language')}
           placeholder={t('codeBlock.inlineLanguage', 'Language')}
-          items={codeBlockLanguages.items}
+          items={selectItems}
         />
         <button
           className={styles.iconButton}

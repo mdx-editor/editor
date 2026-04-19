@@ -57,10 +57,13 @@ export function normalizeCodeBlockLanguages(input: Record<string, string> | Code
 
   if (Array.isArray(input)) {
     for (const lang of input) {
-      // The canonical key is the first alias, or the lowercased name
-      const canonical = lang.alias?.[0] ?? lang.name.toLowerCase()
+      // The canonical key is the first alias, or the lowercased name.
+      // Empty string canonical (e.g. Plain text with alias: ['']) is stored as EMPTY_VALUE
+      // because Radix Select does not accept items with an empty string value.
+      const rawCanonical = lang.alias?.[0] ?? lang.name.toLowerCase()
+      const canonical = rawCanonical || EMPTY_VALUE
       items.push({ value: canonical, label: lang.name })
-      keyMap[canonical] = canonical
+      keyMap[rawCanonical] = canonical
       if (lang.alias) {
         for (const alias of lang.alias) {
           keyMap[alias] = canonical
@@ -89,6 +92,25 @@ export function normalizeCodeBlockLanguages(input: Record<string, string> | Code
   }
 
   return { items, keyMap, supportMap }
+}
+
+/**
+ * Resolves the current language to the select value and items used by CodeMirror language pickers.
+ * Unknown languages are added as a temporary item so the picker remains in sync with the code block value.
+ */
+export function getCodeBlockLanguageSelectData(
+  normalized: NormalizedCodeBlockLanguages,
+  language: string
+): { value: string; items: { value: string; label: string }[] } {
+  const value = normalized.keyMap[language] ?? language
+  if (!value || normalized.items.some((item) => item.value === value)) {
+    return { value, items: normalized.items }
+  }
+
+  return {
+    value,
+    items: [...normalized.items, { value, label: language }]
+  }
 }
 
 /**
@@ -180,10 +202,10 @@ export const codeMirrorPlugin = realmPlugin<{
   }
 })
 
-function buildCodeBlockDescriptor(normalized: NormalizedCodeBlockLanguages): CodeBlockEditorDescriptor {
+function buildCodeBlockDescriptor(_normalized: NormalizedCodeBlockLanguages): CodeBlockEditorDescriptor {
   return {
-    match(language, meta) {
-      return Object.hasOwn(normalized.keyMap, language ?? '') && !meta
+    match(_language, meta) {
+      return !meta
     },
     priority: 1,
     Editor: CodeMirrorEditor
