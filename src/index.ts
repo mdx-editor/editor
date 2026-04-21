@@ -79,6 +79,8 @@ export * from './plugins/markdown-shortcut'
 
 export * from './plugins/search'
 
+export * from './plugins/collapsible-sections'
+
 // Toolbar components
 export * from './plugins/toolbar/components/BlockTypeSelect'
 export * from './plugins/toolbar/components/BoldItalicUnderlineToggles'
