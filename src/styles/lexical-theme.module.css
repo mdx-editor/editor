@@ -57,10 +57,10 @@
 }
 
 .quote {
-  border-left: 3px solid var(--baseBorder);
-  padding-left: var(--spacing-4);
-  margin-left: 0;
-  color: var(--baseTextSubtle);
+  border-inline-start: 3px solid var(--baseBorder);
+  padding-inline-start: var(--spacing-4);
+  margin-inline-start: 0;
+  color: var(--baseText);
 }
 
 .nestedListItem {
