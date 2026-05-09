@@ -19,7 +19,7 @@ import {
   codeMirrorExtensions$,
   getCodeBlockLanguageSelectData
 } from '.'
-import { useCodeMirrorRef } from '../sandpack/useCodeMirrorRef'
+import { useCodeMirrorRef } from './useCodeMirrorRef'
 import { Select } from '../toolbar/primitives/select'
 
 export const COMMON_STATE_CONFIG_EXTENSIONS: Extension[] = []
@@ -35,7 +35,7 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
     codeBlockLanguages$
   )
 
-  const codeMirrorRef = useCodeMirrorRef(nodeKey, 'codeblock', language, focusEmitter)
+  const codeMirrorRef = useCodeMirrorRef(nodeKey, language, focusEmitter)
   const { setCode } = useCodeBlockEditorContext()
   const editorViewRef = React.useRef<EditorView | null>(null)
   const elRef = React.useRef<HTMLDivElement | null>(null)
@@ -48,7 +48,7 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
   const setCodeRef = React.useRef(setCode)
   setCodeRef.current = setCode
   codeMirrorRef.current = {
-    getCodemirror: () => editorViewRef.current as any
+    getCodemirror: () => editorViewRef.current
   }
 
   React.useEffect(() => {

@@ -12,7 +12,7 @@ Markdown content has multiple applications, so the editor component itself is de
 
 ## Architecture at a glance
 
-The rich text editor engine is built on top of the [Lexical](https://lexical.dev/) editor framework. Unlike other similar solutions, Lexical supports complex nested editors for a specific purpose, like tables, code blocks, or even code blocks with live preview.
+The rich text editor engine is built on top of the [Lexical](https://lexical.dev/) editor framework. Unlike other similar solutions, Lexical supports complex nested editors for a specific purpose, like tables, code blocks, or custom block editors.
 
 MDXEditor's markdown processing is built on top of the [MDAST family of packages](https://github.com/syntax-tree/mdast#list-of-utilities). The component implements a bi-directional conversion between the Markdown Abstract Syntax Tree (MDAST) and the Lexical AST by traversing each tree through a set of visitors that convert the nodes of one tree into the other. Depending on their purpose, some MDXEditor plugins extend the tree conversion by adding additional MDAST and/or Lexical AST visitors, and by adding additional Lexical nodes.
 

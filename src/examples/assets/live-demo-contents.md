@@ -46,14 +46,14 @@ export default function App() {
 }
 ```
 
-## A live code example
+## A code example
 
-The block below is a live React component. You can configure multiple live code presets that specify the available npm packages and the default imports. You can also specify a default component that will be rendered in the live code block.
+The block below is an editable React code sample.
 
-```jsx live
+```jsx
 export default function App() {
   return (<div>
-  <p>This is a live React component, that's being previewed in codesandbox. </p>
+  <p>This is an editable React component. </p>
   <p>Editing it will update the fenced codeblock in the markdown.</p>
   </div>)
 }

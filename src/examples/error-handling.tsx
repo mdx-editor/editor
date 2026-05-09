@@ -6,7 +6,6 @@ import {
   DiffSourceToggleWrapper,
   MDXEditor,
   MdastImportVisitor,
-  ShowSandpackInfo,
   UndoRedo,
   addImportVisitor$,
   diffSourcePlugin,
@@ -50,7 +49,6 @@ export function MissingPlugins() {
               <ConditionalContents
                 options={[
                   { when: (editor) => editor?.editorType === 'codeblock', contents: () => <ChangeCodeMirrorLanguage /> },
-                  { when: (editor) => editor?.editorType === 'sandpack', contents: () => <ShowSandpackInfo /> },
                   {
                     fallback: () => (
                       <>
@@ -103,7 +101,6 @@ export function CatchAllPlugin() {
               <ConditionalContents
                 options={[
                   { when: (editor) => editor?.editorType === 'codeblock', contents: () => <ChangeCodeMirrorLanguage /> },
-                  { when: (editor) => editor?.editorType === 'sandpack', contents: () => <ShowSandpackInfo /> },
                   {
                     fallback: () => (
                       <>

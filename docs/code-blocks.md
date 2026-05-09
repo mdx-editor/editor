@@ -6,36 +6,9 @@ position: 0.6
 
 # Code blocks
 
-The code block plugin enables support for fenced code blocks, but does not include any code editing UI. The `codeMirrorPlugin` and the `sandpackPlugin` build on top of it to provide a code editing experience. The next example enables both plugins along with their respective toolbar components.
+The code block plugin enables support for fenced code blocks, but does not include any code editing UI. The `codeMirrorPlugin` builds on top of it to provide a code editing experience. The next example enables both plugins along with their respective toolbar components.
 
 ```tsx
-const defaultSnippetContent = `
-export default function App() {
-  return (
-    <div className="App">
-      <h1>Hello CodeSandbox</h1>
-      <h2>Start editing to see some magic happen!</h2>
-    </div>
-  );
-}
-`.trim()
-
-const simpleSandpackConfig: SandpackConfig = {
-  defaultPreset: 'react',
-  presets: [
-    {
-      label: 'React',
-      name: 'react',
-      meta: 'live react',
-      sandpackTemplate: 'react',
-      sandpackTheme: 'light',
-      snippetFileName: '/App.js',
-      snippetLanguage: 'jsx',
-      initialSnippetContent: defaultSnippetContent
-    }
-  ]
-}
-
 function App() {
   return (
     <MDXEditor
@@ -43,19 +16,16 @@ function App() {
       plugins={[
         // the default code block language to insert when the user clicks the "insert code block" button
         codeBlockPlugin({ defaultCodeBlockLanguage: 'js' }),
-        sandpackPlugin({ sandpackConfig: simpleSandpackConfig }),
-        codeMirrorPlugin({ codeBlockLanguages: { js: 'JavaScript', css: 'CSS' } }),
+        codeMirrorPlugin({ codeBlockLanguages: { js: 'JavaScript', css: 'CSS', tsx: 'TypeScript (React)' } }),
         toolbarPlugin({
           toolbarContents: () => (
             <ConditionalContents
               options={[
                 { when: (editor) => editor?.editorType === 'codeblock', contents: () => <ChangeCodeMirrorLanguage /> },
-                { when: (editor) => editor?.editorType === 'sandpack', contents: () => <ShowSandpackInfo /> },
                 {
                   fallback: () => (
                     <>
                       <InsertCodeBlock />
-                      <InsertSandpack />
                     </>
                   )
                 }
@@ -88,9 +58,9 @@ body {
 }
 ```
 
-React Sandpack:
+TypeScript React:
 
-```tsx live react
+```tsx
 export default function App() {
   return <h1>Hello world from a markdown</h1>
 }
@@ -125,7 +95,7 @@ codeMirrorPlugin({
 
 With the array format, all aliases and extensions are recognized when resolving code block languages, but the language select dropdown shows only one entry per language. This is especially useful when your markdown may use different identifiers for the same language (e.g. `js` vs `javascript`).
 
-If a fenced code block has no `meta`, the CodeMirror editor acts as the default editor even when its language is not listed in `codeBlockLanguages`. In that case, the block falls back to plain-text editing and the unknown language is shown as a temporary item in the language picker so the user can keep it or switch to a configured language.
+If a fenced code block has no `meta`, the CodeMirror editor acts as the default editor even when its language is not listed in `codeBlockLanguages`. In that case, the block falls back to plain-text editing and the unknown language is shown as a temporary item in the language picker so the user can keep it or switch to a configured language. If a fenced code block has `meta`, CodeMirror handles it when the language is listed in `codeBlockLanguages` and preserves the metadata when exporting markdown.
 
 You can also pass the `languages` array from `@codemirror/language-data` directly to support all CodeMirror languages:
 
@@ -189,10 +159,6 @@ codeMirrorPlugin({
 })
 ```
 
-## Configuring the Sandpack editor
-
-Compared to the code mirror editor, the Sandpack one is a bit more complex, as Sandpack needs to know the context of the code block in order to execute it correctly. Before diving in, it's good to [understand Sandpack configuration](https://sandpack.codesandbox.io/) itself. MDXEditor supports multiple Sandpack configurations, based on the meta data of the code block. To configure the supported presets, pass a `sandpackConfig` option in the plugin initialization. For more details, refer to the [SandpackConfig interface](../api/editor.sandpackconfig) and the [SandpackPreset interface](../api/editor.sandpackpreset).
-
 ## Build a custom code block editor
 
 You can implement your own stack of custom code editors by passing a code block editor descriptor to the `codeBlockPlugin`. The next example uses a plain text textarea to edit the code block content. More details about each of the constructs in the example can be found in the API reference.
@@ -246,7 +212,6 @@ export function FallbackCodeEditor() {
         codeBlockPlugin({
           codeBlockEditorDescriptors: [{ priority: -10, match: (_) => true, Editor: CodeMirrorEditor }]
         }),
-        sandpackPlugin({ sandpackConfig: virtuosoSampleSandpackConfig }),
         codeMirrorPlugin({
           codeBlockLanguages: { jsx: 'JavaScript (react)', js: 'JavaScript', css: 'CSS', tsx: 'TypeScript (react)' }
         }),

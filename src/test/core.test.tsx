@@ -1,6 +1,6 @@
 import React from 'react'
 import { describe, expect, it } from 'vitest'
-import { MDXEditor, MDXEditorMethods } from '../'
+import { codeBlockPlugin, codeMirrorPlugin, MDXEditor, MDXEditorMethods } from '../'
 import { render } from '@testing-library/react'
 import { $getRoot, createEditor, ParagraphNode, TextNode } from 'lexical'
 import { QuoteNode } from '@lexical/rich-text'
@@ -126,5 +126,26 @@ describe('markdown import export', () => {
   })
   it('works with code in strong', () => {
     testIdenticalMarkdown('**`Hello` World**')
+  })
+
+  it('preserves fenced code block metadata when CodeMirror handles a configured language', () => {
+    const ref = React.createRef<MDXEditorMethods>()
+    const markdown = `
+\`\`\`tsx live react
+export default function App() {
+  return <h1>Hello world</h1>
+}
+\`\`\`
+`.trim()
+
+    render(
+      <MDXEditor
+        ref={ref}
+        markdown={markdown}
+        plugins={[codeBlockPlugin(), codeMirrorPlugin({ codeBlockLanguages: { tsx: 'TypeScript (React)' } })]}
+      />
+    )
+
+    expect(ref.current?.getMarkdown().trim()).toEqual(markdown)
   })
 })

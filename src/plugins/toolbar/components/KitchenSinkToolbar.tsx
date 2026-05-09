@@ -13,11 +13,9 @@ import { InsertAdmonition } from './InsertAdmonition'
 import { InsertCodeBlock } from './InsertCodeBlock'
 import { InsertFrontmatter } from './InsertFrontmatter'
 import { InsertImage } from './InsertImage'
-import { InsertSandpack } from './InsertSandpack'
 import { InsertTable } from './InsertTable'
 import { InsertThematicBreak } from './InsertThematicBreak'
 import { ListsToggle } from './ListsToggle'
-import { ShowSandpackInfo } from './ShowSandpackInfo'
 import { UndoRedo } from './UndoRedo'
 import { CreateLink } from './CreateLink'
 import { HighlightToggle } from './HighlightToggle'
@@ -43,7 +41,6 @@ export const KitchenSinkToolbar: React.FC = () => {
       <ConditionalContents
         options={[
           { when: (editor) => editor?.editorType === 'codeblock', contents: () => <ChangeCodeMirrorLanguage /> },
-          { when: (editor) => editor?.editorType === 'sandpack', contents: () => <ShowSandpackInfo /> },
           {
             fallback: () => (
               <>
@@ -74,7 +71,6 @@ export const KitchenSinkToolbar: React.FC = () => {
 
                 <Separator />
                 <InsertCodeBlock />
-                <InsertSandpack />
 
                 <ConditionalContents
                   options={[

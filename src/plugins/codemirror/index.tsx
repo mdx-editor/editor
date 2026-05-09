@@ -202,10 +202,10 @@ export const codeMirrorPlugin = realmPlugin<{
   }
 })
 
-function buildCodeBlockDescriptor(_normalized: NormalizedCodeBlockLanguages): CodeBlockEditorDescriptor {
+function buildCodeBlockDescriptor(normalized: NormalizedCodeBlockLanguages): CodeBlockEditorDescriptor {
   return {
-    match(_language, meta) {
-      return !meta
+    match(language, meta) {
+      return !meta || Object.hasOwn(normalized.keyMap, language ?? '')
     },
     priority: 1,
     Editor: CodeMirrorEditor

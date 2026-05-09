@@ -84,10 +84,6 @@ A toolbar button that allows the user to insert a [front-matter](https://jekyllr
 
 A toolbar button that allows the user to insert an image from a URL. For the button to work, you need to have the `imagePlugin` plugin enabled.
 
-### `InsertSandpack`
-
-A dropdown button that allows the user to insert a live code block into the editor. The dropdown offers a list of presets that are defined in the Sandpack plugin config. For this to work, you need to have the `sandpackPlugin` installed.
-
 ### `InsertTable`
 
 A toolbar button that allows the user to insert a table. For this button to work, you need to have the `tablePlugin` plugin enabled.
@@ -99,10 +95,6 @@ A toolbar button that allows the user to insert a thematic break (rendered as an
 ### `ListsToggle`
 
 A toolbar toggle that allows the user to toggle between bulleted and numbered lists. Pressing the selected button will convert the current list to the other type. Pressing it again will remove the list. For this button to work, you need to have the `listsPlugin` plugin enabled.
-
-### `ShowSandpackInfo`
-
-A component that displays the focused live code block's name. For this component to work, you must enable the `sandpackPlugin` for the editor. See `ConditionalContents` for an example of how to display the dropdown only when a Sandpack editor is in focus.
 
 ### `UndoRedo`
 

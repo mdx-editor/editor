@@ -332,7 +332,6 @@
   color: var(--baseBorderHover);
 }
 
-/** used in the sandpack */
 .toolbarButtonSelectTrigger {
   width: auto;
   padding-inline-start: var(--spacing-2);

@@ -1,4 +1,4 @@
-import { CodeMirrorRef } from '@codesandbox/sandpack-react/dist/components/CodeEditor/CodeMirror'
+import { EditorView } from '@codemirror/view'
 import { $createParagraphNode, $getNodeByKey } from 'lexical'
 import React from 'react'
 import { VoidEmitter } from '../../utils/voidEmitter'
@@ -6,25 +6,28 @@ import { useCodeBlockEditorContext } from '../codeblock/CodeBlockNode'
 import { activeEditor$, editorInFocus$ } from '../core'
 import { useCellValue, usePublisher } from '@mdxeditor/gurx'
 
-export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'sandpack', language: string, focusEmitter: VoidEmitter) {
+export interface CodeMirrorRef {
+  getCodemirror(): EditorView | null
+}
+
+export function useCodeMirrorRef(nodeKey: string, language: string, focusEmitter: VoidEmitter) {
   const activeEditor = useCellValue(activeEditor$)
   const setEditorInFocus = usePublisher(editorInFocus$)
-  // const setActiveEditorType = usePublisher('activeEditorType')
   const codeMirrorRef = React.useRef<CodeMirrorRef | null>(null)
   const { lexicalNode } = useCodeBlockEditorContext()
 
-  // these flags escape the editor with arrows.
-  // they are set to true when the cursor is at the top or bottom of the editor, and then the user presses the arrow.
+  // These flags allow the user to escape the editor with arrows. They are set
+  // when the cursor is at the top or bottom and cleared after the second arrow.
   const atBottom = React.useRef(false)
   const atTop = React.useRef(false)
 
   const onFocusHandler = React.useCallback(() => {
     setEditorInFocus({
-      editorType,
+      editorType: 'codeblock',
       rootNode: lexicalNode,
       editorRef: codeMirrorRef.current
     })
-  }, [editorType, lexicalNode, setEditorInFocus])
+  }, [lexicalNode, setEditorInFocus])
 
   const onKeyDownHandler = React.useCallback(
     (e: KeyboardEvent) => {
@@ -35,11 +38,9 @@ export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'san
           const selectionEnd = state.selection.ranges[0].to
 
           if (docLength === selectionEnd) {
-            // escaping once
             if (!atBottom.current) {
               atBottom.current = true
             } else {
-              // escaping twice
               activeEditor?.update(() => {
                 const node = $getNodeByKey(nodeKey)!
                 const nextSibling = node.getNextSibling()
@@ -60,19 +61,15 @@ export function useCodeMirrorRef(nodeKey: string, editorType: 'codeblock' | 'san
           const selectionStart = state.selection.ranges[0].from
 
           if (selectionStart === 0) {
-            // escaping once
             if (!atTop.current) {
               atTop.current = true
             } else {
-              // escaping twice
               activeEditor?.update(() => {
                 const node = $getNodeByKey(nodeKey)!
                 const previousSibling = node.getPreviousSibling()
                 if (previousSibling) {
                   codeMirrorRef.current?.getCodemirror()?.contentDOM.blur()
                   node.selectPrevious()
-                } else {
-                  // TODO: insert a paragraph before the sandpack node
                 }
               })
               atTop.current = false
