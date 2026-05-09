@@ -56,6 +56,13 @@
   font-size: 94%
 }
 
+.quote {
+  border-inline-start: 3px solid var(--baseBorder);
+  padding-inline-start: var(--spacing-4);
+  margin-inline-start: 0;
+  color: var(--baseText);
+}
+
 .nestedListItem {
   list-style: none;
   list-style-type: none;

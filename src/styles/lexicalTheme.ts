@@ -2,6 +2,7 @@ import { EditorThemeClasses } from 'lexical'
 import styles from './lexical-theme.module.css'
 
 export const lexicalTheme: EditorThemeClasses = {
+  quote: styles.quote,
   text: {
     bold: styles.bold,
     italic: styles.italic,
