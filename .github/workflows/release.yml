@@ -6,6 +6,10 @@ on:
       - alpha
       - beta
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 permissions:
   contents: read # for checkout
 
@@ -13,19 +17,21 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
+    environment: release
     permissions:
       contents: write # to be able to publish a GitHub release
       issues: write # to be able to comment on released issues
       pull-requests: write # to be able to comment on released pull requests
       id-token: write # to enable use of OIDC for npm provenance
-      actions: write
+      actions: write # to be able to dispatch the website release workflow
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
         with:
           fetch-depth: 0
+          persist-credentials: false
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@3235b876344d2a9aa001b8d1453c930bba69e610 # v3
         with:
           node-version: 'lts/*'
           cache: 'npm'
@@ -51,7 +57,7 @@ jobs:
         run: npx semantic-release
 
       - name: Publish website
-        uses: benc-uk/workflow-dispatch@v1
+        uses: benc-uk/workflow-dispatch@7a027648b88c2413826b6ddd6c76114894dc5ec4 # v1
         with:
           workflow: release.yml
           ref: master
