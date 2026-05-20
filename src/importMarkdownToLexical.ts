@@ -23,12 +23,16 @@ interface MetaData {
 }
 
 /**
- * The registered descriptors for composite nodes (jsx, directives, code blocks).
+ * Per-plugin import context passed to {@link MdastImportVisitor} functions.
  */
 export interface Descriptors {
   jsxComponentDescriptors: JsxComponentDescriptor[]
   directiveDescriptors: DirectiveDescriptor[]
   codeBlockEditorDescriptors: CodeBlockEditorDescriptor[]
+  /**
+   * The fallback language used to select a code block editor when a fenced code block's own language has no matching descriptor.
+   */
+  defaultCodeBlockLanguage?: string
 }
 
 /** @internal */
@@ -43,7 +47,7 @@ export interface MdastImportVisitor<UN extends Mdast.Nodes> {
   /**
    * The test function that determines if this visitor should be used for the given node.
    * As a convenience, you can also pass a string here, which will be compared to the node's type.
-   * @param descriptors - the registered descriptors for composite nodes (jsx, directives, code blocks).
+   * @param descriptors - the registered descriptors and fallback values for composite nodes.
    */
   testNode: ((mdastNode: Mdast.Nodes, descriptors: Descriptors) => boolean) | string
   visitNode(params: {

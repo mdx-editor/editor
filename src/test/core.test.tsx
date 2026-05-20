@@ -1,5 +1,5 @@
 import React from 'react'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { codeBlockPlugin, codeMirrorPlugin, MDXEditor, MDXEditorMethods } from '../'
 import { render } from '@testing-library/react'
 import { $getRoot, createEditor, ParagraphNode, TextNode } from 'lexical'
@@ -86,7 +86,8 @@ describe('markdown import export', () => {
         mdastExtensions: [],
         jsxComponentDescriptors: [],
         directiveDescriptors: [],
-        codeBlockEditorDescriptors: []
+        codeBlockEditorDescriptors: [],
+        defaultCodeBlockLanguage: ''
       })
 
       exportedMarkdown = exportMarkdownFromLexical({
@@ -146,6 +147,35 @@ export default function App() {
       />
     )
 
+    expect(ref.current?.getMarkdown().trim()).toEqual(markdown)
+  })
+
+  it('falls back to the default code block language for unsupported languages with metadata', () => {
+    const ref = React.createRef<MDXEditorMethods>()
+    const onError = vi.fn()
+    const markdown = `
+Before fence.
+
+\`\`\`unsupported live
+some content
+\`\`\`
+
+After fence.
+`.trim()
+
+    render(
+      <MDXEditor
+        ref={ref}
+        markdown={markdown}
+        onError={onError}
+        plugins={[codeBlockPlugin({ defaultCodeBlockLanguage: 'txt' }), codeMirrorPlugin({ codeBlockLanguages: { txt: 'Plain text' } })]}
+      />
+    )
+
+    expect(onError).not.toHaveBeenCalled()
+    const html = ref.current?.getContentEditableHTML() ?? ''
+    expect(html).toContain('some content')
+    expect(html).toContain('After fence.')
     expect(ref.current?.getMarkdown().trim()).toEqual(markdown)
   })
 })

@@ -299,6 +299,13 @@ export const directiveDescriptors$ = Cell<DirectiveDescriptor[]>([])
 export const codeBlockEditorDescriptors$ = Cell<CodeBlockEditorDescriptor[]>([])
 
 /**
+ * The default code block language. Used both when inserting a new code block without an explicit language, and as a
+ * fallback at import time when a fence's own language doesn't match any registered descriptor.
+ * @group Code Block
+ */
+export const defaultCodeBlockLanguage$ = Cell<string>('')
+
+/**
  * A reference to a DOM element. used for the various popups, dialogs, and tooltips
  * @group Core
  */
@@ -678,7 +685,8 @@ function tryImportingMarkdown(r: Realm, node: ImportPoint, markdownValue: string
       syntaxExtensions: r.getValue(syntaxExtensions$),
       jsxComponentDescriptors: r.getValue(jsxComponentDescriptors$),
       directiveDescriptors: r.getValue(directiveDescriptors$),
-      codeBlockEditorDescriptors: r.getValue(codeBlockEditorDescriptors$)
+      codeBlockEditorDescriptors: r.getValue(codeBlockEditorDescriptors$),
+      defaultCodeBlockLanguage: r.getValue(defaultCodeBlockLanguage$)
     })
     r.pub(markdownProcessingError$, null)
   } catch (e) {

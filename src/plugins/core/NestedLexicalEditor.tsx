@@ -22,6 +22,7 @@ import React from 'react'
 import {
   NESTED_EDITOR_UPDATED_COMMAND,
   codeBlockEditorDescriptors$,
+  defaultCodeBlockLanguage$,
   directiveDescriptors$,
   editorInFocus$,
   exportVisitors$,
@@ -191,6 +192,7 @@ export const NestedLexicalEditor = function <T extends Mdast.RootContent>(props:
     jsxComponentDescriptors,
     directiveDescriptors,
     codeBlockEditorDescriptors,
+    defaultCodeBlockLanguage,
     jsxIsAvailable,
     nestedEditorChildren,
     lexicalTheme
@@ -202,6 +204,7 @@ export const NestedLexicalEditor = function <T extends Mdast.RootContent>(props:
     jsxComponentDescriptors$,
     directiveDescriptors$,
     codeBlockEditorDescriptors$,
+    defaultCodeBlockLanguage$,
     jsxIsAvailable$,
     nestedEditorChildren$,
     lexicalTheme$
@@ -245,6 +248,7 @@ export const NestedLexicalEditor = function <T extends Mdast.RootContent>(props:
         visitors: importVisitors,
         directiveDescriptors,
         codeBlockEditorDescriptors,
+        defaultCodeBlockLanguage,
         jsxComponentDescriptors
       })
     })

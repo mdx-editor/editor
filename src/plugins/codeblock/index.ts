@@ -7,16 +7,18 @@ import {
   addImportVisitor$,
   addLexicalNode$,
   codeBlockEditorDescriptors$,
+  defaultCodeBlockLanguage$,
   insertDecoratorNode$
 } from '../core'
 import { $createCodeBlockNode, CodeBlockNode, CreateCodeBlockNodeOptions } from './CodeBlockNode'
 import { VoidEmitter } from '../../utils/voidEmitter'
-import { Cell, Signal, map, withLatestFrom } from '@mdxeditor/gurx'
+import { Signal, map, withLatestFrom } from '@mdxeditor/gurx'
 import { realmPlugin } from '../../RealmWithPlugins'
 export * from './CodeBlockNode'
 
 export type { CodeBlockEditorContextValue, CreateCodeBlockNodeOptions } from './CodeBlockNode'
 export { useCodeBlockEditorContext } from './CodeBlockNode'
+export { defaultCodeBlockLanguage$ }
 
 /**
  * The properties passed to the {@link CodeBlockEditorDescriptor.Editor} component.
@@ -70,12 +72,6 @@ export interface CodeBlockEditorDescriptor {
 }
 
 /**
- * Contains the default language to use when creating a new code block if no language is passed.
- * @group Code Block
- */
-export const defaultCodeBlockLanguage$ = Cell<string>('')
-
-/**
  * A signal that inserts a new code block into the editor with the published options.
  * @group Code Block
  */
@@ -110,7 +106,8 @@ export const codeBlockPlugin = realmPlugin<{
    */
   codeBlockEditorDescriptors?: CodeBlockEditorDescriptor[]
   /**
-   * The default language to use when creating a new code block if no language is passed.
+   * The default code block language. Used when inserting a new code block, and as a fallback at import time for
+   * fences whose language has no matching descriptor.
    */
   defaultCodeBlockLanguage?: string
 }>({
@@ -121,6 +118,7 @@ export const codeBlockPlugin = realmPlugin<{
   init(realm, params) {
     realm.pubIn({
       [addActivePlugin$]: 'codeblock',
+      [defaultCodeBlockLanguage$]: params?.defaultCodeBlockLanguage ?? '',
       [codeBlockEditorDescriptors$]: params?.codeBlockEditorDescriptors ?? [],
       [addImportVisitor$]: MdastCodeVisitor,
       [addLexicalNode$]: CodeBlockNode,

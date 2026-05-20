@@ -34,6 +34,7 @@ import { uuidv4 } from '../../utils/uuid4'
 import {
   NESTED_EDITOR_UPDATED_COMMAND,
   codeBlockEditorDescriptors$,
+  defaultCodeBlockLanguage$,
   directiveDescriptors$,
   editorRootElementRef$,
   exportVisitors$,
@@ -344,6 +345,7 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
     jsxComponentDescriptors,
     directiveDescriptors,
     codeBlockEditorDescriptors,
+    defaultCodeBlockLanguage,
     jsxIsAvailable,
     rootEditor,
     tableCellEditorChildren
@@ -354,6 +356,7 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
     jsxComponentDescriptors$,
     directiveDescriptors$,
     codeBlockEditorDescriptors$,
+    defaultCodeBlockLanguage$,
     jsxIsAvailable$,
     rootEditor$,
     tableCellEditorChildren$
@@ -373,7 +376,8 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
         visitors: importVisitors,
         jsxComponentDescriptors,
         directiveDescriptors,
-        codeBlockEditorDescriptors
+        codeBlockEditorDescriptors,
+        defaultCodeBlockLanguage
       })
     })
 

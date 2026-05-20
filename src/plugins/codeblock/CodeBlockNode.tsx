@@ -15,6 +15,7 @@ import React from 'react'
 import { CodeBlockEditorProps, defaultCodeBlockLanguage$ } from '.'
 import { voidEmitter } from '../../utils/voidEmitter'
 import { NESTED_EDITOR_UPDATED_COMMAND, codeBlockEditorDescriptors$ } from '../core'
+import { findCodeBlockDescriptor } from './findCodeBlockDescriptor'
 
 /**
  * The options necessary to construct a new code block node.
@@ -253,11 +254,7 @@ const CodeBlockEditorContainer: React.FC<
   const codeBlockEditorDescriptors = useCellValue(codeBlockEditorDescriptors$)
   const defaultCodeBlockLanguage = useCellValue(defaultCodeBlockLanguage$)
 
-  let descriptor = codeBlockEditorDescriptors
-    .sort((a, b) => b.priority - a.priority)
-    .find((descriptor) => descriptor.match(props.language || '', props.meta || ''))
-
-  descriptor ??= codeBlockEditorDescriptors.find((descriptor) => descriptor.match(defaultCodeBlockLanguage || '', props.meta || ''))
+  const descriptor = findCodeBlockDescriptor(codeBlockEditorDescriptors, props.language, props.meta, defaultCodeBlockLanguage)
 
   if (!descriptor) {
     throw new Error(`No CodeBlockEditor registered for language=${props.language} meta=${props.meta}`)
