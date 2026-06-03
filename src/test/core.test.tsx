@@ -21,6 +21,9 @@ import { LexicalListItemVisitor } from '../plugins/lists/LexicalListItemVisitor'
 import { LexicalListVisitor } from '../plugins/lists/LexicalListVisitor'
 import { MdastListItemVisitor } from '../plugins/lists/MdastListItemVisitor'
 import { MdastListVisitor } from '../plugins/lists/MdastListVisitor'
+import { MdastCodeVisitor } from '../plugins/codeblock/MdastCodeVisitor'
+import { CodeBlockVisitor } from '../plugins/codeblock/CodeBlockVisitor'
+import { CodeBlockNode } from '../plugins/codeblock/CodeBlockNode'
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 ;(globalThis as any).IS_REACT_ACT_ENVIRONMENT = true
@@ -193,7 +196,8 @@ describe('List parsing and serialization', () => {
       MdastTextVisitor,
       MdastBreakVisitor,
       MdastListVisitor,
-      MdastListItemVisitor
+      MdastListItemVisitor,
+      MdastCodeVisitor
     ] as unknown as MarkdownParseOptions['visitors']
     const lexicalVisitors = [
       LexicalRootVisitor,
@@ -201,12 +205,13 @@ describe('List parsing and serialization', () => {
       LexicalTextVisitor,
       LexicalLinebreakVisitor,
       LexicalListVisitor,
-      LexicalListItemVisitor
+      LexicalListItemVisitor,
+      CodeBlockVisitor
     ] as unknown as ExportMarkdownFromLexicalOptions['visitors']
 
     const editor = createEditor({
       namespace: 'test-editor',
-      nodes: [ParagraphNode, TextNode, ListItemNode, ListNode],
+      nodes: [ParagraphNode, TextNode, ListItemNode, ListNode, CodeBlockNode],
       onError(error) {
         throw error
       }
@@ -223,7 +228,7 @@ describe('List parsing and serialization', () => {
         mdastExtensions: [],
         jsxComponentDescriptors: [],
         directiveDescriptors: [],
-        codeBlockEditorDescriptors: [],
+        codeBlockEditorDescriptors: [{ match: () => true, priority: 0, Editor: () => null }],
         defaultCodeBlockLanguage: ''
       })
 
@@ -261,6 +266,19 @@ describe('List parsing and serialization', () => {
 
    And another one.
 3. And here's the third list item.`
+
+    const exportedMarkdown = parseAndExport(markdown)
+    expect(exportedMarkdown).toEqual(markdown)
+  })
+
+  test('does not insert extra blank lines before paragraphs that follow list item code blocks', () => {
+    const markdown = `* This is the first list item.
+* Here's the second list item.
+  \`\`\`txt
+  code
+  \`\`\`
+  I need to add another paragraph below the code block.
+* And here's the third list item.`
 
     const exportedMarkdown = parseAndExport(markdown)
     expect(exportedMarkdown).toEqual(markdown)
