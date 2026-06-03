@@ -1,5 +1,5 @@
 import React from 'react'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, test, vi } from 'vitest'
 import { codeBlockPlugin, codeMirrorPlugin, MDXEditor, MDXEditorMethods } from '../'
 import { render } from '@testing-library/react'
 import { $getRoot, createEditor, ParagraphNode, TextNode } from 'lexical'
@@ -16,6 +16,11 @@ import { LexicalTextVisitor } from '../plugins/core/LexicalTextVisitor'
 import { LexicalLinebreakVisitor } from '../plugins/core/LexicalLinebreakVisitor'
 import { MdastBlockQuoteVisitor } from '../plugins/quote/MdastBlockQuoteVisitor'
 import { LexicalQuoteVisitor } from '../plugins/quote/LexicalQuoteVisitor'
+import { ListItemNode, ListNode } from '@lexical/list'
+import { LexicalListItemVisitor } from '../plugins/lists/LexicalListItemVisitor'
+import { LexicalListVisitor } from '../plugins/lists/LexicalListVisitor'
+import { MdastListItemVisitor } from '../plugins/lists/MdastListItemVisitor'
+import { MdastListVisitor } from '../plugins/lists/MdastListVisitor'
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 ;(globalThis as any).IS_REACT_ACT_ENVIRONMENT = true
@@ -177,5 +182,87 @@ After fence.
     expect(html).toContain('some content')
     expect(html).toContain('After fence.')
     expect(ref.current?.getMarkdown().trim()).toEqual(markdown)
+  })
+})
+
+describe('List parsing and serialization', () => {
+  const parseAndExport = (markdown: string) => {
+    const mdastVisitors = [
+      MdastRootVisitor,
+      MdastParagraphVisitor,
+      MdastTextVisitor,
+      MdastBreakVisitor,
+      MdastListVisitor,
+      MdastListItemVisitor
+    ] as unknown as MarkdownParseOptions['visitors']
+    const lexicalVisitors = [
+      LexicalRootVisitor,
+      LexicalParagraphVisitor,
+      LexicalTextVisitor,
+      LexicalLinebreakVisitor,
+      LexicalListVisitor,
+      LexicalListItemVisitor
+    ] as unknown as ExportMarkdownFromLexicalOptions['visitors']
+
+    const editor = createEditor({
+      namespace: 'test-editor',
+      nodes: [ParagraphNode, TextNode, ListItemNode, ListNode],
+      onError(error) {
+        throw error
+      }
+    })
+
+    let exportedMarkdown = ''
+
+    editor.update(() => {
+      importMarkdownToLexical({
+        root: $getRoot(),
+        markdown,
+        visitors: mdastVisitors,
+        syntaxExtensions: [],
+        mdastExtensions: [],
+        jsxComponentDescriptors: [],
+        directiveDescriptors: [],
+        codeBlockEditorDescriptors: [],
+        defaultCodeBlockLanguage: ''
+      })
+
+      exportedMarkdown = exportMarkdownFromLexical({
+        root: $getRoot(),
+        visitors: lexicalVisitors,
+        toMarkdownExtensions: [],
+        toMarkdownOptions: {},
+        jsxComponentDescriptors: [],
+        jsxIsAvailable: false
+      }).trim()
+    })
+
+    return exportedMarkdown
+  }
+
+  test('preserves empty lines inside unordered lists', () => {
+    const markdown = `* This is the first list item.
+* Here's the second list item.
+
+  I need to add another paragraph below the second list item.
+
+  And another one.
+* And here's the third list item.`
+
+    const exportedMarkdown = parseAndExport(markdown)
+    expect(exportedMarkdown).toEqual(markdown)
+  })
+
+  test('preserves empty lines inside ordered lists', () => {
+    const markdown = `1. This is the first list item.
+2. Here's the second list item.
+
+   I need to add another paragraph below the second list item.
+
+   And another one.
+3. And here's the third list item.`
+
+    const exportedMarkdown = parseAndExport(markdown)
+    expect(exportedMarkdown).toEqual(markdown)
   })
 })
