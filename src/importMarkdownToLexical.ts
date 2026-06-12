@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { ElementNode, LexicalNode } from 'lexical'
 import * as Mdast from 'mdast'
-import { fromMarkdown, type Options } from 'mdast-util-from-markdown'
+import { fromMarkdown, type Extension as FromMarkdownExtension } from 'mdast-util-from-markdown'
 import { MdxjsEsm } from 'mdast-util-mdx'
 import { toMarkdown } from 'mdast-util-to-markdown'
 import { ParseOptions } from 'micromark-util-types'
@@ -35,8 +35,11 @@ export interface Descriptors {
   defaultCodeBlockLanguage?: string
 }
 
-/** @internal */
-export type MdastExtensions = Options['mdastExtensions']
+export type { Options as FromMarkdownOptions } from 'mdast-util-from-markdown'
+
+export type MdastExtension = FromMarkdownExtension | FromMarkdownExtension[]
+
+export type MdastExtensions = MdastExtension[]
 
 /**
  * Implement this interface to convert certain mdast nodes into lexical nodes.
@@ -132,7 +135,6 @@ export interface ImportPoint {
 
 /**
  * The options of the tree import utility. Not meant to be used directly.
- * @internal
  */
 export interface MdastTreeImportOptions extends Descriptors {
   root: ImportPoint
@@ -146,12 +148,6 @@ export interface MarkdownParseOptions extends Omit<MdastTreeImportOptions, 'mdas
   syntaxExtensions: NonNullable<ParseOptions['extensions']>
   mdastExtensions: MdastExtensions
 }
-
-/**
- * An extension for the `fromMarkdown` utility tree construction.
- * @internal
- */
-export type MdastExtension = NonNullable<MdastExtensions>[number]
 
 /**
  * An extension for the `fromMarkdown` utility markdown parse.

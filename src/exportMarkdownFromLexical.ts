@@ -1,13 +1,15 @@
 import { $isElementNode, ElementNode as LexicalElementNode, LexicalNode, RootNode as LexicalRootNode } from 'lexical'
 import * as Mdast from 'mdast'
 import type { MdxjsEsm } from 'mdast-util-mdx'
-import { Options as ToMarkdownOptions, toMarkdown } from 'mdast-util-to-markdown'
+import { type Options as MdastToMarkdownOptions, toMarkdown } from 'mdast-util-to-markdown'
 import { ImportStatement } from './importMarkdownToLexical'
 import { isMdastHTMLNode } from './plugins/core/MdastHTMLNode'
 import type { JsxComponentDescriptor } from './plugins/jsx'
 import { mergeStyleAttributes } from './utils/mergeStyleAttributes'
 
-export type { Options as ToMarkdownOptions } from 'mdast-util-to-markdown'
+// Keep this as an interface so API Extractor emits the package-root import.
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface ToMarkdownOptions extends MdastToMarkdownOptions {}
 
 /**
  * Implement this interface in order to process mdast node(s) into a lexical tree.
@@ -95,9 +97,6 @@ export interface LexicalExportVisitor<LN extends LexicalNode, UN extends Mdast.N
  */
 export type LexicalVisitor = LexicalExportVisitor<LexicalNode, Mdast.RootContent>
 
-/**
- * @internal
- */
 export interface ExportLexicalTreeOptions {
   root: LexicalRootNode
   visitors: LexicalVisitor[]
@@ -384,11 +383,10 @@ function fixWrappingWhitespace(node: Mdast.Parent | Mdast.RootContent, parentCha
   }
 }
 
-export type ToMarkdownExtension = NonNullable<ToMarkdownOptions['extensions']>[number]
+// Keep this as an interface so API Extractor does not rewrite it to mdast-util-to-markdown/lib/types.
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface ToMarkdownExtension extends ToMarkdownOptions {}
 
-/**
- * @internal
- */
 export interface ExportMarkdownFromLexicalOptions extends ExportLexicalTreeOptions {
   visitors: LexicalVisitor[]
 

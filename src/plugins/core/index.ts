@@ -44,11 +44,12 @@ import { highlightMark } from 'micromark-extension-highlight-mark'
 import { mdxJsx } from 'micromark-extension-mdx-jsx'
 import { mdxMd } from 'micromark-extension-mdx-md'
 import React from 'react'
-import { LexicalConvertOptions, exportMarkdownFromLexical } from '../../exportMarkdownFromLexical'
+import { LexicalConvertOptions, ToMarkdownExtension, exportMarkdownFromLexical } from '../../exportMarkdownFromLexical'
 import {
   ImportPoint,
   MarkdownParseError,
   MarkdownParseOptions,
+  MdastExtension,
   MdastImportVisitor,
   UnrecognizedMarkdownConstructError,
   importMarkdownToLexical
@@ -261,7 +262,7 @@ export const importVisitors$ = Cell<MdastImportVisitor<Mdast.Nodes>[]>([])
 export const usedLexicalNodes$ = Cell<Klass<LexicalNode>[]>([])
 export const syntaxExtensions$ = Cell<MarkdownParseOptions['syntaxExtensions']>([])
 /** @internal */
-export const mdastExtensions$ = Cell<NonNullable<MarkdownParseOptions['mdastExtensions']>>([])
+export const mdastExtensions$ = Cell<MdastExtension[]>([])
 
 // export configuration
 /**
@@ -270,7 +271,7 @@ export const mdastExtensions$ = Cell<NonNullable<MarkdownParseOptions['mdastExte
  */
 export const exportVisitors$ = Cell<NonNullable<LexicalConvertOptions['visitors']>>([])
 /** @internal */
-export const toMarkdownExtensions$ = Cell<NonNullable<LexicalConvertOptions['toMarkdownExtensions']>>([])
+export const toMarkdownExtensions$ = Cell<ToMarkdownExtension[]>([])
 /** @internal */
 export const toMarkdownOptions$ = Cell<NonNullable<LexicalConvertOptions['toMarkdownOptions']>>({})
 
@@ -344,7 +345,7 @@ export const addSyntaxExtension$ = Appender(syntaxExtensions$)
  * Adds a mdast extension to the markdown parser.
  * @group Markdown Processing
  */
-export const addMdastExtension$ = Appender(mdastExtensions$)
+export const addMdastExtension$: NodeRef<MdastExtension | MdastExtension[]> = Appender(mdastExtensions$)
 
 /**
  * Adds an export visitor to be used when exporting markdown from the Lexical tree.
@@ -356,7 +357,7 @@ export const addExportVisitor$ = Appender(exportVisitors$)
  * Adds a markdown to string extension to be used when exporting markdown from the Lexical tree.
  * @group Markdown Processing
  */
-export const addToMarkdownExtension$ = Appender(toMarkdownExtensions$)
+export const addToMarkdownExtension$: NodeRef<ToMarkdownExtension | ToMarkdownExtension[]> = Appender(toMarkdownExtensions$)
 
 export const muteChange$ = Cell(false)
 /**
