@@ -158,7 +158,7 @@ See the [MDX editor in CRA GitHub sample repository for a working example](https
 
 The MDXEditor component accepts its initial value through the `markdown` property. Notice that the property works like the [textarea `defaultValue`](https://react.dev/reference/react-dom/components/textarea#providing-an-initial-value-for-a-text-area). To change the value dynamically, you should use the `setMarkdown` ref method.
 
-To listen for changes of the value of the editor, use the `onChange` callback property. The event is triggered continuously as the user types, so you can use it to update your state.
+To listen for changes of the value of the editor, use the `onChange` callback property. The event is triggered continuously as the user types, so you can use it to update your state. It's not advised to plug that same state into the `markdown` property, as that will refresh the component every time the content changes, which can cause lag.
 
 Alternatively, to obtain the value of the editor, use the `getMarkdown` ref method.
 
