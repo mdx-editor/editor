@@ -348,7 +348,11 @@ export const openLinkEditDialog$ = Action((r) => {
         setTimeout(() => {
           editor.getEditorState().read(() => {
             const linkNode = getLinkNodeInSelection(selection)
-            const rectangle = getSelectionRectangle(editor)!
+            // getSelectionRectangle returns null when the native DOM selection is not inside
+            // the editor (e.g. an image node is selected). Fall back to the editor's own
+            // rectangle so the dialog still opens instead of crashing (#753).
+            const rectangle: RectData = getSelectionRectangle(editor) ??
+              editor.getRootElement()?.getBoundingClientRect() ?? { top: 0, left: 0, width: 0, height: 0 }
             const initialUrl = linkNode?.getURL() ?? ''
             const url = linkNode?.getURL() ?? ''
             const title = linkNode?.getTitle() ?? ''
