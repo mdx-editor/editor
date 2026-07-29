@@ -79,13 +79,14 @@ export const headingsPlugin = realmPlugin<{
    */
   allowedHeadingLevels?: readonly HEADING_LEVEL[]
 }>({
-  init(realm) {
+  init(realm, params) {
     realm.pubIn({
       [addActivePlugin$]: 'headings',
       [addImportVisitor$]: MdastHeadingVisitor,
       [addLexicalNode$]: HeadingNode,
       [addExportVisitor$]: LexicalHeadingVisitor
     })
+    realm.pub(allowedHeadingLevels$, params?.allowedHeadingLevels ?? ALL_HEADING_LEVELS)
   },
   update(realm, params) {
     realm.pub(allowedHeadingLevels$, params?.allowedHeadingLevels ?? ALL_HEADING_LEVELS)
