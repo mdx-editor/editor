@@ -22,7 +22,7 @@ import { HighlightToggle } from './HighlightToggle'
 
 function whenInAdmonition(editorInFocus: EditorInFocus | null) {
   const node = editorInFocus?.rootNode
-  if (!node || node.getType() !== 'directive') {
+  if (node?.getType() !== 'directive') {
     return false
   }
 

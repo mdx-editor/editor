@@ -316,7 +316,7 @@ export interface CellProps {
 
 const Cell: React.FC<Omit<CellProps, 'focus'>> = ({ align, ...props }) => {
   const { activeCell, setActiveCell } = props
-  const isActive = Boolean(activeCell && activeCell[0] === props.colIndex && activeCell[1] === props.rowIndex)
+  const isActive = activeCell?.[0] === props.colIndex && activeCell[1] === props.rowIndex
 
   const className = AlignToTailwindClassMap[align ?? 'left']
 
