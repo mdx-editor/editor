@@ -5,7 +5,7 @@ import * as Popover from '@radix-ui/react-popover'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import React from 'react'
 
-import { activeEditor$, editorRootElementRef$, iconComponentFor$, useTranslation } from '../core'
+import { activeEditor$, contentEditableWrapperElement$, editorRootElementRef$, iconComponentFor$, useTranslation } from '../core'
 import { DownshiftAutoComplete } from '../core/ui/DownshiftAutoComplete'
 import styles from '@/styles/ui.module.css'
 import classNames from 'classnames'
@@ -145,6 +145,7 @@ export function LinkEditForm({
 export const LinkDialog: React.FC = () => {
   const [
     editorRootElementRef,
+    contentEditableWrapperElement,
     activeEditor,
     iconComponentFor,
     linkDialogState,
@@ -153,6 +154,7 @@ export const LinkDialog: React.FC = () => {
     showLinkTitleField
   ] = useCellValues(
     editorRootElementRef$,
+    contentEditableWrapperElement$,
     activeEditor$,
     iconComponentFor$,
     linkDialogState$,
@@ -167,6 +169,7 @@ export const LinkDialog: React.FC = () => {
   const removeLink = usePublisher(removeLink$)
 
   React.useEffect(() => {
+    const scrollContainer = contentEditableWrapperElement?.closest('.mdxeditor-root-contenteditable')
     const update = () => {
       activeEditor?.getEditorState().read(() => {
         publishWindowChange(true)
@@ -175,12 +178,14 @@ export const LinkDialog: React.FC = () => {
 
     window.addEventListener('resize', update)
     window.addEventListener('scroll', update)
+    scrollContainer?.addEventListener('scroll', update)
 
     return () => {
       window.removeEventListener('resize', update)
       window.removeEventListener('scroll', update)
+      scrollContainer?.removeEventListener('scroll', update)
     }
-  }, [activeEditor, publishWindowChange])
+  }, [activeEditor, contentEditableWrapperElement, publishWindowChange])
 
   const [copyUrlTooltipOpen, setCopyUrlTooltipOpen] = React.useState(false)
 
@@ -209,6 +214,7 @@ export const LinkDialog: React.FC = () => {
         <Popover.Content
           className={classNames(styles.linkDialogPopoverContent)}
           sideOffset={5}
+          updatePositionStrategy="always"
           onOpenAutoFocus={(e) => {
             e.preventDefault()
           }}

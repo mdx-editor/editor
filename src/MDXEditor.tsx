@@ -78,7 +78,7 @@ const RichTextEditor: React.FC = () => {
         <div className={classNames(styles.rootContentEditableWrapper, 'mdxeditor-root-contenteditable')}>
           <RichTextPlugin
             contentEditable={
-              <div ref={onRef}>
+              <div ref={onRef} className="mdxeditor-contenteditable-wrapper">
                 <ContentEditable
                   className={classNames(styles.contentEditable, contentEditableClassName)}
                   ariaLabel={t('contentArea.editableMarkdown', 'editable markdown')}

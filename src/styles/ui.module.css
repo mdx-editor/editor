@@ -1271,3 +1271,72 @@ form.multiFieldForm {
     white-space: pre-wrap;
   }
 }
+
+/*
+  Opt-in support for stretching the editor to fill a sized parent.
+  Add "mdxeditor-full-height" to the className prop; every element between
+  the editor root and the contenteditable joins a flex column chain, so the
+  entire editor area is clickable and focusable. The diff-source wrapper
+  elements participate as well; its rich-text pane keeps the inline display
+  toggle and passes height down via percentage instead of flex.
+*/
+:global(.mdxeditor.mdxeditor-full-height) {
+  display: flex;
+  flex-direction: column;
+}
+
+:global(.mdxeditor-full-height .mdxeditor-toolbar) {
+  flex-shrink: 0;
+}
+
+:global(.mdxeditor-full-height .mdxeditor-root-contenteditable) {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: auto;
+}
+
+:global(.mdxeditor-full-height .mdxeditor-contenteditable-wrapper) {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+:global(.mdxeditor-full-height .mdxeditor-contenteditable-wrapper) .contentEditable {
+  flex-grow: 1;
+}
+
+:global(.mdxeditor-full-height .mdxeditor-diff-source-wrapper) {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+:global(.mdxeditor-full-height .mdxeditor-rich-text-editor) {
+  flex-grow: 1;
+  min-height: 0;
+}
+
+:global(.mdxeditor-full-height .mdxeditor-rich-text-editor .mdxeditor-root-contenteditable) {
+  height: 100%;
+  box-sizing: border-box;
+}
+
+:global(.mdxeditor-full-height .mdxeditor-source-editor),
+:global(.mdxeditor-full-height .mdxeditor-diff-editor) {
+  flex-grow: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+:global(.mdxeditor-full-height .mdxeditor-source-editor .cm-editor) {
+  height: 100%;
+}
+
+/*
+  The diff panes are intentionally not stretched: @codemirror/merge enforces
+  height: auto !important on them so that its scroll sync keeps both sides
+  aligned; the diff editor wrapper above scrolls the whole merge view instead.
+*/
