@@ -85,6 +85,43 @@ function getFixedContainingBlock(element: HTMLElement | null): HTMLElement | nul
 }
 
 /**
+ * The link dialog anchor is position: fixed, so coordinates must be relative to
+ * the nearest fixed containing block (e.g. a transformed dialog) when one exists.
+ */
+function adjustedRectangle(rect: Pick<DOMRect, 'top' | 'left' | 'width' | 'height'>, rootElement: HTMLElement) {
+  const fixedContainer = getFixedContainingBlock(rootElement)
+  if (fixedContainer) {
+    const containerRect = fixedContainer.getBoundingClientRect()
+    return {
+      top: Math.round(rect.top - containerRect.top),
+      left: Math.round(rect.left - containerRect.left),
+      width: Math.round(rect.width),
+      height: Math.round(rect.height)
+    }
+  }
+
+  return {
+    top: Math.round(rect.top),
+    left: Math.round(rect.left),
+    width: Math.round(rect.width),
+    height: Math.round(rect.height)
+  }
+}
+
+/**
+ * Gets the coordinates of the DOM element that renders the node with the given key.
+ * @group Utils
+ */
+export function getNodeRectangle(editor: LexicalEditor, nodeKey: string) {
+  const rootElement = editor.getRootElement()
+  const element = editor.getElementByKey(nodeKey)
+  if (rootElement === null || element === null) {
+    return null
+  }
+  return adjustedRectangle(element.getBoundingClientRect(), rootElement)
+}
+
+/**
  * Gets the coordinates of the selection in the Lexical editor.
  * @group Utils
  */
@@ -124,23 +161,7 @@ export function getSelectionRectangle(editor: LexicalEditor) {
       }
     }
 
-    const fixedContainer = getFixedContainingBlock(rootElement)
-    if (fixedContainer) {
-      const containerRect = fixedContainer.getBoundingClientRect()
-      return {
-        top: Math.round(rect.top - containerRect.top),
-        left: Math.round(rect.left - containerRect.left),
-        width: Math.round(rect.width),
-        height: Math.round(rect.height)
-      }
-    }
-
-    return {
-      top: Math.round(rect.top),
-      left: Math.round(rect.left),
-      width: Math.round(rect.width),
-      height: Math.round(rect.height)
-    }
+    return adjustedRectangle(rect, rootElement)
   } else if (activeElement?.className !== 'link-input') {
     return null
   }

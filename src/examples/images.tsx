@@ -1,5 +1,6 @@
 import React from 'react'
 import {
+  CreateLink,
   DiffSourceToggleWrapper,
   InsertImage,
   MDXEditor,
@@ -7,6 +8,8 @@ import {
   imagePlugin,
   insertImage$,
   jsxPlugin,
+  linkDialogPlugin,
+  linkPlugin,
   toolbarPlugin,
   usePublisher
 } from '../'
@@ -239,6 +242,42 @@ export function ImageDialogButtonExample() {
         ]}
         onChange={console.log}
       />
+    </>
+  )
+}
+
+const linkedImageMarkdown = `
+A paragraph with some text.
+
+![plain image](https://picsum.photos/200/300)
+
+[![linked image](https://picsum.photos/id/237/200/300)](https://example.com)
+`
+
+export const ImageWithLinkDialog: Story = () => {
+  const [markdown, setMarkdown] = React.useState(linkedImageMarkdown.trim())
+
+  return (
+    <>
+      <MDXEditor
+        markdown={linkedImageMarkdown}
+        plugins={[
+          imagePlugin(),
+          linkPlugin({ validateUrl: (url) => url.startsWith('https://') }),
+          linkDialogPlugin(),
+          diffSourcePlugin(),
+          toolbarPlugin({
+            toolbarContents: () => (
+              <DiffSourceToggleWrapper>
+                <CreateLink />
+                <InsertImage />
+              </DiffSourceToggleWrapper>
+            )
+          })
+        ]}
+        onChange={setMarkdown}
+      />
+      <output aria-label="Linked image Markdown">{markdown}</output>
     </>
   )
 }

@@ -1,14 +1,18 @@
 import { $createLinkNode, $isAutoLinkNode, $isLinkNode, LinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link'
-import { Action, Cell, Signal, filter, map, withLatestFrom } from '@mdxeditor/gurx'
+import { Action, Cell, Signal, map, withLatestFrom } from '@mdxeditor/gurx'
 import { JSX } from 'react'
 import {
+  $createNodeSelection,
   $createTextNode,
   $getNearestNodeFromDOMNode,
   $getNodeByKey,
   $getSelection,
   $insertNodes,
+  $isDecoratorNode,
+  $isNodeSelection,
   $isRangeSelection,
   $isTextNode,
+  $setSelection,
   COMMAND_PRIORITY_HIGH,
   COMMAND_PRIORITY_LOW,
   KEY_DOWN_COMMAND,
@@ -19,7 +23,7 @@ import {
 } from 'lexical'
 import { realmPlugin } from '../../RealmWithPlugins'
 import { IS_APPLE } from '../../utils/detectMac'
-import { getSelectedNode, getSelectionRectangle } from '../../utils/lexicalHelpers'
+import { getNodeRectangle, getSelectedNode, getSelectionRectangle } from '../../utils/lexicalHelpers'
 import { activeEditor$, addComposerChild$, createActiveEditorSubscription$, currentSelection$, readOnly$, viewMode$ } from '../core'
 import { LinkDialog } from './LinkDialog'
 import { $findMatchingParent } from '@lexical/utils'
@@ -38,6 +42,7 @@ export interface InactiveLinkDialog {
   type: 'inactive'
   rectangle?: undefined
   linkNodeKey?: undefined
+  decoratorNodeKey?: undefined
 }
 
 /**
@@ -51,6 +56,8 @@ export interface PreviewLinkDialog {
   /** The fail-closed URL used only for automatic preview navigation. */
   href?: string
   linkNodeKey: string
+  /** Set when the link wraps a single inline decorator node (e.g. an image) that the dialog targets. */
+  decoratorNodeKey?: string
   rectangle: RectData
 }
 
@@ -66,6 +73,8 @@ export interface EditLinkDialog {
   text: string
   withAnchorText: boolean
   linkNodeKey: string
+  /** Set when the dialog targets a single inline decorator node (e.g. an image) instead of a text selection. */
+  decoratorNodeKey?: string
   rectangle: RectData
 }
 
@@ -84,6 +93,15 @@ function getLinkNodeInSelection(selection: RangeSelection | null) {
     return node
   }
   return null
+}
+
+function getSelectedInlineDecorator(selection = $getSelection()) {
+  if (!$isNodeSelection(selection)) {
+    return null
+  }
+  const nodes = selection.getNodes()
+  const node = nodes.length === 1 ? nodes[0] : null
+  return $isDecoratorNode(node) && node.isInline() ? node : null
 }
 
 function getPreviewHref(editor: LexicalEditor | null, linkNodeKey: string, url: string): string {
@@ -136,9 +154,9 @@ export const linkDialogState$ = Cell<InactiveLinkDialog | PreviewLinkDialog | Ed
       (event) => {
         if (event.key === 'k' && (IS_APPLE ? event.metaKey : event.ctrlKey) && !r.getValue(readOnly$)) {
           const selection = $getSelection()
-          // we open the dialog if there's an actual selection
-          // or if the cursor is inside a link
-          if ($isRangeSelection(selection)) {
+          // we open the dialog if there's an actual selection, if the cursor is
+          // inside a link, or if an inline decorator node (e.g. an image) is selected
+          if ($isRangeSelection(selection) || getSelectedInlineDecorator(selection) !== null) {
             r.pub(openLinkEditDialog$)
             event.stopPropagation()
             event.preventDefault()
@@ -169,6 +187,7 @@ export const linkDialogState$ = Cell<InactiveLinkDialog | PreviewLinkDialog | Ed
             text,
             withAnchorText,
             linkNodeKey: state.linkNodeKey,
+            decoratorNodeKey: state.decoratorNodeKey,
             rectangle: state.rectangle
           } as EditLinkDialog)
         })
@@ -184,6 +203,48 @@ export const linkDialogState$ = Cell<InactiveLinkDialog | PreviewLinkDialog | Ed
     const title = payload.title?.trim() ?? ''
 
     if (url !== '') {
+      if (state.decoratorNodeKey !== undefined) {
+        let linkNodeKey = ''
+        let linkApplied = false
+
+        editor?.update(
+          () => {
+            const node = $getNodeByKey(state.decoratorNodeKey!)
+            if (node === null) {
+              return
+            }
+            const nodeSelection = $createNodeSelection()
+            nodeSelection.add(node.getKey())
+            $setSelection(nodeSelection)
+            linkApplied = editor.dispatchCommand(TOGGLE_LINK_COMMAND, url)
+            if (!linkApplied) {
+              return
+            }
+            const parent = node.getParent()
+            if ($isLinkNode(parent)) {
+              parent.setTitle(title)
+              linkNodeKey = parent.getKey()
+            }
+          },
+          { discrete: true }
+        )
+
+        if (linkNodeKey === '') {
+          return
+        }
+
+        r.pub(linkDialogState$, {
+          type: 'preview',
+          linkNodeKey,
+          decoratorNodeKey: state.decoratorNodeKey,
+          rectangle: state.rectangle,
+          title,
+          url,
+          href: getPreviewHref(editor, linkNodeKey, url)
+        } as PreviewLinkDialog)
+        return
+      }
+
       if (selection?.isCollapsed()) {
         const linkContent = text || title || url
 
@@ -229,7 +290,20 @@ export const linkDialogState$ = Cell<InactiveLinkDialog | PreviewLinkDialog | Ed
       } as PreviewLinkDialog)
     } else {
       if (state.type === 'edit' && state.initialUrl !== '') {
-        editor?.dispatchCommand(TOGGLE_LINK_COMMAND, null)
+        if (state.decoratorNodeKey !== undefined) {
+          editor?.update(() => {
+            const node = $getNodeByKey(state.decoratorNodeKey!)
+            if (node === null) {
+              return
+            }
+            const nodeSelection = $createNodeSelection()
+            nodeSelection.add(node.getKey())
+            $setSelection(nodeSelection)
+            editor.dispatchCommand(TOGGLE_LINK_COMMAND, null)
+          })
+        } else {
+          editor?.dispatchCommand(TOGGLE_LINK_COMMAND, null)
+        }
       }
       r.pub(linkDialogState$, {
         type: 'inactive'
@@ -254,6 +328,7 @@ export const linkDialogState$ = Cell<InactiveLinkDialog | PreviewLinkDialog | Ed
               url: state.initialUrl,
               href: getPreviewHref(editor, state.linkNodeKey, state.initialUrl),
               linkNodeKey: state.linkNodeKey,
+              decoratorNodeKey: state.decoratorNodeKey,
               rectangle: state.rectangle
             } as PreviewLinkDialog
           }
@@ -269,7 +344,25 @@ export const linkDialogState$ = Cell<InactiveLinkDialog | PreviewLinkDialog | Ed
     r.pipe(
       r.combine(currentSelection$, onWindowChange$),
       withLatestFrom(activeEditor$, linkDialogState$, readOnly$),
-      map(([[selection], activeEditor, _, readOnly]) => {
+      map(([[selection], activeEditor, state, readOnly]) => {
+        if (state.decoratorNodeKey !== undefined && activeEditor && !readOnly) {
+          const selectedDecoratorKey = activeEditor.getEditorState().read(() => {
+            const editorSelection = $getSelection()
+            if (!$isNodeSelection(editorSelection)) {
+              return null
+            }
+            const nodes = editorSelection.getNodes()
+            return nodes.length === 1 ? nodes[0].getKey() : null
+          })
+
+          if (selectedDecoratorKey !== state.decoratorNodeKey) {
+            return { type: 'inactive' } as InactiveLinkDialog
+          }
+
+          const rectangle = getNodeRectangle(activeEditor, state.decoratorNodeKey)
+          return rectangle === null ? ({ type: 'inactive' } as InactiveLinkDialog) : { ...state, rectangle }
+        }
+
         if ($isRangeSelection(selection) && activeEditor && !readOnly) {
           const node = getLinkNodeInSelection(selection)
           if (!selection.isCollapsed()) return { type: 'inactive' } as InactiveLinkDialog
@@ -337,44 +430,84 @@ export const removeLink$ = Action((r) => {
  * @group Link Dialog
  */
 export const openLinkEditDialog$ = Action((r) => {
-  r.sub(
-    r.pipe(
-      openLinkEditDialog$,
-      withLatestFrom(currentSelection$, activeEditor$),
-      filter(([, selection]) => $isRangeSelection(selection))
-    ),
-    ([, selection, editor]) => {
-      editor?.focus(() => {
-        setTimeout(() => {
-          editor.getEditorState().read(() => {
-            const linkNode = getLinkNodeInSelection(selection)
-            const rectangle = getSelectionRectangle(editor)!
-            const initialUrl = linkNode?.getURL() ?? ''
-            const url = linkNode?.getURL() ?? ''
-            const title = linkNode?.getTitle() ?? ''
-            const linkNodeKey = linkNode?.getKey() ?? ''
+  r.sub(r.pipe(openLinkEditDialog$, withLatestFrom(currentSelection$, activeEditor$)), ([, selection, editor]) => {
+    if (!editor) {
+      return
+    }
 
-            const withAnchorText = linkNode
-              ? linkNode.getTextContent().length > 0 && linkNode.getChildrenSize() <= 1
-              : Boolean(selection?.isCollapsed())
+    // an inline decorator node (e.g. an image) is selected - target it so that
+    // the update wraps it in a link instead of acting on the stale text selection.
+    const decorator = editor.getEditorState().read(() => {
+      const node = getSelectedInlineDecorator()
+      if (node === null) {
+        return null
+      }
+      const parent = node.getParent()
+      const linkNode = $isLinkNode(parent) ? parent : null
+      return {
+        nodeKey: node.getKey(),
+        url: linkNode?.getURL() ?? '',
+        title: linkNode?.getTitle() ?? '',
+        linkNodeKey: linkNode?.getKey() ?? ''
+      }
+    })
 
-            const text = withAnchorText && linkNode ? linkNode.getTextContent() : ''
+    if (decorator !== null) {
+      const rectangle = getNodeRectangle(editor, decorator.nodeKey)
+      if (rectangle === null) {
+        return
+      }
+      r.pub(linkDialogState$, {
+        type: 'edit',
+        initialUrl: decorator.url,
+        url: decorator.url,
+        title: decorator.title,
+        text: '',
+        withAnchorText: false,
+        linkNodeKey: decorator.linkNodeKey,
+        decoratorNodeKey: decorator.nodeKey,
+        rectangle
+      })
+      return
+    }
 
-            r.pub(linkDialogState$, {
-              type: 'edit',
-              initialUrl,
-              url,
-              title,
-              text,
-              withAnchorText,
-              linkNodeKey,
-              rectangle
-            })
+    if (!$isRangeSelection(selection)) {
+      return
+    }
+
+    editor.focus(() => {
+      setTimeout(() => {
+        editor.getEditorState().read(() => {
+          const linkNode = getLinkNodeInSelection(selection)
+          const rectangle = getSelectionRectangle(editor)
+          if (rectangle === null) {
+            return
+          }
+          const initialUrl = linkNode?.getURL() ?? ''
+          const url = linkNode?.getURL() ?? ''
+          const title = linkNode?.getTitle() ?? ''
+          const linkNodeKey = linkNode?.getKey() ?? ''
+
+          const withAnchorText = linkNode
+            ? linkNode.getTextContent().length > 0 && linkNode.getChildrenSize() <= 1
+            : selection.isCollapsed()
+
+          const text = withAnchorText && linkNode ? linkNode.getTextContent() : ''
+
+          r.pub(linkDialogState$, {
+            type: 'edit',
+            initialUrl,
+            url,
+            title,
+            text,
+            withAnchorText,
+            linkNodeKey,
+            rectangle
           })
         })
       })
-    }
-  )
+    })
+  })
 })
 
 /** @internal */

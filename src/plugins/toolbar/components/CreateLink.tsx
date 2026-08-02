@@ -17,6 +17,9 @@ export const CreateLink = () => {
     <ButtonWithTooltip
       aria-label={t('toolbar.link', 'Create link')}
       title={t('toolbar.link', 'Create link')}
+      onPointerDown={(event) => {
+        event.preventDefault()
+      }}
       onClick={(_) => {
         openLinkDialog()
       }}
