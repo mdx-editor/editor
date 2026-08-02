@@ -82,6 +82,10 @@ export class FrontmatterNode extends DecoratorNode<JSX.Element> {
   isKeyboardSelectable(): boolean {
     return false
   }
+
+  isInline(): boolean {
+    return false
+  }
 }
 
 /**
