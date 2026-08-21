@@ -408,7 +408,9 @@ export const MDXEditor = React.forwardRef<MDXEditorMethods, MDXEditorProps>((pro
   const realmMethods = React.useRef<MDXEditorMethods | null>(null)
   const replayingRealmMethods = React.useRef<MDXEditorMethods | null>(null)
   const pendingMethodCalls = React.useRef<((methods: MDXEditorMethods) => void)[]>([])
-  const preReadyMarkdown = React.useRef(props.trim === false ? props.markdown : props.markdown.trim())
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- runtime markdown can be undefined/null
+  const initialMarkdown = props.markdown ?? ''
+  const preReadyMarkdown = React.useRef(props.trim === false ? initialMarkdown : initialMarkdown.trim())
   const callWhenReady = React.useCallback((call: (methods: MDXEditorMethods) => void) => {
     const methods = realmMethods.current
     if (methods && replayingRealmMethods.current === null) {

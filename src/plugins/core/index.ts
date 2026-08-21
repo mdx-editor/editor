@@ -370,15 +370,18 @@ export const setMarkdown$ = Signal<string>((r) => {
       setMarkdown$,
       withLatestFrom(markdown$, rootEditor$, inFocus$),
       filter(([newMarkdown, oldMarkdown]) => {
-        return newMarkdown.trim() !== oldMarkdown.trim()
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- runtime values can be undefined
+        return (newMarkdown ?? '').trim() !== (oldMarkdown ?? '').trim()
       })
     ),
     ([theNewMarkdownValue, , editor, inFocus]) => {
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- runtime values can be undefined
+      const markdown = theNewMarkdownValue ?? ''
       r.pub(muteChange$, true)
       editor?.update(
         () => {
           $getRoot().clear()
-          tryImportingMarkdown(r, $getRoot(), theNewMarkdownValue)
+          tryImportingMarkdown(r, $getRoot(), markdown)
 
           if (!inFocus) {
             $setSelection(null)
@@ -1012,7 +1015,7 @@ export const corePlugin = realmPlugin<{
         params?.editorState === null
           ? null
           : () => {
-              const markdown = params?.initialMarkdown.trim() ?? ''
+              const markdown = (params?.initialMarkdown ?? '').trim()
               tryImportingMarkdown(r, $getRoot(), markdown)
             }
     })

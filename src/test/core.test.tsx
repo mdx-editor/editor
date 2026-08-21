@@ -1,7 +1,7 @@
 import React from 'react'
 import { describe, expect, it, test, vi } from 'vitest'
 import { codeBlockPlugin, codeMirrorPlugin, MDXEditor, MDXEditorMethods, thematicBreakPlugin } from '../'
-import { render } from '@testing-library/react'
+import { act, render, waitFor } from '@testing-library/react'
 import { $getRoot, createEditor, ParagraphNode, TextNode } from 'lexical'
 import { QuoteNode } from '@lexical/rich-text'
 import { importMarkdownToLexical, type MarkdownParseOptions } from '../importMarkdownToLexical'
@@ -224,6 +224,31 @@ After fence.
     render(<MDXEditor ref={ref} markdown={'Before\n\n***\n\nAfter'} plugins={[thematicBreakPlugin()]} />)
 
     expect(ref.current?.getMarkdown().trim()).toEqual('Before\n\n***\n\nAfter')
+  })
+})
+
+describe('undefined markdown resilience', () => {
+  it('renders an empty editor when markdown is undefined', () => {
+    const ref = React.createRef<MDXEditorMethods>()
+    render(<MDXEditor ref={ref} markdown={undefined as unknown as string} />)
+    expect(ref.current?.getMarkdown().trim()).toEqual('')
+  })
+
+  it('renders an empty editor when markdown is null', () => {
+    const ref = React.createRef<MDXEditorMethods>()
+    render(<MDXEditor ref={ref} markdown={null as unknown as string} />)
+    expect(ref.current?.getMarkdown().trim()).toEqual('')
+  })
+
+  it('treats setMarkdown(undefined) as empty without throwing', async () => {
+    const ref = React.createRef<MDXEditorMethods>()
+    render(<MDXEditor ref={ref} markdown="hello" />)
+    act(() => {
+      ref.current?.setMarkdown(undefined as unknown as string)
+    })
+    await waitFor(() => {
+      expect(ref.current?.getMarkdown().trim()).toEqual('')
+    })
   })
 })
 
