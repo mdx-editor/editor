@@ -1,4 +1,4 @@
-import { $createParagraphNode, ElementNode, RootNode } from 'lexical'
+import { ElementNode } from 'lexical'
 import { MdxJsxTextElement } from 'mdast-util-mdx'
 import { $createLexicalJsxNode } from './LexicalJsxNode'
 import { MdastImportVisitor } from '../../importMarkdownToLexical'
@@ -14,22 +14,11 @@ export const MdastMdxJsxElementVisitor: MdastImportVisitor<MdxJsxTextElement | M
     }
     return false
   },
-  visitNode({ lexicalParent, mdastNode, descriptors: { jsxComponentDescriptors }, metaData }) {
-    const descriptor =
-      jsxComponentDescriptors.find((descriptor) => descriptor.name === mdastNode.name) ??
-      jsxComponentDescriptors.find((descriptor) => descriptor.name === '*')
-
-    // the parser does not know that the node should be treated as an inline element, but our descriptor does.
-    if (descriptor?.kind === 'text' && mdastNode.type === 'mdxJsxFlowElement') {
-      const patchedNode = { ...mdastNode, type: 'mdxJsxTextElement' } as MdxJsxTextElement
-      const paragraph = $createParagraphNode()
-      paragraph.append($createLexicalJsxNode(patchedNode, mdastNode.name ? metaData.importDeclarations[mdastNode.name] : undefined))
-      ;(lexicalParent as RootNode).append(paragraph)
-    } else {
-      ;(lexicalParent as ElementNode).append(
-        $createLexicalJsxNode(mdastNode, mdastNode.name ? metaData.importDeclarations[mdastNode.name] : undefined)
-      )
-    }
+  visitNode({ lexicalParent, mdastNode, metaData }) {
+    ;(lexicalParent as ElementNode).append(
+      $createLexicalJsxNode(mdastNode, mdastNode.name ? metaData.importDeclarations[mdastNode.name] : undefined)
+    )
   },
-  priority: -200
+  priority: -200,
+  jsxKindReconciliationOwner: true
 }

@@ -124,7 +124,7 @@ export const GenericJsxEditor: React.FC<GenericJsxEditorProps> = ({ mdastNode, d
 
       {descriptor.hasChildren ? (
         <NestedLexicalEditor<MdxJsxTextElement | MdxJsxFlowElement>
-          block={descriptor.kind === 'flow'}
+          block={mdastNode.type === 'mdxJsxFlowElement'}
           getContent={(node) => node.children as PhrasingContent[]}
           getUpdatedMdastNode={(mdastNode, children) => {
             return { ...mdastNode, children } as any
