@@ -20,6 +20,12 @@ To handle common basic HTML formatting (e.g. `u` tags), the default parsing incl
 
 Another problem that can occur during markdown parsing is the lack of plugins to handle certain markdown features. For example, the markdown may include table syntax, but the editor may not have the table plugin enabled. Internally, this exception is going to happen at the phase where MDAST nodes are converted into lexical nodes (the UI rendered in the rich text editing surface). Just like in the previous case, you can use the `onError` prop to handle these errors. You can also add a custom "catch-all" plugin that registers an MDAST visitor with a low priority that will handle all unknown nodes. See `./extending-the-editor` for more information.
 
+## Errors due to JSX kind mismatches
+
+The MDX parser can produce a text JSX node for a component declared as `flow`, or a flow JSX node for a component declared as `text`. The `jsxPlugin` `kindMismatchPolicy` parameter controls this behavior. Its default `source` value preserves the parser's content model. Use `normalize` to make descriptors authoritative for lossless conversions, or `error` to reject all mismatches.
+
+Normalization reports an error when it would need to split surrounding paragraph text or flatten multiple blocks. The `onError` payload identifies the component, parsed kind, declared kind, and active policy. The original Markdown remains available so that the author can recover in source mode.
+
 ## Enable source mode to allow the user to recover from errors
 
 The diff-source plugin can be used as an "escape hatch" for potentially invalid markdown. Out of the box, the plugin will attach listeners to the markdown conversion, and, if it fails, will display an error message suggesting the user to switch to source mode and fix the problem there. If the user fixes the problem, then switching to rich text mode will work and the content will be displayed correctly.

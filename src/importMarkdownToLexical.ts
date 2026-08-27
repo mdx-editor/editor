@@ -9,6 +9,7 @@ import { FORMAT } from './FormatConstants'
 import { CodeBlockEditorDescriptor } from './plugins/codeblock'
 import { DirectiveDescriptor } from './plugins/directives'
 import { JsxComponentDescriptor } from './plugins/jsx'
+import { type JsxKindMismatchPolicy, reconcileJsxKindMismatches } from './plugins/jsx/reconcileJsxKind'
 
 export interface ImportStatement {
   source: string
@@ -27,6 +28,8 @@ interface MetaData {
  */
 export interface Descriptors {
   jsxComponentDescriptors: JsxComponentDescriptor[]
+  /** How parsed JSX node kinds are reconciled with their component descriptors. */
+  jsxKindMismatchPolicy?: JsxKindMismatchPolicy
   directiveDescriptors: DirectiveDescriptor[]
   codeBlockEditorDescriptors: CodeBlockEditorDescriptor[]
   /**
@@ -122,6 +125,8 @@ export interface MdastImportVisitor<UN extends Mdast.Nodes> {
    * Default 0, optional, sets the priority of the visitor. The higher the number, the earlier it will be called.
    */
   priority?: number
+  /** @internal Marks the visitor that owns descriptor-based JSX kind reconciliation. */
+  jsxKindReconciliationOwner?: boolean
 }
 
 function isParent(node: unknown): node is Mdast.Parent {
@@ -242,11 +247,30 @@ export function importMarkdownToLexical({
 }
 
 export function importMdastTreeToLexical({ root, mdastRoot, visitors, ...descriptors }: MdastTreeImportOptions): void {
+  visitors = visitors.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0))
+
+  function findVisitor(mdastNode: Mdast.Nodes, skipVisitors: Set<number> | null = null) {
+    return visitors.find((visitor, index) => {
+      if (skipVisitors?.has(index)) {
+        return false
+      }
+      if (typeof visitor.testNode === 'string') {
+        return visitor.testNode === mdastNode.type
+      }
+      return visitor.testNode(mdastNode, descriptors)
+    })
+  }
+
+  mdastRoot = reconcileJsxKindMismatches(
+    mdastRoot,
+    descriptors.jsxComponentDescriptors,
+    descriptors.jsxKindMismatchPolicy ?? 'source',
+    (node) => findVisitor(node)?.jsxKindReconciliationOwner === true
+  )
+
   const formattingMap = new WeakMap<Mdast.Parent, number>()
   const styleMap = new WeakMap<Mdast.Parent, string>()
   const metaData: MetaData = gatherMetadata(mdastRoot)
-
-  visitors = visitors.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0))
 
   function visitChildren(mdastNode: Mdast.Parent, lexicalParent: LexicalNode) {
     if (!isParent(mdastNode)) {
@@ -263,15 +287,7 @@ export function importMdastTreeToLexical({ root, mdastRoot, visitors, ...descrip
     mdastParent: Mdast.Parent | null,
     skipVisitors: Set<number> | null = null
   ) {
-    const visitor = visitors.find((visitor, index) => {
-      if (skipVisitors?.has(index)) {
-        return false
-      }
-      if (typeof visitor.testNode === 'string') {
-        return visitor.testNode === mdastNode.type
-      }
-      return visitor.testNode(mdastNode, descriptors)
-    })
+    const visitor = findVisitor(mdastNode, skipVisitors)
     if (!visitor) {
       try {
         throw new UnrecognizedMarkdownConstructError(`Unsupported markdown syntax: ${toMarkdown(mdastNode)}`)

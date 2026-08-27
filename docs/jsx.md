@@ -107,6 +107,33 @@ more Content
 </BlockNode>
 ```
 
+## JSX kind mismatches
+
+The MDX parser determines whether JSX is a text or flow node from its Markdown context. A component descriptor declares how MDXEditor intends to edit that component. These values can differ. For example, this valid one-line MDX is parsed as a text node even when `Card.Header` has a `flow` descriptor:
+
+```text
+<Card.Header><Icon /> Text</Card.Header>
+```
+
+Use `kindMismatchPolicy` to select how `jsxPlugin` handles the mismatch:
+
+```tsx
+jsxPlugin({
+  jsxComponentDescriptors,
+  kindMismatchPolicy: 'normalize'
+})
+```
+
+- `source` is the default. The parsed node type controls the nested editor, and MDXEditor does not rewrite the JSX kind.
+- `normalize` makes the descriptor authoritative when conversion is lossless. A standalone one-line text element declared as `flow` is converted to flow content and can be serialized in multiline form.
+- `error` rejects every mismatch through the editor's `onError` callback.
+
+The policy applies only to nodes handled as descriptor-based JSX components. Built-in HTML elements keep their existing handling, including when the descriptor list contains a wildcard entry.
+
+Normalization does not split surrounding paragraphs or flatten multiple blocks. Such conversions could change or discard content, so they produce a recoverable error. Write block components on separate lines when they occur next to other text.
+
+`GenericJsxEditor` follows these policies. A custom JSX editor receives both `mdastNode` and `descriptor`; in `source` mode, it should derive its content model from `mdastNode.type`.
+
 ## Types of properties
 
 There are two types of properties - "textual" and "expressions" in JSX. You can define type in `JsxComponentDescriptor`. `jsxPlugin` will treat the value based on this setting. For example, this code:
