@@ -1,6 +1,13 @@
 import { $createHeadingNode, HeadingNode } from '@lexical/rich-text'
 import { Cell } from '@mdxeditor/gurx'
-import { $createParagraphNode, COMMAND_PRIORITY_LOW, KEY_DOWN_COMMAND } from 'lexical'
+import {
+  $createParagraphNode,
+  $isLineBreakNode,
+  COMMAND_PRIORITY_LOW,
+  KEY_DOWN_COMMAND,
+  type ParagraphNode,
+  type RangeSelection
+} from 'lexical'
 import { realmPlugin } from '../../RealmWithPlugins'
 import { controlOrMeta } from '../../utils/detectMac'
 import {
@@ -13,6 +20,44 @@ import {
 } from '../core'
 import { LexicalHeadingVisitor } from './LexicalHeadingVisitor'
 import { MdastHeadingVisitor } from './MdastHeadingVisitor'
+
+function $isAtStartOfHeading(heading: HeadingNode, selection: RangeSelection | undefined): boolean {
+  if (selection === undefined || heading.isEmpty()) {
+    return false
+  }
+  const firstDescendant = heading.getFirstDescendant()
+  return firstDescendant !== null && selection.anchor.key === firstDescendant.getKey() && selection.anchor.offset === 0
+}
+
+function $splitAfterLineBreak(selection: RangeSelection | undefined): boolean {
+  return selection?.anchor.offset === 0 && $isLineBreakNode(selection.anchor.getNode().getPreviousSibling())
+}
+
+// Lexical treats any text offset 0 as the start of the heading, so Enter after a
+// Shift+Enter linebreak moves the heading onto the latter line.
+function $insertNewHeadingAfter(this: HeadingNode, selection?: RangeSelection, restoreSelection = true): ParagraphNode | HeadingNode {
+  const lastDescendant = this.getLastDescendant()
+  const isAtEnd =
+    !lastDescendant ||
+    (selection?.anchor.key === lastDescendant.getKey() && selection.anchor.offset === lastDescendant.getTextContentSize())
+  const splitAfterBreak = $splitAfterLineBreak(selection)
+  const newElement = isAtEnd || selection === undefined || splitAfterBreak ? $createParagraphNode() : $createHeadingNode(this.getTag())
+  const direction = this.getDirection()
+  newElement.setDirection(direction)
+  this.insertAfter(newElement, restoreSelection)
+  if ($isAtStartOfHeading(this, selection) && selection) {
+    const paragraph = $createParagraphNode()
+    paragraph.select()
+    this.replace(paragraph, true)
+  }
+  if (splitAfterBreak && selection) {
+    const lineBreak = selection.anchor.getNode().getPreviousSibling()
+    if ($isLineBreakNode(lineBreak)) {
+      lineBreak.remove()
+    }
+  }
+  return newElement
+}
 
 const FORMATTING_KEYS = ['Digit0', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6']
 
@@ -80,6 +125,7 @@ export const headingsPlugin = realmPlugin<{
   allowedHeadingLevels?: readonly HEADING_LEVEL[]
 }>({
   init(realm, params) {
+    HeadingNode.prototype.insertNewAfter = $insertNewHeadingAfter
     realm.pubIn({
       [addActivePlugin$]: 'headings',
       [addImportVisitor$]: MdastHeadingVisitor,
