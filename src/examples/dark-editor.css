@@ -28,17 +28,17 @@
   --baseText: var(--mauve-11);
   --baseTextContrast: var(--mauve-12);
 
-  --admonitionTipBg: var(--cyan4);
-  --admonitionTipBorder: var(--cyan8);
+  --admonitionTipBg: var(--cyan-4);
+  --admonitionTipBorder: var(--cyan-8);
   
-  --admonitionInfoBg: var(--grass4);
-  --admonitionInfoBorder: var(--grass8);
+  --admonitionInfoBg: var(--grass-4);
+  --admonitionInfoBorder: var(--grass-8);
 
-  --admonitionCautionBg: var(--amber4);
-  --admonitionCautionBorder: var(--amber8);
+  --admonitionCautionBg: var(--amber-4);
+  --admonitionCautionBorder: var(--amber-8);
 
-  --admonitionDangerBg: var(--red4);
-  --admonitionDangerBorder: var(--red8);
+  --admonitionDangerBg: var(--red-4);
+  --admonitionDangerBorder: var(--red-8);
 
   --admonitionNoteBg: var(--mauve-4);
   --admonitionNoteBorder: var(--mauve-8);
