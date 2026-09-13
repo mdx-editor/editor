@@ -1,4 +1,4 @@
-blank_issues_enabled: true # force the usage of a template
+blank_issues_enabled: false # force the usage of a template
 contact_links:
   - name: Feature Requests, support and consulting
     url: https://github.com/sponsors/petyosi
