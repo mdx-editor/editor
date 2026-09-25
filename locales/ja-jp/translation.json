@@ -1,0 +1,118 @@
+{
+  "frontmatterEditor": {
+    "title": "文書のメタデータを編集",
+    "key": "キー",
+    "value": "値",
+    "addEntry": "項目を追加"
+  },
+  "dialogControls": {
+    "save": "保存",
+    "cancel": "キャンセル"
+  },
+  "uploadImage": {
+    "dialogTitle": "画像をアップロード",
+    "uploadInstructions": "端末から画像をアップロード：",
+    "addViaUrlInstructions": "または、URL を指定して画像を追加：",
+    "autoCompletePlaceholder": "画像の URL を選択または貼り付け",
+    "alt": "代替テキスト：",
+    "title": "タイトル：",
+    "width": "幅：",
+    "height": "高さ："
+  },
+  "imageEditor": {
+    "deleteImage": "画像を削除",
+    "editImage": "画像を編集"
+  },
+  "createLink": {
+    "url": "URL",
+    "urlPlaceholder": "URL を選択または貼り付け",
+    "text": "リンクに表示するテキスト",
+    "textTooltip": "リンクとして表示される文字列",
+    "title": "リンクのタイトル",
+    "titleTooltip": "リンクにマウスポインターを重ねると表示されるタイトル（title 属性）",
+    "saveTooltip": "リンク先を設定",
+    "cancelTooltip": "変更をキャンセル"
+  },
+  "linkPreview": {
+    "open": "{{url}} を新しいウィンドウで開く",
+    "edit": "リンク先を編集",
+    "copyToClipboard": "クリップボードにコピー",
+    "copied": "コピーしました",
+    "remove": "リンクを解除"
+  },
+  "table": {
+    "deleteTable": "表を削除",
+    "columnMenu": "列のメニュー",
+    "textAlignment": "文字の配置",
+    "alignLeft": "左揃え",
+    "alignCenter": "中央揃え",
+    "alignRight": "右揃え",
+    "insertColumnLeft": "左に列を挿入",
+    "insertColumnRight": "右に列を挿入",
+    "deleteColumn": "この列を削除",
+    "rowMenu": "行のメニュー",
+    "insertRowAbove": "上に行を挿入",
+    "insertRowBelow": "下に行を挿入",
+    "deleteRow": "この行を削除"
+  },
+  "toolbar": {
+    "blockTypes": {
+      "paragraph": "段落",
+      "quote": "引用",
+      "heading": "見出し {{level}}"
+    },
+    "blockTypeSelect": {
+      "selectBlockTypeTooltip": "ブロックの種類を選択",
+      "placeholder": "ブロックの種類"
+    },
+    "toggleGroup": "切り替えボタンのグループ",
+    "removeBold": "太字を解除",
+    "bold": "太字",
+    "removeItalic": "斜体を解除",
+    "italic": "斜体",
+    "underline": "下線",
+    "removeUnderline": "下線を解除",
+    "removeInlineCode": "インラインコードを解除",
+    "inlineCode": "インラインコード",
+    "link": "リンクを挿入",
+    "richText": "リッチテキスト",
+    "diffMode": "差分表示",
+    "source": "ソース編集",
+    "admonition": "補足・注意のブロックを挿入",
+    "codeBlock": "コードブロックを挿入",
+    "editFrontmatter": "メタデータを編集",
+    "insertFrontmatter": "メタデータを挿入",
+    "image": "画像を挿入",
+    "table": "表を挿入",
+    "thematicBreak": "区切り線を挿入",
+    "bulletedList": "箇条書き",
+    "numberedList": "番号付きリスト",
+    "checkList": "チェックリスト",
+    "undo": "元に戻す {{shortcut}}",
+    "redo": "やり直す {{shortcut}}",
+    "highlight": "ハイライト",
+    "removeHighlight": "ハイライトを解除",
+    "superscript": "上付き文字",
+    "subscript": "下付き文字",
+    "strikethrough": "取り消し線",
+    "removeSubscript": "下付き文字を解除",
+    "removeSuperscript": "上付き文字を解除",
+    "removeStrikethrough": "取り消し線を解除"
+  },
+  "admonitions": {
+    "note": "補足",
+    "tip": "ヒント",
+    "danger": "警告",
+    "info": "情報",
+    "caution": "注意",
+    "changeType": "補足・注意のブロックの種類を選択",
+    "placeholder": "補足・注意のブロックの種類"
+  },
+  "codeBlock": {
+    "language": "コードの言語",
+    "selectLanguage": "コードの言語を選択"
+  },
+  "contentArea": {
+    "editableMarkdown": "Markdown の編集領域"
+  }
+}
