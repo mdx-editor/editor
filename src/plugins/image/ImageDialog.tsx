@@ -66,6 +66,9 @@ export const ImageDialog: React.FC = () => {
           }}
         >
           <Dialog.Title>{t('uploadImage.dialogTitle', 'Upload an image')}</Dialog.Title>
+          <Dialog.Description className={styles.visuallyHidden}>
+            {t('uploadImage.dialogDescription', 'Insert an image from a URL or upload one from your device.')}
+          </Dialog.Description>
           <form
             onSubmit={async (e) => {
               e.preventDefault()
