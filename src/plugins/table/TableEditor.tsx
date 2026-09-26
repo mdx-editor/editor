@@ -544,17 +544,21 @@ const ColumnEditor: React.FC<ColumnEditorProps> = ({
 }) => {
   const tableKey = lexicalTable.getKey()
   const [editorRootElementRef, iconComponentFor] = useCellValues(editorRootElementRef$, iconComponentFor$)
+  const [open, setOpen] = React.useState(false)
 
   const insertColumnAt = React.useCallback(
     (colIndex: number) => {
-      parentEditor.update(() => {
-        const currentTable = $getTableNodeByKey(tableKey)
-        if (!currentTable) {
-          return
-        }
-        currentTable.insertColumnAt(colIndex)
-        setActiveCellWithBoundaries([colIndex, 0])
-      })
+      setOpen(false)
+      setTimeout(() => {
+        parentEditor.update(() => {
+          const currentTable = $getTableNodeByKey(tableKey)
+          if (!currentTable) {
+            return
+          }
+          currentTable.insertColumnAt(colIndex)
+          setActiveCellWithBoundaries([colIndex, 0])
+        })
+      }, 0)
     },
     [parentEditor, setActiveCellWithBoundaries, tableKey]
   )
@@ -579,7 +583,7 @@ const ColumnEditor: React.FC<ColumnEditorProps> = ({
 
   const t = useTranslation()
   return (
-    <RadixPopover.Root>
+    <RadixPopover.Root open={open} onOpenChange={setOpen}>
       <RadixPopover.PopoverTrigger
         className={styles.tableColumnEditorTrigger}
         data-active={highlightedCoordinates[0] === colIndex + 1}
