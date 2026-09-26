@@ -3,7 +3,8 @@
     "title": "Edit document frontmatter",
     "key": "Key",
     "value": "Value",
-    "addEntry": "Add entry"
+    "addEntry": "Add entry",
+    "dialogDescription": "Add, edit, or remove the key-value entries of the document frontmatter."
   },
   "dialogControls": {
     "save": "Save",
@@ -17,7 +18,9 @@
     "alt": "Alt:",
     "title": "Title:",
     "width": "Width:",
-    "height": "Height:"
+    "height": "Height:",
+    "dialogDescription": "Insert an image from a URL or upload one from your device.",
+    "addViaUrlInstructionsNoUpload": "Add an image from an URL:"
   },
   "imageEditor": {
     "deleteImage": "Delete image",
@@ -91,7 +94,13 @@
     "undo": "Undo {{shortcut}}",
     "redo": "Redo {{shortcut}}",
     "highlight": "Highlight",
-    "removeHighlight": "Remove highlight"
+    "removeHighlight": "Remove highlight",
+    "strikethrough": "Strikethrough",
+    "removeStrikethrough": "Remove strikethrough",
+    "superscript": "Superscript",
+    "removeSuperscript": "Remove superscript",
+    "subscript": "Subscript",
+    "removeSubscript": "Remove subscript"
   },
   "admonitions": {
     "note": "Note",
@@ -104,9 +113,13 @@
   },
   "codeBlock": {
     "language": "Code block language",
-    "selectLanguage": "Select code block language"
+    "selectLanguage": "Select code block language",
+    "inlineLanguage": "Language"
   },
   "contentArea": {
     "editableMarkdown": "editable markdown"
+  },
+  "dialog": {
+    "close": "Close dialog"
   }
 }
