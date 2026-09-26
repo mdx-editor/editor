@@ -1,6 +1,7 @@
 import { realmPlugin } from '../../RealmWithPlugins'
 import { createEmptyHistoryState } from '@lexical/history'
 import { $isHeadingNode, HeadingTagType } from '@lexical/rich-text'
+import { $isListItemNode } from '@lexical/list'
 import { $setBlocksType } from '@lexical/selection'
 import { $findMatchingParent, $insertNodeToNearestRoot, $wrapNodeInElement } from '@lexical/utils'
 import { Cell, NodeRef, Realm, Signal, filter, map, scan, useCellValue, withLatestFrom } from '@mdxeditor/gurx'
@@ -822,6 +823,57 @@ export const convertSelectionToNode$ = Signal<() => ElementNode>((r) => {
 })
 
 /**
+ * Returns the direct child of `parent` that contains `node`, or null when `node` is not a descendant of `parent`.
+ */
+function $getChildContaining(parent: ElementNode, node: LexicalNode): LexicalNode | null {
+  let current: LexicalNode | null = node
+  while (current !== null && !current.is(parent)) {
+    if (current.getParent() === parent) {
+      return current
+    }
+    current = current.getParent()
+  }
+  return null
+}
+
+/**
+ * Inserts a decorator node at the current selection.
+ *
+ * Block-level decorator nodes are normally hoisted to the nearest root, but doing that from within a list
+ * item tears the node out of the list and splits the list in two, which breaks the list numbering.
+ * When the selection sits inside a list item, the node is inserted into that list item instead.
+ * @group Core
+ */
+export function $insertDecoratorNodeAtSelection(node: DecoratorNode<unknown>): void {
+  if (node.isInline()) {
+    $insertNodes([node])
+    if ($isRootOrShadowRoot(node.getParentOrThrow())) {
+      $wrapNodeInElement(node, $createParagraphNode).selectEnd()
+    }
+    return
+  }
+
+  const selection = $getSelection()
+  const anchorNode = $isRangeSelection(selection) ? selection.anchor.getNode() : null
+
+  if (anchorNode !== null) {
+    const listItem = $findMatchingParent(anchorNode, $isListItemNode)
+    if ($isListItemNode(listItem)) {
+      const enclosingBlock = $getChildContaining(listItem, anchorNode)
+      if (enclosingBlock === null) {
+        // The selection sits on the list item itself, so there is no block to insert after.
+        listItem.append(node)
+      } else {
+        enclosingBlock.insertAfter(node)
+      }
+      return
+    }
+  }
+
+  $insertNodeToNearestRoot(node)
+}
+
+/**
  * Inserts a decorator node (constructed by the published factory) at the current selection.
  * @group Core
  */
@@ -834,14 +886,7 @@ export const insertDecoratorNode$ = Signal<() => DecoratorNode<unknown>>((r) => 
           if ($isRangeSelection(selection)) {
             theEditor.update(() => {
               const node = nodeFactory()
-              if (node.isInline()) {
-                $insertNodes([node])
-                if ($isRootOrShadowRoot(node.getParentOrThrow())) {
-                  $wrapNodeInElement(node, $createParagraphNode).selectEnd()
-                }
-              } else {
-                $insertNodeToNearestRoot(node)
-              }
+              $insertDecoratorNodeAtSelection(node)
               setTimeout(() => {
                 if ('select' in node && typeof node.select === 'function') {
                   // eslint-disable-next-line @typescript-eslint/no-unsafe-call
