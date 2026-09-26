@@ -6,13 +6,16 @@ import { $setBlocksType } from '@lexical/selection'
 import { $findMatchingParent, $insertNodeToNearestRoot, $wrapNodeInElement } from '@lexical/utils'
 import { Cell, NodeRef, Realm, Signal, filter, map, scan, useCellValue, withLatestFrom } from '@mdxeditor/gurx'
 import {
+  $caretFromPoint,
   $createParagraphNode,
   $getRoot,
   $getSelection,
   $insertNodes,
   $isRangeSelection,
+  $isTextPointCaret,
   $isRootOrShadowRoot,
   $setSelection,
+  $splitAtPointCaretNext,
   BLUR_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
   DecoratorNode,
@@ -27,6 +30,7 @@ import {
   LexicalNode,
   LexicalNodeReplacement,
   ParagraphNode,
+  PointCaret,
   RangeSelection,
   SELECTION_CHANGE_COMMAND,
   TextFormatType,
@@ -823,20 +827,6 @@ export const convertSelectionToNode$ = Signal<() => ElementNode>((r) => {
 })
 
 /**
- * Returns the direct child of `parent` that contains `node`, or null when `node` is not a descendant of `parent`.
- */
-function $getChildContaining(parent: ElementNode, node: LexicalNode): LexicalNode | null {
-  let current: LexicalNode | null = node
-  while (current !== null && !current.is(parent)) {
-    if (current.getParent() === parent) {
-      return current
-    }
-    current = current.getParent()
-  }
-  return null
-}
-
-/**
  * Inserts a decorator node at the current selection.
  *
  * Block-level decorator nodes are normally hoisted to the nearest root, but doing that from within a list
@@ -854,19 +844,19 @@ export function $insertDecoratorNodeAtSelection(node: DecoratorNode<unknown>): v
   }
 
   const selection = $getSelection()
-  const anchorNode = $isRangeSelection(selection) ? selection.anchor.getNode() : null
-
-  if (anchorNode !== null) {
-    const listItem = $findMatchingParent(anchorNode, $isListItemNode)
+  if ($isRangeSelection(selection)) {
+    const listItem = $findMatchingParent(selection.focus.getNode(), $isListItemNode)
     if ($isListItemNode(listItem)) {
-      const enclosingBlock = $getChildContaining(listItem, anchorNode)
-      if (enclosingBlock === null) {
-        // The selection sits on the list item itself, so there is no block to insert after.
-        listItem.append(node)
-      } else {
-        enclosingBlock.insertAfter(node)
+      // Split the text and any inline elements (such as links) at the caret, but stop at the list item
+      // rather than the root, the way $insertNodeToNearestRoot would.
+      let caret: PointCaret<'next'> | null = $caretFromPoint(selection.focus, 'next')
+      while (caret !== null && ($isTextPointCaret(caret) || !listItem.is(caret.getParentAtCaret()))) {
+        caret = $splitAtPointCaretNext(caret)
       }
-      return
+      if (caret !== null) {
+        caret.insert(node)
+        return
+      }
     }
   }
 

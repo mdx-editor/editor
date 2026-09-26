@@ -1,5 +1,6 @@
 import { render } from '@testing-library/react'
 import { $createParagraphNode, $createTextNode, $getRoot, createEditor, ParagraphNode, TextNode, type LexicalNode } from 'lexical'
+import { $createLinkNode, LinkNode } from '@lexical/link'
 import { $createListItemNode, $createListNode, ListItemNode, ListNode, registerList } from '@lexical/list'
 import React from 'react'
 import { describe, expect, it } from 'vitest'
@@ -34,7 +35,7 @@ function describeTree(node: LexicalNode, depth = 0): string[] {
 function createListEditor() {
   const editor = createEditor({
     namespace: 'codeblock-in-list',
-    nodes: [ParagraphNode, TextNode, ListItemNode, ListNode, CodeBlockNode],
+    nodes: [ParagraphNode, TextNode, LinkNode, ListItemNode, ListNode, CodeBlockNode],
     onError(error) {
       throw error
     }
@@ -95,5 +96,48 @@ describe('code blocks inside list items (#788)', () => {
     })
 
     expect(tree).toEqual(['root', '  paragraph', '    text', '  codeblock', '  paragraph'])
+  })
+
+  it('splits the list item text at the caret', () => {
+    const editor = createListEditor()
+    let tree: string[] = []
+    let texts: string[] = []
+
+    editor.update(() => {
+      const text = $createTextNode('beforeafter')
+      $getRoot().append($createListNode('number').append($createListItemNode().append(text)))
+      text.select(6, 6)
+
+      $insertDecoratorNodeAtSelection(newCodeBlock())
+    })
+    editor.update(() => {
+      tree = describeTree($getRoot())
+      texts = $getRoot()
+        .getAllTextNodes()
+        .map((node) => node.getTextContent())
+    })
+
+    expect(tree).toEqual(['root', '  list', '    listitem', '      text', '      codeblock', '      text'])
+    expect(texts).toEqual(['before', 'after'])
+  })
+
+  it('keeps the block out of an inline element that holds the caret', () => {
+    const editor = createListEditor()
+    let tree: string[] = []
+
+    editor.update(() => {
+      const linkText = $createTextNode('linktext')
+      $getRoot().append(
+        $createListNode('bullet').append($createListItemNode().append($createLinkNode('https://example.com').append(linkText)))
+      )
+      linkText.select(4, 4)
+
+      $insertDecoratorNodeAtSelection(newCodeBlock())
+    })
+    editor.update(() => {
+      tree = describeTree($getRoot())
+    })
+
+    expect(tree).toEqual(['root', '  list', '    listitem', '      link', '        text', '      codeblock', '      link', '        text'])
   })
 })
