@@ -842,7 +842,7 @@ function $getChildContaining(parent: ElementNode, node: LexicalNode): LexicalNod
  * Block-level decorator nodes are normally hoisted to the nearest root, but doing that from within a list
  * item tears the node out of the list and splits the list in two, which breaks the list numbering.
  * When the selection sits inside a list item, the node is inserted into that list item instead.
- * @group Core
+ * @internal
  */
 export function $insertDecoratorNodeAtSelection(node: DecoratorNode<unknown>): void {
   if (node.isInline()) {
