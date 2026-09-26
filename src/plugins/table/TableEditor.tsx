@@ -93,7 +93,11 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
 
   const setActiveCellWithBoundaries = React.useCallback(
     (cell: [number, number] | null) => {
-      const colCount = lexicalTable.getColCount()
+      // The lexicalTable prop lags behind structural changes until the next render.
+      const [colCount, rowCount] = parentEditor.getEditorState().read(() => {
+        const currentTable = $getTableNodeByKey(tableKey)
+        return currentTable ? [currentTable.getColCount(), currentTable.getRowCount()] : [0, 0]
+      })
 
       if (cell === null) {
         setActiveCell(null)
@@ -113,7 +117,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
         rowIndex -= 1
       }
 
-      if (rowIndex > lexicalTable.getRowCount() - 1) {
+      if (rowIndex > rowCount - 1) {
         setActiveCell(null)
         parentEditor.update(() => {
           const currentTable = $getTableNodeByKey(tableKey)
@@ -142,7 +146,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
 
       setActiveCell([colIndex, rowIndex])
     },
-    [lexicalTable, parentEditor, tableKey]
+    [parentEditor, tableKey]
   )
   React.useEffect(() => {
     lexicalTable.focusEmitter.subscribe(setActiveCellWithBoundaries)
@@ -151,14 +155,24 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
   const addRowToBottom = React.useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault()
-      parentEditor.update(() => {
-        const currentTable = $getTableNodeByKey(tableKey)
-        if (!currentTable) {
-          return
+      let nextCell: [number, number] | null = null
+      parentEditor.update(
+        () => {
+          const currentTable = $getTableNodeByKey(tableKey)
+          if (!currentTable) {
+            return
+          }
+          nextCell = [0, currentTable.getRowCount()]
+          currentTable.addRowToBottom()
+        },
+        {
+          onUpdate: () => {
+            if (nextCell) {
+              setActiveCell(nextCell)
+            }
+          }
         }
-        currentTable.addRowToBottom()
-        setActiveCell([0, currentTable.getRowCount()])
-      })
+      )
     },
     [parentEditor, tableKey]
   )
@@ -167,14 +181,24 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
   const addColumnToRight = React.useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault()
-      parentEditor.update(() => {
-        const currentTable = $getTableNodeByKey(tableKey)
-        if (!currentTable) {
-          return
+      let nextCell: [number, number] | null = null
+      parentEditor.update(
+        () => {
+          const currentTable = $getTableNodeByKey(tableKey)
+          if (!currentTable) {
+            return
+          }
+          nextCell = [currentTable.getColCount(), 0]
+          currentTable.addColumnToRight()
+        },
+        {
+          onUpdate: () => {
+            if (nextCell) {
+              setActiveCell(nextCell)
+            }
+          }
         }
-        currentTable.addColumnToRight()
-        setActiveCell([currentTable.getColCount(), 0])
-      })
+      )
     },
     [parentEditor, tableKey]
   )
@@ -544,21 +568,27 @@ const ColumnEditor: React.FC<ColumnEditorProps> = ({
 }) => {
   const tableKey = lexicalTable.getKey()
   const [editorRootElementRef, iconComponentFor] = useCellValues(editorRootElementRef$, iconComponentFor$)
-  const [open, setOpen] = React.useState(false)
 
   const insertColumnAt = React.useCallback(
     (colIndex: number) => {
-      setOpen(false)
-      setTimeout(() => {
-        parentEditor.update(() => {
+      let inserted = false
+      parentEditor.update(
+        () => {
           const currentTable = $getTableNodeByKey(tableKey)
           if (!currentTable) {
             return
           }
           currentTable.insertColumnAt(colIndex)
-          setActiveCellWithBoundaries([colIndex, 0])
-        })
-      }, 0)
+          inserted = true
+        },
+        {
+          onUpdate: () => {
+            if (inserted) {
+              setActiveCellWithBoundaries([colIndex, 0])
+            }
+          }
+        }
+      )
     },
     [parentEditor, setActiveCellWithBoundaries, tableKey]
   )
@@ -583,7 +613,7 @@ const ColumnEditor: React.FC<ColumnEditorProps> = ({
 
   const t = useTranslation()
   return (
-    <RadixPopover.Root open={open} onOpenChange={setOpen}>
+    <RadixPopover.Root>
       <RadixPopover.PopoverTrigger
         className={styles.tableColumnEditorTrigger}
         data-active={highlightedCoordinates[0] === colIndex + 1}
@@ -663,14 +693,24 @@ const RowEditor: React.FC<RowEditorProps> = ({
 
   const insertRowAt = React.useCallback(
     (rowIndex: number) => {
-      parentEditor.update(() => {
-        const currentTable = $getTableNodeByKey(tableKey)
-        if (!currentTable) {
-          return
+      let inserted = false
+      parentEditor.update(
+        () => {
+          const currentTable = $getTableNodeByKey(tableKey)
+          if (!currentTable) {
+            return
+          }
+          currentTable.insertRowAt(rowIndex)
+          inserted = true
+        },
+        {
+          onUpdate: () => {
+            if (inserted) {
+              setActiveCellWithBoundaries([0, rowIndex])
+            }
+          }
         }
-        currentTable.insertRowAt(rowIndex)
-        setActiveCellWithBoundaries([0, rowIndex])
-      })
+      )
     },
     [parentEditor, setActiveCellWithBoundaries, tableKey]
   )
