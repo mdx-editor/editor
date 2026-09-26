@@ -74,6 +74,9 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
           <Dialog.Overlay className={styles.dialogOverlay} />
           <Dialog.Content className={styles.largeDialogContent} data-editor-type="frontmatter">
             <Dialog.Title className={styles.dialogTitle}>{t('frontmatterEditor.title', 'Edit document frontmatter')}</Dialog.Title>
+            <Dialog.Description className={styles.visuallyHidden}>
+              {t('frontmatterEditor.dialogDescription', 'Add, edit, or remove the key-value entries of the document frontmatter.')}
+            </Dialog.Description>
             <form
               onSubmit={(e) => {
                 void handleSubmit(onSubmit)(e)

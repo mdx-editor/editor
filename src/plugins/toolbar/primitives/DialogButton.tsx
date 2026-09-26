@@ -70,6 +70,8 @@ export const DialogButton = React.forwardRef<
       <Dialog.Portal container={editorRootElementRef?.current}>
         <Dialog.Overlay className={styles.dialogOverlay} />
         <Dialog.Content className={styles.dialogContent}>
+          <Dialog.Title className={styles.visuallyHidden}>{tooltipTitle}</Dialog.Title>
+          <Dialog.Description className={styles.visuallyHidden}>{dialogInputPlaceholder}</Dialog.Description>
           <DialogForm
             submitButtonTitle={submitButtonTitle}
             autocompleteSuggestions={autocompleteSuggestions}
