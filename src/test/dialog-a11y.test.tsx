@@ -38,11 +38,27 @@ function expectDialogDescription(name: string, description: string) {
 
 describe('editor dialog accessibility', () => {
   it('describes the image dialog', () => {
-    render(<MDXEditor markdown="" plugins={[imagePlugin(), toolbarPlugin({ toolbarContents: () => <InsertImage /> })]} />)
+    render(
+      <MDXEditor
+        markdown=""
+        plugins={[
+          imagePlugin({ imageUploadHandler: () => Promise.resolve('https://example.com/image.png') }),
+          toolbarPlugin({ toolbarContents: () => <InsertImage /> })
+        ]}
+      />
+    )
 
     fireEvent.click(screen.getByRole('button', { name: 'Insert image' }))
 
     expectDialogDescription('Upload an image', 'Insert an image from a URL or upload one from your device.')
+  })
+
+  it('does not announce device upload when the image dialog has no upload handler', () => {
+    render(<MDXEditor markdown="" plugins={[imagePlugin(), toolbarPlugin({ toolbarContents: () => <InsertImage /> })]} />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Insert image' }))
+
+    expectDialogDescription('Upload an image', 'Insert an image from a URL.')
   })
 
   it('names and describes the shared toolbar dialog', () => {

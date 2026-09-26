@@ -20,6 +20,7 @@
     "width": "Width:",
     "height": "Height:",
     "dialogDescription": "Insert an image from a URL or upload one from your device.",
+    "dialogDescriptionNoUpload": "Insert an image from a URL.",
     "addViaUrlInstructionsNoUpload": "Add an image from an URL:"
   },
   "imageEditor": {
