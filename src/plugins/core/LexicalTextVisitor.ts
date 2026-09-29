@@ -18,6 +18,55 @@ export function isMdastText(mdastNode: Mdast.Nodes): mdastNode is Mdast.Text {
 }
 const JOINABLE_TAGS = ['u', 'span', 'sub', 'sup']
 
+type FormatContainerNode = Mdast.Emphasis | Mdast.Strong | Mdast.Delete | Mdast.Highlight | MdxJsxTextElement
+
+interface FormatContainer {
+  format: number
+  isTag: boolean
+  matches: (node: Mdast.RootContent) => boolean
+  create: () => FormatContainerNode
+}
+
+function tagFormat(format: number, name: string): FormatContainer {
+  return {
+    format,
+    isTag: true,
+    matches: (node) => node.type === 'mdxJsxTextElement' && node.name === name && node.attributes.length === 0,
+    create: () => ({ type: 'mdxJsxTextElement', name, children: [], attributes: [] })
+  }
+}
+
+function markerFormat(format: number, type: 'emphasis' | 'strong' | 'delete' | 'highlight'): FormatContainer {
+  return {
+    format,
+    isTag: false,
+    matches: (node) => node.type === type,
+    create: () => ({ type, children: [] })
+  }
+}
+
+// The order breaks ties between formats that start and end on the same text nodes.
+const FORMAT_CONTAINERS = [
+  tagFormat(IS_UNDERLINE, 'u'),
+  tagFormat(IS_SUPERSCRIPT, 'sup'),
+  tagFormat(IS_SUBSCRIPT, 'sub'),
+  markerFormat(IS_ITALIC, 'emphasis'),
+  markerFormat(IS_BOLD, 'strong'),
+  markerFormat(IS_STRIKETHROUGH, 'delete'),
+  markerFormat(IS_HIGHLIGHT, 'highlight')
+]
+
+function countFollowingTextNodesWithFormat(lexicalNode: TextNode, format: number) {
+  const style = lexicalNode.getStyle()
+  let count = 0
+  let sibling = lexicalNode.getNextSibling()
+  while ($isTextNode(sibling) && sibling.getFormat() & format && sibling.getStyle() === style) {
+    count++
+    sibling = sibling.getNextSibling()
+  }
+  return count
+}
+
 export const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text | Mdast.Html | MdxJsxTextElement> = {
   shouldJoin: (prevNode, currentNode) => {
     if (['text', 'emphasis', 'strong', 'highlight'].includes(prevNode.type)) {
@@ -52,8 +101,6 @@ export const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text | Mda
 
   testLexicalNode: $isTextNode,
   visitLexicalNode: ({ lexicalNode, mdastParent, actions }) => {
-    const previousSibling = lexicalNode.getPreviousSibling()
-    const prevFormat = $isTextNode(previousSibling) ? previousSibling.getFormat() : 0
     const textContent = lexicalNode.getTextContent()
     // if the node is only whitespace, ignore the format.
     const format = lexicalNode.getFormat()
@@ -70,114 +117,28 @@ export const LexicalTextVisitor: LexicalExportVisitor<TextNode, Mdast.Text | Mda
       }) as Mdast.Parent
     }
 
-    if (prevFormat & format & IS_UNDERLINE) {
-      localParentNode = actions.appendToParent(localParentNode, {
-        type: 'mdxJsxTextElement',
-        name: 'u',
-        children: [],
-        attributes: []
-      }) as Mdast.Parent
+    // Step into the still-open containers of the preceding text directly. Re-appending them relies on joining with the
+    // last sibling, which fails when a format that ends here is nested outside of one that continues.
+    let continuedFormats = 0
+    for (;;) {
+      const lastChild = localParentNode.children.at(-1)
+      const container =
+        lastChild && FORMAT_CONTAINERS.find((c) => format & c.format && !(continuedFormats & c.format) && c.matches(lastChild))
+      if (!container) {
+        break
+      }
+      continuedFormats |= container.format
+      localParentNode = lastChild as Mdast.Parent
     }
 
-    if (prevFormat & format & IS_SUPERSCRIPT) {
-      localParentNode = actions.appendToParent(localParentNode, {
-        type: 'mdxJsxTextElement',
-        name: 'sup',
-        children: [],
-        attributes: []
-      }) as Mdast.Parent
-    }
+    // A format that runs further must wrap the shorter ones, or it gets split when they end. Tags stay outside of
+    // markdown markers, because a marker next to `<` inside a word cannot open or close emphasis (#735).
+    const containersToOpen = FORMAT_CONTAINERS.filter((c) => format & c.format && !(continuedFormats & c.format))
+      .map((container) => ({ container, runLength: countFollowingTextNodesWithFormat(lexicalNode, container.format) }))
+      .sort((a, b) => Number(b.container.isTag) - Number(a.container.isTag) || b.runLength - a.runLength)
 
-    if (prevFormat & format & IS_SUBSCRIPT) {
-      localParentNode = actions.appendToParent(localParentNode, {
-        type: 'mdxJsxTextElement',
-        name: 'sub',
-        children: [],
-        attributes: []
-      }) as Mdast.Parent
-    }
-
-    if (prevFormat & format & IS_ITALIC) {
-      localParentNode = actions.appendToParent(localParentNode, {
-        type: 'emphasis',
-        children: []
-      }) as Mdast.Parent
-    }
-    if (prevFormat & format & IS_BOLD) {
-      localParentNode = actions.appendToParent(localParentNode, {
-        type: 'strong',
-        children: []
-      }) as Mdast.Parent
-    }
-
-    if (prevFormat & format & IS_STRIKETHROUGH) {
-      localParentNode = actions.appendToParent(localParentNode, {
-        type: 'delete',
-        children: []
-      }) as Mdast.Parent
-    }
-
-    if (prevFormat & format & IS_HIGHLIGHT) {
-      localParentNode = actions.appendToParent(localParentNode, {
-        type: 'highlight',
-        children: []
-      }) as Mdast.Parent
-    }
-    // repeat the same sequence as above for formatting introduced with this node
-
-    if (format & IS_UNDERLINE && !(prevFormat & IS_UNDERLINE)) {
-      localParentNode = actions.appendToParent(localParentNode, {
-        type: 'mdxJsxTextElement',
-        name: 'u',
-        children: [],
-        attributes: []
-      }) as Mdast.Parent
-    }
-
-    if (format & IS_SUPERSCRIPT && !(prevFormat & IS_SUPERSCRIPT)) {
-      localParentNode = actions.appendToParent(localParentNode, {
-        type: 'mdxJsxTextElement',
-        name: 'sup',
-        children: [],
-        attributes: []
-      }) as Mdast.Parent
-    }
-
-    if (format & IS_SUBSCRIPT && !(prevFormat & IS_SUBSCRIPT)) {
-      localParentNode = actions.appendToParent(localParentNode, {
-        type: 'mdxJsxTextElement',
-        name: 'sub',
-        children: [],
-        attributes: []
-      }) as Mdast.Parent
-    }
-
-    if (format & IS_ITALIC && !(prevFormat & IS_ITALIC)) {
-      localParentNode = actions.appendToParent(localParentNode, {
-        type: 'emphasis',
-        children: []
-      }) as Mdast.Parent
-    }
-
-    if (format & IS_BOLD && !(prevFormat & IS_BOLD)) {
-      localParentNode = actions.appendToParent(localParentNode, {
-        type: 'strong',
-        children: []
-      }) as Mdast.Parent
-    }
-
-    if (format & IS_STRIKETHROUGH && !(prevFormat & IS_STRIKETHROUGH)) {
-      localParentNode = actions.appendToParent(localParentNode, {
-        type: 'delete',
-        children: []
-      }) as Mdast.Parent
-    }
-
-    if (format & IS_HIGHLIGHT && !(prevFormat & IS_HIGHLIGHT)) {
-      localParentNode = actions.appendToParent(localParentNode, {
-        type: 'highlight',
-        children: []
-      }) as Mdast.Parent
+    for (const { container } of containersToOpen) {
+      localParentNode = actions.appendToParent(localParentNode, container.create()) as Mdast.Parent
     }
 
     if (format & IS_CODE) {

@@ -130,6 +130,13 @@ describe('markdown import export', () => {
     testIdenticalMarkdown(`a<u>***Hello***</u>a World`)
   })
 
+  it.each(['***arp*:** Displays tables', '***a* b**', '***a `c`* b**', '~~a **b** c~~', '~~**a** b~~', '==**a** b==', '~~***a*** b~~'])(
+    'keeps a format that runs past a nested one intact: %s',
+    (markdown) => {
+      testIdenticalMarkdown(markdown)
+    }
+  )
+
   it('works with code', () => {
     testIdenticalMarkdown('`Hello` World')
   })
