@@ -133,6 +133,8 @@ function isParent(node: unknown): node is Mdast.Parent {
   return (node as { children?: any[] }).children instanceof Array
 }
 
+const TEXT_BLOCK_TYPES = ['paragraph', 'heading', 'tableCell']
+
 export interface ImportPoint {
   append(node: LexicalNode): void
   getType(): string
@@ -277,6 +279,18 @@ export function importMdastTreeToLexical({ root, mdastRoot, visitors, ...descrip
       throw new Error('Attempting to visit children of a non-parent')
     }
     mdastNode.children.forEach((child) => {
+      // Links, HTML elements and other inline parents do not set formatting themselves, so without this their text would
+      // lose the formatting around them. Text blocks start fresh, which keeps a block-level <u> out of the text below it.
+      if (isParent(child) && !TEXT_BLOCK_TYPES.includes(child.type)) {
+        const formatting = formattingMap.get(mdastNode)
+        if (formatting !== undefined && !formattingMap.has(child)) {
+          formattingMap.set(child, formatting)
+        }
+        const style = styleMap.get(mdastNode)
+        if (style !== undefined && !styleMap.has(child)) {
+          styleMap.set(child, style)
+        }
+      }
       visit(child, lexicalParent, mdastNode)
     })
   }

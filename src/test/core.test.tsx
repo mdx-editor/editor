@@ -1,10 +1,10 @@
 import React from 'react'
 import { describe, expect, it, test, vi } from 'vitest'
-import { codeBlockPlugin, codeMirrorPlugin, MDXEditor, MDXEditorMethods, thematicBreakPlugin } from '../'
+import { codeBlockPlugin, codeMirrorPlugin, linkPlugin, MDXEditor, MDXEditorMethods, thematicBreakPlugin } from '../'
 import { render } from '@testing-library/react'
 import { $getRoot, createEditor, ParagraphNode, TextNode } from 'lexical'
 import { QuoteNode } from '@lexical/rich-text'
-import { importMarkdownToLexical, type MarkdownParseOptions } from '../importMarkdownToLexical'
+import { importMarkdownToLexical, type MarkdownParseOptions, type MdastImportVisitor } from '../importMarkdownToLexical'
 import { exportMarkdownFromLexical, type ExportMarkdownFromLexicalOptions } from '../exportMarkdownFromLexical'
 import { MdastRootVisitor } from '../plugins/core/MdastRootVisitor'
 import { MdastParagraphVisitor } from '../plugins/core/MdastParagraphVisitor'
@@ -24,6 +24,10 @@ import { MdastListVisitor } from '../plugins/lists/MdastListVisitor'
 import { MdastCodeVisitor } from '../plugins/codeblock/MdastCodeVisitor'
 import { CodeBlockVisitor } from '../plugins/codeblock/CodeBlockVisitor'
 import { CodeBlockNode } from '../plugins/codeblock/CodeBlockNode'
+import { LinkNode } from '@lexical/link'
+import type * as Mdast from 'mdast'
+import { MdastLinkVisitor } from '../plugins/link/MdastLinkVisitor'
+import { IS_ITALIC, IS_UNDERLINE } from '../FormatConstants'
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 ;(globalThis as any).IS_REACT_ACT_ENVIRONMENT = true
@@ -154,6 +158,66 @@ describe('markdown import export', () => {
   })
   it('works with code in strong', () => {
     testIdenticalMarkdown('**`Hello` World**')
+  })
+
+  it.each([
+    ['**[a](https://x.com)**', '[**a**](https://x.com)'],
+    ['~~[a](https://x.com)~~', '[~~a~~](https://x.com)'],
+    ['<u>[a](https://x.com)</u>', '[<u>a</u>](https://x.com)'],
+    ['**<kbd>a</kbd> b**', '<kbd>**a**</kbd> **b**'],
+    ['**<span style="color: red">a</span> b**', '<span style="color: red">**a**</span> **b**'],
+    ['<span style="color: red">**a** b</span>', '<span style="color: red">**a** b</span>']
+  ])('keeps the surrounding formatting of text inside inline elements: %s', (markdown, expected) => {
+    const ref = React.createRef<MDXEditorMethods>()
+    render(<MDXEditor ref={ref} markdown={markdown} plugins={[linkPlugin()]} />)
+    expect(ref.current?.getMarkdown().trim()).toEqual(expected)
+  })
+
+  it('keeps formatting that a custom import visitor assigns to a child node', () => {
+    const UnderlineLinksInEmphasisVisitor: MdastImportVisitor<Mdast.Emphasis> = {
+      testNode: 'emphasis',
+      visitNode({ mdastNode, actions, lexicalParent }) {
+        actions.addFormatting(IS_ITALIC)
+        mdastNode.children.forEach((child) => {
+          if (child.type === 'link') {
+            actions.addFormatting(IS_UNDERLINE, child)
+          }
+        })
+        actions.visitChildren(mdastNode, lexicalParent)
+      }
+    }
+
+    const editor = createEditor({
+      namespace: 'test-editor',
+      nodes: [ParagraphNode, TextNode, LinkNode],
+      onError(error) {
+        throw error
+      }
+    })
+
+    let linkTextFormat = 0
+    editor.update(() => {
+      importMarkdownToLexical({
+        root: $getRoot(),
+        markdown: '*[a](https://x.com)*',
+        visitors: [
+          MdastRootVisitor,
+          MdastParagraphVisitor,
+          MdastTextVisitor,
+          MdastLinkVisitor,
+          UnderlineLinksInEmphasisVisitor
+        ] as unknown as MarkdownParseOptions['visitors'],
+        syntaxExtensions: [],
+        mdastExtensions: [],
+        jsxComponentDescriptors: [],
+        directiveDescriptors: [],
+        codeBlockEditorDescriptors: [],
+        defaultCodeBlockLanguage: ''
+      })
+      linkTextFormat = $getRoot().getAllTextNodes()[0].getFormat()
+    })
+
+    expect(linkTextFormat).toBe(IS_UNDERLINE)
   })
 
   it('preserves fenced code block metadata when CodeMirror handles a configured language', () => {
