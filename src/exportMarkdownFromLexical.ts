@@ -280,6 +280,7 @@ export function exportLexicalTreeToMdast({
     typedRoot.children.unshift(...imports)
   }
 
+  splitParagraphsAtBlankLines(typedRoot)
   fixWrappingWhitespace(typedRoot, [])
   collapseNestedHtmlTags(typedRoot)
 
@@ -337,6 +338,46 @@ function convertUnderlineJsxToHtml(node: Mdast.Parent | Mdast.RootContent) {
     })
     nodeAsParent.children = newChildren
   }
+}
+
+const BLANK_LINE_REGEXP = /\n(?:[^\S\n]*\n)+/
+
+// Consecutive line breaks export as a blank line inside a paragraph. List items rely on this, since their paragraphs
+// are imported as a pair of line breaks. Markdown cannot represent a blank line in a paragraph, so split it instead.
+function splitParagraphsAtBlankLines(node: Mdast.Nodes) {
+  if (!('children' in node)) {
+    return
+  }
+  const children: Mdast.RootContent[] = []
+  for (const child of node.children) {
+    if (child.type === 'paragraph' && child.children.some((c) => c.type === 'text' && BLANK_LINE_REGEXP.test(c.value))) {
+      children.push(...splitParagraph(child))
+    } else {
+      splitParagraphsAtBlankLines(child)
+      children.push(child)
+    }
+  }
+  ;(node as Mdast.Parent).children = children
+}
+
+function splitParagraph(paragraph: Mdast.Paragraph): Mdast.Paragraph[] {
+  const paragraphs: Mdast.Paragraph[] = [{ type: 'paragraph', children: [] }]
+  for (const child of paragraph.children) {
+    if (child.type !== 'text') {
+      paragraphs.at(-1)!.children.push(child)
+      continue
+    }
+    child.value.split(BLANK_LINE_REGEXP).forEach((value, index) => {
+      if (index > 0) {
+        paragraphs.push({ type: 'paragraph', children: [] })
+      }
+      if (value) {
+        paragraphs.at(-1)!.children.push({ type: 'text', value })
+      }
+    })
+  }
+  const nonEmptyParagraphs = paragraphs.filter((p) => p.children.length > 0)
+  return nonEmptyParagraphs.length > 0 ? nonEmptyParagraphs : [{ type: 'paragraph', children: [] }]
 }
 
 const TRAILING_WHITESPACE_REGEXP = /\s+$/

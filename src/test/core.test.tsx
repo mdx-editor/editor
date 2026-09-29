@@ -48,6 +48,18 @@ describe('markdown import export', () => {
     testIdenticalMarkdown(`Hello\nWorld`)
   })
 
+  it('exports consecutive line breaks as a paragraph break', () => {
+    const ref = React.createRef<MDXEditorMethods>()
+    render(<MDXEditor ref={ref} markdown={'a\\\n\\\nb'} />)
+    expect(ref.current?.getMarkdown().trim()).toEqual('a\n\nb')
+  })
+
+  it('keeps leading whitespace of the paragraph that follows consecutive line breaks', () => {
+    const ref = React.createRef<MDXEditorMethods>()
+    render(<MDXEditor ref={ref} markdown={'a\\\n\\\n&#x20;b'} />)
+    expect(ref.current?.getMarkdown().trim()).toEqual('a\n\n&#x20;b')
+  })
+
   it('works with two paragraphs', () => {
     testIdenticalMarkdown(`Hello\n\nWorld`)
   })
