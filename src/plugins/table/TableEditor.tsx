@@ -7,15 +7,23 @@ import {
   $createParagraphNode,
   $getNodeByKey,
   $getRoot,
+  $getSelection,
+  $isElementNode,
+  $isRangeSelection,
+  $isRootNode,
   BLUR_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
   COMMAND_PRIORITY_EDITOR,
   COMMAND_PRIORITY_LOW,
+  DELETE_CHARACTER_COMMAND,
+  DELETE_LINE_COMMAND,
+  DELETE_WORD_COMMAND,
   FOCUS_COMMAND,
   KEY_ENTER_COMMAND,
   KEY_TAB_COMMAND,
   LexicalEditor,
   LexicalEditorWithDispose,
+  LexicalNode,
   NodeKey
 } from 'lexical'
 import * as Mdast from 'mdast'
@@ -72,6 +80,28 @@ const AlignToTailwindClassMap = {
 function $getTableNodeByKey(key: NodeKey): TableNode | null {
   const node = $getNodeByKey(key)
   return $isTableNode(node) ? node : null
+}
+
+// With nothing left to delete in a direction, Lexical measures the deletion with the native
+// Selection.modify, which moves the DOM caret and focus into the neighboring cell editor.
+// The two cells then bounce focus between each other, which can loop forever and freeze the page.
+function $isCollapsedAtCellEdge(isBackward: boolean): boolean {
+  const selection = $getSelection()
+  if (!$isRangeSelection(selection) || !selection.isCollapsed()) {
+    return false
+  }
+  let node: LexicalNode | null = selection.anchor.getNode()
+  const edgeOffset = isBackward ? 0 : $isElementNode(node) ? node.getChildrenSize() : node.getTextContentSize()
+  if (selection.anchor.offset !== edgeOffset) {
+    return false
+  }
+  while (node !== null && !$isRootNode(node)) {
+    if ((isBackward ? node.getPreviousSibling() : node.getNextSibling()) !== null) {
+      return false
+    }
+    node = node.getParent()
+  }
+  return true
 }
 
 export interface TableEditorProps {
@@ -502,6 +532,10 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
         },
         COMMAND_PRIORITY_CRITICAL
       ),
+
+      editor.registerCommand(DELETE_CHARACTER_COMMAND, $isCollapsedAtCellEdge, COMMAND_PRIORITY_CRITICAL),
+      editor.registerCommand(DELETE_WORD_COMMAND, $isCollapsedAtCellEdge, COMMAND_PRIORITY_CRITICAL),
+      editor.registerCommand(DELETE_LINE_COMMAND, $isCollapsedAtCellEdge, COMMAND_PRIORITY_CRITICAL),
 
       editor.registerCommand(
         BLUR_COMMAND,
