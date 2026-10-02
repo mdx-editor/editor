@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { Realm } from '@mdxeditor/gurx'
-import { $createTextNode, $getRoot, HISTORY_PUSH_TAG, type LexicalEditor, type ParagraphNode } from 'lexical'
+import { $createTextNode, $getRoot, $isParagraphNode, HISTORY_PUSH_TAG, type LexicalEditor } from 'lexical'
 import React from 'react'
 import { describe, expect, it } from 'vitest'
 import { MDXEditor, type MDXEditorMethods } from '../MDXEditor'
@@ -49,7 +49,7 @@ function renderConditionalToolbar(suppressSharedHistory = false) {
       realm.pub(editorInFocus$, { editorType: 'lexical', rootNode, editorRef: editor })
     })
   }
-  const edit = () =>
+  const edit = () => {
     act(() => {
       editor.update(
         () => {
@@ -59,11 +59,16 @@ function renderConditionalToolbar(suppressSharedHistory = false) {
       )
       editor.update(
         () => {
-          $getRoot().getFirstChildOrThrow<ParagraphNode>().append($createTextNode(' edit'))
+          const paragraph = $getRoot().getFirstChildOrThrow()
+          if (!$isParagraphNode(paragraph)) {
+            throw new Error('Expected the initial document to contain a paragraph')
+          }
+          paragraph.append($createTextNode(' edit'))
         },
         { discrete: true, tag: HISTORY_PUSH_TAG }
       )
     })
+  }
   return { realm, editor, ref, remount, edit }
 }
 
