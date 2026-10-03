@@ -407,6 +407,10 @@
 
 .codeMirrorToolbar {
   @mixin nested-editor-toolbar;
+  /* Reserve a row for the controls instead of covering the first code line. */
+  position: static;
+  justify-content: flex-end;
+  margin: -0.8rem -0.8rem 0.8rem;
 }
 
 .frontmatterWrapper {
