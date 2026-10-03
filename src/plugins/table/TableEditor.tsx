@@ -478,7 +478,8 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
           root: $getRoot(),
           jsxComponentDescriptors,
           visitors: exportVisitors,
-          jsxIsAvailable
+          jsxIsAvailable,
+          addImportStatements: false
         })
         parentEditor.update(
           () => {
