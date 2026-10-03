@@ -207,6 +207,27 @@ export function exportLexicalTreeToMdast({
     throw new Error('traversal ended with no root element')
   }
 
+  const typedRoot = unistRoot as Mdast.Root
+
+  // Decorators such as directives and tables contain MDAST subtrees rather than
+  // Lexical children, so their JSX references never reach the JSX visitor.
+  if (addImportStatements) {
+    const registerNestedComponents = (node: Mdast.Nodes) => {
+      if ((node.type === 'mdxJsxFlowElement' || node.type === 'mdxJsxTextElement') && node.name !== null && !isMdastHTMLNode(node)) {
+        const descriptor =
+          jsxComponentDescriptors.find((descriptor) => descriptor.name === node.name) ??
+          jsxComponentDescriptors.find((descriptor) => descriptor.name === '*')
+        if (descriptor?.source) {
+          registerReferredComponent(node.name)
+        }
+      }
+      if ('children' in node) {
+        node.children.forEach(registerNestedComponents)
+      }
+    }
+    registerNestedComponents(typedRoot)
+  }
+
   // iterate over all referred components and construct import statements, then append them to the root
   const importsMap = new Map<string, string[]>()
   const defaultImportsMap = new Map<string, string>()
@@ -270,8 +291,6 @@ export function exportLexicalTreeToMdast({
       } as MdxjsEsm
     })
   )
-
-  const typedRoot = unistRoot as Mdast.Root
 
   const frontmatter = typedRoot.children.find((child) => child.type === 'yaml')
   if (frontmatter) {
