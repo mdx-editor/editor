@@ -197,6 +197,9 @@ export const LinkDialog: React.FC = () => {
 
   const urlIsExternal = linkDialogState.type === 'preview' && linkDialogState.url.startsWith('http')
 
+  // `navigator.clipboard` is undefined outside secure contexts (plain http on a non-localhost origin).
+  const canCopyUrl = typeof (window.navigator.clipboard as Clipboard | undefined)?.writeText === 'function'
+
   return (
     <Popover.Root open={true}>
       <Popover.Anchor
@@ -263,32 +266,34 @@ export const LinkDialog: React.FC = () => {
               >
                 {iconComponentFor('edit')}
               </ActionButton>
-              <Tooltip.Provider>
-                <Tooltip.Root open={copyUrlTooltipOpen}>
-                  <Tooltip.Trigger asChild>
-                    <ActionButton
-                      title={t('linkPreview.copyToClipboard', 'Copy to clipboard')}
-                      aria-label={t('linkPreview.copyToClipboard', 'Copy to clipboard')}
-                      onClick={() => {
-                        void window.navigator.clipboard.writeText(linkDialogState.url).then(() => {
-                          setCopyUrlTooltipOpen(true)
-                          setTimeout(() => {
-                            setCopyUrlTooltipOpen(false)
-                          }, 1000)
-                        })
-                      }}
-                    >
-                      {copyUrlTooltipOpen ? iconComponentFor('check') : iconComponentFor('content_copy')}
-                    </ActionButton>
-                  </Tooltip.Trigger>
-                  <Tooltip.Portal container={editorRootElementRef?.current}>
-                    <Tooltip.Content className={classNames(styles.tooltipContent)} sideOffset={5}>
-                      {t('linkPreview.copied', 'Copied!')}
-                      <Tooltip.Arrow />
-                    </Tooltip.Content>
-                  </Tooltip.Portal>
-                </Tooltip.Root>
-              </Tooltip.Provider>
+              {canCopyUrl && (
+                <Tooltip.Provider>
+                  <Tooltip.Root open={copyUrlTooltipOpen}>
+                    <Tooltip.Trigger asChild>
+                      <ActionButton
+                        title={t('linkPreview.copyToClipboard', 'Copy to clipboard')}
+                        aria-label={t('linkPreview.copyToClipboard', 'Copy to clipboard')}
+                        onClick={() => {
+                          void window.navigator.clipboard.writeText(linkDialogState.url).then(() => {
+                            setCopyUrlTooltipOpen(true)
+                            setTimeout(() => {
+                              setCopyUrlTooltipOpen(false)
+                            }, 1000)
+                          })
+                        }}
+                      >
+                        {copyUrlTooltipOpen ? iconComponentFor('check') : iconComponentFor('content_copy')}
+                      </ActionButton>
+                    </Tooltip.Trigger>
+                    <Tooltip.Portal container={editorRootElementRef?.current}>
+                      <Tooltip.Content className={classNames(styles.tooltipContent)} sideOffset={5}>
+                        {t('linkPreview.copied', 'Copied!')}
+                        <Tooltip.Arrow />
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
+                  </Tooltip.Root>
+                </Tooltip.Provider>
+              )}
 
               <ActionButton
                 title={t('linkPreview.remove', 'Remove link')}
