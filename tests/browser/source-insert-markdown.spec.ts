@@ -24,7 +24,8 @@ for (const mode of ['source', 'diff']) {
     // Keyboard undo/redo exercises CodeMirror's actual browser history.
     await editor.press('ControlOrMeta+z')
     await expect(editor).toHaveText('Edited content')
-    await editor.press('ControlOrMeta+Shift+z')
+    // Playwright preserves key casing; Shift+lowercase z is still interpreted as Undo.
+    await editor.press('ControlOrMeta+Shift+Z')
     await expect(editor).toHaveText('Edited new content')
     await editor.press('Shift+ArrowLeft')
     await editor.press('Shift+ArrowLeft')
