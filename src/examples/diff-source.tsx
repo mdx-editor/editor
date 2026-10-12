@@ -107,3 +107,38 @@ export function ReadOnlyDiffMode() {
     </div>
   )
 }
+
+export function InsertMarkdown() {
+  const ref = useRef<MDXEditorMethods>(null)
+  const [lastChange, setLastChange] = React.useState('')
+  const [currentMarkdown, setCurrentMarkdown] = React.useState('')
+  return (
+    <div className="App">
+      <MDXEditor
+        ref={ref}
+        markdown="Original rich text"
+        onChange={setLastChange}
+        plugins={[
+          diffSourcePlugin({ diffMarkdown: 'Unchanged comparison' }),
+          toolbarPlugin({
+            toolbarContents: () => (
+              <DiffSourceToggleWrapper>
+                <UndoRedo />
+              </DiffSourceToggleWrapper>
+            )
+          })
+        ]}
+      />
+      <button onClick={() => ref.current?.insertMarkdown('new ')}>Insert Markdown</button>
+      <button
+        onClick={() => {
+          setCurrentMarkdown(ref.current?.getMarkdown() ?? '')
+        }}
+      >
+        Get Markdown
+      </button>
+      <pre aria-label="Current Markdown">{currentMarkdown}</pre>
+      <pre aria-label="Last change">{lastChange}</pre>
+    </div>
+  )
+}

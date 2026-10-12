@@ -408,12 +408,16 @@ export const setMarkdown$ = Signal<string>((r) => {
   )
 })
 
+/** @internal */
+export const insertMarkdownHandler$ = Cell<((markdown: string) => boolean) | null>(null)
+
 /**
  * Inserts new markdown value into the current cursor position of the active editor.
  * @group Core
  */
 export const insertMarkdown$ = Signal<string>((r) => {
   r.sub(r.pipe(insertMarkdown$, withLatestFrom(activeEditor$, inFocus$)), ([markdownToInsert, editor, inFocus]) => {
+    if (r.getValue(insertMarkdownHandler$)?.(markdownToInsert)) return
     editor?.update(() => {
       const selection = $getSelection()
       if (selection !== null) {
@@ -918,11 +922,14 @@ export const viewMode$ = Cell<ViewMode>('rich-text', (r) => {
       { current: 'rich-text' as ViewMode, next: 'rich-text' as ViewMode }
     )
   }
-  r.sub(r.pipe(viewMode$, currentNextViewMode(), withLatestFrom(markdownSourceEditorValue$)), ([{ current }, markdownSourceFromEditor]) => {
-    if (current === 'source' || current === 'diff') {
-      r.pub(setMarkdown$, markdownSourceFromEditor)
+  r.sub(
+    r.pipe(viewMode$, currentNextViewMode(), withLatestFrom(markdownSourceEditorValue$)),
+    ([{ current, next }, markdownSourceFromEditor]) => {
+      if ((current === 'source' || current === 'diff') && next === 'rich-text') {
+        r.pub(setMarkdown$, markdownSourceFromEditor)
+      }
     }
-  })
+  )
 
   r.sub(
     r.pipe(
