@@ -90,12 +90,8 @@ function pickTransformersForActivePlugins(pluginIds: string[], allowedHeadingLev
     // STRIKETHROUGH
   ]
 
-  if (pluginIds.includes('headings')) {
-    // Using a range is technically a bug, because the developer might have allowed h2 and h4, but not h3.
-    // However, it's a very unlikely edge case.
-    const minHeadingLevel = Math.min(...allowedHeadingLevels)
-    const maxHeadingLevel = Math.max(...allowedHeadingLevels)
-    const headingRegExp = new RegExp(`^(#{${minHeadingLevel},${maxHeadingLevel}})\\s`)
+  if (pluginIds.includes('headings') && allowedHeadingLevels.length > 0) {
+    const headingRegExp = new RegExp(`^(${allowedHeadingLevels.map((level) => '#'.repeat(level)).join('|')})\\s`)
 
     const HEADING: ElementTransformer = {
       dependencies: [HeadingNode],

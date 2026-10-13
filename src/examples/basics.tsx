@@ -161,6 +161,10 @@ export function Headings() {
   return <MDXEditor markdown="# hello world" plugins={[headingsPlugin()]} />
 }
 
+export function NonConsecutiveHeadingLevels() {
+  return <MDXEditor markdown="" plugins={[headingsPlugin({ allowedHeadingLevels: [2, 4] }), markdownShortcutPlugin()]} />
+}
+
 const breakMarkdown = `hello
 
 ----------------
