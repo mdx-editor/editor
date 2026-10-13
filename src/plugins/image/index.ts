@@ -19,6 +19,7 @@ import {
   DRAGOVER_COMMAND,
   DRAGSTART_COMMAND,
   DROP_COMMAND,
+  EditorUpdateOptions,
   LexicalCommand,
   LexicalEditor,
   PASTE_COMMAND,
@@ -112,28 +113,27 @@ export interface EditingImageDialogState {
   initialValues: Omit<SaveImageParameters, 'file'>
 }
 
+// Dialog focus can leave a table cell before an image change commits. Synchronize
+// the committed change rather than relying on a second blur from that cell.
+function syncNestedEditorOnUpdate(editor: LexicalEditor): EditorUpdateOptions {
+  return { onUpdate: () => editor.dispatchCommand(NESTED_EDITOR_UPDATED_COMMAND, undefined) }
+}
+
 const internalInsertImage$ = Signal<SrcImageParameters>((r) => {
   r.sub(r.pipe(internalInsertImage$, withLatestFrom(activeEditor$)), ([values, theEditor]) => {
-    theEditor?.update(
-      () => {
-        const imageNode = $createImageNode({
-          altText: values.altText ?? '',
-          src: values.src,
-          title: values.title ?? '',
-          width: parseImageDimension(values.width),
-          height: parseImageDimension(values.height)
-        })
-        $insertNodes([imageNode])
-        if ($isRootOrShadowRoot(imageNode.getParentOrThrow())) {
-          $wrapNodeInElement(imageNode, $createParagraphNode).selectEnd()
-        }
-      },
-      {
-        // Dialog focus can leave a table cell before this change. Synchronize the
-        // committed image rather than relying on a second blur from that cell.
-        onUpdate: () => theEditor.dispatchCommand(NESTED_EDITOR_UPDATED_COMMAND, undefined)
+    theEditor?.update(() => {
+      const imageNode = $createImageNode({
+        altText: values.altText ?? '',
+        src: values.src,
+        title: values.title ?? '',
+        width: parseImageDimension(values.width),
+        height: parseImageDimension(values.height)
+      })
+      $insertNodes([imageNode])
+      if ($isRootOrShadowRoot(imageNode.getParentOrThrow())) {
+        $wrapNodeInElement(imageNode, $createParagraphNode).selectEnd()
       }
-    )
+    }, syncNestedEditorOnUpdate(theEditor))
   })
 })
 
@@ -201,26 +201,21 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
         const handler =
           dialogState.type === 'editing'
             ? (src: string) => {
-                theEditor?.update(
-                  () => {
-                    const { nodeKey } = dialogState
-                    const imageNode = $getNodeByKey(nodeKey)! as ImageNode
+                theEditor?.update(() => {
+                  const { nodeKey } = dialogState
+                  const imageNode = $getNodeByKey(nodeKey)! as ImageNode
 
-                    imageNode.setTitle(values.title)
-                    imageNode.setAltText(values.altText)
-                    imageNode.setSrc(src)
+                  imageNode.setTitle(values.title)
+                  imageNode.setAltText(values.altText)
+                  imageNode.setSrc(src)
 
-                    if (allowSetImageDimensions) {
-                      const width = parseImageDimension(values.width)
-                      const height = parseImageDimension(values.height)
+                  if (allowSetImageDimensions) {
+                    const width = parseImageDimension(values.width)
+                    const height = parseImageDimension(values.height)
 
-                      imageNode.setWidthAndHeight(width ?? 'inherit', height ?? 'inherit')
-                    }
-                  },
-                  {
-                    onUpdate: () => theEditor.dispatchCommand(NESTED_EDITOR_UPDATED_COMMAND, undefined)
+                    imageNode.setWidthAndHeight(width ?? 'inherit', height ?? 'inherit')
                   }
-                )
+                }, syncNestedEditorOnUpdate(theEditor))
                 r.pub(imageDialogState$, { type: 'inactive' })
               }
             : (src: string) => {
