@@ -113,10 +113,17 @@ export interface EditingImageDialogState {
   initialValues: Omit<SaveImageParameters, 'file'>
 }
 
-// Dialog focus can leave a table cell before an image change commits. Synchronize
-// the committed change rather than relying on a second blur from that cell.
+// Dialog focus or a slow upload can leave a table cell before an image change
+// commits. Synchronize the committed change rather than relying on a second blur
+// from that cell.
 function syncNestedEditorOnUpdate(editor: LexicalEditor): EditorUpdateOptions {
   return { onUpdate: () => editor.dispatchCommand(NESTED_EDITOR_UPDATED_COMMAND, undefined) }
+}
+
+// Synchronizing deactivates a table cell, so leave an editor that still has focus
+// to its own blur save.
+function syncNestedEditorIfBlurred(editor: LexicalEditor): EditorUpdateOptions | undefined {
+  return editor.getRootElement()?.contains(document.activeElement) ? undefined : syncNestedEditorOnUpdate(editor)
 }
 
 const internalInsertImage$ = Signal<SrcImageParameters>((r) => {
@@ -298,12 +305,14 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
 
             Promise.all(cbPayload.map((file) => imageUploadHandlerValue(file.getAsFile()!)))
               .then((urls) => {
-                urls.forEach((url) => {
-                  editor.dispatchCommand(INSERT_IMAGE_COMMAND, {
-                    src: url,
-                    altText: ''
+                editor.update(() => {
+                  urls.forEach((url) => {
+                    editor.dispatchCommand(INSERT_IMAGE_COMMAND, {
+                      src: url,
+                      altText: ''
+                    })
                   })
-                })
+                }, syncNestedEditorIfBlurred(editor))
               })
               .catch((e: unknown) => {
                 throw e
@@ -503,12 +512,14 @@ function onDrop(event: DragEvent, editor: LexicalEditor, imageUploadHandler: Ima
         })
       )
         .then((urls) => {
-          urls.forEach((url) => {
-            editor.dispatchCommand(INSERT_IMAGE_COMMAND, {
-              src: url,
-              altText: ''
+          editor.update(() => {
+            urls.forEach((url) => {
+              editor.dispatchCommand(INSERT_IMAGE_COMMAND, {
+                src: url,
+                altText: ''
+              })
             })
-          })
+          }, syncNestedEditorIfBlurred(editor))
         })
         .catch((e: unknown) => {
           throw e
