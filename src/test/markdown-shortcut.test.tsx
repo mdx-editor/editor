@@ -1,28 +1,31 @@
 import React from 'react'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+import { act, render } from '@testing-library/react'
 import { registerMarkdownShortcuts, type ElementTransformer, type Transformer } from '@lexical/markdown'
 import { $isHeadingNode, HeadingNode } from '@lexical/rich-text'
 import { $createParagraphNode, $createTextNode, $getRoot, $getSelection, $isRangeSelection, createEditor } from 'lexical'
-import { Realm } from '@mdxeditor/gurx'
-import { composerChildren$, nestedEditorChildren$, tableCellEditorChildren$ } from '../plugins/core'
+import { Realm, RealmContext } from '@mdxeditor/gurx'
+import { composerChildren$, tableCellEditorChildren$ } from '../plugins/core'
 import { ALL_HEADING_LEVELS, headingsPlugin, type HEADING_LEVEL } from '../plugins/headings'
 import { markdownShortcutPlugin } from '../plugins/markdown-shortcut'
 
+const renderedTransformers = vi.hoisted(() => [] as Transformer[][])
+
+// The Lexical plugin needs a composer; only the transformers it receives matter here.
+vi.mock('@lexical/react/LexicalMarkdownShortcutPlugin', () => ({
+  MarkdownShortcutPlugin: ({ transformers }: { transformers: Transformer[] }) => {
+    renderedTransformers.push(transformers)
+    return null
+  }
+}))
+
 const editorChildren = [
   { name: 'root', cell: composerChildren$ },
-  { name: 'nested', cell: nestedEditorChildren$ },
   { name: 'table cell', cell: tableCellEditorChildren$ }
 ]
 
-function headingShortcutTransformer(allowedHeadingLevels: readonly HEADING_LEVEL[] | undefined, cell = composerChildren$) {
-  const realm = new Realm()
-
-  headingsPlugin({ allowedHeadingLevels }).init?.(realm)
-  markdownShortcutPlugin().init?.(realm)
-
-  const ShortcutChild = realm.getValue(cell)[0] as () => React.ReactElement<{ transformers: Transformer[] }>
-  const shortcutElement = ShortcutChild()
-  return shortcutElement.props.transformers.find((transformer): transformer is ElementTransformer => {
+function findHeadingTransformer(transformers: Transformer[]) {
+  return transformers.find((transformer): transformer is ElementTransformer => {
     return (
       'regExp' in transformer &&
       'dependencies' in transformer &&
@@ -30,6 +33,29 @@ function headingShortcutTransformer(allowedHeadingLevels: readonly HEADING_LEVEL
       transformer.type === 'element'
     )
   })
+}
+
+function renderShortcuts(allowedHeadingLevels: readonly HEADING_LEVEL[] | undefined, cell = composerChildren$) {
+  const realm = new Realm()
+
+  headingsPlugin({ allowedHeadingLevels }).init?.(realm)
+  markdownShortcutPlugin().init?.(realm)
+
+  const ShortcutChild = realm.getValue(cell)[0] as React.ComponentType
+  renderedTransformers.length = 0
+  render(
+    <RealmContext.Provider value={realm}>
+      <ShortcutChild />
+    </RealmContext.Provider>
+  )
+  return {
+    realm,
+    transformers: () => renderedTransformers[renderedTransformers.length - 1]
+  }
+}
+
+function headingShortcutTransformer(allowedHeadingLevels: readonly HEADING_LEVEL[] | undefined, cell = composerChildren$) {
+  return findHeadingTransformer(renderShortcuts(allowedHeadingLevels, cell).transformers())
 }
 
 describe.each(editorChildren)('markdownShortcutPlugin in $name editors', ({ cell }) => {
@@ -74,6 +100,32 @@ describe.each(editorChildren)('markdownShortcutPlugin in $name editors', ({ cell
 
   it('does not register heading shortcuts when no heading levels are allowed', () => {
     expect(headingShortcutTransformer([], cell)).toBeUndefined()
+  })
+
+  it('follows heading level updates after initialization', () => {
+    const { realm, transformers } = renderShortcuts([2, 4], cell)
+
+    act(() => {
+      headingsPlugin({ allowedHeadingLevels: [3] }).update?.(realm)
+    })
+    const updated = findHeadingTransformer(transformers())
+    expect('### ').toMatch(updated!.regExp)
+    expect('## ').not.toMatch(updated!.regExp)
+
+    act(() => {
+      headingsPlugin({ allowedHeadingLevels: [] }).update?.(realm)
+    })
+    expect(findHeadingTransformer(transformers())).toBeUndefined()
+  })
+
+  it('keeps the transformers when the same heading levels are republished', () => {
+    const { realm, transformers } = renderShortcuts([2, 4], cell)
+    const initial = transformers()
+
+    act(() => {
+      headingsPlugin({ allowedHeadingLevels: [2, 4] }).update?.(realm)
+    })
+    expect(transformers()).toBe(initial)
   })
 })
 

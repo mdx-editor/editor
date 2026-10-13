@@ -74,7 +74,7 @@ export const allowedHeadingLevels$ = Cell<readonly HEADING_LEVEL[]>(ALL_HEADING_
  */
 export const headingsPlugin = realmPlugin<{
   /**
-   * Allows you to limit the headings used in the editor. Affects the block type dropdown and the keyboard shortcuts.
+   * Allows you to limit the headings used in the editor. Affects the block type dropdown, the keyboard shortcuts, and the markdown shortcuts.
    * @default [1, 2, 3, 4, 5, 6]
    */
   allowedHeadingLevels?: readonly HEADING_LEVEL[]
