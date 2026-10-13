@@ -27,6 +27,11 @@ export type SerializedTableNode = Spread<
 
 const EMPTY_CELL: Mdast.TableCell = { type: 'tableCell', children: [] as Mdast.PhrasingContent[] }
 
+// Imported cells carry source positions that cell editor exports never have.
+function serializeWithoutPositions(children: Mdast.PhrasingContent[]) {
+  return JSON.stringify(children, (key, value: unknown) => (key === 'position' ? undefined : value))
+}
+
 type CoordinatesSubscription = (coords: [colIndex: number, rowIndex: number]) => void
 
 function coordinatesEmitter() {
@@ -131,6 +136,12 @@ export class TableNode extends DecoratorNode<JSX.Element> {
 
   /** @internal */
   updateCellContents(colIndex: number, rowIndex: number, children: Mdast.PhrasingContent[]): void {
+    // Cell editors save on every blur and cell navigation. Marking the table
+    // dirty for an unchanged cell would push an extra root Undo step.
+    const currentChildren = this.getLatest().__mdastNode.children[rowIndex].children[colIndex].children
+    if (serializeWithoutPositions(currentChildren) === serializeWithoutPositions(children)) {
+      return
+    }
     const self = this.getWritable()
     const table = self.__mdastNode
     const row = table.children[rowIndex]
