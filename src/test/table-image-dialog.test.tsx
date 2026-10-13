@@ -274,6 +274,58 @@ describe('table image dialog persistence', () => {
     })
   })
 
+  it.each(['paste', 'drop'] as const)('keeps a %s upload that completes after moving to another cell', async (transfer) => {
+    let finishUpload!: (src: string) => void
+    const upload = vi.fn(
+      () =>
+        new Promise<string>((resolve) => {
+          finishUpload = resolve
+        })
+    )
+    const { ref, onChange, sourceCell, otherCell } = await setup(markdown, upload)
+    const file = new File(['image'], 'image.png', { type: 'image/png' })
+    const items = [{ kind: 'file', type: file.type, getAsFile: () => file }]
+    if (transfer === 'paste') fireEvent.paste(sourceCell, { clipboardData: { items } })
+    else fireEvent.drop(sourceCell, { dataTransfer: { items } })
+    await focusCell(otherCell)
+    await act(async () => {
+      finishUpload(imageUrl)
+      await Promise.resolve()
+    })
+    await waitFor(() => {
+      expect(sourceCell.querySelector('img')).toHaveAttribute('src', imageUrl)
+    })
+    await waitFor(() => {
+      expectSaved(ref, onChange)
+    })
+    expect(otherCell.closest('td')).toHaveAttribute('data-active', 'true')
+  })
+
+  it('keeps a root paste upload that completes after moving into a table cell', async () => {
+    let finishUpload!: (src: string) => void
+    const upload = vi.fn(
+      () =>
+        new Promise<string>((resolve) => {
+          finishUpload = resolve
+        })
+    )
+    const { ref, onChange, root, otherCell } = await setup(markdown, upload)
+    await focusCell(root)
+    const file = new File(['image'], 'image.png', { type: 'image/png' })
+    fireEvent.paste(root, { clipboardData: { items: [{ kind: 'file', type: file.type, getAsFile: () => file }] } })
+    await focusCell(otherCell)
+    await act(async () => {
+      finishUpload(imageUrl)
+      await Promise.resolve()
+    })
+    await waitFor(() => {
+      expect(root.querySelector(`:scope > p img[src="${imageUrl}"]`)).not.toBeNull()
+    })
+    await waitFor(() => {
+      expectSaved(ref, onChange)
+    })
+  })
+
   it.each(['Cancel', 'Escape'])('does not insert an image when dismissing with %s', async (dismissal) => {
     const { ref, onChange, otherCell } = await setup()
     const initial = ref.current!.getMarkdown()

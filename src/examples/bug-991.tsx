@@ -1,9 +1,15 @@
 import React from 'react'
-import { imagePlugin, InsertImage, MDXEditor, tablePlugin, toolbarPlugin } from '..'
+import { imagePlugin, ImageUploadHandler, InsertImage, MDXEditor, tablePlugin, toolbarPlugin } from '..'
+
+declare global {
+  interface Window {
+    finishTableImageUpload?: () => void
+  }
+}
 
 const initialMarkdown = '| One | Two |\n| --- | --- |\n| A | B |\n\nOutside the table.'
 
-function TableImageRepro({ markdown }: { markdown: string }) {
+function TableImageRepro({ markdown, imageUploadHandler = null }: { markdown: string; imageUploadHandler?: ImageUploadHandler }) {
   const [version, setVersion] = React.useState(0)
   const [savedMarkdown, setSavedMarkdown] = React.useState(markdown)
   return (
@@ -21,7 +27,7 @@ function TableImageRepro({ markdown }: { markdown: string }) {
         key={version}
         markdown={savedMarkdown}
         onChange={setSavedMarkdown}
-        plugins={[tablePlugin(), imagePlugin(), toolbarPlugin({ toolbarContents: () => <InsertImage /> })]}
+        plugins={[tablePlugin(), imagePlugin({ imageUploadHandler }), toolbarPlugin({ toolbarContents: () => <InsertImage /> })]}
       />
     </>
   )
@@ -35,4 +41,20 @@ export function TableImageDialog() {
 /** Edits an image that a table cell already holds. */
 export function TableExistingImage() {
   return <TableImageRepro markdown={initialMarkdown.replace('| A |', '| A![old](https://example.com/old-991.png) |')} />
+}
+
+/** Holds pasted and dropped uploads until `window.finishTableImageUpload()`, so a test can move to another editor first. */
+export function TableLateUpload() {
+  return (
+    <TableImageRepro
+      markdown={initialMarkdown}
+      imageUploadHandler={() =>
+        new Promise((resolve) => {
+          window.finishTableImageUpload = () => {
+            resolve('https://example.com/late-991.png')
+          }
+        })
+      }
+    />
+  )
 }

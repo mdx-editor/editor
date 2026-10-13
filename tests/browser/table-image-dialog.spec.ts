@@ -63,3 +63,32 @@ test('saves an edit to an existing table image before leaving the dialog (#991)'
   await expect(image).toHaveCount(1)
   await expect(image).toHaveAttribute('src', imageUrl)
 })
+
+for (const source of ['cell', 'root'] as const) {
+  test(`keeps a ${source} paste upload that finishes after moving to another cell`, async ({ page }) => {
+    await page.goto('/?story=bug-991--table-late-upload&mode=preview')
+    const cells = page.locator('table tbody [contenteditable="true"]')
+    const target = cells.nth(3)
+    const pasteTarget = source === 'cell' ? cells.nth(2) : page.getByText('Outside the table.', { exact: true })
+    await pasteTarget.click()
+    await page.keyboard.press('End')
+    await pasteTarget.evaluate((element) => {
+      const clipboardData = new DataTransfer()
+      clipboardData.items.add(new File(['image'], 'image.png', { type: 'image/png' }))
+      element.dispatchEvent(new ClipboardEvent('paste', { clipboardData, bubbles: true, cancelable: true }))
+    })
+    await target.click()
+    await page.keyboard.type('typing')
+    await page.evaluate(() => {
+      window.finishTableImageUpload!()
+    })
+
+    await expect(page.getByLabel('Saved Markdown', { exact: true })).toContainText('https://example.com/late-991.png')
+    const imageContainer = source === 'cell' ? cells.nth(2) : page.locator('.mdxeditor-root-contenteditable [contenteditable] > p')
+    await expect(imageContainer.locator('img[src="https://example.com/late-991.png"]')).toHaveCount(1)
+    // The user keeps working in the cell they moved to.
+    await expect(target.locator('xpath=ancestor::td')).toHaveAttribute('data-active', 'true')
+    await page.keyboard.type(' more')
+    await expect(target).toHaveText('Btyping more')
+  })
+}

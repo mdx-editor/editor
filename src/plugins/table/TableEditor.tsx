@@ -468,33 +468,37 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  const save = React.useCallback(() => {
+    if (!editor) {
+      return
+    }
+    editor.getEditorState().read(() => {
+      const mdast = exportLexicalTreeToMdast({
+        root: $getRoot(),
+        jsxComponentDescriptors,
+        visitors: exportVisitors,
+        jsxIsAvailable
+      })
+      parentEditor.update(
+        () => {
+          const currentTable = $getTableNodeByKey(tableKey)
+          if (!currentTable) {
+            return
+          }
+          currentTable.updateCellContents(colIndex, rowIndex, (mdast.children[0] as Mdast.Paragraph).children)
+        },
+        { discrete: true }
+      )
+      parentEditor.dispatchCommand(NESTED_EDITOR_UPDATED_COMMAND, undefined)
+    })
+  }, [colIndex, editor, exportVisitors, jsxComponentDescriptors, jsxIsAvailable, parentEditor, rowIndex, tableKey])
+
   const saveAndFocus = React.useCallback(
     (nextCell: [number, number] | null) => {
-      if (!editor) {
-        return
-      }
-      editor.getEditorState().read(() => {
-        const mdast = exportLexicalTreeToMdast({
-          root: $getRoot(),
-          jsxComponentDescriptors,
-          visitors: exportVisitors,
-          jsxIsAvailable
-        })
-        parentEditor.update(
-          () => {
-            const currentTable = $getTableNodeByKey(tableKey)
-            if (!currentTable) {
-              return
-            }
-            currentTable.updateCellContents(colIndex, rowIndex, (mdast.children[0] as Mdast.Paragraph).children)
-          },
-          { discrete: true }
-        )
-        parentEditor.dispatchCommand(NESTED_EDITOR_UPDATED_COMMAND, undefined)
-      })
+      save()
       setActiveCell(nextCell)
     },
-    [colIndex, editor, exportVisitors, jsxComponentDescriptors, jsxIsAvailable, parentEditor, rowIndex, setActiveCell, tableKey]
+    [save, setActiveCell]
   )
 
   React.useEffect(() => {
@@ -554,13 +558,19 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
       editor.registerCommand(
         NESTED_EDITOR_UPDATED_COMMAND,
         () => {
-          saveAndFocus(null)
+          // A late update, such as a finished upload, can arrive after the user
+          // moved to another cell, which must stay active.
+          if (focus) {
+            saveAndFocus(null)
+          } else {
+            save()
+          }
           return true
         },
         COMMAND_PRIORITY_EDITOR
       )
     )
-  }, [colIndex, editor, rootEditor, rowIndex, saveAndFocus, setActiveCell])
+  }, [colIndex, editor, focus, rootEditor, rowIndex, save, saveAndFocus, setActiveCell])
 
   React.useEffect(() => {
     if (focus && editor) {

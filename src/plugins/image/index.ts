@@ -23,6 +23,8 @@ import {
   LexicalCommand,
   LexicalEditor,
   PASTE_COMMAND,
+  SKIP_DOM_SELECTION_TAG,
+  getNearestEditorFromDOMNode,
   createCommand
 } from 'lexical'
 import { realmPlugin } from '../../RealmWithPlugins'
@@ -120,10 +122,32 @@ function syncNestedEditorOnUpdate(editor: LexicalEditor): EditorUpdateOptions {
   return { onUpdate: () => editor.dispatchCommand(NESTED_EDITOR_UPDATED_COMMAND, undefined) }
 }
 
-// Synchronizing deactivates a table cell, so leave an editor that still has focus
-// to its own blur save.
-function syncNestedEditorIfBlurred(editor: LexicalEditor): EditorUpdateOptions | undefined {
-  return editor.getRootElement()?.contains(document.activeElement) ? undefined : syncNestedEditorOnUpdate(editor)
+function $insertImageNode(payload: InsertImagePayload) {
+  const imageNode = $createImageNode(payload)
+  $insertNodes([imageNode])
+  if ($isRootOrShadowRoot(imageNode.getParentOrThrow())) {
+    $wrapNodeInElement(imageNode, $createParagraphNode).selectEnd()
+  }
+}
+
+function insertUploadedImages(editor: LexicalEditor, urls: string[]) {
+  // An editor that still has focus saves on its own blur, and synchronizing would
+  // deactivate its table cell. Once focus has moved on, synchronize instead, and
+  // keep the DOM selection where the user is working now.
+  const options: EditorUpdateOptions | undefined =
+    document.activeElement && getNearestEditorFromDOMNode(document.activeElement) === editor
+      ? undefined
+      : { ...syncNestedEditorOnUpdate(editor), tag: SKIP_DOM_SELECTION_TAG }
+  editor.update(() => {
+    urls.forEach((url) => {
+      const payload: InsertImagePayload = { src: url, altText: '' }
+      // INSERT_IMAGE_COMMAND is handled only in the active editor, and the user
+      // may have moved to another editor while the upload was running.
+      if (!editor.dispatchCommand(INSERT_IMAGE_COMMAND, payload)) {
+        $insertImageNode(payload)
+      }
+    })
+  }, options)
 }
 
 const internalInsertImage$ = Signal<SrcImageParameters>((r) => {
@@ -248,12 +272,7 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
         editor.registerCommand<InsertImagePayload>(
           INSERT_IMAGE_COMMAND,
           (payload) => {
-            const imageNode = $createImageNode(payload)
-            $insertNodes([imageNode])
-            if ($isRootOrShadowRoot(imageNode.getParentOrThrow())) {
-              $wrapNodeInElement(imageNode, $createParagraphNode).selectEnd()
-            }
-
+            $insertImageNode(payload)
             return true
           },
           COMMAND_PRIORITY_EDITOR
@@ -305,14 +324,7 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
 
             Promise.all(cbPayload.map((file) => imageUploadHandlerValue(file.getAsFile()!)))
               .then((urls) => {
-                editor.update(() => {
-                  urls.forEach((url) => {
-                    editor.dispatchCommand(INSERT_IMAGE_COMMAND, {
-                      src: url,
-                      altText: ''
-                    })
-                  })
-                }, syncNestedEditorIfBlurred(editor))
+                insertUploadedImages(editor, urls)
               })
               .catch((e: unknown) => {
                 throw e
@@ -512,14 +524,7 @@ function onDrop(event: DragEvent, editor: LexicalEditor, imageUploadHandler: Ima
         })
       )
         .then((urls) => {
-          editor.update(() => {
-            urls.forEach((url) => {
-              editor.dispatchCommand(INSERT_IMAGE_COMMAND, {
-                src: url,
-                altText: ''
-              })
-            })
-          }, syncNestedEditorIfBlurred(editor))
+          insertUploadedImages(editor, urls)
         })
         .catch((e: unknown) => {
           throw e
