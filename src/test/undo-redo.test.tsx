@@ -1,11 +1,17 @@
+import { getPeerDependencyFromEditor } from '@lexical/extension'
+import { HistoryExtension } from '@lexical/history'
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { Realm } from '@mdxeditor/gurx'
-import { $createTextNode, $getRoot, $isParagraphNode, HISTORY_PUSH_TAG, type LexicalEditor } from 'lexical'
+import { $createParagraphNode, $createTextNode, $getRoot, $isParagraphNode, HISTORY_PUSH_TAG, type LexicalEditor } from 'lexical'
 import React from 'react'
 import { describe, expect, it } from 'vitest'
+import { AdmonitionDirectiveDescriptor } from '../directive-editors/AdmonitionDirectiveDescriptor'
+import { GenericJsxEditor } from '../jsx-editors/GenericJsxEditor'
 import { MDXEditor, type MDXEditorMethods } from '../MDXEditor'
-import { activeEditor$, editorInFocus$, rootEditor$ } from '../plugins/core'
+import { activeEditor$, editorInFocus$, NESTED_EDITOR_UPDATED_COMMAND, rootEditor$ } from '../plugins/core'
 import { createExtensionEditor } from '../plugins/core/lexicalExtensions'
+import { directivesPlugin } from '../plugins/directives'
+import { jsxPlugin } from '../plugins/jsx'
 import { toolbarPlugin } from '../plugins/toolbar'
 import { UndoRedo } from '../plugins/toolbar/components/UndoRedo'
 import { ConditionalContents } from '../plugins/toolbar/primitives/toolbar'
@@ -131,5 +137,78 @@ describe('UndoRedo lifecycle', () => {
       local.dispose()
       noHistory.dispose()
     }
+  })
+})
+
+describe('nested editor saves', () => {
+  it.each([
+    ['directive', 'blur', ':::info\nhello\n:::'],
+    ['directive', 'nested editor update', ':::info\nhello\n:::'],
+    ['jsx', 'blur', '<Grid>\n  hello\n</Grid>'],
+    ['jsx', 'nested editor update', '<Grid>\n  hello\n</Grid>']
+  ])('adds a root Undo step only when the %s content changed (%s)', async (_kind, trigger, markdown) => {
+    let rootEditor!: LexicalEditor
+    const ref = React.createRef<MDXEditorMethods>()
+    const { container } = render(
+      <MDXEditor
+        ref={ref}
+        markdown={markdown}
+        plugins={[
+          {
+            postInit: (realm) => {
+              rootEditor = realm.getValue(rootEditor$)!
+            }
+          },
+          directivesPlugin({ directiveDescriptors: [AdmonitionDirectiveDescriptor] }),
+          jsxPlugin({ jsxComponentDescriptors: [{ name: 'Grid', kind: 'flow', props: [], hasChildren: true, Editor: GenericJsxEditor }] })
+        ]}
+      />
+    )
+    await waitFor(() => {
+      expect(container.querySelectorAll('[contenteditable="true"]')).toHaveLength(2)
+    })
+    const history = getPeerDependencyFromEditor<typeof HistoryExtension>(rootEditor, HistoryExtension.name)!.output.historyState.value
+    const nestedElement = container.querySelectorAll<HTMLElement>('[contenteditable="true"]')[1]
+    const nestedEditor = (nestedElement as HTMLElement & { __lexicalEditor: LexicalEditor }).__lexicalEditor
+    const saveNested = () => {
+      act(() => {
+        if (trigger === 'blur') {
+          fireEvent.blur(nestedElement, { relatedTarget: null })
+        } else {
+          nestedEditor.dispatchCommand(NESTED_EDITOR_UPDATED_COMMAND, undefined)
+        }
+      })
+    }
+
+    // History only pushes the previous state once it has recorded one.
+    act(() => {
+      rootEditor.update(
+        () => {
+          $getRoot().append($createParagraphNode().append($createTextNode('after')))
+        },
+        { discrete: true }
+      )
+    })
+    const undoDepth = history.undoStack.length
+
+    saveNested()
+    expect(history.undoStack).toHaveLength(undoDepth)
+
+    act(() => {
+      nestedEditor.update(
+        () => {
+          const paragraph = $getRoot().getFirstChildOrThrow()
+          if (!$isParagraphNode(paragraph)) {
+            throw new Error('Expected the nested editor to contain a paragraph')
+          }
+          paragraph.append($createTextNode('x'))
+        },
+        { discrete: true }
+      )
+    })
+    const editedDepth = history.undoStack.length
+    saveNested()
+    expect(history.undoStack).toHaveLength(editedDepth + 1)
+    expect(ref.current!.getMarkdown()).toContain('hellox')
   })
 })

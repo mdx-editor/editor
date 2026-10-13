@@ -11,6 +11,7 @@ import {
 import * as Mdast from 'mdast'
 import React, { JSX } from 'react'
 import { noop } from '../../utils/fp'
+import { isMdastEqualIgnoringPositions } from '../../utils/mdastEquality'
 import { TableEditor } from './TableEditor'
 import { TableCell, TableRow } from 'mdast-util-gfm-table/lib'
 
@@ -26,11 +27,6 @@ export type SerializedTableNode = Spread<
 >
 
 const EMPTY_CELL: Mdast.TableCell = { type: 'tableCell', children: [] as Mdast.PhrasingContent[] }
-
-// Imported cells carry source positions that cell editor exports never have.
-function serializeWithoutPositions(children: Mdast.PhrasingContent[]) {
-  return JSON.stringify(children, (key, value: unknown) => (key === 'position' ? undefined : value))
-}
 
 type CoordinatesSubscription = (coords: [colIndex: number, rowIndex: number]) => void
 
@@ -139,7 +135,7 @@ export class TableNode extends DecoratorNode<JSX.Element> {
     // Cell editors save on every blur and cell navigation. Marking the table
     // dirty for an unchanged cell would push an extra root Undo step.
     const currentChildren = this.getLatest().__mdastNode.children[rowIndex].children[colIndex].children
-    if (serializeWithoutPositions(currentChildren) === serializeWithoutPositions(children)) {
+    if (isMdastEqualIgnoringPositions(currentChildren, children)) {
       return
     }
     const self = this.getWritable()
