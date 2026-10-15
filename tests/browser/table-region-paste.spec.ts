@@ -9,7 +9,15 @@ test('pastes a rectangle at the active cell and restores it with one Undo/Redo',
   await cells.nth(8).evaluate((element) => {
     const data = new DataTransfer()
     data.setData('text/plain', 'x\t\ny\tz')
-    element.dispatchEvent(new ClipboardEvent('paste', { clipboardData: data, bubbles: true, cancelable: true }))
+    const event = new ClipboardEvent('paste', { clipboardData: data, bubbles: true, cancelable: true })
+    // Match the compatibility suite: Firefox drops constructor clipboardData.
+    if (event.clipboardData?.getData('text/plain') !== 'x\t\ny\tz') {
+      Object.defineProperty(event, 'clipboardData', { value: data })
+    }
+    if (event.clipboardData?.getData('text/plain') !== 'x\t\ny\tz') {
+      throw new Error('Synthetic paste lost the rectangular clipboard payload')
+    }
+    element.dispatchEvent(event)
   })
   await expect(cells).toHaveCount(16)
   await expect(cells.nth(10)).toHaveText('x')

@@ -1,5 +1,15 @@
 import { act, fireEvent, render, waitFor } from '@testing-library/react'
-import { BLUR_COMMAND, $createTextNode, $getRoot, PASTE_COMMAND, REDO_COMMAND, UNDO_COMMAND, type LexicalEditor } from 'lexical'
+import {
+  BLUR_COMMAND,
+  HISTORY_PUSH_TAG,
+  $createParagraphNode,
+  $createTextNode,
+  $getRoot,
+  PASTE_COMMAND,
+  REDO_COMMAND,
+  UNDO_COMMAND,
+  type LexicalEditor
+} from 'lexical'
 import React from 'react'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { MDXEditor, type MDXEditorMethods } from '../MDXEditor'
@@ -21,18 +31,14 @@ afterAll(() => {
   vi.unstubAllGlobals()
 })
 
-async function setup() {
+async function setup(markdown = '| a | b |\n| - | - |\n| c | d |') {
   const ref = React.createRef<MDXEditorMethods>()
   const view = render(
-    <MDXEditor
-      ref={ref}
-      markdown={'| a | b |\n| - | - |\n| c | d |'}
-      plugins={[tablePlugin(), toolbarPlugin({ toolbarContents: () => <UndoRedo /> })]}
-    />
+    <MDXEditor ref={ref} markdown={markdown} plugins={[tablePlugin(), toolbarPlugin({ toolbarContents: () => <UndoRedo /> })]} />
   )
   const cells = () => Array.from(view.container.querySelectorAll<HTMLElement>('tbody [contenteditable="true"]'))
   await waitFor(() => {
-    expect(cells()).toHaveLength(4)
+    expect(cells().length).toBeGreaterThanOrEqual(4)
   })
   const editor = (index: number) => (cells()[index] as HTMLElement & { __lexicalEditor: LexicalEditor }).__lexicalEditor
   return { ...view, ref, cells, editor }
@@ -357,5 +363,162 @@ describe('table region paste', () => {
     await waitFor(() => {
       expect(cells().map((c) => c.textContent)).toEqual(['a old', 'b', 'x', 'y'])
     })
+  })
+  it('keeps ordinary cell undo local even when the parent has older history', async () => {
+    const { cells, editor, getByRole } = await setup()
+    const parent = editor(0)._parentEditor!
+    act(() => {
+      parent.update(
+        () => {
+          $getRoot().selectEnd()
+        },
+        { discrete: true }
+      )
+    })
+    act(() => {
+      parent.update(
+        () => {
+          $getRoot().append($createParagraphNode().append($createTextNode('root edit')))
+        },
+        { discrete: true, tag: HISTORY_PUSH_TAG }
+      )
+    })
+    act(() => {
+      cells()[0].focus()
+      editor(0).update(
+        () => {
+          $getRoot().selectEnd()
+        },
+        { discrete: true }
+      )
+    })
+    act(() => {
+      editor(0).update(
+        () => {
+          $getRoot().getLastDescendant()!.insertAfter($createTextNode(' local'))
+        },
+        { discrete: true, tag: HISTORY_PUSH_TAG }
+      )
+    })
+    act(() => {
+      editor(0).dispatchCommand(UNDO_COMMAND, undefined)
+    })
+    await waitFor(() => {
+      expect(cells()[0]).toHaveTextContent('a')
+    })
+    await waitFor(() => {
+      expect(getByRole('radio', { name: /Undo/ })).toBeDisabled()
+    })
+    act(() => {
+      editor(0).dispatchCommand(UNDO_COMMAND, undefined)
+    })
+    expect(parent.getEditorState().read(() => $getRoot().getTextContent())).toContain('root edit')
+    act(() => {
+      editor(0).dispatchCommand(REDO_COMMAND, undefined)
+    })
+    await waitFor(() => {
+      expect(cells()[0]).toHaveTextContent('a local')
+    })
+  })
+
+  it('retains paste routing through a parent selection-only history merge', async () => {
+    const { cells, editor } = await setup()
+    paste(editor(2), 'x\ty')
+    await waitFor(() => {
+      expect(cells()[2]).toHaveTextContent('x')
+    })
+    const parent = editor(2)._parentEditor!
+    act(() => {
+      parent.update(
+        () => {
+          $getRoot().selectEnd()
+        },
+        { discrete: true }
+      )
+    })
+    act(() => {
+      editor(2).dispatchCommand(UNDO_COMMAND, undefined)
+    })
+    await waitFor(() => {
+      expect(cells()[2]).toHaveTextContent('c')
+    })
+    act(() => {
+      editor(2).dispatchCommand(REDO_COMMAND, undefined)
+    })
+    await waitFor(() => {
+      expect(cells()[2]).toHaveTextContent('x')
+    })
+  })
+
+  it('does not route paste history through another table or an unrelated root edit', async () => {
+    const { cells, editor } = await setup('| a | b |\n| - | - |\n| c | d |\n\nBetween\n\n| e | f |\n| - | - |\n| g | h |')
+    await waitFor(() => {
+      expect(cells()).toHaveLength(8)
+    })
+    paste(editor(2), 'x\ty')
+    await waitFor(() => {
+      expect(cells()[2]).toHaveTextContent('x')
+    })
+    act(() => {
+      editor(6).dispatchCommand(UNDO_COMMAND, undefined)
+    })
+    expect(cells()[2]).toHaveTextContent('x')
+    const parent = editor(2)._parentEditor!
+    act(() => {
+      parent.update(
+        () => {
+          $getRoot().append($createParagraphNode().append($createTextNode('root edit')))
+        },
+        { discrete: true, tag: HISTORY_PUSH_TAG }
+      )
+    })
+    act(() => {
+      editor(2).dispatchCommand(UNDO_COMMAND, undefined)
+    })
+    expect(parent.getEditorState().read(() => $getRoot().getTextContent())).toContain('root edit')
+    expect(cells()[2]).toHaveTextContent('x')
+  })
+
+  it('a new branch after undoing paste does not retain parent routing', async () => {
+    const { cells, editor, getByRole } = await setup()
+    paste(editor(2), 'x\ty')
+    await waitFor(() => {
+      expect(cells()[2].textContent).toBe('x')
+    })
+    act(() => {
+      editor(2).dispatchCommand(UNDO_COMMAND, undefined)
+    })
+    await waitFor(() => {
+      expect(cells()[2].textContent).toBe('c')
+    })
+    const parent = editor(0)._parentEditor!
+    act(() => {
+      parent.update(
+        () => {
+          $getRoot().getLastChildOrThrow().selectEnd()
+        },
+        { discrete: true }
+      )
+    })
+    act(() => {
+      parent.update(
+        () => {
+          $getRoot().append($createParagraphNode().append($createTextNode('NEWBRANCH')))
+        },
+        { discrete: true }
+      )
+    })
+    fireEvent.focus(cells()[0])
+    fireEvent.focus(cells()[2])
+    await waitFor(() => {
+      expect(getByRole('radio', { name: /Redo/ })).toBeDisabled()
+    })
+    await waitFor(() => {
+      expect(getByRole('radio', { name: /Undo/ })).toBeDisabled()
+    })
+    act(() => {
+      editor(2).dispatchCommand(REDO_COMMAND, undefined)
+    })
+    expect(cells()[2].textContent).toBe('c')
   })
 })

@@ -31,6 +31,7 @@ import {
   FOCUS_COMMAND,
   KEY_ENTER_COMMAND,
   KEY_TAB_COMMAND,
+  EditorState,
   LexicalEditor,
   LexicalEditorWithDispose,
   LexicalNode,
@@ -125,6 +126,16 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
   const tableKey = lexicalTable.getKey()
   const [activeCell, setActiveCell] = React.useState<[number, number] | null>(null)
   const [cellEditors] = React.useState(() => new Set<LexicalEditor>())
+  const [pasteHistoryStates] = React.useState(() => new WeakSet<EditorState>())
+  React.useEffect(
+    () =>
+      parentEditor.registerUpdateListener(({ editorState, prevEditorState, tags }) => {
+        // Preserve the paste branch through selection/history merges, but do not
+        // carry it onto an older state restored by Undo or a new branch from it.
+        if (!tags.has(HISTORIC_TAG) && pasteHistoryStates.has(prevEditorState)) pasteHistoryStates.add(editorState)
+      }),
+    [parentEditor, pasteHistoryStates]
+  )
   const [iconComponentFor, readOnly] = useCellValues(iconComponentFor$, readOnly$)
   const getCellKey = React.useMemo(() => {
     return (cell: Mdast.TableCell & { __cacheKey?: string }) => {
@@ -353,6 +364,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
                     key={getCellKey(mdastCell)}
                     contents={mdastCell.children}
                     cellEditors={cellEditors}
+                    pasteHistoryStates={pasteHistoryStates}
                     setActiveCell={setActiveCellWithBoundaries}
                     {...{
                       rowIndex,
@@ -398,6 +410,7 @@ export interface CellProps {
   lexicalTable: TableNode
   contents: Mdast.PhrasingContent[]
   cellEditors: Set<LexicalEditor>
+  pasteHistoryStates: WeakSet<EditorState>
   colIndex: number
   rowIndex: number
   align?: Mdast.AlignType
@@ -435,7 +448,8 @@ const CellEditor: React.FC<CellProps> = ({
   contents,
   colIndex,
   rowIndex,
-  cellEditors
+  cellEditors,
+  pasteHistoryStates
 }) => {
   const tableKey = lexicalTable.getKey()
   const [
@@ -584,8 +598,21 @@ const CellEditor: React.FC<CellProps> = ({
     const history = getPeerDependencyFromEditor<typeof HistoryExtension>(editor, HistoryExtension.name)!.output.historyState.value
     const parentHistory = getPeerDependencyFromEditor<typeof HistoryExtension>(parentEditor, HistoryExtension.name)?.output.historyState
       .value
-    const canUndoParent = () => (parentHistory?.undoStack.length ?? 0) > 0
-    const canRedoParent = () => history.undoStack.length === 0 && (parentHistory?.redoStack.length ?? 0) > 0
+    const hasPasteHistory = () =>
+      Boolean(
+        parentHistory &&
+          [parentHistory.current, ...parentHistory.undoStack, ...parentHistory.redoStack].some(
+            (entry) => entry && pasteHistoryStates.has(entry.editorState)
+          )
+      )
+    const changesThisTable = (target: EditorState | undefined) => {
+      if (!target || !hasPasteHistory()) return false
+      const currentTable = parentEditor.getEditorState().read(() => $getTableNodeByKey(tableKey)?.getMdastNode())
+      const targetTable = target.read(() => $getTableNodeByKey(tableKey)?.getMdastNode())
+      return Boolean(currentTable && targetTable && !isMdastEqualIgnoringPositions(currentTable, targetTable))
+    }
+    const canUndoParent = () => changesThisTable(parentHistory?.undoStack.at(-1)?.editorState)
+    const canRedoParent = () => history.undoStack.length === 0 && changesThisTable(parentHistory?.redoStack.at(-1)?.editorState)
     const publishAvailability = () => {
       if (focus) {
         editor.dispatchCommand(CAN_UNDO_COMMAND, history.undoStack.length > 0 || canUndoParent())
@@ -649,6 +676,7 @@ const CellEditor: React.FC<CellProps> = ({
             },
             { discrete: true, tag: HISTORY_PUSH_TAG }
           )
+          pasteHistoryStates.add(parentEditor.getEditorState())
           setActiveCell([colIndex, rowIndex])
           parentEditor.dispatchCommand(NESTED_EDITOR_UPDATED_COMMAND, undefined)
           return true
@@ -658,7 +686,7 @@ const CellEditor: React.FC<CellProps> = ({
       editor.registerCommand(
         UNDO_COMMAND,
         () => {
-          if (history.undoStack.length > 0) return false
+          if (history.undoStack.length > 0 || !canUndoParent()) return false
           parentEditor.dispatchCommand(UNDO_COMMAND, undefined)
           return true
         },
@@ -667,14 +695,14 @@ const CellEditor: React.FC<CellProps> = ({
       editor.registerCommand(
         REDO_COMMAND,
         () => {
-          if (history.redoStack.length > 0 || history.undoStack.length > 0) return false
+          if (history.redoStack.length > 0 || !canRedoParent()) return false
           parentEditor.dispatchCommand(REDO_COMMAND, undefined)
           return true
         },
         COMMAND_PRIORITY_CRITICAL
       )
     )
-  }, [editor, focus, save, parentEditor, tableKey, colIndex, rowIndex, setActiveCell, cellEditors])
+  }, [editor, focus, save, parentEditor, tableKey, colIndex, rowIndex, setActiveCell, cellEditors, pasteHistoryStates])
 
   const isCurrentCell = React.useCallback(
     () =>
@@ -695,14 +723,21 @@ const CellEditor: React.FC<CellProps> = ({
       // Leaving the cell commits its edit as a parent-table history step.
       // Keep local typing undo while editing, but do not replay that same edit
       // again from an older local stack after the parent has restored it.
-      if (editor) {
+      const parentHistory = getPeerDependencyFromEditor<typeof HistoryExtension>(parentEditor, HistoryExtension.name)?.output.historyState
+        .value
+      const hasPasteHistory =
+        parentHistory &&
+        [parentHistory.current, ...parentHistory.undoStack, ...parentHistory.redoStack].some(
+          (entry) => entry && pasteHistoryStates.has(entry.editorState)
+        )
+      if (editor && hasPasteHistory) {
         const history = getPeerDependencyFromEditor<typeof HistoryExtension>(editor, HistoryExtension.name)!.output.historyState.value
         history.undoStack = []
         history.redoStack = []
       }
       setActiveCell(nextCell)
     },
-    [editor, isCurrentCell, save, setActiveCell]
+    [editor, isCurrentCell, save, setActiveCell, parentEditor, pasteHistoryStates]
   )
 
   React.useEffect(() => {
