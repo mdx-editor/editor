@@ -234,6 +234,17 @@ export function Table() {
   )
 }
 
+/** Paste a standalone HTML table or tab-separated cells into any existing cell. */
+export function TableRegionPaste() {
+  return (
+    <div>
+      <p>Copy a table or tab-separated region, then paste into a cell below. The table grows to fit. Undo restores the whole region.</p>
+      <p>HTML formatting is reduced to text, and merged cells become text in the top-left cell with empty covered cells.</p>
+      <Table />
+    </div>
+  )
+}
+
 export function Link() {
   return <MDXEditor markdown={'some [hello](https://google.com) link'} plugins={[linkPlugin()]} />
 }

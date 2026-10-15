@@ -174,3 +174,11 @@ Each plugin registers both import and export visitors for its node types.
 - Add tests for new features
 - Update examples in `src/examples/` to demonstrate the feature
 - Keep commits focused and well-described
+
+## Table region paste contract
+
+Paste a standalone HTML table or TSV containing an unquoted tab into an existing cell. The cell is the top-left anchor; the destination grows right and down, and empty cells overwrite existing contents. The resulting table is limited to 10,000 cells; an oversized destination is ignored without saving pending edits. HTML formatting and block content become readable plain text. Merged cells retain text at the top-left and use empty covered cells. Ordinary prose and CSV continue through normal paste.
+
+While editing a cell, typing uses its local Undo/Redo history. Leaving a cell commits its contents as one parent-table history step. A region paste first commits pending anchor text and then creates one separate parent step. It resets older local history boundaries so Undo from another cell cannot jump ahead of the paste. Parent Undo/Redo restores committed cell edits as well as entire pastes, including cells whose editor identity did not change. This keeps committed content recoverable; it does not preserve every in-cell typing group across a commit boundary. Parent-history routing and commit-boundary resets apply only while this table has a region-paste branch in history. Routing stops at unrelated root/other-table steps; ordinary cells without a region paste retain their existing local-history behavior. Undoing the paste preserves Redo, while creating a new branch after that Undo expires the paste routing.
+
+The focused parser and integration tests are `tableClipboard.test.ts`, `table-paste.test.tsx`, and `table-paste-limits.test.ts`. `tests/browser/table-region-paste.spec.ts` additionally checks actual browser focus and keyboard Undo/Redo with a synthetic DOM clipboard event. This event does not certify OS clipboard permissions, Excel, or Google Sheets integration.
