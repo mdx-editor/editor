@@ -34,16 +34,17 @@ import { $createHorizontalRuleNode, $isHorizontalRuleNode, HorizontalRuleNode } 
  */
 export const markdownShortcutPlugin = realmPlugin({
   init(realm) {
-    const pluginIds = realm.getValue(activePlugins$)
     realm.pubIn({
-      [addComposerChild$]: () => <MarkdownShortcuts pluginIds={pluginIds} />,
-      [addNestedEditorChild$]: () => <MarkdownShortcuts pluginIds={pluginIds} />,
-      [addTableCellEditorChild$]: () => <MarkdownShortcuts pluginIds={pluginIds} excludeLists />
+      [addComposerChild$]: () => <MarkdownShortcuts />,
+      [addNestedEditorChild$]: () => <MarkdownShortcuts />,
+      [addTableCellEditorChild$]: () => <MarkdownShortcuts excludeLists />
     })
   }
 })
 
-const MarkdownShortcuts: React.FC<{ pluginIds: string[]; excludeLists?: boolean }> = ({ pluginIds, excludeLists = false }) => {
+const MarkdownShortcuts: React.FC<{ excludeLists?: boolean }> = ({ excludeLists = false }) => {
+  // Read reactively: plugins listed after markdownShortcutPlugin register themselves after its init runs.
+  const pluginIds = useCellValue(activePlugins$)
   const allowedHeadingLevels = useCellValue(allowedHeadingLevels$)
   // headingsPlugin republishes its levels on every editor render, usually as a new array with the same contents.
   const headingLevelsKey = allowedHeadingLevels.join()
