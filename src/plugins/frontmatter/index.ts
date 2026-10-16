@@ -1,3 +1,4 @@
+import { ensureFrontmatterHistoryBaseline } from './frontmatterHistory'
 import { realmPlugin } from '../../RealmWithPlugins'
 import {
   addExportVisitor$,
@@ -7,6 +8,7 @@ import {
   addSyntaxExtension$,
   addToMarkdownExtension$,
   createRootEditorSubscription$,
+  readOnly$,
   rootEditor$
 } from '../core'
 import { Action, Cell, withLatestFrom } from '@mdxeditor/gurx'
@@ -16,6 +18,7 @@ import {
   $isRangeSelection,
   $isTextNode,
   COMMAND_PRIORITY_CRITICAL,
+  HISTORY_PUSH_TAG,
   ElementNode,
   KEY_DOWN_COMMAND,
   LexicalEditor
@@ -38,7 +41,9 @@ export const frontmatterDialogOpen$ = Cell(false)
  * @group Frontmatter
  */
 export const insertFrontmatter$ = Action((r) => {
-  r.sub(r.pipe(insertFrontmatter$, withLatestFrom(rootEditor$)), ([, rootEditor]) => {
+  r.sub(r.pipe(insertFrontmatter$, withLatestFrom(rootEditor$, readOnly$)), ([, rootEditor, readOnly]) => {
+    if (readOnly) return
+    if (rootEditor) ensureFrontmatterHistoryBaseline(rootEditor)
     rootEditor?.update(() => {
       const firstItem = $getRoot().getFirstChild()
       if (!$isFrontmatterNode(firstItem)) {
@@ -59,13 +64,18 @@ export const insertFrontmatter$ = Action((r) => {
  * @group Frontmatter
  */
 export const removeFrontmatter$ = Action((r) => {
-  r.sub(r.pipe(removeFrontmatter$, withLatestFrom(rootEditor$)), ([, rootEditor]) => {
-    rootEditor?.update(() => {
-      const firstItem = $getRoot().getFirstChild()
-      if ($isFrontmatterNode(firstItem)) {
-        firstItem.remove()
-      }
-    })
+  r.sub(r.pipe(removeFrontmatter$, withLatestFrom(rootEditor$, readOnly$)), ([, rootEditor, readOnly]) => {
+    if (readOnly) return
+    if (rootEditor) ensureFrontmatterHistoryBaseline(rootEditor)
+    rootEditor?.update(
+      () => {
+        const firstItem = $getRoot().getFirstChild()
+        if ($isFrontmatterNode(firstItem)) {
+          firstItem.remove()
+        }
+      },
+      { tag: HISTORY_PUSH_TAG }
+    )
     r.pub(frontmatterDialogOpen$, false)
   })
 })

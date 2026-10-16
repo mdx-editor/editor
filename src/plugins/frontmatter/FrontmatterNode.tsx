@@ -1,4 +1,5 @@
-import { DecoratorNode, EditorConfig, LexicalEditor, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
+import { DecoratorNode, EditorConfig, LexicalEditor, LexicalNode, NodeKey, SerializedLexicalNode, Spread, HISTORY_PUSH_TAG } from 'lexical'
+import { ensureFrontmatterHistoryBaseline } from './frontmatterHistory'
 import React, { JSX } from 'react'
 import { FrontmatterEditor } from './FrontmatterEditor'
 
@@ -71,9 +72,14 @@ export class FrontmatterNode extends DecoratorNode<JSX.Element> {
       <FrontmatterEditor
         yaml={this.getYaml()}
         onChange={(yaml) => {
-          editor.update(() => {
-            this.setYaml(yaml)
-          })
+          if (!editor.isEditable()) return
+          ensureFrontmatterHistoryBaseline(editor)
+          editor.update(
+            () => {
+              if (editor.isEditable() && this.isAttached()) this.setYaml(yaml)
+            },
+            { tag: HISTORY_PUSH_TAG }
+          )
         }}
       />
     )
