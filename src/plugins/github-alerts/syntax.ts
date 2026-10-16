@@ -1,48 +1,31 @@
-import type { Extension as SyntaxExtension, State, Tokenizer } from 'micromark-util-types'
 import type { Extension as MdastExtension } from 'mdast-util-from-markdown'
-import { markdownLineEnding } from 'micromark-util-character'
-import { GITHUB_ALERT_TYPES, type GitHubAlertType } from './GitHubAlertNode'
+import type { GitHubAlertType } from './GitHubAlertNode'
 
-declare module 'micromark-util-types' {
-  interface TokenTypeMap {
-    githubAlertMarker: 'githubAlertMarker'
-  }
-}
-
-const tokenize: Tokenizer = function (effects, ok, nok) {
-  let value = ''
-  const start: State = (code) => {
-    effects.enter('githubAlertMarker')
-    return consume(code)
-  }
-  const consume: State = (code) => {
-    if (code === null || markdownLineEnding(code)) return nok(code)
-    value += String.fromCharCode(code)
-    effects.consume(code)
-    if (code === 93) return end
-    if (value.length > 12) return nok(code)
-    return consume
-  }
-  const end: State = (code) => {
-    if (!GITHUB_ALERT_TYPES.some((type) => value === `[!${type}]`)) return nok(code)
-    if (code !== null && !markdownLineEnding(code)) return nok(code)
-    effects.exit('githubAlertMarker')
-    return ok(code)
-  }
-  return start
-}
-
-export const githubAlertsSyntax: SyntaxExtension = { text: { 91: { name: 'githubAlertMarker', tokenize } } }
+// Inspect a completed block quote instead of consuming inline bracket syntax.
+// Otherwise a marker-like reference link can lose its destination.
 export const githubAlertsFromMarkdown: MdastExtension = {
-  enter: {
-    githubAlertMarker(token) {
-      this.enter({ type: 'text', value: '', data: { githubAlertMarker: true } }, token)
-    }
-  },
   exit: {
-    githubAlertMarker(token) {
+    blockQuote(token) {
       const node = this.stack[this.stack.length - 1]
-      if (node.type === 'text') node.value = this.sliceSerialize(token)
+      if (node.type === 'blockquote') {
+        const paragraph = node.children.at(0)
+        // Check the original spelling so escapes and character references remain literal.
+        const marker = /^>[ \t]*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\](?:\r\n|[\r\n]|$)/.exec(this.sliceSerialize(token))
+        if (paragraph?.type === 'paragraph' && marker) {
+          const first = paragraph.children.at(0)
+          if (first?.type === 'text') {
+            first.data = { ...first.data, githubAlertMarker: true }
+          } else if (first?.type === 'linkReference' && first.referenceType === 'shortcut') {
+            // A definition elsewhere must not turn a real first-line alert marker into a link.
+            paragraph.children[0] = {
+              type: 'text',
+              value: `[!${marker[1]}]`,
+              data: { githubAlertMarker: true },
+              position: first.position
+            }
+          }
+        }
+      }
       this.exit(token)
     }
   }

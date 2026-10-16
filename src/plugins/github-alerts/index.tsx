@@ -19,7 +19,6 @@ import {
   addImportVisitor$,
   addLexicalNode$,
   addToMarkdownExtension$,
-  addSyntaxExtension$,
   addMdastExtension$,
   createActiveEditorSubscription$,
   readOnly$,
@@ -30,7 +29,7 @@ import { MdastBlockQuoteVisitor } from '../quote/MdastBlockQuoteVisitor'
 import { LexicalQuoteVisitor } from '../quote/LexicalQuoteVisitor'
 import { $createGitHubAlertNode, $isGitHubAlertNode, GITHUB_ALERT_TYPES, GitHubAlertNode, type GitHubAlertType } from './GitHubAlertNode'
 import { githubAlertsToMarkdown, LexicalGitHubAlertVisitor, MdastGitHubAlertVisitor } from './visitors'
-import { githubAlertsSyntax, githubAlertsFromMarkdown } from './syntax'
+import { githubAlertsFromMarkdown } from './syntax'
 export * from './GitHubAlertNode'
 
 function $selectedAlert(): GitHubAlertNode | null {
@@ -107,7 +106,6 @@ export const githubAlertsPlugin = realmPlugin({
       [addImportVisitor$]: [MdastGitHubAlertVisitor, MdastBlockQuoteVisitor],
       [addExportVisitor$]: [LexicalGitHubAlertVisitor, LexicalQuoteVisitor],
       [addToMarkdownExtension$]: githubAlertsToMarkdown,
-      [addSyntaxExtension$]: githubAlertsSyntax,
       [addMdastExtension$]: githubAlertsFromMarkdown
     })
     realm.pub(createActiveEditorSubscription$, (editor) =>

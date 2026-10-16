@@ -14,7 +14,8 @@ import {
   type LexicalEditor
 } from 'lexical'
 import { MDXEditor, type MDXEditorMethods } from '../MDXEditor'
-import { rootEditor$ } from '../plugins/core'
+import { fromMarkdown } from 'mdast-util-from-markdown'
+import { rootEditor$, syntaxExtensions$, mdastExtensions$ } from '../plugins/core'
 import {
   githubAlertsPlugin,
   GITHUB_ALERT_TYPES,
@@ -218,4 +219,44 @@ describe('GitHub alerts', () => {
     })
     expect(ref.current!.getMarkdown()).toBe('> [!IMPORTANT]\n> Content')
   })
+})
+
+describe('additional ordinary Markdown regression audit', () => {
+  it.each([
+    'See [!NOTE]\n\n[!NOTE]: https://example.com',
+    '> Quote has a [!TIP]\n\n[!TIP]: https://example.com',
+    '> [!WARNING]\n> See [!TIP]\n\n[!TIP]: https://example.com'
+  ])('preserves the reference link AST in %s', (markdown) => {
+    const { realm } = setup('')
+    const tree = fromMarkdown(markdown, {
+      extensions: realm.getValue(syntaxExtensions$),
+      mdastExtensions: realm.getValue(mdastExtensions$)
+    })
+    expect(JSON.stringify(tree)).toContain('"type":"linkReference"')
+    expect(JSON.stringify(tree)).toContain('"url":"https://example.com"')
+  })
+})
+
+describe('additional marker source audit', () => {
+  it.each(['\n', '\r\n', '\r'])('recognizes a standalone marker with %j line ending', (eol) => {
+    const { container, ref } = setup('> [!NOTE]' + eol + '> Body')
+    expect(container.querySelector('[data-github-alert="NOTE"]')).not.toBeNull()
+    expect(ref.current!.getMarkdown()).toBe('> [!NOTE]\n> Body')
+  })
+})
+
+it('recognizes the first-line marker even when its label is defined as a reference', () => {
+  const { realm } = setup('')
+  const tree = fromMarkdown('> [!NOTE]\n> Body uses [!TIP]\n\n[!NOTE]: /marker\n[!TIP]: /body', {
+    extensions: realm.getValue(syntaxExtensions$),
+    mdastExtensions: realm.getValue(mdastExtensions$)
+  })
+  const quote = tree.children[0]
+  expect(quote.type).toBe('blockquote')
+  if (quote.type !== 'blockquote') throw new Error('Expected a block quote')
+  const paragraph = quote.children[0]
+  expect(paragraph.type).toBe('paragraph')
+  if (paragraph.type !== 'paragraph') throw new Error('Expected a paragraph')
+  expect(paragraph.children[0]).toMatchObject({ type: 'text', value: '[!NOTE]', data: { githubAlertMarker: true } })
+  expect(paragraph.children.at(-1)).toMatchObject({ type: 'linkReference', identifier: '!tip' })
 })

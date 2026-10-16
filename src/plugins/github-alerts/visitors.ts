@@ -11,14 +11,16 @@ function parseAlert(node: Mdast.Blockquote): { type: GitHubAlertType; children: 
   const text = first.children.at(0)
   if (text?.type !== 'text' || !text.data?.githubAlertMarker) return null
   // A marker must occupy the entire first line. Do not consume unknown or inline markers.
-  const match = /^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\](?:\r?\n|$)/.exec(text.value)
+  const match = /^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\](?:\r\n|[\r\n]|$)/.exec(text.value)
   if (!match) return null
   const remainingText = text.value.slice(match[0].length)
   const paragraphChildren = [
     ...(remainingText ? [{ ...text, value: remainingText }] : []),
     ...first.children
       .slice(1)
-      .map((child, index) => (index === 0 && child.type === 'text' ? { ...child, value: child.value.replace(/^\r?\n/, '') } : child))
+      .map((child, index) =>
+        index === 0 && child.type === 'text' ? { ...child, value: child.value.replace(/^(?:\r\n|[\r\n])/, '') } : child
+      )
       .filter((child) => child.type !== 'text' || child.value !== '')
   ]
   const children = [

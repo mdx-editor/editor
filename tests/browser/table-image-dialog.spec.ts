@@ -75,7 +75,15 @@ for (const source of ['cell', 'root'] as const) {
     await pasteTarget.evaluate((element) => {
       const clipboardData = new DataTransfer()
       clipboardData.items.add(new File(['image'], 'image.png', { type: 'image/png' }))
-      element.dispatchEvent(new ClipboardEvent('paste', { clipboardData, bubbles: true, cancelable: true }))
+      const event = new ClipboardEvent('paste', { clipboardData, bubbles: true, cancelable: true })
+      // Firefox drops constructor clipboardData, including synthetic files.
+      if (event.clipboardData?.files.length !== 1) {
+        Object.defineProperty(event, 'clipboardData', { value: clipboardData })
+      }
+      if (event.clipboardData?.files[0]?.name !== 'image.png') {
+        throw new Error('Synthetic paste lost the image clipboard payload')
+      }
+      element.dispatchEvent(event)
     })
     await target.click()
     await page.keyboard.type('typing')
