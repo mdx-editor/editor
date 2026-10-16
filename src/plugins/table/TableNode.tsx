@@ -11,6 +11,7 @@ import {
 import * as Mdast from 'mdast'
 import React, { JSX } from 'react'
 import { noop } from '../../utils/fp'
+import { isMdastEqualIgnoringPositions } from '../../utils/mdastEquality'
 import { TableEditor } from './TableEditor'
 import { TableCell, TableRow } from 'mdast-util-gfm-table/lib'
 
@@ -131,6 +132,12 @@ export class TableNode extends DecoratorNode<JSX.Element> {
 
   /** @internal */
   updateCellContents(colIndex: number, rowIndex: number, children: Mdast.PhrasingContent[]): void {
+    // Cell editors save on every blur and cell navigation. Marking the table
+    // dirty for an unchanged cell would push an extra root Undo step.
+    const currentChildren = this.getLatest().__mdastNode.children[rowIndex].children[colIndex].children
+    if (isMdastEqualIgnoringPositions(currentChildren, children)) {
+      return
+    }
     const self = this.getWritable()
     const table = self.__mdastNode
     const row = table.children[rowIndex]

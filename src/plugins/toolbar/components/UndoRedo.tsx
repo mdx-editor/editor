@@ -1,3 +1,5 @@
+import { getPeerDependencyFromEditor } from '@lexical/extension'
+import { HistoryExtension } from '@lexical/history'
 import { mergeRegister } from '@lexical/utils'
 import { useCellValues } from '@mdxeditor/gurx'
 import { CAN_REDO_COMMAND, CAN_UNDO_COMMAND, COMMAND_PRIORITY_CRITICAL, REDO_COMMAND, UNDO_COMMAND } from 'lexical'
@@ -17,6 +19,14 @@ export const UndoRedo: React.FC = () => {
   const t = useTranslation()
 
   React.useEffect(() => {
+    const history = activeEditor
+      ? getPeerDependencyFromEditor<typeof HistoryExtension>(activeEditor, HistoryExtension.name)?.output
+      : undefined
+    const historyState = history?.disabled.value ? undefined : history?.historyState.value
+    // Availability commands only describe future changes. Conditional toolbar
+    // contents can mount after those commands have already been dispatched.
+    setCanUndo((historyState?.undoStack.length ?? 0) > 0)
+    setCanRedo((historyState?.redoStack.length ?? 0) > 0)
     if (activeEditor) {
       return mergeRegister(
         activeEditor.registerCommand<boolean>(

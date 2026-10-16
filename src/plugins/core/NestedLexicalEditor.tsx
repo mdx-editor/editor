@@ -46,6 +46,7 @@ import styles from '../../styles/ui.module.css'
 import { mergeRegister } from '@lexical/utils'
 import { VoidEmitter } from '../../utils/voidEmitter'
 import { isPartOftheEditorUI } from '../../utils/isPartOftheEditorUI'
+import { isMdastEqualIgnoringPositions } from '../../utils/mdastEquality'
 import { useCellValues, usePublisher, useRealm } from '@mdxeditor/gurx'
 import { DirectiveNode } from '../directives'
 import { LexicalJsxNode } from '../jsx/LexicalJsxNode'
@@ -285,7 +286,16 @@ export const NestedLexicalEditor = function <T extends Mdast.RootContent>(props:
           addImportStatements: false
         })
         const content: Mdast.RootContent[] = block ? mdast.children : (mdast.children[0] as Mdast.Paragraph)!.children
-        updateMdastNode(getUpdatedMdastNode(structuredClone(mdastNode) as any, content as any))
+        const updatedMdastNode = getUpdatedMdastNode(structuredClone(mdastNode) as any, content as any)
+        const currentMdastNode = parentEditor.getEditorState().read(() => {
+          return ($getNodeByKey(lexicalNode.getKey()) as DirectiveNode | LexicalJsxNode | null)?.getMdastNode()
+        })
+        // Blur and view mode switches save unconditionally. Rewriting an
+        // unchanged node would push an extra root Undo step.
+        if (isMdastEqualIgnoringPositions(currentMdastNode, updatedMdastNode)) {
+          return
+        }
+        updateMdastNode(updatedMdastNode)
       })
     }
 
@@ -351,6 +361,7 @@ export const NestedLexicalEditor = function <T extends Mdast.RootContent>(props:
     jsxIsAvailable,
     lexicalNode,
     mdastNode,
+    parentEditor,
     removeNode,
     setEditorInFocus,
     updateMdastNode,

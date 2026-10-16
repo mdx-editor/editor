@@ -21,6 +21,7 @@ import {
 import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin'
 import { $createHeadingNode, $isHeadingNode, HeadingNode, HeadingTagType } from '@lexical/rich-text'
 import { ElementNode, LexicalNode } from 'lexical'
+import { useCellValue } from '@mdxeditor/gurx'
 import { realmPlugin } from '../../RealmWithPlugins'
 import { $createCodeBlockNode, CodeBlockNode } from '../codeblock/CodeBlockNode'
 import { activePlugins$, addComposerChild$, addNestedEditorChild$, addTableCellEditorChild$ } from '../core'
@@ -34,16 +35,25 @@ import { $createHorizontalRuleNode, $isHorizontalRuleNode, HorizontalRuleNode } 
 export const markdownShortcutPlugin = realmPlugin({
   init(realm) {
     const pluginIds = realm.getValue(activePlugins$)
-    const allowedHeadingLevels: readonly HEADING_LEVEL[] = pluginIds.includes('headings') ? realm.getValue(allowedHeadingLevels$) : []
-    const transformers = pickTransformersForActivePlugins(pluginIds, allowedHeadingLevels)
-    const tableCellTransformers = transformers.filter((t) => !LIST_TRANSFORMERS.has(t))
     realm.pubIn({
-      [addComposerChild$]: () => <MarkdownShortcutPlugin transformers={transformers} />,
-      [addNestedEditorChild$]: () => <MarkdownShortcutPlugin transformers={transformers} />,
-      [addTableCellEditorChild$]: () => <MarkdownShortcutPlugin transformers={tableCellTransformers} />
+      [addComposerChild$]: () => <MarkdownShortcuts pluginIds={pluginIds} />,
+      [addNestedEditorChild$]: () => <MarkdownShortcuts pluginIds={pluginIds} />,
+      [addTableCellEditorChild$]: () => <MarkdownShortcuts pluginIds={pluginIds} excludeLists />
     })
   }
 })
+
+const MarkdownShortcuts: React.FC<{ pluginIds: string[]; excludeLists?: boolean }> = ({ pluginIds, excludeLists = false }) => {
+  const allowedHeadingLevels = useCellValue(allowedHeadingLevels$)
+  // headingsPlugin republishes its levels on every editor render, usually as a new array with the same contents.
+  const headingLevelsKey = allowedHeadingLevels.join()
+  const transformers = React.useMemo(() => {
+    const transformers = pickTransformersForActivePlugins(pluginIds, pluginIds.includes('headings') ? allowedHeadingLevels : [])
+    return excludeLists ? transformers.filter((t) => !LIST_TRANSFORMERS.has(t)) : transformers
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- headingLevelsKey stands in for allowedHeadingLevels
+  }, [pluginIds, headingLevelsKey, excludeLists])
+  return <MarkdownShortcutPlugin transformers={transformers} />
+}
 
 const createBlockNode = (createNode: (match: string[]) => ElementNode): ElementTransformer['replace'] => {
   return (parentNode, children, match) => {
@@ -90,12 +100,8 @@ function pickTransformersForActivePlugins(pluginIds: string[], allowedHeadingLev
     // STRIKETHROUGH
   ]
 
-  if (pluginIds.includes('headings')) {
-    // Using a range is technically a bug, because the developer might have allowed h2 and h4, but not h3.
-    // However, it's a very unlikely edge case.
-    const minHeadingLevel = Math.min(...allowedHeadingLevels)
-    const maxHeadingLevel = Math.max(...allowedHeadingLevels)
-    const headingRegExp = new RegExp(`^(#{${minHeadingLevel},${maxHeadingLevel}})\\s`)
+  if (pluginIds.includes('headings') && allowedHeadingLevels.length > 0) {
+    const headingRegExp = new RegExp(`^(${allowedHeadingLevels.map((level) => '#'.repeat(level)).join('|')})\\s`)
 
     const HEADING: ElementTransformer = {
       dependencies: [HeadingNode],
