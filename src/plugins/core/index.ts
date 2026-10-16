@@ -377,35 +377,39 @@ export const muteChange$ = Cell(false)
  * @group Core
  */
 export const setMarkdown$ = Signal<string>((r) => {
-  r.sub(
-    r.pipe(
-      setMarkdown$,
-      withLatestFrom(markdown$, rootEditor$, inFocus$),
-      filter(([newMarkdown, oldMarkdown]) => {
-        return newMarkdown.trim() !== oldMarkdown.trim()
-      })
-    ),
-    ([theNewMarkdownValue, , editor, inFocus]) => {
-      r.pub(muteChange$, true)
-      editor?.update(
-        () => {
-          $getRoot().clear()
-          tryImportingMarkdown(r, $getRoot(), theNewMarkdownValue)
-
-          if (!inFocus) {
-            $setSelection(null)
-          } else {
-            editor.focus()
-          }
-        },
-        {
-          onUpdate: () => {
-            r.pub(muteChange$, false)
-          }
+  r.sub(r.pipe(setMarkdown$, withLatestFrom(markdown$, rootEditor$, inFocus$)), ([theNewMarkdownValue, oldMarkdown, editor, inFocus]) => {
+    if (r.getValue(viewMode$) !== 'rich-text') {
+      if (theNewMarkdownValue !== r.getValue(markdownSourceEditorValue$)) {
+        const wasMuted = r.getValue(muteChange$)
+        r.pub(muteChange$, true)
+        try {
+          r.pub(markdownSourceEditorValue$, theNewMarkdownValue)
+        } finally {
+          r.pub(muteChange$, wasMuted)
         }
-      )
+      }
+      return
     }
-  )
+    if (theNewMarkdownValue.trim() === oldMarkdown.trim()) return
+    r.pub(muteChange$, true)
+    editor?.update(
+      () => {
+        $getRoot().clear()
+        tryImportingMarkdown(r, $getRoot(), theNewMarkdownValue)
+
+        if (!inFocus) {
+          $setSelection(null)
+        } else {
+          editor.focus()
+        }
+      },
+      {
+        onUpdate: () => {
+          r.pub(muteChange$, false)
+        }
+      }
+    )
+  })
 })
 
 /** @internal */

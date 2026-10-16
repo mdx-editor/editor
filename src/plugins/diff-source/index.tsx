@@ -1,7 +1,7 @@
 import { EditorState, Extension, type EditorStateConfig } from '@codemirror/state'
 import { history, historyField } from '@codemirror/commands'
 import { EditorView } from '@codemirror/view'
-import { ViewMode, addEditorWrapper$, insertMarkdownHandler$, markdownSourceEditorValue$, readOnly$, viewMode$ } from '../core'
+import { ViewMode, addEditorWrapper$, insertMarkdownHandler$, markdownSourceEditorValue$, viewMode$ } from '../core'
 import { DiffSourceWrapper } from './DiffSourceWrapper'
 import { Cell, type Realm } from '@mdxeditor/gurx'
 import { realmPlugin } from '../../RealmWithPlugins'
@@ -21,19 +21,25 @@ export const sourceEditorView$ = Cell<{ view: EditorView; mode: 'source' | 'diff
 /** @internal */
 export const pendingSourceEditorState$ = Cell<EditorState | null>(null)
 
+function getSourceEditorState(realm: Realm): EditorState {
+  const doc = realm.getValue(markdownSourceEditorValue$)
+  const outgoingState = realm.getValue(sourceEditorView$)?.view.state
+  if (outgoingState?.doc.toString() === doc) return outgoingState
+  const pendingState = realm.getValue(pendingSourceEditorState$)
+  if (pendingState?.doc.toString() === doc) return pendingState
+  return EditorState.create({ doc, extensions: [...realm.getValue(cmExtensions$), history()] })
+}
+
 /** @internal */
 export function getSourceEditorConfig(realm: Realm): EditorStateConfig {
-  const doc = realm.getValue(markdownSourceEditorValue$)
-  const pendingState = realm.getValue(pendingSourceEditorState$)
-  realm.pub(pendingSourceEditorState$, null)
-  if (pendingState?.doc.toString() === doc) {
-    return {
-      doc,
-      selection: pendingState.selection,
-      extensions: historyField.init(() => pendingState.field(historyField))
-    }
+  const state = getSourceEditorState(realm)
+  // React StrictMode can mount the view twice. Reading must not consume the
+  // pending selection/history before the real mount receives it.
+  return {
+    doc: state.doc,
+    selection: state.selection,
+    extensions: historyField.init(() => state.field(historyField))
   }
-  return { doc }
 }
 
 /**
@@ -66,30 +72,33 @@ export const diffSourcePlugin = realmPlugin<{
 
   init(r, params) {
     r.sub(viewMode$, (mode) => {
-      if (mode === 'rich-text') r.pub(pendingSourceEditorState$, null)
+      r.pub(pendingSourceEditorState$, mode === 'rich-text' ? null : getSourceEditorState(r))
+    })
+    r.sub(markdownSourceEditorValue$, (markdown) => {
+      const editor = r.getValue(sourceEditorView$)
+      if (!editor || r.getValue(viewMode$) === 'rich-text') return
+      if (editor.view.state.doc.toString() !== markdown) {
+        editor.view.dispatch({
+          changes: { from: 0, to: editor.view.state.doc.length, insert: markdown },
+          selection: { anchor: 0 },
+          filter: false
+        })
+      }
+      r.pub(pendingSourceEditorState$, editor.view.state)
     })
     r.pub(insertMarkdownHandler$, (markdown) => {
       const mode = r.getValue(viewMode$)
       if (mode === 'rich-text') return false
       const editor = r.getValue(sourceEditorView$)
-      if (editor?.mode === mode) {
+      if (editor) {
+        // Until unmount, the outgoing view still owns the source document.
+        // Use its dispatch pipeline so MergeView updates both sides' chunks.
         editor.view.dispatch(editor.view.state.replaceSelection(markdown))
+        if (r.getValue(viewMode$) !== 'rich-text') r.pub(pendingSourceEditorState$, editor.view.state)
       } else {
         // A mode change can precede the corresponding React editor mount.
         // Apply the edit now, retaining its selection and history for that mount.
-        const doc = r.getValue(markdownSourceEditorValue$)
-        const pendingState = r.getValue(pendingSourceEditorState$)
-        const state =
-          pendingState?.doc.toString() === doc
-            ? pendingState
-            : EditorState.create({
-                doc,
-                extensions: [
-                  ...r.getValue(cmExtensions$),
-                  history(),
-                  EditorState.readOnly.of(r.getValue(readOnly$) || (mode === 'diff' && r.getValue(readOnlyDiff$)))
-                ]
-              })
+        const state = getSourceEditorState(r)
         const nextState = state.update(state.replaceSelection(markdown)).state
         r.pubIn({
           [pendingSourceEditorState$]: nextState,

@@ -56,7 +56,7 @@ export const SourceEditor = () => {
         editorViewRef.current = null
       }
     },
-    // Recreate the view when an external setMarkdown call changes markdown$.
+    // Recreate the view if the underlying rich-text document changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [markdown, readOnly, updateMarkdown, cmExtensions, triggerOnBlur, realm]
   )

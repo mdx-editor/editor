@@ -130,6 +130,7 @@ export function InsertMarkdown() {
         ]}
       />
       <button onClick={() => ref.current?.insertMarkdown('new ')}>Insert Markdown</button>
+      <button onClick={() => ref.current?.setMarkdown('Original rich text')}>Reset Markdown</button>
       <button
         onClick={() => {
           setCurrentMarkdown(ref.current?.getMarkdown() ?? '')
