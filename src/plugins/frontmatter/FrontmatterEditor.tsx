@@ -2,13 +2,11 @@ import * as Dialog from '@radix-ui/react-dialog'
 import classNames from 'classnames'
 import YamlParser from 'js-yaml'
 import React from 'react'
-import { useFieldArray, useForm } from 'react-hook-form'
+import { emptyValue, parseFrontmatter, serializeFrontmatter, ValueDraft, ValueType } from './frontmatterValues'
 import { frontmatterDialogOpen$, removeFrontmatter$ } from '.'
 import styles from '../../styles/ui.module.css'
 import { editorRootElementRef$, iconComponentFor$, readOnly$, useTranslation } from '../core'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
-
-type YamlConfig = { key: string; value: string }[]
 
 export interface FrontmatterEditorProps {
   yaml: string
@@ -22,129 +20,138 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
     iconComponentFor$,
     frontmatterDialogOpen$
   )
-  const t = useTranslation()
   const setFrontmatterDialogOpen = usePublisher(frontmatterDialogOpen$)
   const removeFrontmatter = usePublisher(removeFrontmatter$)
-  const yamlConfig = React.useMemo<YamlConfig>(() => {
-    if (!yaml) {
-      return []
-    }
-    return Object.entries(YamlParser.load(yaml) as Record<string, string>).map(([key, value]) => ({ key, value }))
-  }, [yaml])
-
-  const { register, control, handleSubmit } = useForm({
-    defaultValues: {
-      yamlConfig
-    }
-  })
-
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: 'yamlConfig'
-  })
-
-  const onSubmit = React.useCallback(
-    ({ yamlConfig }: { yamlConfig: YamlConfig }) => {
-      if (yamlConfig.length === 0) {
-        removeFrontmatter()
+  return frontmatterDialogOpen ? (
+    <FrontmatterDialog
+      key={yaml}
+      yaml={yaml}
+      onChange={onChange}
+      readOnly={readOnly}
+      container={editorRootElementRef?.current}
+      iconComponentFor={iconComponentFor}
+      close={() => {
         setFrontmatterDialogOpen(false)
-        return
-      }
-      const yaml = yamlConfig.reduce<Record<string, string>>((acc, { key, value }) => {
-        if (key && value) {
-          acc[key] = value
+      }}
+      removeFrontmatter={removeFrontmatter}
+    />
+  ) : null
+}
+
+function FrontmatterDialog({
+  yaml,
+  onChange,
+  readOnly,
+  container,
+  iconComponentFor,
+  close,
+  removeFrontmatter
+}: FrontmatterEditorProps & {
+  readOnly: boolean
+  container: HTMLElement | null | undefined
+  iconComponentFor: (name: 'close') => React.ReactNode
+  close: () => void
+  removeFrontmatter: () => void
+}) {
+  const t = useTranslation()
+  const initial = React.useMemo(() => {
+    try {
+      return { draft: parseFrontmatter(yaml), error: '' }
+    } catch (error) {
+      return { draft: null, error: String(error) }
+    }
+  }, [yaml])
+  const [draft, setDraft] = React.useState(initial.draft)
+  const [raw, setRaw] = React.useState(yaml)
+  const [error, setError] = React.useState(initial.error)
+  const [dirty, setDirty] = React.useState(false)
+  const onSubmit = (event: React.FormEvent) => {
+    event.preventDefault()
+    event.stopPropagation()
+    if (readOnly) return
+    try {
+      if (dirty) {
+        if (draft) onChange(serializeFrontmatter(draft))
+        else {
+          // Validate syntax, but permit values unsupported by the field editor.
+          YamlParser.load(raw)
+          onChange(raw)
         }
-        return acc
-      }, {})
-      onChange(YamlParser.dump(yaml).trim())
-      setFrontmatterDialogOpen(false)
-    },
-    [onChange, setFrontmatterDialogOpen, removeFrontmatter]
-  )
+      }
+      close()
+    } catch (error) {
+      setError(String(error))
+    }
+  }
 
   return (
     <>
       <Dialog.Root
-        open={frontmatterDialogOpen}
+        open={true}
         onOpenChange={(open) => {
-          setFrontmatterDialogOpen(open)
+          if (!open) close()
         }}
       >
-        <Dialog.Portal container={editorRootElementRef?.current}>
+        <Dialog.Portal container={container}>
           <Dialog.Overlay className={styles.dialogOverlay} />
-          <Dialog.Content className={styles.largeDialogContent} data-editor-type="frontmatter">
+          <Dialog.Content
+            className={styles.largeDialogContent}
+            style={{ maxHeight: '85vh', overflow: 'auto', width: 'min(640px, 90vw)' }}
+            data-editor-type="frontmatter"
+          >
             <Dialog.Title className={styles.dialogTitle}>{t('frontmatterEditor.title', 'Edit document frontmatter')}</Dialog.Title>
             <Dialog.Description className={styles.visuallyHidden}>
               {t('frontmatterEditor.dialogDescription', 'Add, edit, or remove the key-value entries of the document frontmatter.')}
             </Dialog.Description>
             <form
-              onSubmit={(e) => {
-                void handleSubmit(onSubmit)(e)
-                e.stopPropagation()
-              }}
-              onReset={(e) => {
-                e.stopPropagation()
-                setFrontmatterDialogOpen(false)
+              onSubmit={onSubmit}
+              onReset={(event) => {
+                event.stopPropagation()
+                close()
               }}
             >
-              <table className={styles.propertyEditorTable}>
-                <colgroup>
-                  <col />
-                  <col />
-                  <col />
-                </colgroup>
-                <thead>
-                  <tr>
-                    <th>{t('frontmatterEditor.key', 'Key')}</th>
-                    <th>{t('frontmatterEditor.value', 'Value')}</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {fields.map((item, index) => {
-                    return (
-                      <tr key={item.id}>
-                        <td>
-                          <TableInput {...register(`yamlConfig.${index}.key`, { required: true })} autofocusIfEmpty readOnly={readOnly} />
-                        </td>
-                        <td>
-                          <TableInput {...register(`yamlConfig.${index}.value`, { required: true })} readOnly={readOnly} />
-                        </td>
-                        <td>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              remove(index)
-                            }}
-                            className={styles.iconButton}
-                            disabled={readOnly}
-                          >
-                            {iconComponentFor('delete_big')}
-                          </button>
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <td>
-                      <button
-                        disabled={readOnly}
-                        className={classNames(styles.primaryButton, styles.smallButton)}
-                        type="button"
-                        onClick={() => {
-                          append({ key: '', value: '' })
-                        }}
-                      >
-                        {t('frontmatterEditor.addEntry', 'Add entry')}
-                      </button>
-                    </td>
-                  </tr>
-                </tfoot>
-              </table>
+              {error && <p role="alert">{error}</p>}
+              {draft ? (
+                <ValueEditor
+                  value={draft}
+                  label="Frontmatter"
+                  readOnly={readOnly}
+                  onChange={(value) => {
+                    setDraft(value)
+                    setDirty(true)
+                    setError('')
+                  }}
+                />
+              ) : (
+                <label>
+                  {t('frontmatterEditor.yaml', 'YAML')}
+                  <textarea
+                    aria-label="YAML"
+                    className={styles.propertyEditorInput}
+                    value={raw}
+                    readOnly={readOnly}
+                    onChange={(event) => {
+                      setRaw(event.target.value)
+                      setDirty(true)
+                    }}
+                  />
+                </label>
+              )}
+              <button
+                type="button"
+                disabled={readOnly}
+                className={styles.secondaryButton}
+                onClick={() => {
+                  if (!readOnly) {
+                    removeFrontmatter()
+                    close()
+                  }
+                }}
+              >
+                {t('frontmatterEditor.remove', 'Remove frontmatter')}
+              </button>
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--spacing-2)' }}>
-                <button type="submit" className={styles.primaryButton}>
+                <button type="submit" disabled={readOnly} className={styles.primaryButton}>
                   {t('dialogControls.save', 'Save')}
                 </button>
                 <button type="reset" className={styles.secondaryButton}>
@@ -164,9 +171,113 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
   )
 }
 
-const TableInput = React.forwardRef<
-  HTMLInputElement,
-  React.InputHTMLAttributes<HTMLInputElement> & { autofocusIfEmpty?: boolean; autoFocus?: boolean; value?: string }
->(({ className, autofocusIfEmpty: _, ...props }, ref) => {
-  return <input className={classNames(styles.propertyEditorInput, className)} {...props} ref={ref} />
-})
+function ValueEditor({
+  value,
+  onChange,
+  label,
+  readOnly
+}: {
+  value: ValueDraft
+  onChange: (value: ValueDraft) => void
+  label: string
+  readOnly: boolean
+}) {
+  const t = useTranslation()
+  const types: ValueType[] = ['string', 'number', 'boolean', 'null', 'object', 'array']
+  return (
+    <fieldset disabled={readOnly} style={{ border: 0, padding: 'var(--spacing-2)', minWidth: 0 }}>
+      <legend>{label}</legend>
+      <select
+        aria-label={`${label} type`}
+        value={value.type}
+        onChange={(event) => {
+          onChange(emptyValue(event.target.value as ValueType))
+        }}
+      >
+        {types.map((type) => (
+          <option key={type} value={type}>
+            {t(`frontmatterEditor.types.${type}`, type)}
+          </option>
+        ))}
+      </select>
+      {value.type === 'string' && (
+        <textarea
+          className={styles.propertyEditorInput}
+          aria-label={`${label} value`}
+          value={value.text}
+          onChange={(event) => {
+            onChange({ ...value, text: event.target.value })
+          }}
+        />
+      )}
+      {value.type === 'number' && (
+        <input
+          className={styles.propertyEditorInput}
+          aria-label={`${label} value`}
+          value={value.text}
+          onChange={(event) => {
+            onChange({ ...value, text: event.target.value })
+          }}
+        />
+      )}
+      {value.type === 'boolean' && (
+        <input
+          type="checkbox"
+          aria-label={`${label} value`}
+          checked={value.text === 'true'}
+          onChange={(event) => {
+            onChange({ ...value, text: String(event.target.checked) })
+          }}
+        />
+      )}
+      {(value.type === 'object' || value.type === 'array') && (
+        <>
+          {value.entries.map((entry, index) => (
+            <div key={index}>
+              {value.type === 'object' && (
+                <input
+                  className={styles.propertyEditorInput}
+                  aria-label={`${label} key ${index + 1}`}
+                  value={entry.key}
+                  onChange={(event) => {
+                    onChange({
+                      ...value,
+                      entries: value.entries.map((item, i) => (i === index ? { ...item, key: event.target.value } : item))
+                    })
+                  }}
+                />
+              )}
+              <ValueEditor
+                value={entry.value}
+                label={`${label}[${index + 1}]`}
+                readOnly={readOnly}
+                onChange={(child) => {
+                  onChange({ ...value, entries: value.entries.map((item, i) => (i === index ? { ...item, value: child } : item)) })
+                }}
+              />
+              <button
+                type="button"
+                aria-label={`${label} remove ${index + 1}`}
+                className={styles.secondaryButton}
+                onClick={() => {
+                  onChange({ ...value, entries: value.entries.filter((_, i) => i !== index) })
+                }}
+              >
+                {t('frontmatterEditor.removeEntry', 'Remove entry')}
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            className={classNames(styles.primaryButton, styles.smallButton)}
+            onClick={() => {
+              onChange({ ...value, entries: [...value.entries, { key: '', value: emptyValue('string') }] })
+            }}
+          >
+            {t('frontmatterEditor.addEntry', 'Add entry')}
+          </button>
+        </>
+      )}
+    </fieldset>
+  )
+}
