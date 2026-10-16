@@ -204,6 +204,72 @@ describe('image dialog upload lifecycle', () => {
       expect(screen.getByRole('button', { name: 'Save' })).toBeEnabled()
     } else expect(screen.queryByRole('dialog')).toBeNull()
   })
+  it.each(['root', 'table', 'directive'] as const)(
+    'ignores a pending upload when setMarkdown replaces the %s document',
+    async (location) => {
+      const pending = deferred()
+      const { submit, ref } = await setup(() => pending.promise, location)
+      await submit()
+      await act(async () => {
+        ref.current!.setMarkdown('Replacement document')
+        await Promise.resolve()
+      })
+      expect(screen.queryByRole('dialog')).toBeNull()
+      await act(async () => {
+        pending.resolve(url)
+        await Promise.resolve()
+      })
+      expect(ref.current!.getMarkdown()).toBe('Replacement document')
+    }
+  )
+  it('keeps a pending upload for a no-op setMarkdown', async () => {
+    const pending = deferred()
+    const { submit, ref } = await setup(() => pending.promise)
+    await submit()
+    await act(async () => {
+      ref.current!.setMarkdown(`  ${ref.current!.getMarkdown()}\n`)
+      await Promise.resolve()
+    })
+    expect(screen.getByRole('status')).toHaveTextContent('Uploading image')
+    await act(async () => {
+      pending.resolve(url)
+      await Promise.resolve()
+    })
+    expect(ref.current!.getMarkdown()).toContain(url)
+  })
+  it.each(['resolve', 'reject'] as const)(
+    'ignores an old %s after replacing the document and starting a new upload',
+    async (settlement) => {
+      const first = deferred()
+      const second = deferred()
+      const upload = vi.fn().mockReturnValueOnce(first.promise).mockReturnValueOnce(second.promise)
+      const { submit, realm, ref, target } = await setup(upload)
+      await submit()
+      await act(async () => {
+        ref.current!.setMarkdown('Replacement document')
+        await Promise.resolve()
+      })
+      await focus(target)
+      act(() => {
+        realm.pub(openNewImageDialog$)
+        realm.pub(saveImage$, { file: files as unknown as FileList, altText: 'new document image' })
+      })
+      await act(async () => {
+        if (settlement === 'resolve') first.resolve('https://example.com/stale.png')
+        else first.reject(new Error('old document upload'))
+        await Promise.resolve()
+      })
+      expect(screen.queryByRole('alert')).toBeNull()
+      expect(screen.getByRole('status')).toBeInTheDocument()
+      expect(ref.current!.getMarkdown()).toBe('Replacement document')
+      await act(async () => {
+        second.resolve(url)
+        await Promise.resolve()
+      })
+      expect(ref.current!.getMarkdown()).toContain('new document image')
+      expect(ref.current!.getMarkdown()).not.toContain('stale.png')
+    }
+  )
   it('does not let a cancelled rejection overwrite a newer upload status', async () => {
     const first = deferred()
     const second = deferred()

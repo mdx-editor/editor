@@ -53,3 +53,21 @@ for (const dismissal of ['Cancel', 'Escape']) {
     expect(errors).toEqual([])
   })
 }
+
+test('does not insert a pending upload into a replacement document', async ({ page }) => {
+  const errors: string[] = []
+  page.on('pageerror', (error) => errors.push(error.message))
+  await page.goto('/?story=image-upload-lifecycle--upload-lifecycle&mode=preview')
+  await page.getByRole('textbox').click()
+  await page.getByRole('button', { name: 'Insert image', exact: true }).click()
+  const dialog = page.getByRole('dialog')
+  await dialog.locator('input[type="file"]').setInputFiles({ name: 'old.png', mimeType: 'image/png', buffer: Buffer.from('image') })
+  await dialog.getByRole('button', { name: 'Save', exact: true }).click()
+  await expect(dialog.getByRole('status')).toBeVisible()
+  await page.evaluate(() => window.replaceImageDialogDocument!('Replacement document'))
+  await expect(dialog).toHaveCount(0)
+  await page.evaluate(() => window.settleImageDialogUpload!(false))
+  await expect(page.getByRole('textbox')).toHaveText('Replacement document')
+  await expect(page.getByLabel('Saved Markdown', { exact: true })).toHaveText('Replacement document')
+  expect(errors).toEqual([])
+})

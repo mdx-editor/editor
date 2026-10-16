@@ -37,7 +37,9 @@ import {
   addImportVisitor$,
   addLexicalNode$,
   createActiveEditorSubscription$,
-  readOnly$
+  markdown$,
+  readOnly$,
+  setMarkdown$
 } from '../core'
 import { EditImageToolbar, EditImageToolbarProps } from './EditImageToolbar'
 import { ImageDialog } from './ImageDialog'
@@ -241,6 +243,17 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
       request = null
     })
     r.link(r.pipe(imageDialogState$, mapTo('idle' as const)), imageUploadState$)
+    // Replacing the document can retain the same root editor, so editor identity
+    // alone cannot keep a late upload from being inserted into the new document.
+    r.link(
+      r.pipe(
+        setMarkdown$,
+        withLatestFrom(markdown$),
+        filter(([nextMarkdown, currentMarkdown]) => nextMarkdown.trim() !== currentMarkdown.trim()),
+        mapTo({ type: 'inactive' as const })
+      ),
+      imageDialogState$
+    )
     r.link(
       r.pipe(
         activeEditor$,
