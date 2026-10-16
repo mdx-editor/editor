@@ -8,6 +8,7 @@ import { useCellValue } from '@mdxeditor/gurx'
 const MAX_SUGGESTIONS = 20
 
 interface DownshiftAutoCompleteProps {
+  inputId?: string
   suggestions: string[]
   control: Control<any>
   setValue: UseFormSetValue<any>
@@ -22,12 +23,13 @@ export const DownshiftAutoComplete: React.FC<DownshiftAutoCompleteProps> = (prop
   if (props.suggestions.length > 0) {
     return <DownshiftAutoCompleteWithSuggestions {...props} />
   } else {
-    return <input className={styles.textInput} size={40} autoFocus {...props.register(props.inputName)} />
+    return <input id={props.inputId} className={styles.textInput} size={40} autoFocus {...props.register(props.inputName)} />
   }
 }
 
 export const DownshiftAutoCompleteWithSuggestions: React.FC<DownshiftAutoCompleteProps> = ({
   autofocus,
+  inputId,
   suggestions,
   control,
   inputName,
@@ -41,6 +43,7 @@ export const DownshiftAutoCompleteWithSuggestions: React.FC<DownshiftAutoComplet
   const enableAutoComplete = suggestions.length > 0
 
   const { isOpen, getToggleButtonProps, getMenuProps, getInputProps, highlightedIndex, getItemProps, selectedItem } = useCombobox({
+    inputId,
     initialInputValue,
     onInputValueChange({ inputValue = '' }) {
       setValue(inputName, inputValue)

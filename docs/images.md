@@ -27,6 +27,14 @@ The `InsertImage` toolbar button lets users insert an image from a URL. When the
 />
 ```
 
+### Upload progress and retry
+
+While a dialog upload is running, the dialog announces its progress and disables the fields and Save button. Cancel and Escape remain available. If the upload handler rejects or throws, an error is announced and the file, title, and alternative text are kept so the user can retry.
+
+Closing the dialog, opening a different image dialog, changing the active editor, or making the editor read-only discards pending dialog results. This prevents a late result from inserting an image into a different editor or closing a newer dialog. The `imageUploadHandler` callback does not accept an abort signal, so dismissing the dialog does not cancel the network request itself.
+
+Custom image dialogs can read `imageUploadState$` (`idle`, `uploading`, or `error`). The built-in status messages can be translated using `uploadImage.uploading` and `uploadImage.uploadError`. These states describe dialog uploads; pasted and dropped uploads retain their existing behavior.
+
 ## Pasting and dropping images
 
 The editor handles dropping and pasting images and clipboard contents that contain images. To handle that, you need to upload the image to a location of your choice and return the URL of the uploaded image. This is done through the `imageUploadHandler` parameter of the `imagePlugin`. The parameter accepts a function that receives a `File` object and returns a `Promise` that resolves to the URL of the uploaded image.

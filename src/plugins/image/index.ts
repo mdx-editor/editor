@@ -2,7 +2,7 @@
 import { ImagePlaceholder } from '@/plugins/image/ImagePlaceholder'
 import { $wrapNodeInElement, mergeRegister } from '@lexical/utils'
 import { JSX } from 'react'
-import { Action, Cell, Signal, map, mapTo, withLatestFrom } from '@mdxeditor/gurx'
+import { Action, Cell, Signal, filter, map, mapTo, withLatestFrom } from '@mdxeditor/gurx'
 import {
   $createParagraphNode,
   $createRangeSelection,
@@ -36,7 +36,8 @@ import {
   addExportVisitor$,
   addImportVisitor$,
   addLexicalNode$,
-  createActiveEditorSubscription$
+  createActiveEditorSubscription$,
+  readOnly$
 } from '../core'
 import { EditImageToolbar, EditImageToolbarProps } from './EditImageToolbar'
 import { ImageDialog } from './ImageDialog'
@@ -220,48 +221,98 @@ export const imagePreviewHandler$ = Cell<ImagePreviewHandler>(null)
 export const imagePlaceholder$ = Cell<typeof ImagePlaceholder | null>(null)
 
 /**
+ * Upload status of the current image dialog. Dismissal ignores pending results;
+ * it does not abort the consumer's upload request.
+ * @group Image
+ */
+export const imageUploadState$ = Cell<'idle' | 'uploading' | 'error'>('idle')
+
+/**
  * Holds the current state of the image dialog.
  * @group Image
  */
 export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogState | EditingImageDialogState>(
   { type: 'inactive' },
   (r) => {
+    // A request belongs to one dialog session and one editor. Cancelling the
+    // session ignores its result; the upload callback itself is not abortable.
+    let request: object | null = null
+    r.sub(imageDialogState$, () => {
+      request = null
+    })
+    r.link(r.pipe(imageDialogState$, mapTo('idle' as const)), imageUploadState$)
+    r.link(
+      r.pipe(
+        activeEditor$,
+        filter(() => request !== null),
+        mapTo({ type: 'inactive' as const })
+      ),
+      imageDialogState$
+    )
+    // Link this transition into the same graph update so consumers of both
+    // readOnly$ and imageDialogState$ observe a consistent snapshot.
+    r.link(
+      r.pipe(
+        readOnly$,
+        filter((readOnly) => readOnly),
+        mapTo({ type: 'inactive' as const })
+      ),
+      imageDialogState$
+    )
     r.sub(
       r.pipe(saveImage$, withLatestFrom(activeEditor$, imageUploadHandler$, imageDialogState$, allowSetImageDimensions$)),
-      ([values, theEditor, imageUploadHandler, dialogState, allowSetImageDimensions]) => {
-        const handler =
-          dialogState.type === 'editing'
-            ? (src: string) => {
-                theEditor?.update(() => {
-                  const { nodeKey } = dialogState
-                  const imageNode = $getNodeByKey(nodeKey)! as ImageNode
-
-                  imageNode.setTitle(values.title)
-                  imageNode.setAltText(values.altText)
-                  imageNode.setSrc(src)
-
-                  if (allowSetImageDimensions) {
-                    const width = parseImageDimension(values.width)
-                    const height = parseImageDimension(values.height)
-
-                    imageNode.setWidthAndHeight(width ?? 'inherit', height ?? 'inherit')
-                  }
-                }, syncNestedEditorOnUpdate(theEditor))
-                r.pub(imageDialogState$, { type: 'inactive' })
+      ([values, editor, upload, dialog, allowDimensions]) => {
+        if (request || dialog.type === 'inactive' || !editor || !editor.isEditable() || r.getValue(readOnly$)) return
+        const token = {}
+        request = token
+        const isCurrent = () =>
+          request === token &&
+          r.getValue(imageDialogState$) === dialog &&
+          r.getValue(activeEditor$) === editor &&
+          editor.isEditable() &&
+          !r.getValue(readOnly$)
+        const save = (src: string) => {
+          if (!isCurrent()) return
+          editor.update(() => {
+            if (dialog.type === 'editing') {
+              const node = $getNodeByKey(dialog.nodeKey)
+              if (!$isImageNode(node)) return
+              node.setTitle(values.title)
+              node.setAltText(values.altText)
+              node.setSrc(src)
+              if (allowDimensions) {
+                node.setWidthAndHeight(parseImageDimension(values.width) ?? 'inherit', parseImageDimension(values.height) ?? 'inherit')
               }
-            : (src: string) => {
-                r.pub(internalInsertImage$, { ...values, src })
-                r.pub(imageDialogState$, { type: 'inactive' })
-              }
-
+            } else {
+              $insertImageNode({
+                ...values,
+                src,
+                altText: values.altText ?? '',
+                width: parseImageDimension(values.width),
+                height: parseImageDimension(values.height)
+              })
+            }
+          }, syncNestedEditorOnUpdate(editor))
+          r.pub(closeImageDialog$)
+        }
+        const fail = () => {
+          if (!isCurrent()) return
+          request = null
+          r.pub(imageUploadState$, 'error')
+        }
         if (values.file && values.file.length > 0) {
-          imageUploadHandler?.(values.file.item(0)!)
-            .then(handler)
-            .catch((e: unknown) => {
-              throw e
-            })
+          if (!upload) {
+            fail()
+            return
+          }
+          r.pub(imageUploadState$, 'uploading')
+          Promise.resolve()
+            .then(() => upload(values.file!.item(0)!))
+            .then(save, fail)
         } else if (values.src) {
-          handler(values.src)
+          save(values.src)
+        } else {
+          request = null
         }
       }
     )
@@ -343,7 +394,13 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
  * @group Image
  */
 export const openNewImageDialog$ = Action((r) => {
-  r.link(r.pipe(openNewImageDialog$, mapTo({ type: 'new' })), imageDialogState$)
+  r.link(
+    r.pipe(
+      openNewImageDialog$,
+      map(() => ({ type: 'new' as const }))
+    ),
+    imageDialogState$
+  )
 })
 
 /**
