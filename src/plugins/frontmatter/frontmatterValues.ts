@@ -17,6 +17,9 @@ function toDraft(value: unknown, ancestors = new Set<object>(), depth = 0, budge
   if (--budget.remaining < 0) throw new Error('Frontmatter is too large to edit as fields. Use YAML instead.')
   if (depth > 50) throw new Error('Frontmatter is too deeply nested to edit as fields. Use YAML instead.')
   if (value === null) return emptyValue('null')
+  if (typeof value === 'number' && Number.isInteger(value) && !Number.isSafeInteger(value)) {
+    throw new Error('Integers outside the safe integer range cannot be edited as fields. Use YAML instead.')
+  }
   if (typeof value === 'string' || typeof value === 'boolean' || (typeof value === 'number' && Number.isFinite(value))) {
     return { ...emptyValue(typeof value as ValueType), text: String(value) }
   }
@@ -47,7 +50,9 @@ export function draftValue(draft: ValueDraft): unknown {
       return draft.text === 'true'
     case 'number': {
       if (!draft.text.trim() || !Number.isFinite(Number(draft.text))) throw new Error('Enter a finite number.')
-      return Number(draft.text)
+      const value = Number(draft.text)
+      if (Number.isInteger(value) && !Number.isSafeInteger(value)) throw new Error('Enter a number within the safe integer range.')
+      return value
     }
     case 'array':
       return draft.entries.map(({ value }) => draftValue(value))

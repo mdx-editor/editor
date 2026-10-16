@@ -171,3 +171,29 @@ describe('structured frontmatter dialog', () => {
     expect(read()).toContain(yaml)
   })
 })
+
+it('preserves large integer source while editing unrelated YAML fields', async () => {
+  const yaml = 'title: original\nid: 9223372036854775807'
+  render(<Harness yaml={yaml} />)
+  fireEvent.click(screen.getByText('Open frontmatter'))
+  expect(screen.getByRole('alert')).toHaveTextContent('safe integer')
+  expect(screen.getByLabelText('YAML')).toHaveValue(yaml)
+  fireEvent.change(screen.getByLabelText('YAML'), { target: { value: yaml.replace('original', 'changed') } })
+  fireEvent.click(screen.getByText('Save'))
+  await waitFor(() => {
+    expect(read()).toContain('title: changed')
+  })
+  expect(read()).toContain('id: 9223372036854775807')
+  fireEvent.click(screen.getByText('Open frontmatter'))
+  expect(screen.getByLabelText('YAML')).toHaveValue(yaml.replace('original', 'changed'))
+})
+
+it('does not commit a numeric edit outside the safe integer range', () => {
+  render(<Harness />)
+  fireEvent.click(screen.getByText('Open frontmatter'))
+  fireEvent.change(screen.getByLabelText('Frontmatter[4] value'), { target: { value: '9223372036854775807' } })
+  fireEvent.click(screen.getByText('Save'))
+  expect(screen.getByRole('alert')).toHaveTextContent('safe integer')
+  expect(screen.getByRole('dialog')).toBeInTheDocument()
+  expect(read()).toContain('count: 0')
+})

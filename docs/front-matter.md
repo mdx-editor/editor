@@ -37,7 +37,8 @@ string, number, boolean, null, object, or array type. Boolean values use checkbo
 strings support multiple lines. Empty strings, zero, false, null, empty collections,
 and fields unknown to the application are retained. Changing a type replaces that
 value with an empty value of the selected type. Array entries retain their order.
-Duplicate object keys and incomplete/non-finite numbers prevent saving.
+Duplicate object keys, incomplete/non-finite numbers, and integers outside JavaScript's
+safe integer range prevent field-based saving. Use a string for a large identifier.
 
 Changes stay in the dialog until Save. Cancel, Escape, and closing the dialog discard
 unsaved edits. Reopening uses the current document, including changes made by undo or
@@ -45,7 +46,8 @@ unsaved edits. Reopening uses the current document, including changes made by un
 saving, and removal. The explicit Remove frontmatter button removes the whole block.
 
 Malformed YAML opens as source text with an error instead of crashing the editor.
-Correct the YAML and save, or cancel to retain the original. Recursive aliases,
+Correct the YAML and save, or cancel to retain the original. Integers outside JavaScript's
+safe integer range, recursive aliases,
 unsupported YAML tags and excessively deep/large field trees also use the source
 editor. Basic structured editing uses the YAML core schema, so date-like values remain
 strings. Saving changed fields serializes YAML and may normalize formatting, comments,
