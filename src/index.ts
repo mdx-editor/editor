@@ -124,3 +124,5 @@ export * from './styles/lexicalTheme'
 
 import * as lexical from 'lexical'
 export { lexical }
+
+export * from './plugins/github-alerts'
