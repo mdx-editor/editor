@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { $getRoot, createEditor, type LexicalNode } from 'lexical'
 import type * as Mdast from 'mdast'
 import type { ContainerDirective } from 'mdast-util-directive'
@@ -15,6 +15,11 @@ import { LexicalTableVisitor } from '../plugins/table/LexicalTableVisitor'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { mdxFromMarkdown } from 'mdast-util-mdx'
 import { mdxjs } from 'micromark-extension-mdxjs'
+
+vi.mock('mdast-util-from-markdown', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('mdast-util-from-markdown')>()
+  return { ...actual, fromMarkdown: vi.fn(actual.fromMarkdown) }
+})
 
 function jsx(name: string | null, children: Mdast.BlockContent[] = []): MdxJsxFlowElement {
   return { type: 'mdxJsxFlowElement', name, attributes: [], children }
@@ -305,4 +310,39 @@ describe('imports from nested MDAST subtrees', () => {
     )
     expect(importValues(result)).toEqual(["import Existing from '@existing'"])
   })
+})
+
+it.each(['UI.Badge', 'my-element', 'svg', 'foo', 'img'])(
+  'does not generate invalid or intrinsic imports for %s in either registration path',
+  (name) => {
+    const result = exportNodes(
+      () => [admonition([jsx(name)]), $createLexicalJsxNode(jsx('Outer', [jsx(name)]))],
+      [descriptor('*', '@fallback')]
+    )
+    expect(importValues(result)).toEqual(["import { Outer } from '@fallback'"])
+  }
+)
+
+it('reuses fallback ESM parsing by source text and reparses changed text', () => {
+  const parse = vi.mocked(fromMarkdown)
+  parse.mockClear()
+  const source = "import CachedForReview from '@cached-for-review'"
+  const run = (value: string) =>
+    exportNodes(() => [admonition([{ type: 'mdxjsEsm', value }, jsx('CachedForReview')])], [descriptor('*', '@fallback')])
+  run(source)
+  run(source)
+  expect(parse).toHaveBeenCalledTimes(1)
+  run(source + ';')
+  expect(parse).toHaveBeenCalledTimes(2)
+})
+
+it('does not regenerate another binding from a carried full declaration', () => {
+  const result = exportNodes(
+    () => [
+      $createLexicalJsxNode(jsx('Foo'), { source: '@custom', defaultExport: false, importText: "import { Foo, Bar } from '@custom'" }),
+      $createLexicalJsxNode(jsx('Bar'))
+    ],
+    [descriptor('*', '@custom')]
+  )
+  expect(importValues(result)).toEqual(["import { Foo, Bar } from '@custom'"])
 })

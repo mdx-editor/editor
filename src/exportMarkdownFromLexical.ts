@@ -8,7 +8,10 @@ import { ImportStatement } from './importMarkdownToLexical'
 import { isMdastHTMLNode } from './plugins/core/MdastHTMLNode'
 import type { JsxComponentDescriptor } from './plugins/jsx'
 import { mergeStyleAttributes } from './utils/mergeStyleAttributes'
-import type { Pattern } from 'estree'
+import type { Pattern, Program } from 'estree'
+
+// Bound memory across documents while reusing metadata-less nested ESM parses.
+const esmParseCache = new Map<string, Program['body']>()
 
 // Keep this as an interface so API Extractor emits the package-root import.
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -128,7 +131,7 @@ export function exportLexicalTreeToMdast({
   visit(root, null)
 
   function registerReferredComponent(componentName: string | null, importStatement?: ImportStatement) {
-    if (componentName === null) {
+    if (componentName === null || (!importStatement?.importText && !/^[A-Z_$][\w$]*$/.test(componentName))) {
       return
     }
     referredComponents.add(componentName)
@@ -242,7 +245,7 @@ export function exportLexicalTreeToMdast({
 
   const collectPreservedBindings = (node: Mdast.Nodes) => {
     if (node.type === 'mdxjsEsm') {
-      let statements = node.data?.estree?.body
+      let statements = node.data?.estree?.body ?? esmParseCache.get(node.value)
       if (!statements) {
         // Nested-editor exports reconstruct imports without parser metadata.
         // Parse those declarations without changing their stored source text.
@@ -255,6 +258,8 @@ export function exportLexicalTreeToMdast({
           // that is not valid MDX; this pass must not rewrite or validate it.
           statements = []
         }
+        if (esmParseCache.size >= 256) esmParseCache.clear()
+        esmParseCache.set(node.value, statements)
       }
       for (const statement of statements) {
         if (statement.type === 'ImportDeclaration') {
@@ -283,17 +288,12 @@ export function exportLexicalTreeToMdast({
   // Lexical children, so their JSX references never reach the JSX visitor.
   if (addImportStatements) {
     const registerNestedComponents = (node: Mdast.Nodes) => {
-      if (
-        (node.type === 'mdxJsxFlowElement' || node.type === 'mdxJsxTextElement') &&
-        node.name !== null &&
-        node.name !== 'img' &&
-        !isMdastHTMLNode(node)
-      ) {
+      if ((node.type === 'mdxJsxFlowElement' || node.type === 'mdxJsxTextElement') && node.name !== null) {
         const descriptor =
           jsxComponentDescriptors.find((descriptor) => descriptor.name === node.name) ??
           jsxComponentDescriptors.find((descriptor) => descriptor.name === '*')
-        if (descriptor?.source) {
-          registerReferredComponent(node.name)
+        if (descriptor?.source || node.data?.mdxEditorImport) {
+          registerReferredComponent(node.name, node.data?.mdxEditorImport)
         }
       }
       if ('children' in node) {
@@ -304,12 +304,29 @@ export function exportLexicalTreeToMdast({
   }
 
   // iterate over all referred components and construct import statements, then append them to the root
+  const originalImports = new Set<string>()
+  for (const componentName of referredComponents) {
+    const original = knownImportSources.get(componentName)
+    if (original?.importText && !preservedBindings.has(componentName.split('.')[0])) {
+      if (addImportStatements || !original.inherited) originalImports.add(original.importText)
+    }
+  }
+  // A full declaration can bind additional components inserted since import.
+  // Reserve every binding before generating any descriptor-based imports.
+  for (const value of originalImports) collectPreservedBindings({ type: 'mdxjsEsm', value })
   const importsMap = new Map<string, string[]>()
   const defaultImportsMap = new Map<string, string>()
   for (const componentName of referredComponents) {
     // MDX ESM declarations are module bindings even when stored in a directive.
     // Existing imports and locally declared exports must remain authoritative.
     if (preservedBindings.has(componentName.split('.')[0])) {
+      continue
+    }
+    const original = knownImportSources.get(componentName)
+    if (original?.importText) {
+      // Nested editors carry the declaration on JSX metadata; only the document
+      // export emits it, so independently saved subtrees cannot duplicate bindings.
+      if (addImportStatements || !original.inherited) originalImports.add(original.importText)
       continue
     }
     const descriptor =
@@ -371,6 +388,8 @@ export function exportLexicalTreeToMdast({
       } as MdxjsEsm
     })
   )
+
+  imports.push(...Array.from(originalImports, (value): MdxjsEsm => ({ type: 'mdxjsEsm', value })))
 
   const frontmatter = typedRoot.children.find((child) => child.type === 'yaml')
   if (frontmatter) {
