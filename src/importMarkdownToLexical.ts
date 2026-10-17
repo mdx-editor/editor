@@ -1,3 +1,4 @@
+import { isHtmlTagName } from './plugins/jsx/jsxTagName'
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { ElementNode, LexicalNode } from 'lexical'
 import * as Mdast from 'mdast'
@@ -14,6 +15,10 @@ import { type JsxKindMismatchPolicy, reconcileJsxKindMismatches } from './plugin
 export interface ImportStatement {
   source: string
   defaultExport: boolean
+  /** Original declaration, retained for aliases and namespace imports. */
+  importText?: string
+  /** Declaration belongs to an enclosing editor, not this stored subtree. */
+  inherited?: boolean
 }
 
 /**
@@ -203,11 +208,31 @@ function gatherMetadata(mdastNode: Mdast.RootContent | Mdast.Root): MetaData {
       declaration.specifiers.forEach((specifier) => {
         importsMap.set(specifier.local.name, {
           source: `${declaration.source.value}`,
-          defaultExport: specifier.type === 'ImportDefaultSpecifier'
+          defaultExport: specifier.type === 'ImportDefaultSpecifier',
+          importText: imp.value
         })
       })
     })
   })
+  function carryImports(node: Mdast.Nodes, inherited = false) {
+    if ((node.type === 'mdxJsxFlowElement' || node.type === 'mdxJsxTextElement') && node.name) {
+      const declaration = importsMap.get(node.name.split('.')[0])
+      if (declaration) node.data = { ...node.data, mdxEditorImport: { ...declaration, inherited } }
+    }
+    if ('children' in node) {
+      const nested =
+        inherited ||
+        node.type === 'containerDirective' ||
+        node.type === 'textDirective' ||
+        node.type === 'leafDirective' ||
+        node.type === 'table' ||
+        ((node.type === 'mdxJsxFlowElement' || node.type === 'mdxJsxTextElement') && (node.name === null || !isHtmlTagName(node.name)))
+      node.children.forEach((child) => {
+        carryImports(child, nested)
+      })
+    }
+  }
+  carryImports(mdastNode)
   return {
     importDeclarations: Object.fromEntries(importsMap.entries())
   }
@@ -374,4 +399,10 @@ export function importMdastTreeToLexical({ root, mdastRoot, visitors, ...descrip
   }
 
   visit(mdastRoot, root as unknown as LexicalNode, null)
+}
+
+declare module 'mdast' {
+  interface Data {
+    mdxEditorImport?: ImportStatement
+  }
 }
