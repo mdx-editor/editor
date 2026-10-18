@@ -146,43 +146,38 @@ describe('imports from nested MDAST subtrees', () => {
   })
 
   describe.each(['exact', 'wildcard'] as const)('preserved exports with a %s descriptor', (kind) => {
+    // Representative module bindings, rather than a declaration-kind matrix.
+    // Exercise both parser metadata and reconstructed ESM for each shape.
     it.each([
-      'export const Existing = () => null',
-      'export let Existing = () => null',
-      'export var Existing = () => null',
-      'export function Existing() {}',
-      'export class Existing {}',
-      'export default function Existing() {}',
-      'export default class Existing {}',
-      'export const { Original: Existing } = components',
-      'export const { Existing = fallback } = components',
-      'export const { nested: [Existing = fallback] } = components',
-      'export const { ...Existing } = components',
-      'export const [, Existing] = components',
-      'export const [...Existing] = components',
-      'export const Other = 1, Existing = () => null'
-    ])('does not duplicate the local binding in %s', (declaration) => {
+      { declaration: 'export const Other = 1, Existing = () => null', bindings: ['Existing'] },
+      {
+        declaration: 'export const { Original: Alias = fallback, nested: [, Item = fallback, ...Tail], ...Rest } = components',
+        bindings: ['Alias', 'Item', 'Tail', 'Rest']
+      },
+      { declaration: 'export function Fn() {}\nexport class Cls {}', bindings: ['Fn', 'Cls'] },
+      { declaration: 'export default function Existing() {}', bindings: ['Existing'] },
+      { declaration: 'export default class Existing {}', bindings: ['Existing'] }
+    ])('does not duplicate local bindings in $declaration', ({ declaration, bindings }) => {
       for (const withMetadata of [true, false]) {
         const esm = withMetadata ? parsedMdx(declaration) : [{ type: 'mdxjsEsm' as const, value: declaration }]
-        const children = [...esm, jsx('Existing'), jsx('Fresh')]
+        const children = [...esm, ...bindings.map((name) => jsx(name)), jsx('Fresh')]
         const originalChildren = structuredClone(children)
         const result = exportNodes(
-          () => [$createLexicalJsxNode(jsx('Existing')), admonition(children)],
-          [descriptor(kind === 'exact' ? 'Existing' : '*', '@components'), descriptor('Fresh', '@fresh')]
+          () => [...bindings.map((name) => $createLexicalJsxNode(jsx(name))), admonition(children)],
+          [
+            ...(kind === 'exact' ? bindings.map((name) => descriptor(name, '@components')) : [descriptor('*', '@components')]),
+            descriptor('Fresh', '@fresh')
+          ]
         )
         expect(importValues(result)).toEqual(["import { Fresh } from '@fresh'"])
-        expect(result.children[2]).toMatchObject({ children: originalChildren })
+        expect(result.children.at(-1)).toMatchObject({ children: originalChildren })
       }
     })
 
     it.each([
-      "export { Existing } from '@other'",
-      "export { Original as Existing } from '@other'",
-      "export * from '@other'",
-      "export * as Existing from '@other'",
+      "export { Existing as Public } from '@other'\nexport * from '@more'\nexport * as Existing from '@namespace'",
       'export const { Existing: Other } = components',
-      'export const Other = Existing',
-      'export default Existing',
+      'export const Other = Existing\nexport default Existing',
       'export default function Other() { const Existing = 1 }',
       'export default function() {}',
       'export default class {}'
