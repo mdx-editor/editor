@@ -5,8 +5,10 @@ import { LexicalExportVisitor } from '../../exportMarkdownFromLexical'
 export const LexicalListVisitor: LexicalExportVisitor<ListNode, Mdast.List> = {
   testLexicalNode: $isListNode,
   visitLexicalNode: ({ lexicalNode, actions }) => {
+    const ordered = lexicalNode.getListType() === 'number'
     actions.addAndStepInto('list', {
-      ordered: lexicalNode.getListType() === 'number',
+      ordered,
+      ...(ordered ? { start: lexicalNode.getStart() } : {}),
       spread: false
     })
   }
