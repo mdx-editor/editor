@@ -15,6 +15,13 @@ test.beforeEach(async ({ page }) => {
     if (message.type() === 'error') errors.push(`console.error: ${message.text()}`)
   })
 
+  // Keep image loading independent of Picsum's redirects and availability.
+  for (const url of ['https://picsum.photos/200/300', 'https://picsum.photos/id/237/200/300']) {
+    await page.route(url, (route) =>
+      route.fulfill({ contentType: 'image/svg+xml', body: '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="300" />' })
+    )
+  }
+
   await page.goto(storyUrl)
   await expect(page.getByRole('img', { name: 'plain image' })).toBeVisible()
 })
