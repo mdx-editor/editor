@@ -122,9 +122,20 @@ describe('explicit table prose entry', () => {
     const saved = ref.current!.getMarkdown()
     expect(saved.includes(before ? 'New prose\n\n| First' : '| One   |\n\nNew prose\n\n| Second')).toBe(true)
     act(() => {
+      ref.current!.setMarkdown('Replacement document')
+    })
+    await waitFor(() => {
+      expect(shape()).toEqual([['paragraph', 'Replacement document']])
+    })
+    act(() => {
       ref.current!.setMarkdown(saved)
     })
-    expect(ref.current!.getMarkdown()).toBe(saved)
+    await waitFor(() => {
+      expect(ref.current!.getMarkdown()).toBe(saved)
+    })
+    expect(shape().map(([type]) => type)).toEqual(
+      before ? ['paragraph', 'table', 'table', 'paragraph'] : ['table', 'paragraph', 'table', 'paragraph']
+    )
   })
 
   it.each([true, false])('reuses only the immediately adjacent empty paragraph (before=%s)', async (before) => {

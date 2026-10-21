@@ -42,8 +42,18 @@ for (const before of [true, false]) {
     ).toEqual([true, true])
     const markdown = await save(page)
     expect(markdown).toBe('| First |\n| ----- |\n| One   |\n\nBetween the tables\n\n| Second |\n| ------ |\n| Two    |')
+    await page.getByLabel('Document').selectOption({ label: 'Table between blocks' })
+    await expect(rootEditor(page).locator('table')).toHaveCount(1)
+    await expect(prose).toHaveCount(0)
     await page.getByRole('button', { name: 'Reload saved Markdown' }).click()
+    await expect(rootEditor(page).locator('table')).toHaveCount(2)
     await expect(prose).toHaveCount(1)
+    expect(
+      await prose.evaluate((paragraph) => [
+        Boolean(paragraph.previousElementSibling?.querySelector('table')),
+        Boolean(paragraph.nextElementSibling?.querySelector('table'))
+      ])
+    ).toEqual([true, true])
     expect(await save(page)).toBe(markdown)
   })
 
