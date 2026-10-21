@@ -566,19 +566,6 @@ const CellEditor: React.FC<CellProps> = ({
     })
   }, [colIndex, editor, exportVisitors, jsxComponentDescriptors, jsxIsAvailable, parentEditor, rowIndex, tableKey])
 
-  React.useEffect(() => {
-    if (!focus || !editor) return
-    const flushAndSave = () => {
-      // editor.read() commits pending typing before save reads its snapshot.
-      editor.read(() => undefined)
-      save()
-    }
-    activeCellSave.current = flushAndSave
-    return () => {
-      if (activeCellSave.current === flushAndSave) activeCellSave.current = null
-    }
-  }, [activeCellSave, editor, focus, save])
-
   const saveAndFocus = React.useCallback(
     (nextCell: [number, number] | null) => {
       save()
@@ -586,6 +573,19 @@ const CellEditor: React.FC<CellProps> = ({
     },
     [save, setActiveCell]
   )
+
+  React.useEffect(() => {
+    if (!focus || !editor) return
+    const flushAndSave = () => {
+      // editor.read() commits pending typing before the normal cell exit saves.
+      editor.read(() => undefined)
+      saveAndFocus(null)
+    }
+    activeCellSave.current = flushAndSave
+    return () => {
+      if (activeCellSave.current === flushAndSave) activeCellSave.current = null
+    }
+  }, [activeCellSave, editor, focus, saveAndFocus])
 
   React.useEffect(() => {
     if (!editor) {
