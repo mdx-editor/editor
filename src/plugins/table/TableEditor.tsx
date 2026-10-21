@@ -691,6 +691,10 @@ const TableActions: React.FC<{ onInsertParagraph: (before: boolean) => void }> =
         className={classNames(styles.tableColumnEditorTrigger, styles.tableActionsTrigger)}
         title={t('table.tableMenu', 'Table menu')}
         data-toolbar-item="true"
+        onKeyDownCapture={(event) => {
+          // Keep native button activation out of the editor's Enter/Space commands.
+          if (event.key === 'Enter' || event.key === ' ') event.stopPropagation()
+        }}
       >
         {iconComponentFor('more_horiz')}
       </RadixPopover.Trigger>
