@@ -812,6 +812,34 @@
   }
 }
 
+.tableActionsTrigger:focus-visible {
+  opacity: 1 !important;
+  outline: 2px solid var(--accentSolid);
+  outline-offset: 2px;
+}
+
+.tableActionsMenu {
+  flex-direction: column;
+  align-items: stretch;
+
+  & > button {
+    @mixin clear-form-element;
+    padding: var(--spacing-2);
+    text-align: left;
+    border-radius: var(--radius-small);
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      background-color: var(--baseBgHover);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--accentSolid);
+    }
+  }
+}
+
 .toggleGroupRoot {
   display: inline-flex;
 

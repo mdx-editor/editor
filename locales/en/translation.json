@@ -45,6 +45,9 @@
     "remove": "Remove link"
   },
   "table": {
+    "tableMenu": "Table menu",
+    "insertParagraphBefore": "Insert paragraph before table",
+    "insertParagraphAfter": "Insert paragraph after table",
     "deleteTable": "Delete table",
     "columnMenu": "Column menu",
     "textAlignment": "Text alignment",

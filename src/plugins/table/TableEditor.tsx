@@ -4,11 +4,13 @@ import { LexicalExtensionEditorComposer } from '@lexical/react/LexicalExtensionE
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import * as RadixPopover from '@radix-ui/react-popover'
 import {
+  $addUpdateTag,
   $createParagraphNode,
   $getNodeByKey,
   $getRoot,
   $getSelection,
   $isElementNode,
+  $isParagraphNode,
   $isRangeSelection,
   $isRootNode,
   BLUR_COMMAND,
@@ -19,8 +21,10 @@ import {
   DELETE_LINE_COMMAND,
   DELETE_WORD_COMMAND,
   FOCUS_COMMAND,
+  HISTORY_PUSH_TAG,
   KEY_ENTER_COMMAND,
   KEY_TAB_COMMAND,
+  SKIP_DOM_SELECTION_TAG,
   LexicalEditor,
   LexicalEditorWithDispose,
   LexicalNode,
@@ -113,6 +117,7 @@ export interface TableEditorProps {
 export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEditor, lexicalTable }) => {
   const tableKey = lexicalTable.getKey()
   const [activeCell, setActiveCell] = React.useState<[number, number] | null>(null)
+  const activeCellSave = React.useRef<(() => void) | null>(null)
   const [iconComponentFor, readOnly] = useCellValues(iconComponentFor$, readOnly$)
   const getCellKey = React.useMemo(() => {
     return (cell: Mdast.TableCell & { __cacheKey?: string }) => {
@@ -181,6 +186,61 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
   React.useEffect(() => {
     lexicalTable.focusEmitter.subscribe(setActiveCellWithBoundaries)
   }, [lexicalTable, setActiveCellWithBoundaries])
+
+  const insertParagraph = React.useCallback(
+    (before: boolean) => {
+      if (readOnly || !parentEditor.isEditable() || !parentEditor.read(() => $getTableNodeByKey(tableKey)?.isAttached())) {
+        return
+      }
+      // Moving focus into editor UI deliberately skips the cell's blur save.
+      // Commit its pending contents before creating the paragraph's Undo step.
+      activeCellSave.current?.()
+      if (!parentEditor.isEditable()) return
+      setActiveCell(null)
+
+      parentEditor.update(
+        () => {
+          const table = $getTableNodeByKey(tableKey)
+          if (!table?.isAttached()) return
+          const sibling = before ? table.getPreviousSibling() : table.getNextSibling()
+          if ($isParagraphNode(sibling) && sibling.isEmpty()) return
+          // Initial import does not enter history. Record a selection-only
+          // baseline so even the very first action can be undone.
+          const index = table.getIndexWithinParent() + (before ? 0 : 1)
+          table.getParentOrThrow().select(index, index)
+        },
+        { discrete: true, tag: SKIP_DOM_SELECTION_TAG }
+      )
+
+      let selected = false
+      parentEditor.update(
+        () => {
+          const table = $getTableNodeByKey(tableKey)
+          if (!table?.isAttached()) return
+          const sibling = before ? table.getPreviousSibling() : table.getNextSibling()
+          if ($isParagraphNode(sibling) && sibling.isEmpty()) {
+            sibling.select()
+          } else {
+            const paragraph = $createParagraphNode()
+            if (before) table.insertBefore(paragraph)
+            else table.insertAfter(paragraph)
+            paragraph.select()
+            $addUpdateTag(HISTORY_PUSH_TAG)
+          }
+          selected = true
+        },
+        {
+          discrete: true,
+          onUpdate: () => {
+            if (selected) {
+              parentEditor.focus()
+            }
+          }
+        }
+      )
+    },
+    [parentEditor, readOnly, tableKey]
+  )
 
   const addRowToBottom = React.useCallback(
     (e: React.MouseEvent) => {
@@ -282,7 +342,9 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
       {readOnly || (
         <thead>
           <tr>
-            <th className={styles.tableToolsColumn}></th>
+            <th className={styles.tableToolsColumn} data-tool-cell={true}>
+              <TableActions onInsertParagraph={insertParagraph} />
+            </th>
             {Array.from({ length: mdastNode.children[0].children.length }, (_, colIndex) => {
               return (
                 <th key={colIndex} data-tool-cell={true}>
@@ -346,6 +408,7 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
                       colIndex,
                       lexicalTable,
                       parentEditor,
+                      activeCellSave,
                       activeCell: readOnly ? [-1, -1] : activeCell
                     }}
                   />
@@ -390,6 +453,7 @@ export interface CellProps {
   activeCell: [number, number] | null
   setActiveCell: (cell: [number, number] | null) => void
   focus: boolean
+  activeCellSave: React.RefObject<(() => void) | null>
 }
 
 const Cell: React.FC<Omit<CellProps, 'focus'>> = ({ align, ...props }) => {
@@ -413,7 +477,16 @@ const Cell: React.FC<Omit<CellProps, 'focus'>> = ({ align, ...props }) => {
   )
 }
 
-const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, lexicalTable, contents, colIndex, rowIndex }) => {
+const CellEditor: React.FC<CellProps> = ({
+  focus,
+  setActiveCell,
+  parentEditor,
+  lexicalTable,
+  contents,
+  colIndex,
+  rowIndex,
+  activeCellSave
+}) => {
   const tableKey = lexicalTable.getKey()
   const [
     importVisitors,
@@ -492,6 +565,19 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
       parentEditor.dispatchCommand(NESTED_EDITOR_UPDATED_COMMAND, undefined)
     })
   }, [colIndex, editor, exportVisitors, jsxComponentDescriptors, jsxIsAvailable, parentEditor, rowIndex, tableKey])
+
+  React.useEffect(() => {
+    if (!focus || !editor) return
+    const flushAndSave = () => {
+      // editor.read() commits pending typing before save reads its snapshot.
+      editor.read(() => undefined)
+      save()
+    }
+    activeCellSave.current = flushAndSave
+    return () => {
+      if (activeCellSave.current === flushAndSave) activeCellSave.current = null
+    }
+  }, [activeCellSave, editor, focus, save])
 
   const saveAndFocus = React.useCallback(
     (nextCell: [number, number] | null) => {
@@ -590,6 +676,58 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
         <Child key={index} />
       ))}
     </LexicalExtensionEditorComposer>
+  )
+}
+
+const TableActions: React.FC<{ onInsertParagraph: (before: boolean) => void }> = ({ onInsertParagraph }) => {
+  const [editorRootElementRef, iconComponentFor] = useCellValues(editorRootElementRef$, iconComponentFor$)
+  const [open, setOpen] = React.useState(false)
+  const pendingInsertion = React.useRef<boolean | null>(null)
+  const t = useTranslation()
+
+  return (
+    <RadixPopover.Root open={open} onOpenChange={setOpen}>
+      <RadixPopover.Trigger
+        className={classNames(styles.tableColumnEditorTrigger, styles.tableActionsTrigger)}
+        title={t('table.tableMenu', 'Table menu')}
+        data-toolbar-item="true"
+      >
+        {iconComponentFor('more_horiz')}
+      </RadixPopover.Trigger>
+      <RadixPopover.Portal container={editorRootElementRef?.current}>
+        <RadixPopover.Content
+          className={classNames(styles.tableColumnEditorPopoverContent, styles.tableActionsMenu)}
+          data-editor-dialog="true"
+          side="top"
+          sideOffset={5}
+          onCloseAutoFocus={(event) => {
+            const before = pendingInsertion.current
+            pendingInsertion.current = null
+            if (before !== null) {
+              event.preventDefault()
+              // Close the popover before moving the table and focusing prose.
+              onInsertParagraph(before)
+            }
+          }}
+        >
+          {[true, false].map((before) => (
+            <button
+              key={String(before)}
+              type="button"
+              onClick={() => {
+                pendingInsertion.current = before
+                setOpen(false)
+              }}
+            >
+              {before
+                ? t('table.insertParagraphBefore', 'Insert paragraph before table')
+                : t('table.insertParagraphAfter', 'Insert paragraph after table')}
+            </button>
+          ))}
+          <RadixPopover.Arrow className={styles.popoverArrow} />
+        </RadixPopover.Content>
+      </RadixPopover.Portal>
+    </RadixPopover.Root>
   )
 }
 
