@@ -1,10 +1,10 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { toMarkdown } from 'mdast-util-to-markdown'
 import { gfmTableFromMarkdown, gfmTableToMarkdown } from 'mdast-util-gfm-table'
 import { gfmTable } from 'micromark-extension-gfm-table'
 import type * as Mdast from 'mdast'
-import { parseTableClipboard } from '../plugins/table/tableClipboard'
+import { MAX_TABLE_PASTE_CELLS, parseTableClipboard, readTableClipboard } from '../plugins/table/tableClipboard'
 
 function clipboard(text: string, html = '') {
   return { getData: (type: string) => (type === 'text/html' ? html : text) }
@@ -69,6 +69,38 @@ describe('table clipboard regions', () => {
     ])
   })
 
+  it('round-trips a wrapped HTML document with entities and Markdown punctuation as literal cells', () => {
+    // Representative browser-copy serialization, not an actual OS clipboard capture.
+    const html =
+      '<!doctype html><html><head><meta charset="utf-8"></head><body><!--StartFragment--><div><span><table><tbody><tr><td>A &amp; B</td><td>&lt;tag&gt; | *literal* [label](url) "quote"</td><td></td></tr></tbody></table></span></div><!--EndFragment--></body></html>'
+    expect(values('wrong\tfallback', html)).toEqual([['A & B', '<tag> | *literal* [label](url) "quote"', '']])
+    const rows = parseTableClipboard(clipboard('wrong\tfallback', html))!
+    const table: Mdast.Table = { type: 'table', children: rows.map((children) => ({ type: 'tableRow', children })) }
+    const markdown = toMarkdown(table, { extensions: [gfmTableToMarkdown()] })
+    const result = fromMarkdown(markdown, { extensions: [gfmTable()], mdastExtensions: [gfmTableFromMarkdown()] })
+    const withoutPositions = JSON.parse(
+      JSON.stringify(result.children[0], (key, value: unknown) => (key === 'position' ? undefined : value))
+    ) as Mdast.Table
+    expect(withoutPositions).toEqual({ ...table, align: [null, null, null] })
+  })
+
+  it('prefers a valid entirely empty HTML region over nonempty TSV', () => {
+    expect(values('do not\tinsert', '<div><table><tr><td></td><td><br></td></tr><tr><td>&nbsp;</td><td> </td></tr></table></div>')).toEqual(
+      [
+        ['', ''],
+        ['', '']
+      ]
+    )
+  })
+
+  it('normalizes HTML whitespace while preserving plain TSV whitespace', () => {
+    const plain = '  alpha  beta  \t tail '
+    expect(values(plain)).toEqual([['  alpha  beta  ', ' tail ']])
+    expect(values(plain, '<table><tr><td>  alpha&nbsp; beta  </td><td><div> tail </div></td></tr></table>')).toEqual([
+      ['alpha beta', 'tail']
+    ])
+  })
+
   it('flattens inline and block content and excludes active content', () => {
     expect(
       values(
@@ -102,6 +134,60 @@ describe('table clipboard regions', () => {
     expect(parseTableClipboard(clipboard('x'.repeat(1000000) + '\t'))).toBeNull()
     expect(parseTableClipboard(clipboard(Array(1002).fill('x').join('\t')))).toBeNull()
     expect(parseTableClipboard(clipboard('', `<table>${'<tr><td colspan="1000">A</td></tr>'.repeat(11)}</table>`))).toBeNull()
+  })
+
+  it.each([
+    [10, 1000],
+    [1000, 10]
+  ])('accepts the exact cell budget (%i rows by %i columns)', (height, width) => {
+    const rows = parseTableClipboard(clipboard((Array(width).fill('x').join('\t') + '\n').repeat(height)))!
+    expect(rows).toHaveLength(height)
+    expect(rows.every((row) => row.length === width)).toBe(true)
+  })
+
+  it('rejects oversized TSV before normalizing the entire million-cell input', () => {
+    // Exactly the accepted source-size limit, but 100 times the allowed cell count.
+    const text = ('\t'.repeat(999) + '\n').repeat(1000)
+    // Capture the original method; Reflect.apply below preserves its receiver.
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    const replace = String.prototype.replace
+    let normalizedCells = 0
+    const spy = vi.spyOn(String.prototype, 'replace').mockImplementation(function (this: string, ...args) {
+      if (args[0] instanceof RegExp && args[0].source === '\\r\\n?') normalizedCells++
+      return Reflect.apply(replace, this, args) as string
+    })
+    let result
+    try {
+      result = parseTableClipboard(clipboard(text))
+    } finally {
+      spy.mockRestore()
+    }
+    expect(result).toBeNull()
+    expect(normalizedCells).toBeLessThanOrEqual(MAX_TABLE_PASTE_CELLS + 1)
+  })
+
+  it.each(['0', '2'])('does not let rowspan=%s cross HTML row-group boundaries', (rowspan) => {
+    expect(
+      values(
+        '',
+        `<table><tbody><tr><td rowspan="${rowspan}">A</td><td>B</td></tr></tbody><tbody><tr><td>C</td><td>D</td></tr></tbody></table>`
+      )
+    ).toEqual([
+      ['A', 'B'],
+      ['C', 'D']
+    ])
+  })
+
+  it('distinguishes rejected sources from ordinary text and preserves valid fallback priority', () => {
+    const oversizedHTML = '<table>' + '<tr><td colspan="1000">A</td></tr>'.repeat(11) + '</table>'
+    expect(readTableClipboard(clipboard('', oversizedHTML))).toBe('rejected')
+    expect(readTableClipboard(clipboard('', '<table/>' + ' '.repeat(1000000)))).toBe('rejected')
+    expect(readTableClipboard(clipboard(Array(1002).fill('x').join('\t')))).toBe('rejected')
+    expect(readTableClipboard(clipboard('line\n'.repeat(1001) + 'x\ty'))).toBe('rejected')
+    expect(readTableClipboard(clipboard('ordinary prose'))).toBeNull()
+    expect(readTableClipboard(clipboard('line\n'.repeat(1001)))).toBeNull()
+    expect(values('safe\tfallback', oversizedHTML)).toEqual([['safe', 'fallback']])
+    expect(values(Array(1002).fill('x').join('\t'), '<table><tr><td>safe</td></tr></table>')).toEqual([['safe']])
   })
 
   it('returns independent empty cells', () => {

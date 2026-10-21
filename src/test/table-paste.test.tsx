@@ -87,6 +87,101 @@ describe('table region paste', () => {
     expect(cells().map((cell) => cell.textContent)).toEqual(['a', 'b', '', 'c', 'x', '', '', 'y', 'z'])
   })
 
+  it.each([
+    { name: 'HTML', plain: '', html: '<table>' + '<tr><td colspan="1000">A</td></tr>'.repeat(11) + '</table>' },
+    { name: 'TSV', plain: Array(1002).fill('x').join('\t'), html: '' }
+  ])('consumes oversized $name regions instead of falling through to cell paste', async ({ plain, html }) => {
+    const { cells, editor, ref } = await setup()
+    const before = ref.current!.getMarkdown()
+    act(() => {
+      cells()[2].focus()
+      editor(2).update(
+        () => {
+          $getRoot().selectEnd()
+        },
+        { discrete: true }
+      )
+    })
+    const event = paste(editor(2), plain, html)
+    await act(async () => {
+      await Promise.resolve()
+    })
+    expect(event.defaultPrevented).toBe(true)
+    expect(
+      editor(2)
+        .getEditorState()
+        .read(() =>
+          $getRoot()
+            .getChildren()
+            .map((node) => node.getType())
+        )
+    ).toEqual(['paragraph'])
+    expect(ref.current!.getMarkdown()).toBe(before)
+    expect(cells().map((cell) => cell.textContent)).toEqual(['a', 'b', 'c', 'd'])
+    expect(
+      editor(2)
+        .getEditorState()
+        .read(() => $getRoot().getTextContent())
+    ).toBe('c')
+    expect(cells()).toHaveLength(4)
+  })
+
+  it('keeps focus in a surviving cell when Undo removes the newly focused expansion cell', async () => {
+    const { cells, editor } = await setup()
+    act(() => {
+      cells()[3].focus()
+    })
+    paste(editor(3), 'x\t\ny\tz')
+    await waitFor(() => {
+      expect(cells()).toHaveLength(9)
+    })
+    act(() => {
+      cells()[8].focus()
+    })
+    expect(cells()[8]).toHaveFocus()
+    act(() => {
+      editor(8).dispatchCommand(UNDO_COMMAND, undefined)
+    })
+    await waitFor(() => {
+      expect(cells().map((cell) => cell.textContent)).toEqual(['a', 'b', 'c', 'd'])
+      expect(cells()[3].closest('td')).toHaveAttribute('data-active', 'true')
+      expect(cells().filter((cell) => cell.closest('[data-active="true"]'))).toHaveLength(1)
+    })
+    act(() => {
+      editor(3).dispatchCommand(REDO_COMMAND, undefined)
+    })
+    await waitFor(() => {
+      expect(cells()).toHaveLength(9)
+      expect(cells()[4].closest('td')).toHaveAttribute('data-active', 'true')
+    })
+  })
+
+  it('clears a rectangle with empty HTML cells and restores content and focus on Undo', async () => {
+    const { cells, editor } = await setup()
+    act(() => {
+      cells()[0].focus()
+    })
+    paste(editor(0), 'wrong\tfallback', '<table><tr><td></td><td><br></td></tr><tr><td>&nbsp;</td><td> </td></tr></table>')
+    await waitFor(() => {
+      expect(cells().map((cell) => cell.textContent)).toEqual(['', '', '', ''])
+      expect(cells()[0].closest('th')).toHaveAttribute('data-active', 'true')
+    })
+    act(() => {
+      editor(0).dispatchCommand(UNDO_COMMAND, undefined)
+    })
+    await waitFor(() => {
+      expect(cells().map((cell) => cell.textContent)).toEqual(['a', 'b', 'c', 'd'])
+      expect(cells()[0].closest('th')).toHaveAttribute('data-active', 'true')
+    })
+    act(() => {
+      editor(0).dispatchCommand(REDO_COMMAND, undefined)
+    })
+    await waitFor(() => {
+      expect(cells().map((cell) => cell.textContent)).toEqual(['', '', '', ''])
+      expect(cells()[0].closest('th')).toHaveAttribute('data-active', 'true')
+    })
+  })
+
   it('restores unsaved cell text on Undo and ignores a stale blur after paste', async () => {
     const { cells, editor } = await setup()
     act(() => {

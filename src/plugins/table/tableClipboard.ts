@@ -5,18 +5,21 @@ const MAX_SOURCE_LENGTH = 1000000
 export const MAX_TABLE_PASTE_CELLS = 10000
 const MAX_DIMENSION = 1000
 
+type ClipboardRegion = Mdast.TableCell[][] | null | 'rejected'
+
 function textCell(value = ''): Mdast.TableCell {
   return { type: 'tableCell', children: value ? [{ type: 'text', value }] : [] }
 }
 
-function rectangle(rows: Mdast.TableCell[][]): Mdast.TableCell[][] | null {
+function rectangle(rows: Mdast.TableCell[][]): ClipboardRegion {
   const width = rows.reduce((max, row) => Math.max(max, row.length), 0)
-  if (!width || width > MAX_DIMENSION || rows.length > MAX_DIMENSION || width * rows.length > MAX_TABLE_PASTE_CELLS) return null
+  if (!width) return null
+  if (width > MAX_DIMENSION || rows.length > MAX_DIMENSION || width * rows.length > MAX_TABLE_PASTE_CELLS) return 'rejected'
   return rows.map((row) => Array.from({ length: width }, (_, index) => row[index] ?? textCell()))
 }
 
 /** Parse spreadsheet TSV, including quoted tabs/newlines and doubled quotes. */
-function parseTSV(text: string): Mdast.TableCell[][] | null {
+function parseTSV(text: string): ClipboardRegion {
   const rows: Mdast.TableCell[][] = []
   let row: Mdast.TableCell[] = []
   let value = ''
@@ -24,6 +27,7 @@ function parseTSV(text: string): Mdast.TableCell[][] | null {
   let closedQuote = false
   let hasTab = false
   let endedRow = false
+  let width = 0
   for (let index = 0; index < text.length; index++) {
     const char = text[index]
     endedRow = false
@@ -41,6 +45,10 @@ function parseTSV(text: string): Mdast.TableCell[][] | null {
       }
     } else if (char === '\t' || char === '\n' || char === '\r') {
       row.push(textCell(value.replace(/\r\n?/g, '\n')))
+      width = Math.max(width, row.length)
+      // Reject as soon as the eventual rectangle exceeds the allocation budget.
+      // An input below the source limit can still contain a million empty fields.
+      if (row.length > MAX_DIMENSION || width * (rows.length + 1) > MAX_TABLE_PASTE_CELLS) return text.includes('\t') ? 'rejected' : null
       value = ''
       closedQuote = false
       if (char === '\t') {
@@ -51,7 +59,7 @@ function parseTSV(text: string): Mdast.TableCell[][] | null {
         row = []
         endedRow = true
       }
-      if (row.length > MAX_DIMENSION || rows.length > MAX_DIMENSION) return null
+      if (rows.length > MAX_DIMENSION) return text.includes('\t') ? 'rejected' : null
     } else if (closedQuote) {
       return null
     } else if (char === '"' && value === '') {
@@ -107,18 +115,25 @@ function cellText(cell: HTMLTableCellElement): string {
   return copy.textContent.replace(/\s+/g, ' ').trim()
 }
 
-function parseHTML(html: string): Mdast.TableCell[][] | null {
+function parseHTML(html: string): ClipboardRegion {
   if (!html || typeof DOMParser === 'undefined') return null
   const table = standaloneTable(new DOMParser().parseFromString(html, 'text/html'))
-  if (!table?.rows.length || table.rows.length > MAX_DIMENSION) return null
+  if (!table?.rows.length) return null
+  if (table.rows.length > MAX_DIMENSION) return 'rejected'
   const rows: Mdast.TableCell[][] = Array.from({ length: table.rows.length }, () => [])
+  let groupEnd = 0
   for (let y = 0; y < table.rows.length; y++) {
+    if (y === groupEnd) {
+      groupEnd = y + 1
+      while (groupEnd < table.rows.length && table.rows[groupEnd].parentElement === table.rows[y].parentElement) groupEnd++
+    }
     let x = 0
     for (const cell of Array.from(table.rows[y].cells)) {
       while (rows[y][x]) x++
       const width = cell.colSpan
-      const height = Math.min(cell.rowSpan || rows.length - y, rows.length - y)
-      if (x + width > MAX_DIMENSION || (x + width) * rows.length > MAX_TABLE_PASTE_CELLS) return null
+      // Row spans, including rowspan=0, stop at the current HTML row group.
+      const height = Math.min(cell.rowSpan || groupEnd - y, groupEnd - y)
+      if (x + width > MAX_DIMENSION || (x + width) * rows.length > MAX_TABLE_PASTE_CELLS) return 'rejected'
       for (let dy = 0; dy < height; dy++) {
         for (let dx = 0; dx < width; dx++) {
           // Malformed overlapping spans are not safe to reinterpret as a region.
@@ -133,12 +148,25 @@ function parseHTML(html: string): Mdast.TableCell[][] | null {
 }
 
 /**
+ * Read a region while distinguishing rejected oversized tables from ordinary text.
+ * A rejected region must not fall through to rich-text paste and create a nested table.
+ */
+export function readTableClipboard(data: Pick<DataTransfer, 'getData'>): ClipboardRegion {
+  const html = data.getData('text/html')
+  const text = data.getData('text/plain')
+  const htmlRegion = html.length <= MAX_SOURCE_LENGTH ? parseHTML(html) : /<table[\s/>]/i.test(html) ? 'rejected' : null
+  if (Array.isArray(htmlRegion)) return htmlRegion
+  const textRegion = text.length <= MAX_SOURCE_LENGTH ? parseTSV(text) : text.includes('\t') ? 'rejected' : null
+  if (Array.isArray(textRegion)) return textRegion
+  return htmlRegion === 'rejected' || textRegion === 'rejected' ? 'rejected' : null
+}
+
+/**
  * Read a standalone HTML table or tab-delimited spreadsheet region. Ordinary text
- * (including multiline prose) returns null so the normal cell paste can handle it.
+ * (including multiline prose) and rejected regions return null.
  * HTML formatting is intentionally downgraded to text; merged-cell coverage is empty.
  */
 export function parseTableClipboard(data: Pick<DataTransfer, 'getData'>): Mdast.TableCell[][] | null {
-  const html = data.getData('text/html')
-  const text = data.getData('text/plain')
-  return (html.length <= MAX_SOURCE_LENGTH ? parseHTML(html) : null) ?? (text.length <= MAX_SOURCE_LENGTH ? parseTSV(text) : null)
+  const result = readTableClipboard(data)
+  return Array.isArray(result) ? result : null
 }

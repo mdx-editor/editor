@@ -1,6 +1,6 @@
 import { getPeerDependencyFromEditor } from '@lexical/extension'
 import { HistoryExtension } from '@lexical/history'
-import { parseTableClipboard } from './tableClipboard'
+import { readTableClipboard } from './tableClipboard'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary'
 import { LexicalExtensionEditorComposer } from '@lexical/react/LexicalExtensionEditorComposer'
@@ -133,8 +133,21 @@ export const TableEditor: React.FC<TableEditorProps> = ({ mdastNode, parentEdito
         // Preserve the paste branch through selection/history merges, but do not
         // carry it onto an older state restored by Undo or a new branch from it.
         if (!tags.has(HISTORIC_TAG) && pasteHistoryStates.has(prevEditorState)) pasteHistoryStates.add(editorState)
+        if (tags.has(HISTORIC_TAG)) {
+          const bounds = editorState.read(() => {
+            const table = $getTableNodeByKey(tableKey)
+            return table ? [table.getColCount(), table.getRowCount()] : [0, 0]
+          })
+          // Undo can remove the expansion cell the user focused after pasting.
+          // Keep a valid cell active so the next keyboard Redo stays in the table.
+          setActiveCell((current) => {
+            if (!current || !bounds[0] || !bounds[1]) return null
+            const next: [number, number] = [Math.min(current[0], bounds[0] - 1), Math.min(current[1], bounds[1] - 1)]
+            return next[0] === current[0] && next[1] === current[1] ? current : next
+          })
+        }
       }),
-    [parentEditor, pasteHistoryStates]
+    [parentEditor, pasteHistoryStates, tableKey]
   )
   const [iconComponentFor, readOnly] = useCellValues(iconComponentFor$, readOnly$)
   const getCellKey = React.useMemo(() => {
@@ -648,8 +661,12 @@ const CellEditor: React.FC<CellProps> = ({
         PASTE_COMMAND,
         (event) => {
           if (!editor.isEditable() || !('clipboardData' in event) || !event.clipboardData) return false
-          const cells = parseTableClipboard(event.clipboardData)
+          const cells = readTableClipboard(event.clipboardData)
           if (!cells) return false
+          if (cells === 'rejected') {
+            event.preventDefault()
+            return true
+          }
           const canPaste = parentEditor.getEditorState().read(() => $getTableNodeByKey(tableKey)?.canPasteCells(colIndex, rowIndex, cells))
           // Consume an oversized region without changing either the cell or
           // the parent table; falling through could insert a nested table.
