@@ -19,7 +19,10 @@ async function save(page: Page) {
 test.beforeEach(async ({ page }) => {
   const errors: string[] = []
   runtimeErrors.set(page, errors)
-  page.on('pageerror', (error) => errors.push(error.message))
+  page.on('pageerror', (error) => errors.push(`pageerror: ${error.message}`))
+  page.on('console', (message) => {
+    if (message.type() === 'error') errors.push(`console.error: ${message.text()}`)
+  })
   await page.goto(storyUrl)
   await expect(rootEditor(page).locator('table')).toHaveCount(2)
 })
@@ -129,6 +132,32 @@ test('supports keyboard-only activation, visible focus and Escape cancellation',
   await expect(rootEditor(page)).toBeFocused()
   await page.keyboard.type('Keyboard prose')
   await expect(paragraphs(page).first()).toHaveText('Keyboard prose')
+  await menu.focus()
+  await page.keyboard.press('Enter')
+  await page.keyboard.press('Tab')
+  await expect(page.getByRole('button', { name: 'Insert paragraph after table', exact: true })).toBeFocused()
+  await page.keyboard.press('Enter')
+  await expect(rootEditor(page)).toBeFocused()
+  await page.keyboard.type('Keyboard after prose')
+  await expect(paragraphs(page).nth(1)).toHaveText('Keyboard after prose')
+})
+
+test('retains Tab, Shift-Tab, Enter and Shift-Enter cell navigation', async ({ page }) => {
+  const cells = rootEditor(page).locator('table').first().locator('tbody [contenteditable="true"]')
+  const header = cells.first()
+  const body = cells.last()
+  const baseline = await save(page)
+  await header.click()
+  await page.keyboard.press('Tab')
+  await expect(body).toBeFocused()
+  await page.keyboard.press('Shift+Tab')
+  await expect(header).toBeFocused()
+  await page.keyboard.press('Enter')
+  await expect(body).toBeFocused()
+  await page.keyboard.press('Shift+Enter')
+  await expect(header).toBeFocused()
+  await expect(paragraphs(page)).toHaveCount(1)
+  expect(await save(page)).toBe(baseline)
 })
 
 test('does not change the document on import, hover, focus or menu cancellation and hides read-only actions', async ({ page }) => {
