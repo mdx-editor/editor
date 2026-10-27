@@ -1,7 +1,7 @@
 import React from 'react'
 
-import { cmExtensions$, diffMarkdown$, readOnlyDiff$ } from '.'
-import { markdown$, markdownSourceEditorValue$, onBlur$, readOnly$ } from '../core'
+import { cmExtensions$, diffMarkdown$, getSourceEditorConfig, readOnlyDiff$, sourceEditorView$ } from '.'
+import { markdownSourceEditorValue$, onBlur$, readOnly$ } from '../core'
 
 import { MergeView } from '@codemirror/merge'
 import { EditorState } from '@codemirror/state'
@@ -17,7 +17,7 @@ function setContent(view: EditorView | undefined, content: string) {
 
 export const DiffViewer: React.FC = () => {
   const realm = useRealm()
-  const [newMarkdown, oldMarkdown, readOnly, readOnlyDiff] = useCellValues(markdown$, diffMarkdown$, readOnly$, readOnlyDiff$)
+  const [oldMarkdown, readOnly, readOnlyDiff] = useCellValues(diffMarkdown$, readOnly$, readOnlyDiff$)
   const onUpdate = usePublisher(markdownSourceEditorValue$)
   const elRef = React.useRef<HTMLDivElement | null>(null)
   const cmMergeViewRef = React.useRef<MergeView | null>(null)
@@ -27,12 +27,6 @@ export const DiffViewer: React.FC = () => {
   React.useEffect(() => {
     return realm.sub(diffMarkdown$, (newDiffMarkdown) => {
       setContent(cmMergeViewRef.current?.a, newDiffMarkdown)
-    })
-  }, [realm])
-
-  React.useEffect(() => {
-    return realm.sub(markdown$, (newMarkdown) => {
-      setContent(cmMergeViewRef.current?.b, newMarkdown)
     })
   }, [realm])
 
@@ -54,6 +48,7 @@ export const DiffViewer: React.FC = () => {
           revertControls: 'a-to-b'
         } as const)
 
+    const { extensions: pendingHistory = [], ...stateConfig } = getSourceEditorConfig(realm)
     cmMergeViewRef.current = new MergeView({
       ...revertParams,
       parent: elRef.current!,
@@ -64,11 +59,12 @@ export const DiffViewer: React.FC = () => {
         extensions: [...cmExtensions, ...COMMON_STATE_CONFIG_EXTENSIONS, EditorState.readOnly.of(true)]
       },
       b: {
-        doc: newMarkdown,
+        ...stateConfig,
         extensions: [
           ...cmExtensions,
           ...COMMON_STATE_CONFIG_EXTENSIONS,
           EditorState.readOnly.of(isReadOnly),
+          pendingHistory,
           EditorView.updateListener.of(({ state }) => {
             const md = state.doc.toString()
             onUpdate(md)
@@ -82,7 +78,9 @@ export const DiffViewer: React.FC = () => {
         ]
       }
     })
+    realm.pub(sourceEditorView$, { view: cmMergeViewRef.current.b, mode: 'diff' })
     return () => {
+      if (realm.getValue(sourceEditorView$)?.view === cmMergeViewRef.current?.b) realm.pub(sourceEditorView$, null)
       cmMergeViewRef.current?.destroy()
       cmMergeViewRef.current = null
     }

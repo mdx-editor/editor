@@ -28,6 +28,7 @@ import {
   createCommand
 } from 'lexical'
 import { realmPlugin } from '../../RealmWithPlugins'
+import { registerRealmCleanup } from '../../realmSession'
 import { CAN_USE_DOM } from '../../utils/detectMac'
 import {
   NESTED_EDITOR_UPDATED_COMMAND,
@@ -122,7 +123,11 @@ export interface EditingImageDialogState {
 // commits. Synchronize the committed change rather than relying on a second blur
 // from that cell.
 function syncNestedEditorOnUpdate(editor: LexicalEditor): EditorUpdateOptions {
-  return { onUpdate: () => editor.dispatchCommand(NESTED_EDITOR_UPDATED_COMMAND, undefined) }
+  return {
+    onUpdate: () => editor.dispatchCommand(NESTED_EDITOR_UPDATED_COMMAND, undefined),
+    // Updating an inactive target must not move the user's current selection.
+    tag: document.activeElement && getNearestEditorFromDOMNode(document.activeElement) === editor ? undefined : SKIP_DOM_SELECTION_TAG
+  }
 }
 
 function $insertImageNode(payload: InsertImagePayload) {
@@ -153,45 +158,12 @@ function insertUploadedImages(editor: LexicalEditor, urls: string[]) {
   }, options)
 }
 
-const internalInsertImage$ = Signal<SrcImageParameters>((r) => {
-  r.sub(r.pipe(internalInsertImage$, withLatestFrom(activeEditor$)), ([values, theEditor]) => {
-    theEditor?.update(() => {
-      const imageNode = $createImageNode({
-        altText: values.altText ?? '',
-        src: values.src,
-        title: values.title ?? '',
-        width: parseImageDimension(values.width),
-        height: parseImageDimension(values.height)
-      })
-      $insertNodes([imageNode])
-      if ($isRootOrShadowRoot(imageNode.getParentOrThrow())) {
-        $wrapNodeInElement(imageNode, $createParagraphNode).selectEnd()
-      }
-    }, syncNestedEditorOnUpdate(theEditor))
-  })
-})
-
 /**
  * A signal that inserts a new image node with the published payload.
+ * File uploads retain the editor active at invocation and ignore stale results.
  * @group Image
  */
-export const insertImage$ = Signal<InsertImageParameters>((r) => {
-  r.sub(r.pipe(insertImage$, withLatestFrom(imageUploadHandler$)), ([values, imageUploadHandler]) => {
-    const handler = (src: string) => {
-      r.pub(internalInsertImage$, { ...values, src })
-    }
-
-    if ('file' in values) {
-      imageUploadHandler?.(values.file)
-        .then(handler)
-        .catch((e: unknown) => {
-          throw e
-        })
-    } else {
-      handler(values.src)
-    }
-  })
-})
+export const insertImage$ = Signal<InsertImageParameters>()
 /**
  * Holds the autocomplete suggestions for image sources.
  * @group Image
@@ -236,31 +208,41 @@ export const imageUploadState$ = Cell<'idle' | 'uploading' | 'error'>('idle')
 export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogState | EditingImageDialogState>(
   { type: 'inactive' },
   (r) => {
-    // A request belongs to one dialog session and one editor. Cancelling the
-    // session ignores its result; the upload callback itself is not abortable.
-    let request: object | null = null
-    r.sub(imageDialogState$, () => {
-      request = null
+    // Both public and dialog uploads use the same document/editor guard. A
+    // dialog request also belongs to its opening session; independent imperative
+    // uploads can run concurrently without a dialog or cancelling each other.
+    type DialogSession = NewImageDialogState | EditingImageDialogState
+    const requests = new Set<{ dialog: DialogSession | null }>()
+    let dialogRequest: object | null = null
+    let dialogEditor: LexicalEditor | null = null
+    let disposed = false
+    registerRealmCleanup(r, () => {
+      disposed = true
+      requests.clear()
+      dialogRequest = null
+    })
+    r.sub(imageDialogState$, (dialog) => {
+      for (const request of requests) {
+        if (request.dialog) requests.delete(request)
+      }
+      dialogRequest = null
+      dialogEditor = dialog.type === 'inactive' ? null : r.getValue(activeEditor$)
     })
     r.link(r.pipe(imageDialogState$, mapTo('idle' as const)), imageUploadState$)
-    // Replacing the document can retain the same root editor, so editor identity
-    // alone cannot keep a late upload from being inserted into the new document.
-    r.link(
+    // A parent resync must not dismiss an idle URL dialog or reset its fields.
+    // Only uploads started against the previous document become stale.
+    r.sub(
       r.pipe(
         setMarkdown$,
         withLatestFrom(markdown$),
-        filter(([nextMarkdown, currentMarkdown]) => nextMarkdown.trim() !== currentMarkdown.trim()),
-        mapTo({ type: 'inactive' as const })
+        filter(([nextMarkdown, currentMarkdown]) => nextMarkdown.trim() !== currentMarkdown.trim())
       ),
-      imageDialogState$
-    )
-    r.link(
-      r.pipe(
-        activeEditor$,
-        filter(() => request !== null),
-        mapTo({ type: 'inactive' as const })
-      ),
-      imageDialogState$
+      () => {
+        const pendingDialogUpload = [...requests].some((request) => request.dialog !== null)
+        requests.clear()
+        dialogRequest = null
+        if (pendingDialogUpload) r.pub(closeImageDialog$)
+      }
     )
     // Link this transition into the same graph update so consumers of both
     // readOnly$ and imageDialogState$ observe a consistent snapshot.
@@ -272,22 +254,85 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
       ),
       imageDialogState$
     )
-    r.sub(
-      r.pipe(saveImage$, withLatestFrom(activeEditor$, imageUploadHandler$, imageDialogState$, allowSetImageDimensions$)),
-      ([values, editor, upload, dialog, allowDimensions]) => {
-        if (request || dialog.type === 'inactive' || !editor || !editor.isEditable() || r.getValue(readOnly$)) return
-        const token = {}
-        request = token
-        const isCurrent = () =>
-          request === token &&
-          r.getValue(imageDialogState$) === dialog &&
-          r.getValue(activeEditor$) === editor &&
+    r.sub(readOnly$, (readOnly) => {
+      if (readOnly) requests.clear()
+    })
+
+    const startRequest = (editor: LexicalEditor | null, dialog: DialogSession | null) => {
+      const rootElement = editor?.getRootElement()
+      if (disposed || !editor || !rootElement?.isConnected || !editor.isEditable() || r.getValue(readOnly$)) return
+      const token = { dialog }
+      requests.add(token)
+      return {
+        token,
+        isCurrent: () =>
+          requests.has(token) &&
+          (!dialog || r.getValue(imageDialogState$) === dialog) &&
+          editor.getRootElement() === rootElement &&
+          rootElement.isConnected &&
           editor.isEditable() &&
-          !r.getValue(readOnly$)
+          !r.getValue(readOnly$),
+        finish: () => {
+          requests.delete(token)
+          if (dialogRequest === token) dialogRequest = null
+        }
+      }
+    }
+    const insert = (editor: LexicalEditor, values: SrcImageParameters) => {
+      editor.update(() => {
+        $insertImageNode({
+          ...values,
+          altText: values.altText ?? '',
+          width: parseImageDimension(values.width),
+          height: parseImageDimension(values.height)
+        })
+      }, syncNestedEditorOnUpdate(editor))
+    }
+    r.sub(
+      r.pipe(insertImage$, withLatestFrom(activeEditor$, imageUploadHandler$, imageDialogState$)),
+      ([values, editor, upload, dialog]) => {
+        const request = startRequest(editor, dialog.type === 'inactive' ? null : dialog)
+        if (!request || !editor) return
         const save = (src: string) => {
-          if (!isCurrent()) return
-          editor.update(() => {
-            if (dialog.type === 'editing') {
+          if (!request.isCurrent()) {
+            request.finish()
+            return
+          }
+          insert(editor, { ...values, src })
+          request.finish()
+        }
+        if ('file' in values) {
+          const fail = (error: unknown) => {
+            console.error(error)
+            request.finish()
+          }
+          if (!upload) {
+            fail(new Error('No image upload handler is configured'))
+            return
+          }
+          Promise.resolve()
+            .then(() => upload(values.file))
+            .then(save, fail)
+        } else {
+          save(values.src)
+        }
+      }
+    )
+    r.sub(
+      r.pipe(saveImage$, withLatestFrom(imageUploadHandler$, imageDialogState$, allowSetImageDimensions$)),
+      ([values, upload, dialog, allowDimensions]) => {
+        const editor = dialogEditor
+        if (dialogRequest || dialog.type === 'inactive' || !editor) return
+        const request = startRequest(editor, dialog)
+        if (!request) return
+        dialogRequest = request.token
+        const save = (src: string) => {
+          if (!request.isCurrent()) {
+            request.finish()
+            return
+          }
+          if (dialog.type === 'editing') {
+            editor.update(() => {
               const node = $getNodeByKey(dialog.nodeKey)
               if (!$isImageNode(node)) return
               node.setTitle(values.title)
@@ -296,26 +341,25 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
               if (allowDimensions) {
                 node.setWidthAndHeight(parseImageDimension(values.width) ?? 'inherit', parseImageDimension(values.height) ?? 'inherit')
               }
-            } else {
-              $insertImageNode({
-                ...values,
-                src,
-                altText: values.altText ?? '',
-                width: parseImageDimension(values.width),
-                height: parseImageDimension(values.height)
-              })
-            }
-          }, syncNestedEditorOnUpdate(editor))
+            }, syncNestedEditorOnUpdate(editor))
+          } else {
+            insert(editor, { ...values, src })
+          }
+          request.finish()
           r.pub(closeImageDialog$)
         }
-        const fail = () => {
-          if (!isCurrent()) return
-          request = null
+        const fail = (error: unknown) => {
+          console.error(error)
+          if (!request.isCurrent()) {
+            request.finish()
+            return
+          }
+          request.finish()
           r.pub(imageUploadState$, 'error')
         }
         if (values.file && values.file.length > 0) {
           if (!upload) {
-            fail()
+            fail(new Error('No image upload handler is configured'))
             return
           }
           r.pub(imageUploadState$, 'uploading')
@@ -325,7 +369,7 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
         } else if (values.src) {
           save(values.src)
         } else {
-          request = null
+          request.finish()
         }
       }
     )
@@ -482,6 +526,8 @@ export const imagePlugin = realmPlugin<{
   imagePlaceholder?: (() => JSX.Element) | null
 }>({
   init(realm, params) {
+    // Install lifecycle guards even when a custom dialog never reads its state.
+    realm.getValue(imageDialogState$)
     realm.pubIn({
       [addImportVisitor$]: [MdastImageVisitor, MdastHtmlImageVisitor, MdastJsxImageVisitor],
       [addLexicalNode$]: ImageNode,
