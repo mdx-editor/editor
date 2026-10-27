@@ -1,0 +1,29 @@
+.alert {
+  border-inline-start: 0.25rem solid var(--accent-9);
+  padding: 0.5rem 1rem;
+  margin-block: 1rem;
+}
+
+.alert::before {
+  content: attr(data-github-alert);
+  display: block;
+  font-weight: 600;
+  color: var(--accent-11);
+  user-select: none;
+}
+
+.alert[data-github-alert='TIP'] {
+  border-color: var(--admonitionInfoBorder);
+}
+
+.alert[data-github-alert='IMPORTANT'] {
+  border-color: var(--admonitionTipBorder);
+}
+
+.alert[data-github-alert='WARNING'] {
+  border-color: var(--admonitionCautionBorder);
+}
+
+.alert[data-github-alert='CAUTION'] {
+  border-color: var(--admonitionDangerBorder);
+}
