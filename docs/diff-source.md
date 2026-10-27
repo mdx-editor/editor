@@ -28,6 +28,12 @@ It's an useful integration if you're building something for power users that are
 />
 ```
 
+## Programmatic edits and mode switches
+
+In source and diff mode, `insertMarkdown()` uses the current CodeMirror selection and undo history. `setMarkdown()` replaces the current raw source, including incomplete Markdown and whitespace.
+
+Switching between source and diff preserves the raw document without parsing it through the rich-text editor. The parse-error banner and `onError` are updated when returning to rich-text mode.
+
 ## Read-Only Diff mode
 
 You can enable the read-only mode for the diff viewer in two ways:

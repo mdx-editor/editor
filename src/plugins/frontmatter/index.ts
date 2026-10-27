@@ -1,5 +1,5 @@
-import { ensureFrontmatterHistoryBaseline } from './frontmatterHistory'
 import { realmPlugin } from '../../RealmWithPlugins'
+import { ComponentType } from 'react'
 import {
   addExportVisitor$,
   addImportVisitor$,
@@ -8,7 +8,6 @@ import {
   addSyntaxExtension$,
   addToMarkdownExtension$,
   createRootEditorSubscription$,
-  readOnly$,
   rootEditor$
 } from '../core'
 import { Action, Cell, withLatestFrom } from '@mdxeditor/gurx'
@@ -18,7 +17,6 @@ import {
   $isRangeSelection,
   $isTextNode,
   COMMAND_PRIORITY_CRITICAL,
-  HISTORY_PUSH_TAG,
   ElementNode,
   KEY_DOWN_COMMAND,
   LexicalEditor
@@ -28,7 +26,15 @@ import { frontmatter } from 'micromark-extension-frontmatter'
 import { $createFrontmatterNode, $isFrontmatterNode, FrontmatterNode } from './FrontmatterNode'
 import { LexicalFrontmatterVisitor } from './LexicalFrontmatterVisitor'
 import { MdastFrontmatterVisitor } from './MdastFrontmatterVisitor'
+import { FrontmatterEditor, FrontmatterEditorProps } from './FrontmatterEditor'
 export * from './FrontmatterNode'
+export { FrontmatterEditor, type FrontmatterEditorProps } from './FrontmatterEditor'
+
+/**
+ * The component used to edit frontmatter. Defaults to the key-value form.
+ * @group Frontmatter
+ */
+export const frontmatterEditor$ = Cell<ComponentType<FrontmatterEditorProps>>(FrontmatterEditor)
 
 /**
  * Whether the frontmatter dialog is open.
@@ -41,9 +47,7 @@ export const frontmatterDialogOpen$ = Cell(false)
  * @group Frontmatter
  */
 export const insertFrontmatter$ = Action((r) => {
-  r.sub(r.pipe(insertFrontmatter$, withLatestFrom(rootEditor$, readOnly$)), ([, rootEditor, readOnly]) => {
-    if (readOnly) return
-    if (rootEditor) ensureFrontmatterHistoryBaseline(rootEditor)
+  r.sub(r.pipe(insertFrontmatter$, withLatestFrom(rootEditor$)), ([, rootEditor]) => {
     rootEditor?.update(() => {
       const firstItem = $getRoot().getFirstChild()
       if (!$isFrontmatterNode(firstItem)) {
@@ -64,18 +68,13 @@ export const insertFrontmatter$ = Action((r) => {
  * @group Frontmatter
  */
 export const removeFrontmatter$ = Action((r) => {
-  r.sub(r.pipe(removeFrontmatter$, withLatestFrom(rootEditor$, readOnly$)), ([, rootEditor, readOnly]) => {
-    if (readOnly) return
-    if (rootEditor) ensureFrontmatterHistoryBaseline(rootEditor)
-    rootEditor?.update(
-      () => {
-        const firstItem = $getRoot().getFirstChild()
-        if ($isFrontmatterNode(firstItem)) {
-          firstItem.remove()
-        }
-      },
-      { tag: HISTORY_PUSH_TAG }
-    )
+  r.sub(r.pipe(removeFrontmatter$, withLatestFrom(rootEditor$)), ([, rootEditor]) => {
+    rootEditor?.update(() => {
+      const firstItem = $getRoot().getFirstChild()
+      if ($isFrontmatterNode(firstItem)) {
+        firstItem.remove()
+      }
+    })
     r.pub(frontmatterDialogOpen$, false)
   })
 })
@@ -98,9 +97,13 @@ export const hasFrontmatter$ = Cell(false, (r) => {
  * A plugin that adds support for frontmatter.
  * @group Frontmatter
  */
-export const frontmatterPlugin = realmPlugin({
-  init: (realm) => {
+export const frontmatterPlugin = realmPlugin<{
+  /** Overrides the default key-value form. */
+  FrontmatterEditor?: ComponentType<FrontmatterEditorProps>
+}>({
+  init: (realm, params) => {
     realm.pubIn({
+      [frontmatterEditor$]: params?.FrontmatterEditor ?? FrontmatterEditor,
       [addMdastExtension$]: frontmatterFromMarkdown('yaml'),
       [addSyntaxExtension$]: frontmatter(),
       [addLexicalNode$]: FrontmatterNode,
@@ -158,5 +161,8 @@ export const frontmatterPlugin = realmPlugin({
         )
       }
     })
+  },
+  update: (realm, params) => {
+    realm.pub(frontmatterEditor$, params?.FrontmatterEditor ?? FrontmatterEditor)
   }
 })

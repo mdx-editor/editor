@@ -30,28 +30,21 @@ export function Frontmatter() {
 }
 ```
 
-## Structured values
+The default key-value form preserves existing values such as `false`, `0`, and empty
+strings when another field is edited. Dates are loaded with YAML's core schema and
+remain strings. New and changed text values are saved as strings. Saving without
+changes (including editing then reverting a field) keeps the original YAML, comments
+and formatting. A changed save serializes the YAML
+and may normalize formatting. Object and array values are retained but are not edited
+by the text inputs. Frontmatter that cannot be safely edited in this form must be
+changed in the Markdown source instead.
 
-The dialog edits nested objects and arrays recursively. Each value has an explicit
-string, number, boolean, null, object, or array type. Boolean values use checkboxes;
-strings support multiple lines. Empty strings, zero, false, null, empty collections,
-and fields unknown to the application are retained. Changing a type replaces that
-value with an empty value of the selected type. Array entries retain their order.
-Duplicate object keys, incomplete/non-finite numbers, and integers outside JavaScript's
-safe integer range prevent field-based saving. Use a string for a large identifier.
+## Custom frontmatter editor
 
-Changes stay in the dialog until Save. Cancel, Escape, and closing the dialog discard
-unsaved edits. Reopening uses the current document, including changes made by undo or
-`setMarkdown`. Save is one undoable document update; read-only editors disable edits,
-saving, and removal. The explicit Remove frontmatter button removes the whole block.
-
-Malformed YAML opens as source text with an error instead of crashing the editor.
-Correct the YAML and save, or cancel to retain the original. Integers outside JavaScript's
-safe integer range, recursive aliases,
-unsupported YAML tags and excessively deep/large field trees also use the source
-editor. Basic structured editing uses the YAML core schema, so date-like values remain
-strings. Saving changed fields serializes YAML and may normalize formatting, comments,
-and anchors; saving without edits leaves the original YAML untouched.
-
-No schema or form library is required. Application-specific schema validation and
-custom field widgets are outside the scope of this editor.
+Pass a component to `frontmatterPlugin({ FrontmatterEditor: MyFrontmatterEditor })`
+to replace the default form. The component receives `FrontmatterEditorProps`: the
+current `yaml` string and an `onChange(yaml)` callback. Both strings contain only the
+frontmatter contents, **without** the enclosing `---` delimiters. The component can
+use `frontmatterDialogOpen$` to follow the toolbar's dialog state. Omit the option to
+restore the default form; changing the component option updates existing frontmatter
+nodes too.

@@ -2,156 +2,226 @@ import * as Dialog from '@radix-ui/react-dialog'
 import classNames from 'classnames'
 import YamlParser from 'js-yaml'
 import React from 'react'
-import { emptyValue, parseFrontmatter, serializeFrontmatter, ValueDraft, ValueType } from './frontmatterValues'
+import { useFieldArray, useForm } from 'react-hook-form'
 import { frontmatterDialogOpen$, removeFrontmatter$ } from '.'
 import styles from '../../styles/ui.module.css'
 import { editorRootElementRef$, iconComponentFor$, readOnly$, useTranslation } from '../core'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 
+type YamlConfig = { key: string; value: unknown }[]
+
+/**
+ * Props passed to the frontmatter editor component.
+ * @group Frontmatter
+ */
 export interface FrontmatterEditorProps {
+  /** The frontmatter contents, without the enclosing `---` delimiters. */
   yaml: string
+  /** Replaces the frontmatter contents, without the enclosing `---` delimiters. */
   onChange: (yaml: string) => void
 }
 
+/**
+ * The default key-value frontmatter editor.
+ * @group Frontmatter
+ */
 export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) => {
+  const [frontmatterDialogOpen] = useCellValues(frontmatterDialogOpen$)
+  // Mount a fresh form on reopen, and when external edits replace the YAML.
+  return frontmatterDialogOpen ? <FrontmatterForm key={yaml} yaml={yaml} onChange={onChange} /> : null
+}
+
+const FrontmatterForm = ({ yaml, onChange }: FrontmatterEditorProps) => {
   const [readOnly, editorRootElementRef, iconComponentFor, frontmatterDialogOpen] = useCellValues(
     readOnly$,
     editorRootElementRef$,
     iconComponentFor$,
     frontmatterDialogOpen$
   )
+  const t = useTranslation()
   const setFrontmatterDialogOpen = usePublisher(frontmatterDialogOpen$)
   const removeFrontmatter = usePublisher(removeFrontmatter$)
-  return frontmatterDialogOpen ? (
-    <FrontmatterDialog
-      key={yaml}
-      yaml={yaml}
-      onChange={onChange}
-      readOnly={readOnly}
-      container={editorRootElementRef?.current}
-      iconComponentFor={iconComponentFor}
-      close={() => {
-        setFrontmatterDialogOpen(false)
-      }}
-      removeFrontmatter={removeFrontmatter}
-    />
-  ) : null
-}
-
-function FrontmatterDialog({
-  yaml,
-  onChange,
-  readOnly,
-  container,
-  iconComponentFor,
-  close,
-  removeFrontmatter
-}: FrontmatterEditorProps & {
-  readOnly: boolean
-  container: HTMLElement | null | undefined
-  iconComponentFor: (name: 'close') => React.ReactNode
-  close: () => void
-  removeFrontmatter: () => void
-}) {
-  const t = useTranslation()
-  const initial = React.useMemo(() => {
+  const { yamlConfig, invalid } = React.useMemo(() => {
     try {
-      return { draft: parseFrontmatter(yaml), error: '' }
-    } catch (error) {
-      return { draft: null, error: String(error) }
+      const value: unknown = YamlParser.load(yaml, {
+        schema: YamlParser.CORE_SCHEMA,
+        listener: (event, state) => {
+          // Do not round existing large integers while saving unrelated fields.
+          if (
+            event === 'close' &&
+            typeof state.result === 'number' &&
+            Number.isInteger(state.result) &&
+            !Number.isSafeInteger(state.result)
+          ) {
+            throw new Error('Unsafe integer')
+          }
+        }
+      })
+      if (value === undefined) return { yamlConfig: [], invalid: false }
+      if (value === null || typeof value !== 'object' || Array.isArray(value)) return { yamlConfig: [], invalid: true }
+      // The form library clones defaults recursively; recursive aliases cannot
+      // safely become form values. Leave their original source untouched.
+      JSON.stringify(value)
+      return { yamlConfig: Object.entries(value as Record<string, unknown>).map(([key, value]) => ({ key, value })), invalid: false }
+    } catch {
+      return { yamlConfig: [], invalid: true }
     }
   }, [yaml])
-  const [draft, setDraft] = React.useState(initial.draft)
-  const [raw, setRaw] = React.useState(yaml)
-  const [error, setError] = React.useState(initial.error)
-  const [dirty, setDirty] = React.useState(false)
-  const onSubmit = (event: React.FormEvent) => {
-    event.preventDefault()
-    event.stopPropagation()
-    if (readOnly) return
-    try {
-      if (dirty) {
-        if (draft) onChange(serializeFrontmatter(draft))
-        else {
-          // Validate syntax, but permit values unsupported by the field editor.
-          YamlParser.load(raw)
-          onChange(raw)
-        }
-      }
-      close()
-    } catch (error) {
-      setError(String(error))
+
+  const { register, control, handleSubmit } = useForm({
+    defaultValues: {
+      yamlConfig
     }
-  }
+  })
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'yamlConfig'
+  })
+  // Field-array operations refresh item.value from the current form. Keep the
+  // initial YAML value by stable row identity so edits can still be reverted.
+  const originalValues = React.useRef(new Map<string, unknown>())
+
+  const onSubmit = React.useCallback(
+    ({ yamlConfig: updatedConfig }: { yamlConfig: YamlConfig }) => {
+      if (readOnly || invalid) return
+      // Compare values, not just dirty fields: edit-then-revert must preserve
+      // comments, quoting and whitespace just like an untouched Save.
+      const options = { schema: YamlParser.CORE_SCHEMA }
+      // Form defaults are cloned, so alias identity must not count as an edit.
+      const comparisonOptions = { ...options, noRefs: true }
+      if (YamlParser.dump(updatedConfig, comparisonOptions) === YamlParser.dump(yamlConfig, comparisonOptions)) {
+        setFrontmatterDialogOpen(false)
+        return
+      }
+      if (updatedConfig.length === 0) {
+        removeFrontmatter()
+        setFrontmatterDialogOpen(false)
+        return
+      }
+      const yaml = Object.fromEntries(updatedConfig.filter(({ key }) => key).map(({ key, value }) => [key, value] as const))
+      onChange(YamlParser.dump(yaml, options).trimEnd())
+      setFrontmatterDialogOpen(false)
+    },
+    [onChange, setFrontmatterDialogOpen, removeFrontmatter, yamlConfig, readOnly, invalid]
+  )
 
   return (
     <>
       <Dialog.Root
-        open={true}
+        open={frontmatterDialogOpen}
         onOpenChange={(open) => {
-          if (!open) close()
+          setFrontmatterDialogOpen(open)
         }}
       >
-        <Dialog.Portal container={container}>
+        <Dialog.Portal container={editorRootElementRef?.current}>
           <Dialog.Overlay className={styles.dialogOverlay} />
-          <Dialog.Content
-            className={styles.largeDialogContent}
-            style={{ maxHeight: '85vh', overflow: 'auto', width: 'min(640px, 90vw)' }}
-            data-editor-type="frontmatter"
-          >
+          <Dialog.Content className={styles.largeDialogContent} data-editor-type="frontmatter">
             <Dialog.Title className={styles.dialogTitle}>{t('frontmatterEditor.title', 'Edit document frontmatter')}</Dialog.Title>
             <Dialog.Description className={styles.visuallyHidden}>
               {t('frontmatterEditor.dialogDescription', 'Add, edit, or remove the key-value entries of the document frontmatter.')}
             </Dialog.Description>
             <form
-              onSubmit={onSubmit}
-              onReset={(event) => {
-                event.stopPropagation()
-                close()
+              onSubmit={(e) => {
+                void handleSubmit(onSubmit)(e)
+                e.stopPropagation()
+              }}
+              onReset={(e) => {
+                e.stopPropagation()
+                setFrontmatterDialogOpen(false)
               }}
             >
-              {error && <p role="alert">{error}</p>}
-              {draft ? (
-                <ValueEditor
-                  value={draft}
-                  label="Frontmatter"
-                  readOnly={readOnly}
-                  onChange={(value) => {
-                    setDraft(value)
-                    setDirty(true)
-                    setError('')
-                  }}
-                />
-              ) : (
-                <label>
-                  {t('frontmatterEditor.yaml', 'YAML')}
-                  <textarea
-                    aria-label="YAML"
-                    className={styles.propertyEditorInput}
-                    value={raw}
-                    readOnly={readOnly}
-                    onChange={(event) => {
-                      setRaw(event.target.value)
-                      setDirty(true)
-                    }}
-                  />
-                </label>
+              {invalid && (
+                <p role="alert">
+                  {t(
+                    'frontmatterEditor.invalidYaml',
+                    'This frontmatter cannot be edited as key-value fields. Edit the Markdown source instead.'
+                  )}
+                </p>
               )}
-              <button
-                type="button"
-                disabled={readOnly}
-                className={styles.secondaryButton}
-                onClick={() => {
-                  if (!readOnly) {
-                    removeFrontmatter()
-                    close()
-                  }
-                }}
-              >
-                {t('frontmatterEditor.remove', 'Remove frontmatter')}
-              </button>
+              <table className={styles.propertyEditorTable}>
+                <colgroup>
+                  <col />
+                  <col />
+                  <col />
+                </colgroup>
+                <thead>
+                  <tr>
+                    <th>{t('frontmatterEditor.key', 'Key')}</th>
+                    <th>{t('frontmatterEditor.value', 'Value')}</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {fields.map((item, index) => {
+                    if (!originalValues.current.has(item.id)) originalValues.current.set(item.id, item.value)
+                    const original = originalValues.current.get(item.id)
+                    return (
+                      <tr key={item.id}>
+                        <td>
+                          <TableInput
+                            {...register(`yamlConfig.${index}.key`, { required: true })}
+                            aria-label={t('frontmatterEditor.key', 'Key')}
+                            autofocusIfEmpty
+                            readOnly={readOnly}
+                          />
+                        </td>
+                        <td>
+                          <TableInput
+                            {...register(`yamlConfig.${index}.value`, {
+                              // Text inputs stringify their values. Restore the original
+                              // YAML type if a field is unchanged or edited then reverted.
+                              setValueAs: (value: unknown) => {
+                                if (
+                                  original === null ||
+                                  typeof original === 'string' ||
+                                  typeof original === 'number' ||
+                                  typeof original === 'boolean'
+                                ) {
+                                  return value === String(original ?? '') ? original : value
+                                }
+                                return original
+                              }
+                            })}
+                            aria-label={t('frontmatterEditor.value', 'Value')}
+                            readOnly={readOnly || (typeof original === 'object' && original !== null)}
+                          />
+                        </td>
+                        <td>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              remove(index)
+                            }}
+                            className={styles.iconButton}
+                            disabled={readOnly}
+                          >
+                            {iconComponentFor('delete_big')}
+                          </button>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td>
+                      <button
+                        disabled={readOnly || invalid}
+                        className={classNames(styles.primaryButton, styles.smallButton)}
+                        type="button"
+                        onClick={() => {
+                          append({ key: '', value: '' })
+                        }}
+                      >
+                        {t('frontmatterEditor.addEntry', 'Add entry')}
+                      </button>
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--spacing-2)' }}>
-                <button type="submit" disabled={readOnly} className={styles.primaryButton}>
+                <button type="submit" disabled={readOnly || invalid} className={styles.primaryButton}>
                   {t('dialogControls.save', 'Save')}
                 </button>
                 <button type="reset" className={styles.secondaryButton}>
@@ -171,113 +241,9 @@ function FrontmatterDialog({
   )
 }
 
-function ValueEditor({
-  value,
-  onChange,
-  label,
-  readOnly
-}: {
-  value: ValueDraft
-  onChange: (value: ValueDraft) => void
-  label: string
-  readOnly: boolean
-}) {
-  const t = useTranslation()
-  const types: ValueType[] = ['string', 'number', 'boolean', 'null', 'object', 'array']
-  return (
-    <fieldset disabled={readOnly} style={{ border: 0, padding: 'var(--spacing-2)', minWidth: 0 }}>
-      <legend>{label}</legend>
-      <select
-        aria-label={`${label} type`}
-        value={value.type}
-        onChange={(event) => {
-          onChange(emptyValue(event.target.value as ValueType))
-        }}
-      >
-        {types.map((type) => (
-          <option key={type} value={type}>
-            {t(`frontmatterEditor.types.${type}`, type)}
-          </option>
-        ))}
-      </select>
-      {value.type === 'string' && (
-        <textarea
-          className={styles.propertyEditorInput}
-          aria-label={`${label} value`}
-          value={value.text}
-          onChange={(event) => {
-            onChange({ ...value, text: event.target.value })
-          }}
-        />
-      )}
-      {value.type === 'number' && (
-        <input
-          className={styles.propertyEditorInput}
-          aria-label={`${label} value`}
-          value={value.text}
-          onChange={(event) => {
-            onChange({ ...value, text: event.target.value })
-          }}
-        />
-      )}
-      {value.type === 'boolean' && (
-        <input
-          type="checkbox"
-          aria-label={`${label} value`}
-          checked={value.text === 'true'}
-          onChange={(event) => {
-            onChange({ ...value, text: String(event.target.checked) })
-          }}
-        />
-      )}
-      {(value.type === 'object' || value.type === 'array') && (
-        <>
-          {value.entries.map((entry, index) => (
-            <div key={index}>
-              {value.type === 'object' && (
-                <input
-                  className={styles.propertyEditorInput}
-                  aria-label={`${label} key ${index + 1}`}
-                  value={entry.key}
-                  onChange={(event) => {
-                    onChange({
-                      ...value,
-                      entries: value.entries.map((item, i) => (i === index ? { ...item, key: event.target.value } : item))
-                    })
-                  }}
-                />
-              )}
-              <ValueEditor
-                value={entry.value}
-                label={`${label}[${index + 1}]`}
-                readOnly={readOnly}
-                onChange={(child) => {
-                  onChange({ ...value, entries: value.entries.map((item, i) => (i === index ? { ...item, value: child } : item)) })
-                }}
-              />
-              <button
-                type="button"
-                aria-label={`${label} remove ${index + 1}`}
-                className={styles.secondaryButton}
-                onClick={() => {
-                  onChange({ ...value, entries: value.entries.filter((_, i) => i !== index) })
-                }}
-              >
-                {t('frontmatterEditor.removeEntry', 'Remove entry')}
-              </button>
-            </div>
-          ))}
-          <button
-            type="button"
-            className={classNames(styles.primaryButton, styles.smallButton)}
-            onClick={() => {
-              onChange({ ...value, entries: [...value.entries, { key: '', value: emptyValue('string') }] })
-            }}
-          >
-            {t('frontmatterEditor.addEntry', 'Add entry')}
-          </button>
-        </>
-      )}
-    </fieldset>
-  )
-}
+const TableInput = React.forwardRef<
+  HTMLInputElement,
+  React.InputHTMLAttributes<HTMLInputElement> & { autofocusIfEmpty?: boolean; autoFocus?: boolean; value?: string }
+>(({ className, autofocusIfEmpty: _, ...props }, ref) => {
+  return <input className={classNames(styles.propertyEditorInput, className)} {...props} ref={ref} />
+})

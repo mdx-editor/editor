@@ -1,13 +1,14 @@
 import React from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { act, render } from '@testing-library/react'
-import { registerMarkdownShortcuts, type ElementTransformer, type Transformer } from '@lexical/markdown'
+import { QUOTE, registerMarkdownShortcuts, type ElementTransformer, type Transformer } from '@lexical/markdown'
 import { $isHeadingNode, HeadingNode } from '@lexical/rich-text'
 import { $createParagraphNode, $createTextNode, $getRoot, $getSelection, $isRangeSelection, createEditor } from 'lexical'
 import { Realm, RealmContext } from '@mdxeditor/gurx'
 import { composerChildren$, tableCellEditorChildren$ } from '../plugins/core'
 import { ALL_HEADING_LEVELS, headingsPlugin, type HEADING_LEVEL } from '../plugins/headings'
 import { markdownShortcutPlugin } from '../plugins/markdown-shortcut'
+import { quotePlugin } from '../plugins/quote'
 
 const renderedTransformers = vi.hoisted(() => [] as Transformer[][])
 
@@ -174,5 +175,26 @@ describe('heading shortcut transformation', () => {
     } finally {
       unregister()
     }
+  })
+})
+
+describe('markdownShortcutPlugin plugin ordering', () => {
+  it('picks up plugins that are initialized after it', () => {
+    const realm = new Realm()
+    markdownShortcutPlugin().init?.(realm)
+    quotePlugin().init?.(realm)
+    headingsPlugin().init?.(realm)
+
+    const ShortcutChild = realm.getValue(composerChildren$)[0] as React.ComponentType
+    renderedTransformers.length = 0
+    render(
+      <RealmContext.Provider value={realm}>
+        <ShortcutChild />
+      </RealmContext.Provider>
+    )
+    const transformers = renderedTransformers[renderedTransformers.length - 1]
+
+    expect(transformers).toContain(QUOTE)
+    expect(findHeadingTransformer(transformers)).toBeDefined()
   })
 })
