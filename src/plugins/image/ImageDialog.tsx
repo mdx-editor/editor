@@ -3,12 +3,13 @@ import classNames from 'classnames'
 import React from 'react'
 import { useForm } from 'react-hook-form'
 import styles from '../../styles/ui.module.css'
-import { editorRootElementRef$, useTranslation } from '../core/index'
+import { editorRootElementRef$, useTranslation, readOnly$ } from '../core/index'
 import {
   closeImageDialog$,
   imageAutocompleteSuggestions$,
   imageDialogState$,
   imageUploadHandler$,
+  imageUploadState$,
   saveImage$,
   allowSetImageDimensions$
 } from './index'
@@ -25,25 +26,41 @@ interface ImageFormFields {
 }
 
 export const ImageDialog: React.FC = () => {
-  const [imageAutocompleteSuggestions, state, editorRootElementRef, imageUploadHandler, allowSetImageDimensions] = useCellValues(
-    imageAutocompleteSuggestions$,
-    imageDialogState$,
-    editorRootElementRef$,
-    imageUploadHandler$,
-    allowSetImageDimensions$
-  )
+  const [imageAutocompleteSuggestions, state, editorRootElementRef, imageUploadHandler, allowSetImageDimensions, uploadState, readOnly] =
+    useCellValues(
+      imageAutocompleteSuggestions$,
+      imageDialogState$,
+      editorRootElementRef$,
+      imageUploadHandler$,
+      allowSetImageDimensions$,
+      imageUploadState$,
+      readOnly$
+    )
   const saveImage = usePublisher(saveImage$)
   const closeImageDialog = usePublisher(closeImageDialog$)
   const t = useTranslation()
+  const id = React.useId()
 
-  const { register, handleSubmit, control, setValue, reset } = useForm<ImageFormFields>({
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    values: state.type === 'editing' ? (state.initialValues as any) : {}
-  })
+  const { register, handleSubmit, control, setValue, reset } = useForm<ImageFormFields>()
+  React.useEffect(() => {
+    reset({
+      src: '',
+      title: '',
+      altText: '',
+      width: undefined,
+      height: undefined,
+      file: undefined,
+      ...(state.type === 'editing' ? state.initialValues : {})
+    })
+  }, [state, reset])
 
-  const resetFormState = () => {
-    reset({ src: '', title: '', altText: '', width: undefined, height: undefined })
-  }
+  React.useEffect(
+    () => () => {
+      closeImageDialog()
+    },
+    [closeImageDialog]
+  )
+  const uploading = uploadState === 'uploading'
 
   if (state.type === 'inactive') return null
 
@@ -53,7 +70,6 @@ export const ImageDialog: React.FC = () => {
       onOpenChange={(open) => {
         if (!open) {
           closeImageDialog()
-          resetFormState()
         }
       }}
     >
@@ -76,63 +92,72 @@ export const ImageDialog: React.FC = () => {
               e.preventDefault()
               e.stopPropagation()
               await handleSubmit(saveImage)(e)
-              resetFormState()
             }}
+            aria-busy={uploading}
             className={styles.multiFieldForm}
           >
-            {imageUploadHandler === null ? (
-              <input type="hidden" accept="image/*" {...register('file')} />
-            ) : (
+            <fieldset disabled={uploading || readOnly} style={{ border: 0, padding: 0, margin: 0 }} className={styles.multiFieldForm}>
+              {imageUploadHandler === null ? (
+                <input type="hidden" accept="image/*" id={`${id}-file`} {...register('file')} />
+              ) : (
+                <div className={styles.formField}>
+                  <label htmlFor={`${id}-file`}>{t('uploadImage.uploadInstructions', 'Upload an image from your device:')}</label>
+                  <input type="file" accept="image/*" id={`${id}-file`} {...register('file')} />
+                </div>
+              )}
+
               <div className={styles.formField}>
-                <label htmlFor="file">{t('uploadImage.uploadInstructions', 'Upload an image from your device:')}</label>
-                <input type="file" accept="image/*" {...register('file')} />
+                <label htmlFor={`${id}-src`}>
+                  {imageUploadHandler !== null
+                    ? t('uploadImage.addViaUrlInstructions', 'Or add an image from an URL:')
+                    : t('uploadImage.addViaUrlInstructionsNoUpload', 'Add an image from an URL:')}
+                </label>
+                <DownshiftAutoComplete
+                  inputId={`${id}-src`}
+                  register={register}
+                  initialInputValue={state.type === 'editing' ? state.initialValues.src ?? '' : ''}
+                  inputName="src"
+                  suggestions={imageAutocompleteSuggestions}
+                  setValue={setValue}
+                  control={control}
+                  placeholder={t('uploadImage.autoCompletePlaceholder', 'Select or paste an image src')}
+                />
               </div>
-            )}
 
-            <div className={styles.formField}>
-              <label htmlFor="src">
-                {imageUploadHandler !== null
-                  ? t('uploadImage.addViaUrlInstructions', 'Or add an image from an URL:')
-                  : t('uploadImage.addViaUrlInstructionsNoUpload', 'Add an image from an URL:')}
-              </label>
-              <DownshiftAutoComplete
-                register={register}
-                initialInputValue={state.type === 'editing' ? state.initialValues.src ?? '' : ''}
-                inputName="src"
-                suggestions={imageAutocompleteSuggestions}
-                setValue={setValue}
-                control={control}
-                placeholder={t('uploadImage.autoCompletePlaceholder', 'Select or paste an image src')}
-              />
-            </div>
-
-            <div className={styles.formField}>
-              <label htmlFor="alt">{t('uploadImage.alt', 'Alt:')}</label>
-              <input type="text" {...register('altText')} className={styles.textInput} />
-            </div>
-
-            <div className={styles.formField}>
-              <label htmlFor="title">{t('uploadImage.title', 'Title:')}</label>
-              <input type="text" {...register('title')} className={styles.textInput} />
-            </div>
-
-            {allowSetImageDimensions && (
-              <div className={styles.imageDimensionsContainer}>
-                <div className={styles.formField}>
-                  <label htmlFor="width">{t('uploadImage.width', 'Width:')}</label>
-                  <input type="number" min={0} {...register('width')} className={styles.textInput} />
-                </div>
-
-                <div className={styles.formField}>
-                  <label htmlFor="height">{t('uploadImage.height', 'Height:')}</label>
-                  <input type="number" min={0} {...register('height')} className={styles.textInput} />
-                </div>
+              <div className={styles.formField}>
+                <label htmlFor={`${id}-alt`}>{t('uploadImage.alt', 'Alt:')}</label>
+                <input type="text" id={`${id}-alt`} {...register('altText')} className={styles.textInput} />
               </div>
-            )}
 
+              <div className={styles.formField}>
+                <label htmlFor={`${id}-title`}>{t('uploadImage.title', 'Title:')}</label>
+                <input type="text" id={`${id}-title`} {...register('title')} className={styles.textInput} />
+              </div>
+
+              {allowSetImageDimensions && (
+                <div className={styles.imageDimensionsContainer}>
+                  <div className={styles.formField}>
+                    <label htmlFor={`${id}-width`}>{t('uploadImage.width', 'Width:')}</label>
+                    <input type="number" min={0} id={`${id}-width`} {...register('width')} className={styles.textInput} />
+                  </div>
+
+                  <div className={styles.formField}>
+                    <label htmlFor={`${id}-height`}>{t('uploadImage.height', 'Height:')}</label>
+                    <input type="number" min={0} id={`${id}-height`} {...register('height')} className={styles.textInput} />
+                  </div>
+                </div>
+              )}
+            </fieldset>
+            {uploading && (
+              <p role="status">
+                <progress aria-label={t('uploadImage.uploading', 'Uploading image…')} /> {t('uploadImage.uploading', 'Uploading image…')}
+              </p>
+            )}
+            {uploadState === 'error' && <p role="alert">{t('uploadImage.uploadError', 'Image upload failed. Please try again.')}</p>}
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--spacing-2)' }}>
               <button
                 type="submit"
+                disabled={uploading || readOnly}
                 title={t('dialogControls.save', 'Save')}
                 aria-label={t('dialogControls.save', 'Save')}
                 className={classNames(styles.primaryButton)}
