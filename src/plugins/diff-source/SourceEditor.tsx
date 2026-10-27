@@ -5,7 +5,7 @@ import { basicLight } from 'cm6-theme-basic-light'
 import { basicSetup } from 'codemirror'
 import React from 'react'
 import { cmExtensions$, getSourceEditorConfig, sourceEditorView$ } from '.'
-import { markdown$, markdownSourceEditorValue$, onBlur$, readOnly$ } from '../core'
+import { markdownSourceEditorValue$, onBlur$, readOnly$ } from '../core'
 import { useCellValues, usePublisher, useRealm } from '@mdxeditor/gurx'
 
 export const COMMON_STATE_CONFIG_EXTENSIONS: Extension[] = [
@@ -18,7 +18,7 @@ export const COMMON_STATE_CONFIG_EXTENSIONS: Extension[] = [
 
 export const SourceEditor = () => {
   const realm = useRealm()
-  const [markdown, readOnly, cmExtensions] = useCellValues(markdown$, readOnly$, cmExtensions$)
+  const [readOnly, cmExtensions] = useCellValues(readOnly$, cmExtensions$)
   const updateMarkdown = usePublisher(markdownSourceEditorValue$)
   const triggerOnBlur = usePublisher(onBlur$)
   const editorViewRef = React.useRef<EditorView | null>(null)
@@ -56,9 +56,7 @@ export const SourceEditor = () => {
         editorViewRef.current = null
       }
     },
-    // Recreate the view if the underlying rich-text document changes.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [markdown, readOnly, updateMarkdown, cmExtensions, triggerOnBlur, realm]
+    [readOnly, updateMarkdown, cmExtensions, triggerOnBlur, realm]
   )
 
   return <div ref={ref} className="cm-sourceView mdxeditor-source-editor" />

@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { cmExtensions$, diffMarkdown$, getSourceEditorConfig, readOnlyDiff$, sourceEditorView$ } from '.'
-import { markdown$, markdownSourceEditorValue$, onBlur$, readOnly$ } from '../core'
+import { markdownSourceEditorValue$, onBlur$, readOnly$ } from '../core'
 
 import { MergeView } from '@codemirror/merge'
 import { EditorState } from '@codemirror/state'
@@ -27,12 +27,6 @@ export const DiffViewer: React.FC = () => {
   React.useEffect(() => {
     return realm.sub(diffMarkdown$, (newDiffMarkdown) => {
       setContent(cmMergeViewRef.current?.a, newDiffMarkdown)
-    })
-  }, [realm])
-
-  React.useEffect(() => {
-    return realm.sub(markdown$, (newMarkdown) => {
-      setContent(cmMergeViewRef.current?.b, newMarkdown)
     })
   }, [realm])
 
