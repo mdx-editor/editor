@@ -18,6 +18,9 @@ export const LexicalListItemVisitor: LexicalExportVisitor<ListItemNode, Mdast.Li
         // @ts-expect-error - MDAST type is incorrect
         actions.visitChildren(firstChild, mdastParent)
       } else {
+        if (firstChild.getListType() === 'number' && firstChild.getStart() !== 1) {
+          prevListItemNode.spread = true
+        }
         actions.visitChildren(lexicalNode, prevListItemNode)
       }
     } else {

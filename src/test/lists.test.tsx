@@ -1,8 +1,10 @@
 import { act, render } from '@testing-library/react'
 import React from 'react'
+import type * as Mdast from 'mdast'
 import { describe, expect, it } from 'vitest'
 import { $createListItemNode, $createListNode } from '@lexical/list'
 import { $createTextNode, $getRoot, type LexicalEditor } from 'lexical'
+import { fromMarkdown } from 'mdast-util-from-markdown'
 import { MDXEditor, realmPlugin, rootEditor$, type MDXEditorMethods } from '../'
 import { listsPlugin } from '../plugins/lists'
 
@@ -13,6 +15,22 @@ function roundTrip(markdown: string) {
   const ref = React.createRef<MDXEditorMethods>()
   render(<MDXEditor ref={ref} markdown={markdown} plugins={[listsPlugin()]} />)
   return ref.current!.getMarkdown().trim()
+}
+
+function tree(markdown: string) {
+  return JSON.parse(JSON.stringify(fromMarkdown(markdown), (key, value: unknown) => (key === 'position' ? undefined : value))) as Mdast.Root
+}
+
+function expectStableNestedList(markdown: string, start: number) {
+  const once = roundTrip(markdown)
+  const twice = roundTrip(once)
+  expect(tree(twice)).toEqual(tree(once))
+  const outer = tree(once).children[0] as Mdast.List
+  expect(outer.children).toHaveLength(1)
+  const nested = outer.children[0].children[1] as Mdast.List
+  expect(nested.type).toBe('list')
+  expect(nested.start).toBe(start)
+  expect(nested.children).toHaveLength(2)
 }
 
 describe('ordered list start (#471)', () => {
@@ -29,7 +47,15 @@ describe('ordered list start (#471)', () => {
   })
 
   it('keeps the start number of a nested ordered list', () => {
-    expect(roundTrip('1. a\n\n   5. b\n   6. c')).toBe('1. a\n   5. b\n   6. c')
+    expectStableNestedList('1. a\n\n   5. b\n   6. c', 5)
+  })
+
+  it('keeps a nested ordered list that starts at zero', () => {
+    expectStableNestedList('1. a\n\n   0. b\n   1. c', 0)
+  })
+
+  it('keeps a nested ordered list that starts at one', () => {
+    expectStableNestedList('1. a\n   1. b\n   2. c', 1)
   })
 
   it('keeps lists that start at one unchanged', () => {
