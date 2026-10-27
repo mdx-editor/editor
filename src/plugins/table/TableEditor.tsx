@@ -477,7 +477,8 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
         root: $getRoot(),
         jsxComponentDescriptors,
         visitors: exportVisitors,
-        jsxIsAvailable
+        jsxIsAvailable,
+        addImportStatements: false
       })
       parentEditor.update(
         () => {
@@ -485,7 +486,7 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
           if (!currentTable) {
             return
           }
-          currentTable.updateCellContents(colIndex, rowIndex, (mdast.children[0] as Mdast.Paragraph).children)
+          currentTable.updateCellContents(colIndex, rowIndex, mdast.children.find((node) => node.type === 'paragraph')?.children ?? [])
         },
         { discrete: true }
       )
