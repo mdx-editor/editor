@@ -53,6 +53,7 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
 
   React.useEffect(() => {
     const el = elRef.current!
+    let disposed = false
     void (async () => {
       const extensions = [
         ...codeMirrorExtensions,
@@ -94,6 +95,12 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
           }
         }
       }
+      // Loading language support can outlive this effect (unmount, language, or
+      // read-only changes). Do not replace a newer view or create an orphaned one.
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- cleanup may run while awaiting the language loader
+      if (disposed) {
+        return
+      }
       el.innerHTML = ''
       editorViewRef.current = new EditorView({
         parent: el,
@@ -103,6 +110,7 @@ export const CodeMirrorEditor = ({ language, nodeKey, code, focusEmitter }: Code
       el.addEventListener('keydown', stopPropagationHandler)
     })()
     return () => {
+      disposed = true
       editorViewRef.current?.destroy()
       editorViewRef.current = null
       el.removeEventListener('keydown', stopPropagationHandler)
