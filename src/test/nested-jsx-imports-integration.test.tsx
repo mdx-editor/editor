@@ -12,6 +12,7 @@ import { jsxPlugin } from '../plugins/jsx'
 import { MDXEditor, type MDXEditorMethods } from '../MDXEditor'
 import { realmPlugin } from '../RealmWithPlugins'
 import { $createLexicalJsxNode } from '../plugins/jsx/LexicalJsxNode'
+import type { ComponentImport } from '../plugins/jsx/imports'
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 ;(globalThis as any).IS_REACT_ACT_ENVIRONMENT = true
@@ -231,12 +232,17 @@ it.each([false, true])('exports a table-cell component without losing content (e
       () => {
         const paragraph = $getRoot().getFirstChildOrThrow()
         if (!$isElementNode(paragraph)) throw new Error('Expected a table-cell paragraph')
+        const originalImport: ComponentImport = {
+          source: '@original',
+          defaultExport: false,
+          kind: 'named',
+          importedName: 'Original',
+          localName: 'Badge'
+        }
         paragraph.append(
           $createLexicalJsxNode(
             { type: 'mdxJsxTextElement', name: 'Badge', attributes: [], children: [] },
-            existingImport
-              ? { source: '@original', defaultExport: false, importText: "import { Original as Badge } from '@original'" }
-              : undefined
+            existingImport ? originalImport : undefined
           )
         )
       },
@@ -259,12 +265,24 @@ it.each([
   ["import Foo from './custom'", 'Foo'],
   ["import * as UI from './custom'", 'UI.Badge']
 ])('preserves the root declaration %s used only inside an admonition', async (declaration, name) => {
+  let nestedEditor: LexicalEditor | null = null
+  function Capture() {
+    const [editor] = useLexicalComposerContext()
+    nestedEditor ??= editor
+    return null
+  }
+  const capture = realmPlugin({
+    init: (realm) => {
+      realm.pub(addNestedEditorChild$, Capture)
+    }
+  })
   const ref = React.createRef<MDXEditorMethods>()
-  render(
+  const { container } = render(
     <MDXEditor
       ref={ref}
       markdown={`${declaration}\n\n:::tip\n<${name} />\n:::`}
       plugins={[
+        capture(),
         directivesPlugin({ directiveDescriptors: [AdmonitionDirectiveDescriptor] }),
         jsxPlugin({
           jsxComponentDescriptors: [
@@ -276,6 +294,23 @@ it.each([
   )
   await waitFor(() => {
     expect(ref.current?.getMarkdown()).toContain(declaration)
+  })
+  await waitFor(() => {
+    expect(nestedEditor).not.toBeNull()
+  })
+  const editable = container.querySelectorAll('[contenteditable="true"]')[1]
+  fireEvent.focus(editable)
+  act(() => {
+    nestedEditor!.update(
+      () => {
+        $getRoot().append($createParagraphNode().append($createTextNode('changed')))
+      },
+      { discrete: true }
+    )
+  })
+  fireEvent.blur(editable)
+  await waitFor(() => {
+    expect(ref.current!.getMarkdown()).toContain('changed')
   })
   const markdown = ref.current!.getMarkdown()
   expect(markdown).not.toContain('@fallback')
@@ -486,4 +521,36 @@ it('keeps a directive-local import in place when its JSX is wrapped in HTML', as
     expect(ref.current!.getMarkdown()).toContain('changed')
   })
   expect(ref.current!.getMarkdown()).toContain(":::tip\nimport { Badge } from './custom'")
+})
+
+it.each([
+  ["import { A } from './a'\nimport { B } from './b'", "import { A } from './a'"],
+  ["import { A } from './a'\nexport const meta = 1", "import { A } from './a'"],
+  ["import Default, { Original as A, B } from './a'", "import { Original as A } from './a'"]
+])('rebuilds only used root import specifiers from %s', async (declarations, expectedImport) => {
+  const ref = React.createRef<MDXEditorMethods>()
+  render(
+    <MDXEditor
+      ref={ref}
+      markdown={`${declarations}\n\n<A />`}
+      plugins={[
+        jsxPlugin({
+          jsxComponentDescriptors: [
+            { name: '*', kind: 'flow', source: '@fallback', props: [], hasChildren: false, Editor: GenericJsxEditor }
+          ]
+        })
+      ]}
+    />
+  )
+  await waitFor(() => {
+    expect(ref.current).not.toBeNull()
+  })
+  const saved = ref.current!.getMarkdown()
+  expect(saved.trim()).toBe(`${expectedImport}\n\n<A />`)
+  act(() => {
+    ref.current!.setMarkdown(saved)
+  })
+  await waitFor(() => {
+    expect(ref.current!.getMarkdown()).toBe(saved)
+  })
 })

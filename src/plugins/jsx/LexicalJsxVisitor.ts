@@ -3,6 +3,7 @@ import { $isLexicalJsxNode, LexicalJsxNode } from './LexicalJsxNode'
 import { LexicalExportVisitor } from '../../exportMarkdownFromLexical'
 import * as Mdast from 'mdast'
 import { isMdastJsxNode } from '.'
+import { getComponentImport, withComponentImport } from './imports'
 
 export const LexicalJsxVisitor: LexicalExportVisitor<LexicalJsxNode, MdxJsxFlowElement | MdxJsxTextElement> = {
   testLexicalNode: $isLexicalJsxNode,
@@ -11,7 +12,7 @@ export const LexicalJsxVisitor: LexicalExportVisitor<LexicalJsxNode, MdxJsxFlowE
       if ('children' in node && node.children instanceof Array) {
         node.children.forEach((child: Mdast.Nodes) => {
           if (isMdastJsxNode(child)) {
-            actions.registerReferredComponent(child.name, child.data?.mdxEditorImport)
+            actions.registerReferredComponent(child.name, getComponentImport(child))
           }
           traverseNestedJsxNodes(child)
         })
@@ -22,10 +23,7 @@ export const LexicalJsxVisitor: LexicalExportVisitor<LexicalJsxNode, MdxJsxFlowE
     const importStatement = lexicalNode.getImportStatement()
     actions.registerReferredComponent(mdastNode.name, importStatement)
     traverseNestedJsxNodes(mdastNode)
-    actions.appendToParent(
-      mdastParent,
-      importStatement ? { ...mdastNode, data: { ...mdastNode.data, mdxEditorImport: importStatement } } : mdastNode
-    )
+    actions.appendToParent(mdastParent, importStatement ? withComponentImport(mdastNode, importStatement) : mdastNode)
   },
   priority: -200
 }

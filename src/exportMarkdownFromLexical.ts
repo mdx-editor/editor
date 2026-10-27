@@ -1,17 +1,17 @@
 import { $isElementNode, ElementNode as LexicalElementNode, LexicalNode, RootNode as LexicalRootNode } from 'lexical'
 import * as Mdast from 'mdast'
-import { mdxFromMarkdown, type MdxjsEsm } from 'mdast-util-mdx'
-import { fromMarkdown } from 'mdast-util-from-markdown'
-import { mdxjs } from 'micromark-extension-mdxjs'
 import { type Options as MdastToMarkdownOptions, toMarkdown } from 'mdast-util-to-markdown'
 import { ImportStatement } from './importMarkdownToLexical'
 import { isMdastHTMLNode } from './plugins/core/MdastHTMLNode'
 import type { JsxComponentDescriptor } from './plugins/jsx'
 import { mergeStyleAttributes } from './utils/mergeStyleAttributes'
-import type { Pattern, Program } from 'estree'
-
-// Bound memory across documents while reusing metadata-less nested ESM parses.
-const esmParseCache = new Map<string, Program['body']>()
+import {
+  type ComponentImport,
+  createImportDeclaration,
+  getComponentImport,
+  getImportSpecifier,
+  getImportSpecifiers
+} from './plugins/jsx/imports'
 
 // Keep this as an interface so API Extractor emits the package-root import.
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -131,7 +131,10 @@ export function exportLexicalTreeToMdast({
   visit(root, null)
 
   function registerReferredComponent(componentName: string | null, importStatement?: ImportStatement) {
-    if (componentName === null || (!importStatement?.importText && !/^[A-Z_$][\w$]*$/.test(componentName))) {
+    if (
+      componentName === null ||
+      (!getImportSpecifier(importStatement) && !/^[\p{Lu}\p{Lt}_$][\p{ID_Continue}$\u200C\u200D]*$/u.test(componentName))
+    ) {
       return
     }
     referredComponents.add(componentName)
@@ -217,72 +220,14 @@ export function exportLexicalTreeToMdast({
   }
 
   const typedRoot = unistRoot as Mdast.Root
-  const preservedBindings = new Set<string>()
-
-  const collectPatternBindings = (pattern: Pattern) => {
-    switch (pattern.type) {
-      case 'Identifier':
-        preservedBindings.add(pattern.name)
-        break
-      case 'ObjectPattern':
-        for (const property of pattern.properties) {
-          collectPatternBindings(property.type === 'RestElement' ? property.argument : property.value)
-        }
-        break
-      case 'ArrayPattern':
-        for (const element of pattern.elements) {
-          if (element) collectPatternBindings(element)
-        }
-        break
-      case 'AssignmentPattern':
-        collectPatternBindings(pattern.left)
-        break
-      case 'RestElement':
-        collectPatternBindings(pattern.argument)
-        break
-    }
-  }
-
-  const collectPreservedBindings = (node: Mdast.Nodes) => {
+  const preservedImports = new Set<string>()
+  const collectPreservedImports = (node: Mdast.Nodes) => {
     if (node.type === 'mdxjsEsm') {
-      let statements = node.data?.estree?.body ?? esmParseCache.get(node.value)
-      if (!statements) {
-        // Nested-editor exports reconstruct imports without parser metadata.
-        // Parse those declarations without changing their stored source text.
-        try {
-          statements = fromMarkdown(node.value, { extensions: [mdxjs()], mdastExtensions: [mdxFromMarkdown()] }).children.flatMap(
-            (child) => (child.type === 'mdxjsEsm' ? child.data?.estree?.body ?? [] : [])
-          )
-        } catch {
-          // Preserve the existing behavior for programmatically supplied ESM
-          // that is not valid MDX; this pass must not rewrite or validate it.
-          statements = []
-        }
-        if (esmParseCache.size >= 256) esmParseCache.clear()
-        esmParseCache.set(node.value, statements)
-      }
-      for (const statement of statements) {
-        if (statement.type === 'ImportDeclaration') {
-          for (const specifier of statement.specifiers) {
-            preservedBindings.add(specifier.local.name)
-          }
-        } else if (statement.type === 'ExportNamedDeclaration' || statement.type === 'ExportDefaultDeclaration') {
-          const declaration = statement.declaration
-          if (declaration?.type === 'VariableDeclaration') {
-            for (const declarator of declaration.declarations) {
-              collectPatternBindings(declarator.id)
-            }
-          } else if ((declaration?.type === 'FunctionDeclaration' || declaration?.type === 'ClassDeclaration') && declaration.id) {
-            preservedBindings.add(declaration.id.name)
-          }
-        }
-      }
+      for (const specifier of getImportSpecifiers(node)) preservedImports.add(specifier.localName)
     }
-    if ('children' in node) {
-      node.children.forEach(collectPreservedBindings)
-    }
+    if ('children' in node) node.children.forEach(collectPreservedImports)
   }
-  collectPreservedBindings(typedRoot)
+  collectPreservedImports(typedRoot)
 
   // Decorators such as directives and tables contain MDAST subtrees rather than
   // Lexical children, so their JSX references never reach the JSX visitor.
@@ -292,8 +237,8 @@ export function exportLexicalTreeToMdast({
         const descriptor =
           jsxComponentDescriptors.find((descriptor) => descriptor.name === node.name) ??
           jsxComponentDescriptors.find((descriptor) => descriptor.name === '*')
-        if (descriptor?.source || node.data?.mdxEditorImport) {
-          registerReferredComponent(node.name, node.data?.mdxEditorImport)
+        if (descriptor?.source || getComponentImport(node)) {
+          registerReferredComponent(node.name, getComponentImport(node))
         }
       }
       if ('children' in node) {
@@ -303,93 +248,51 @@ export function exportLexicalTreeToMdast({
     registerNestedComponents(typedRoot)
   }
 
-  // iterate over all referred components and construct import statements, then append them to the root
-  const originalImports = new Set<string>()
+  // Rebuild only used bindings, never the original ESM block (which can also
+  // contain unused imports or exports). Local nested declarations stay in place.
+  const usedImports = new Map<string, ComponentImport>()
   for (const componentName of referredComponents) {
     const original = knownImportSources.get(componentName)
-    if (original?.importText && !preservedBindings.has(componentName.split('.')[0])) {
-      if (addImportStatements || !original.inherited) originalImports.add(original.importText)
-    }
-  }
-  // A full declaration can bind additional components inserted since import.
-  // Reserve every binding before generating any descriptor-based imports.
-  for (const value of originalImports) collectPreservedBindings({ type: 'mdxjsEsm', value })
-  const importsMap = new Map<string, string[]>()
-  const defaultImportsMap = new Map<string, string>()
-  for (const componentName of referredComponents) {
-    // MDX ESM declarations are module bindings even when stored in a directive.
-    // Existing imports and locally declared exports must remain authoritative.
-    if (preservedBindings.has(componentName.split('.')[0])) {
-      continue
-    }
-    const original = knownImportSources.get(componentName)
-    if (original?.importText) {
-      // Nested editors carry the declaration on JSX metadata; only the document
-      // export emits it, so independently saved subtrees cannot duplicate bindings.
-      if (addImportStatements || !original.inherited) originalImports.add(original.importText)
+    const specifier = getImportSpecifier(original)
+    const localName = specifier?.localName ?? componentName
+    if (preservedImports.has(localName) || usedImports.has(localName)) continue
+    if (!addImportStatements && (!original || specifier?.inherited)) continue
+    if (specifier) {
+      usedImports.set(localName, specifier)
       continue
     }
     const descriptor =
       jsxComponentDescriptors.find((descriptor) => descriptor.name === componentName) ??
-      knownImportSources.get(componentName) ??
+      original ??
       jsxComponentDescriptors.find((descriptor) => descriptor.name === '*')
     if (!descriptor) {
       throw new Error(`Component ${componentName} is used but not imported`)
     }
-    if (!descriptor.source) {
-      continue
-    }
-    if (descriptor.defaultExport) {
-      defaultImportsMap.set(componentName, descriptor.source)
-    } else {
-      const { source } = descriptor
-      const existing = importsMap.get(source)
-      if (existing) {
-        existing.push(componentName)
-      } else {
-        importsMap.set(source, [componentName])
-      }
-    }
-  }
-
-  /**
-   * even when the import statements should not be added,
-   * raw import statements should not be removed.
-   */
-  if (!addImportStatements) {
-    // filter out new imports
-    for (const [path, names] of importsMap.entries()) {
-      const cleaned = names.filter((n) => knownImportSources.has(n))
-      if (cleaned.length > 0) {
-        importsMap.set(path, cleaned)
-      } else {
-        importsMap.delete(path)
-      }
-    }
-    for (const key of defaultImportsMap.keys()) {
-      if (!knownImportSources.has(key)) {
-        defaultImportsMap.delete(key)
-      }
-    }
-  }
-
-  const imports = Array.from(importsMap).map(([source, componentNames]) => {
-    return {
-      type: 'mdxjsEsm',
-      value: `import { ${componentNames.join(', ')} } from '${source}'`
-    } as MdxjsEsm
-  })
-
-  imports.push(
-    ...Array.from(defaultImportsMap).map(([componentName, source]) => {
-      return {
-        type: 'mdxjsEsm',
-        value: `import ${componentName} from '${source}'`
-      } as MdxjsEsm
+    if (!descriptor.source) continue
+    usedImports.set(localName, {
+      source: descriptor.source,
+      defaultExport: descriptor.defaultExport ?? false,
+      kind: descriptor.defaultExport ? 'default' : 'named',
+      importedName: descriptor.defaultExport ? 'default' : localName,
+      localName
     })
-  )
+  }
 
-  imports.push(...Array.from(originalImports, (value): MdxjsEsm => ({ type: 'mdxjsEsm', value })))
+  const namedImports = new Map<string, ComponentImport[]>()
+  const otherImports: ComponentImport[] = []
+  for (const specifier of usedImports.values()) {
+    if (specifier.kind === 'named') {
+      const group = namedImports.get(specifier.source) ?? []
+      group.push(specifier)
+      namedImports.set(specifier.source, group)
+    } else {
+      otherImports.push(specifier)
+    }
+  }
+  const imports = [
+    ...Array.from(namedImports.values(), createImportDeclaration),
+    ...otherImports.map((specifier) => createImportDeclaration([specifier]))
+  ]
 
   const frontmatter = typedRoot.children.find((child) => child.type === 'yaml')
   if (frontmatter) {

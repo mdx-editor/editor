@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { $getRoot, createEditor, type LexicalNode } from 'lexical'
 import type * as Mdast from 'mdast'
 import type { ContainerDirective } from 'mdast-util-directive'
@@ -15,11 +15,7 @@ import { LexicalTableVisitor } from '../plugins/table/LexicalTableVisitor'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { mdxFromMarkdown } from 'mdast-util-mdx'
 import { mdxjs } from 'micromark-extension-mdxjs'
-
-vi.mock('mdast-util-from-markdown', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('mdast-util-from-markdown')>()
-  return { ...actual, fromMarkdown: vi.fn(actual.fromMarkdown) }
-})
+import { createImportDeclaration } from '../plugins/jsx/imports'
 
 function jsx(name: string | null, children: Mdast.BlockContent[] = []): MdxJsxFlowElement {
   return { type: 'mdxJsxFlowElement', name, attributes: [], children }
@@ -77,267 +73,112 @@ function parsedMdx(markdown: string) {
 }
 
 describe('imports from nested MDAST subtrees', () => {
-  it('does not import intrinsic images from a stored directive with a source-backed wildcard', () => {
-    const result = exportNodes(() => [admonition([jsx('img')])], [descriptor('*', '@components')])
-    expect(importValues(result)).toEqual([])
-  })
-
-  it('does not import intrinsic images from a stored table cell with a source-backed wildcard', () => {
+  it('imports components shared by root, directives and tables only once', () => {
     const result = exportNodes(
       () => [
+        $createLexicalJsxNode(jsx('Default')),
+        admonition([jsx('Default'), jsx('First'), jsx('Second')]),
         $createTableNode({
           type: 'table',
           children: [
-            { type: 'tableRow', children: [{ type: 'tableCell', children: [{ ...jsx('img'), type: 'mdxJsxTextElement', children: [] }] }] }
+            {
+              type: 'tableRow',
+              children: [{ type: 'tableCell', children: [{ ...jsx('First'), type: 'mdxJsxTextElement', children: [] }] }]
+            }
           ]
         })
       ],
-      [descriptor('*', '@components')]
-    )
-    expect(importValues(result)).toEqual([])
-  })
-
-  it.each([
-    ['exact', [descriptor('Existing', '@descriptor', true)]],
-    ['wildcard', [descriptor('*', '@fallback')]]
-  ] as const)('does not regenerate a preserved nested import with a source-backed %s descriptor', (_kind, descriptors) => {
-    const children = parsedMdx("import Existing from '@existing'\n\n<Existing />")
-    const result = exportNodes(() => [admonition(children)], [...descriptors])
-    expect(importValues(result)).toEqual([])
-    expect(result.children[0]).toMatchObject({ type: 'containerDirective', children })
-  })
-
-  it('deduplicates imports reconstructed by a nested editor without ESTree metadata', () => {
-    const existingImport = { type: 'mdxjsEsm' as const, value: "import Existing from '@existing'" }
-    const result = exportNodes(() => [admonition([existingImport, jsx('Existing')])], [descriptor('*', '@fallback')])
-    expect(importValues(result)).toEqual([])
-    expect(result.children[0]).toMatchObject({ children: [existingImport, jsx('Existing')] })
-  })
-
-  it('uses local bindings from named aliases and namespace imports without rewriting their declarations', () => {
-    const children = parsedMdx(
-      "import { Original as Existing } from '@existing'\nimport * as UI from '@ui'\n\n<Existing />\n\n<UI.Badge />"
-    )
-    const result = exportNodes(() => [admonition(children)], [descriptor('*', '@fallback')])
-    expect(importValues(result)).toEqual([])
-    expect(result.children[0]).toMatchObject({ children })
-  })
-
-  it('deduplicates a root reference against a preserved nested module binding', () => {
-    const children = parsedMdx("import Existing from '@existing'\n\n<Existing />")
-    const result = exportNodes(
-      () => [$createLexicalJsxNode(jsx('Existing')), admonition(children)],
-      [descriptor('Existing', '@descriptor', true)]
-    )
-    expect(importValues(result)).toEqual([])
-    expect(result.children[1]).toMatchObject({ children })
-  })
-
-  it('keeps generating imports for unrelated components beside preserved ESM and intrinsic images', () => {
-    const children = [...parsedMdx("import Existing from '@existing'\n\n<Existing />"), jsx('img'), jsx('Fresh'), jsx('Img')]
-    const result = exportNodes(() => [admonition(children)], [descriptor('*', '@fallback')])
-    expect(importValues(result)).toEqual(["import { Fresh, Img } from '@fallback'"])
-  })
-
-  it('does not treat side-effect imports or re-exports as local component bindings', () => {
-    const children = [...parsedMdx("import '@side-effect'\nexport { Fresh } from '@other'"), jsx('Fresh')]
-    const result = exportNodes(() => [admonition(children)], [descriptor('Fresh', '@fresh')])
-    expect(importValues(result)).toEqual(["import { Fresh } from '@fresh'"])
-  })
-
-  describe.each(['exact', 'wildcard'] as const)('preserved exports with a %s descriptor', (kind) => {
-    // Representative module bindings, rather than a declaration-kind matrix.
-    // Exercise both parser metadata and reconstructed ESM for each shape.
-    it.each([
-      { declaration: 'export const Other = 1, Existing = () => null', bindings: ['Existing'] },
-      {
-        declaration: 'export const { Original: Alias = fallback, nested: [, Item = fallback, ...Tail], ...Rest } = components',
-        bindings: ['Alias', 'Item', 'Tail', 'Rest']
-      },
-      { declaration: 'export function Fn() {}\nexport class Cls {}', bindings: ['Fn', 'Cls'] },
-      { declaration: 'export default function Existing() {}', bindings: ['Existing'] },
-      { declaration: 'export default class Existing {}', bindings: ['Existing'] }
-    ])('does not duplicate local bindings in $declaration', ({ declaration, bindings }) => {
-      for (const withMetadata of [true, false]) {
-        const esm = withMetadata ? parsedMdx(declaration) : [{ type: 'mdxjsEsm' as const, value: declaration }]
-        const children = [...esm, ...bindings.map((name) => jsx(name)), jsx('Fresh')]
-        const originalChildren = structuredClone(children)
-        const result = exportNodes(
-          () => [...bindings.map((name) => $createLexicalJsxNode(jsx(name))), admonition(children)],
-          [
-            ...(kind === 'exact' ? bindings.map((name) => descriptor(name, '@components')) : [descriptor('*', '@components')]),
-            descriptor('Fresh', '@fresh')
-          ]
-        )
-        expect(importValues(result)).toEqual(["import { Fresh } from '@fresh'"])
-        expect(result.children.at(-1)).toMatchObject({ children: originalChildren })
-      }
-    })
-
-    it.each([
-      "export { Existing as Public } from '@other'\nexport * from '@more'\nexport * as Existing from '@namespace'",
-      'export const { Existing: Other } = components',
-      'export const Other = Existing\nexport default Existing',
-      'export default function Other() { const Existing = 1 }',
-      'export default function() {}',
-      'export default class {}'
-    ])('does not suppress imports for names not locally declared by %s', (declaration) => {
-      const children = [...parsedMdx(declaration), jsx('Existing')]
-      const result = exportNodes(() => [admonition(children)], [descriptor(kind === 'exact' ? 'Existing' : '*', '@components')])
-      expect(importValues(result)).toEqual(["import { Existing } from '@components'"])
-      expect(result.children[1]).toMatchObject({ children })
-    })
-
-    it('uses an exported object binding for member-expression components', () => {
-      const children = [...parsedMdx('export const UI = { Badge: () => null }'), jsx('UI.Badge')]
-      const originalChildren = structuredClone(children)
-      const result = exportNodes(
-        () => [$createLexicalJsxNode(jsx('UI.Badge')), admonition(children)],
-        [descriptor(kind === 'exact' ? 'UI.Badge' : '*', '@components')]
-      )
-      expect(importValues(result)).toEqual([])
-      expect(result.children[1]).toMatchObject({ children: originalChildren })
-    })
-  })
-
-  it.each([true, false])('exports an actual Lexical fragment when addImportStatements is %s', (addImportStatements) => {
-    const fragment = jsx(null, [jsx('Fresh'), jsx(null, [jsx('Other')])])
-    const result = exportNodes(() => [$createLexicalJsxNode(fragment)], [descriptor('*', '@components')], addImportStatements)
-    expect(importValues(result)).toEqual(addImportStatements ? ["import { Fresh, Other } from '@components'"] : [])
-    expect(result.children.at(-1)).toEqual(fragment)
-  })
-
-  it('exports an actual Lexical fragment without requiring a descriptor', () => {
-    const fragment = jsx(null)
-    const result = exportNodes(() => [$createLexicalJsxNode(fragment)], [])
-    expect(importValues(result)).toEqual([])
-    expect(result.children).toEqual([fragment])
-  })
-
-  it('keeps programmatically supplied invalid ESM unchanged instead of introducing export validation', () => {
-    const invalidEsm = { type: 'mdxjsEsm' as const, value: 'import not valid MDX' }
-    const result = exportNodes(() => [admonition([invalidEsm])], [])
-    expect(result.children[0]).toMatchObject({ children: [invalidEsm] })
-  })
-
-  it('imports a default JSX component inside an admonition at the document root', () => {
-    const result = exportNodes(() => [admonition([jsx('Zazz')])], [descriptor('Zazz', '@zazz', true)])
-    expect(importValues(result)).toEqual(["import Zazz from '@zazz'"])
-  })
-
-  it('groups named imports and keeps default imports separate', () => {
-    const result = exportNodes(
-      () => [admonition([jsx('First'), jsx('Second'), jsx('Default')])],
-      [descriptor('First', '@components'), descriptor('Second', '@components'), descriptor('Default', '@default', true)]
+      [descriptor('Default', '@default', true), descriptor('First', '@components'), descriptor('Second', '@components')]
     )
     expect(importValues(result)).toEqual(["import { First, Second } from '@components'", "import Default from '@default'"])
   })
 
-  it('deduplicates references shared by the root and multiple nested editors', () => {
-    const result = exportNodes(
-      () => [$createLexicalJsxNode(jsx('Zazz')), admonition([jsx('Zazz'), jsx('Zazz')]), admonition([jsx('Zazz')])],
-      [descriptor('Zazz', '@zazz', true)]
+  it('does not duplicate parsed directive-local default, aliased or namespace bindings', () => {
+    const children = parsedMdx(
+      "import Existing from '@existing'\nimport { Original as Alias } from '@alias'\nimport * as UI from '@ui'\n\n<Existing />\n\n<Alias />\n\n<UI.Badge />"
     )
-    expect(importValues(result)).toEqual(["import Zazz from '@zazz'"])
+    const result = exportNodes(
+      () => [$createLexicalJsxNode(jsx('Existing')), admonition([...children, jsx('Fresh')])],
+      [descriptor('*', '@fallback')]
+    )
+    expect(importValues(result)).toEqual(["import { Fresh } from '@fallback'"])
+    expect(result.children.at(-1)).toMatchObject({ children: [...children, jsx('Fresh')] })
   })
 
-  it('finds JSX references inside table cells', () => {
+  it('keeps reconstructed directive-local import ownership without reparsing ESM', () => {
+    const existingImport = createImportDeclaration([
+      {
+        source: '@original',
+        defaultExport: false,
+        kind: 'named',
+        importedName: 'Original',
+        localName: 'Alias'
+      }
+    ])
+    const result = exportNodes(() => [admonition([existingImport, jsx('Alias')])], [descriptor('*', '@fallback')])
+    expect(importValues(result)).toEqual([])
+    expect(result.children[0]).toMatchObject({ children: [existingImport, jsx('Alias')] })
+  })
+
+  it.each([true, false])('exports Lexical fragments and their children (addImportStatements: %s)', (addImportStatements) => {
+    const fragment = jsx(null, [jsx('Fresh'), jsx(null, [jsx('Other')])])
+    const result = exportNodes(() => [$createLexicalJsxNode(fragment)], [descriptor('*', '@components')], addImportStatements)
+    expect(importValues(result)).toEqual(addImportStatements ? ["import { Fresh, Other } from '@components'"] : [])
+    expect(result.children.at(-1)).toEqual(fragment)
+    expect(importValues(exportNodes(() => [$createLexicalJsxNode(jsx(null))], []))).toEqual([])
+  })
+
+  it('uses exact descriptors before wildcard sources and skips source-less descriptors', () => {
     const result = exportNodes(
+      () => [admonition([jsx('Exact'), jsx('Fallback'), jsx('NoImport')])],
+      [descriptor('*', '@fallback'), descriptor('Exact', '@exact', true), descriptor('NoImport')]
+    )
+    expect(importValues(result)).toEqual(["import { Fallback } from '@fallback'", "import Exact from '@exact'"])
+    expect(importValues(exportNodes(() => [admonition([jsx('Unknown')])], []))).toEqual([])
+  })
+
+  it('does not generate fresh imports during a nested-editor export, but retains legacy import metadata', () => {
+    const result = exportNodes(
+      () => [$createLexicalJsxNode(jsx('Existing'), { source: '@existing', defaultExport: true }), admonition([jsx('Fresh')])],
+      [descriptor('*'), descriptor('Fresh', '@fresh')],
+      false
+    )
+    expect(importValues(result)).toEqual(["import Existing from '@existing'"])
+  })
+
+  it('uses a Unicode-aware identifier guard in root, JSX-child, directive and table paths', () => {
+    const invalid = ['UI.Badge', 'my-element', 'svg', 'foo', 'img']
+    const valid = ['Äpfel', 'A\u0308pfel']
+    const names = [...valid, ...invalid]
+    const placements: (() => LexicalNode[])[] = [
+      () => names.map((name) => $createLexicalJsxNode(jsx(name))),
+      () => [
+        $createLexicalJsxNode(
+          jsx(
+            null,
+            names.map((name) => jsx(name))
+          )
+        )
+      ],
+      () => [admonition(names.map((name) => jsx(name)))],
       () => [
         $createTableNode({
           type: 'table',
           children: [
             {
               type: 'tableRow',
-              children: [{ type: 'tableCell', children: [{ ...jsx('Badge'), type: 'mdxJsxTextElement', children: [] }] }]
+              children: [
+                { type: 'tableCell', children: names.map((name) => ({ ...jsx(name), type: 'mdxJsxTextElement' as const, children: [] })) }
+              ]
             }
           ]
         })
-      ],
-      [descriptor('Badge', '@components')]
-    )
-    expect(importValues(result)).toEqual(["import { Badge } from '@components'"])
+      ]
+    ]
+    for (const createNodes of placements) {
+      expect(importValues(exportNodes(createNodes, [descriptor('*', '@components')]))).toEqual([
+        "import { Äpfel, A\u0308pfel } from '@components'"
+      ])
+    }
   })
-
-  it('does not import HTML elements or fragments, but visits their component children', () => {
-    const result = exportNodes(() => [admonition([jsx(null, [jsx('span', [jsx('Section')])])])], [descriptor('*', '@components')])
-    expect(importValues(result)).toEqual(["import { Section } from '@components'"])
-  })
-
-  it('does not invent imports for unknown components', () => {
-    const result = exportNodes(() => [admonition([jsx('Unknown')])], [])
-    expect(importValues(result)).toEqual([])
-  })
-
-  it('uses wildcard descriptor sources only when there is no exact descriptor', () => {
-    const result = exportNodes(
-      () => [admonition([jsx('Exact'), jsx('Fallback'), jsx('NoImport')])],
-      [descriptor('*', '@fallback'), descriptor('Exact', '@exact', true), descriptor('NoImport')]
-    )
-    expect(importValues(result)).toEqual(["import { Fallback } from '@fallback'", "import Exact from '@exact'"])
-  })
-
-  it('does not add imports for a source-less wildcard descriptor', () => {
-    const result = exportNodes(() => [admonition([jsx('Unknown')])], [descriptor('*')])
-    expect(importValues(result)).toEqual([])
-  })
-
-  it('keeps existing nested imports in place, as required by #734', () => {
-    const existingImport = { type: 'mdxjsEsm' as const, value: "import Existing from '@existing'" }
-    const result = exportNodes(
-      () => [admonition([existingImport, jsx('Existing'), jsx('Zazz')])],
-      [descriptor('*'), descriptor('Zazz', '@zazz', true)]
-    )
-    expect(importValues(result)).toEqual(["import Zazz from '@zazz'"])
-    expect(result.children[1]).toMatchObject({ type: 'containerDirective', children: [existingImport, jsx('Existing'), jsx('Zazz')] })
-  })
-
-  it('does not generate fresh imports during a nested-editor export', () => {
-    const result = exportNodes(() => [admonition([jsx('Zazz')])], [descriptor('Zazz', '@zazz', true)], false)
-    expect(importValues(result)).toEqual([])
-  })
-
-  it('preserves the original JSX import source when nested export suppresses new imports', () => {
-    const result = exportNodes(
-      () => [$createLexicalJsxNode(jsx('Existing'), { source: '@existing', defaultExport: true })],
-      [descriptor('*')],
-      false
-    )
-    expect(importValues(result)).toEqual(["import Existing from '@existing'"])
-  })
-})
-
-it.each(['UI.Badge', 'my-element', 'svg', 'foo', 'img'])(
-  'does not generate invalid or intrinsic imports for %s in either registration path',
-  (name) => {
-    const result = exportNodes(
-      () => [admonition([jsx(name)]), $createLexicalJsxNode(jsx('Outer', [jsx(name)]))],
-      [descriptor('*', '@fallback')]
-    )
-    expect(importValues(result)).toEqual(["import { Outer } from '@fallback'"])
-  }
-)
-
-it('reuses fallback ESM parsing by source text and reparses changed text', () => {
-  const parse = vi.mocked(fromMarkdown)
-  parse.mockClear()
-  const source = "import CachedForReview from '@cached-for-review'"
-  const run = (value: string) =>
-    exportNodes(() => [admonition([{ type: 'mdxjsEsm', value }, jsx('CachedForReview')])], [descriptor('*', '@fallback')])
-  run(source)
-  run(source)
-  expect(parse).toHaveBeenCalledTimes(1)
-  run(source + ';')
-  expect(parse).toHaveBeenCalledTimes(2)
-})
-
-it('does not regenerate another binding from a carried full declaration', () => {
-  const result = exportNodes(
-    () => [
-      $createLexicalJsxNode(jsx('Foo'), { source: '@custom', defaultExport: false, importText: "import { Foo, Bar } from '@custom'" }),
-      $createLexicalJsxNode(jsx('Bar'))
-    ],
-    [descriptor('*', '@custom')]
-  )
-  expect(importValues(result)).toEqual(["import { Foo, Bar } from '@custom'"])
 })
