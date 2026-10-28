@@ -59,7 +59,8 @@ import {
   editorHasSharedHistory,
   editorsShareHistory,
   ensureEditorHistoryBaseline,
-  recordEditorHistoryExport
+  recordEditorHistoryExport,
+  isEditorHistoryRestoring
 } from './lexicalExtensions'
 
 /**
@@ -384,6 +385,7 @@ export const NestedLexicalEditor = function <T extends Mdast.RootContent>(props:
       editor.registerCommand(
         BLUR_COMMAND,
         (payload) => {
+          if (isEditorHistoryRestoring(editor)) return true
           const relatedTarget = payload.relatedTarget as HTMLElement | null
           if (isPartOftheEditorUI(relatedTarget, rootEditor!.getRootElement()!)) {
             return false

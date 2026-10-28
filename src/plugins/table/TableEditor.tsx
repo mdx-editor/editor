@@ -60,7 +60,7 @@ import {
   usedLexicalNodes$
 } from '../core'
 import { useCellValues } from '@mdxeditor/gurx'
-import { createExtensionEditor, ensureEditorHistoryBaseline } from '../core/lexicalExtensions'
+import { createExtensionEditor, ensureEditorHistoryBaseline, isEditorHistoryRestoring } from '../core/lexicalExtensions'
 
 /**
  * Returns the element type for the cell based on the rowIndex
@@ -607,6 +607,7 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
       editor.registerCommand(
         BLUR_COMMAND,
         (payload) => {
+          if (isEditorHistoryRestoring(parentEditor)) return true
           const relatedTarget = payload.relatedTarget as HTMLElement | null
 
           if (isPartOftheEditorUI(relatedTarget, rootEditor!.getRootElement()!)) {
@@ -633,7 +634,7 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
         COMMAND_PRIORITY_EDITOR
       )
     )
-  }, [colIndex, editor, focus, rootEditor, rowIndex, save, saveAndFocus, setActiveCell])
+  }, [colIndex, editor, focus, parentEditor, rootEditor, rowIndex, save, saveAndFocus, setActiveCell])
 
   React.useEffect(() => {
     if (focus && editor) {
