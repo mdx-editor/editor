@@ -1,3 +1,4 @@
+import { readTableClipboard } from './tableClipboard'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary'
 import { LexicalExtensionEditorComposer } from '@lexical/react/LexicalExtensionEditorComposer'
@@ -12,9 +13,15 @@ import {
   $isRangeSelection,
   $isRootNode,
   BLUR_COMMAND,
+  HISTORY_PUSH_TAG,
+  PASTE_COMMAND,
+  SKIP_DOM_SELECTION_TAG,
+  HISTORIC_TAG,
+  CLEAR_HISTORY_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
   COMMAND_PRIORITY_EDITOR,
   COMMAND_PRIORITY_LOW,
+  COMMAND_PRIORITY_HIGH,
   DELETE_CHARACTER_COMMAND,
   DELETE_LINE_COMMAND,
   DELETE_WORD_COMMAND,
@@ -37,6 +44,7 @@ import * as RadixToolbar from '@radix-ui/react-toolbar'
 import classNames from 'classnames'
 import styles from '../../styles/ui.module.css'
 import { isPartOftheEditorUI } from '../../utils/isPartOftheEditorUI'
+import { isMdastEqualIgnoringPositions } from '../../utils/mdastEquality'
 import { uuidv4 } from '../../utils/uuid4'
 import {
   NESTED_EDITOR_UPDATED_COMMAND,
@@ -56,7 +64,7 @@ import {
   usedLexicalNodes$
 } from '../core'
 import { useCellValues } from '@mdxeditor/gurx'
-import { createExtensionEditor } from '../core/lexicalExtensions'
+import { createExtensionEditor, ensureEditorHistoryBaseline, isEditorHistoryRestoring } from '../core/lexicalExtensions'
 
 /**
  * Returns the element type for the cell based on the rowIndex
@@ -440,6 +448,7 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
   )
 
   const [editor, setEditor] = React.useState<LexicalEditorWithDispose | null>(null)
+  const replacedByPaste = React.useRef(false)
 
   React.useEffect(() => {
     const editor = createExtensionEditor({
@@ -468,8 +477,54 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Only a changed persisted source (e.g. parent Undo) replaces local content.
+  // Rerenders and saves of other cells must not discard uncommitted typing.
+  const persistedContents = React.useRef(contents)
+  React.useEffect(() => {
+    if (!editor || isMdastEqualIgnoringPositions(persistedContents.current, contents)) return
+    persistedContents.current = contents
+    const currentContents = editor
+      .getEditorState()
+      .read(
+        () =>
+          (
+            exportLexicalTreeToMdast({ root: $getRoot(), jsxComponentDescriptors, visitors: exportVisitors, jsxIsAvailable })
+              .children[0] as Mdast.Paragraph
+          ).children
+      )
+    if (isMdastEqualIgnoringPositions(currentContents, contents)) return
+    editor.update(
+      () => {
+        importMdastTreeToLexical({
+          root: $getRoot().clear(),
+          mdastRoot: { type: 'root', children: [{ type: 'paragraph', children: contents }] },
+          visitors: importVisitors,
+          jsxComponentDescriptors,
+          directiveDescriptors,
+          codeBlockEditorDescriptors,
+          defaultCodeBlockLanguage
+        })
+      },
+      { discrete: true, tag: [HISTORIC_TAG, SKIP_DOM_SELECTION_TAG] }
+    )
+    // The authoritative source replaced this cell, not its siblings. Its old
+    // local Undo/Redo states are no longer a valid baseline for subsequent edits.
+    editor.dispatchCommand(CLEAR_HISTORY_COMMAND, undefined)
+    ensureEditorHistoryBaseline(editor)
+  }, [
+    editor,
+    contents,
+    exportVisitors,
+    importVisitors,
+    jsxComponentDescriptors,
+    jsxIsAvailable,
+    directiveDescriptors,
+    codeBlockEditorDescriptors,
+    defaultCodeBlockLanguage
+  ])
+
   const save = React.useCallback(() => {
-    if (!editor) {
+    if (!editor || replacedByPaste.current) {
       return
     }
     editor.getEditorState().read(() => {
@@ -479,22 +534,70 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
         visitors: exportVisitors,
         jsxIsAvailable
       })
+      const nextContents = (mdast.children[0] as Mdast.Paragraph).children
+      const sourceContents = parentEditor
+        .getEditorState()
+        .read(() => $getTableNodeByKey(tableKey)?.getMdastNode().children[rowIndex]?.children[colIndex]?.children)
+      // A parent restore can commit before React reconciles the mounted editor.
+      // A queued blur must not write that editor's stale content back over it.
+      if (
+        !isMdastEqualIgnoringPositions(sourceContents, persistedContents.current) ||
+        isMdastEqualIgnoringPositions(sourceContents, nextContents)
+      )
+        return
+      ensureEditorHistoryBaseline(parentEditor)
       parentEditor.update(
         () => {
           const currentTable = $getTableNodeByKey(tableKey)
           if (!currentTable) {
             return
           }
-          currentTable.updateCellContents(colIndex, rowIndex, (mdast.children[0] as Mdast.Paragraph).children)
+          currentTable.updateCellContents(colIndex, rowIndex, nextContents)
+          persistedContents.current = nextContents
         },
-        { discrete: true }
+        { discrete: true, tag: SKIP_DOM_SELECTION_TAG }
       )
       parentEditor.dispatchCommand(NESTED_EDITOR_UPDATED_COMMAND, undefined)
     })
   }, [colIndex, editor, exportVisitors, jsxComponentDescriptors, jsxIsAvailable, parentEditor, rowIndex, tableKey])
 
+  React.useEffect(() => {
+    if (!editor) return
+    return editor.registerCommand(
+      PASTE_COMMAND,
+      (event) => {
+        if (!editor.isEditable() || !('clipboardData' in event) || !event.clipboardData) return false
+        const cells = readTableClipboard(event.clipboardData)
+        if (!cells) return false
+        event.preventDefault()
+        if (cells === 'rejected') return true
+        const canPaste = parentEditor.getEditorState().read(() => $getTableNodeByKey(tableKey)?.canPasteCells(colIndex, rowIndex, cells))
+        if (!canPaste) return true
+        // The shared core boundary preserves the current parent's baseline
+        // without inventing a second context step when an ancestor has it.
+        ensureEditorHistoryBaseline(parentEditor)
+        // Preserve pending text before the paste boundary. Replaced cells get
+        // fresh identities, so normal React mounting refreshes just that region.
+        save()
+        // A queued blur from this replaced editor must not overwrite the region.
+        replacedByPaste.current = true
+        parentEditor.update(
+          () => {
+            $getTableNodeByKey(tableKey)?.pasteCells(colIndex, rowIndex, cells)
+          },
+          { discrete: true, tag: [HISTORY_PUSH_TAG, SKIP_DOM_SELECTION_TAG] }
+        )
+        setActiveCell([colIndex, rowIndex])
+        parentEditor.dispatchCommand(NESTED_EDITOR_UPDATED_COMMAND, undefined)
+        return true
+      },
+      COMMAND_PRIORITY_HIGH
+    )
+  }, [editor, parentEditor, tableKey, colIndex, rowIndex, save, setActiveCell])
+
   const saveAndFocus = React.useCallback(
     (nextCell: [number, number] | null) => {
+      if (replacedByPaste.current) return
       save()
       setActiveCell(nextCell)
     },
@@ -544,6 +647,7 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
       editor.registerCommand(
         BLUR_COMMAND,
         (payload) => {
+          if (isEditorHistoryRestoring(parentEditor)) return true
           const relatedTarget = payload.relatedTarget as HTMLElement | null
 
           if (isPartOftheEditorUI(relatedTarget, rootEditor!.getRootElement()!)) {
@@ -570,7 +674,7 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
         COMMAND_PRIORITY_EDITOR
       )
     )
-  }, [colIndex, editor, focus, rootEditor, rowIndex, save, saveAndFocus, setActiveCell])
+  }, [colIndex, editor, focus, parentEditor, rootEditor, rowIndex, save, saveAndFocus, setActiveCell])
 
   React.useEffect(() => {
     if (focus && editor) {

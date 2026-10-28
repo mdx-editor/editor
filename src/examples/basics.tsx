@@ -234,6 +234,21 @@ export function Table() {
   )
 }
 
+/** Paste a standalone HTML table or a TSV grid into an existing cell. */
+export function TableRegionPaste() {
+  return (
+    <div>
+      <p>Copy an HTML table or a TSV grid with at least two rows and two columns, then paste into a cell below.</p>
+      <p>Focus outside the table to undo or redo the whole region. Undo inside a cell remains local to that cell.</p>
+      <p>HTML formatting is reduced to text, and merged cells become text in the top-left cell with empty covered cells.</p>
+      <MDXEditor
+        markdown={tableMarkdown + '\n\nOutside the table.'}
+        plugins={[tablePlugin(), toolbarPlugin({ toolbarContents: () => <UndoRedo /> })]}
+      />
+    </div>
+  )
+}
+
 export function Link() {
   return <MDXEditor markdown={'some [hello](https://google.com) link'} plugins={[linkPlugin()]} />
 }

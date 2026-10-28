@@ -2,7 +2,16 @@ import { getPeerDependencyFromEditor } from '@lexical/extension'
 import { HistoryExtension } from '@lexical/history'
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { Realm } from '@mdxeditor/gurx'
-import { $createParagraphNode, $createTextNode, $getRoot, $isParagraphNode, HISTORY_PUSH_TAG, type LexicalEditor } from 'lexical'
+import {
+  $createParagraphNode,
+  $createTextNode,
+  $getRoot,
+  $isParagraphNode,
+  HISTORY_PUSH_TAG,
+  CLEAR_HISTORY_COMMAND,
+  UNDO_COMMAND,
+  type LexicalEditor
+} from 'lexical'
 import React from 'react'
 import { describe, expect, it } from 'vitest'
 import { AdmonitionDirectiveDescriptor } from '../directive-editors/AdmonitionDirectiveDescriptor'
@@ -114,6 +123,40 @@ describe('UndoRedo lifecycle', () => {
     expect(redo()).toBeDisabled()
   })
 
+  it('ignores local child availability commands while the shared root toolbar is active', async () => {
+    const { realm, editor, edit } = renderConditionalToolbar()
+    edit()
+    const cell = createExtensionEditor({
+      name: 'cleared-cell',
+      namespace: 'cleared-cell',
+      nodes: [],
+      parentEditor: editor,
+      historyMode: 'table-local'
+    })
+    try {
+      act(() => {
+        realm.pub(activeEditor$, editor)
+      })
+      expect(undo()).toBeEnabled()
+      act(() => {
+        cell.dispatchCommand(CLEAR_HISTORY_COMMAND, undefined)
+      })
+      expect(undo()).toBeEnabled()
+      act(() => {
+        editor.dispatchCommand(UNDO_COMMAND, undefined)
+      })
+      await waitFor(() => {
+        expect(redo()).toBeEnabled()
+      })
+      act(() => {
+        cell.dispatchCommand(CLEAR_HISTORY_COMMAND, undefined)
+      })
+      expect(redo()).toBeEnabled()
+    } finally {
+      cell.dispose()
+    }
+  })
+
   it('reads the active editor history instead of retaining another editor availability', () => {
     const { realm, editor, edit } = renderConditionalToolbar()
     edit()
@@ -146,7 +189,7 @@ describe('nested editor saves', () => {
     ['directive', 'nested editor update', ':::info\nhello\n:::'],
     ['jsx', 'blur', '<Grid>\n  hello\n</Grid>'],
     ['jsx', 'nested editor update', '<Grid>\n  hello\n</Grid>']
-  ])('adds a root Undo step only when the %s content changed (%s)', async (_kind, trigger, markdown) => {
+  ])('exports changed %s content without a separate history step (%s)', async (_kind, trigger, markdown) => {
     let rootEditor!: LexicalEditor
     const ref = React.createRef<MDXEditorMethods>()
     const { container } = render(
@@ -208,7 +251,7 @@ describe('nested editor saves', () => {
     })
     const editedDepth = history.undoStack.length
     saveNested()
-    expect(history.undoStack).toHaveLength(editedDepth + 1)
+    expect(history.undoStack).toHaveLength(editedDepth)
     expect(ref.current!.getMarkdown()).toContain('hellox')
   })
 })

@@ -3,14 +3,20 @@ import { HistoryExtension, HistoryState, HistoryStateEntry, SharedHistoryExtensi
 import { ReactExtension } from '@lexical/react/ReactExtension'
 import { ReactProviderExtension } from '@lexical/react/ReactProviderExtension'
 import {
+  $getRoot,
+  SKIP_DOM_SELECTION_TAG,
   AnyLexicalExtensionArgument,
   CAN_REDO_COMMAND,
   CAN_UNDO_COMMAND,
   COMMAND_PRIORITY_LOW,
+  COMMAND_PRIORITY_HIGH,
+  UNDO_COMMAND,
+  REDO_COMMAND,
   configExtension,
   CreateEditorArgs,
   defineExtension,
   EditorThemeClasses,
+  EditorState,
   FOCUS_COMMAND,
   HISTORIC_TAG,
   InitialEditorStateType,
@@ -41,6 +47,8 @@ export interface ExtensionEditorConfig {
 const editorsWithSharedHistory = new WeakSet<LexicalEditor>()
 const editorHistoryStates = new WeakMap<LexicalEditor, HistoryState>()
 const extensionBuiltinNodes = new Set<unknown>([RootNode, TextNode, LineBreakNode, TabNode, ParagraphNode])
+const restoringHistories = new WeakSet<HistoryState>()
+const exportedHistoryEntries = new WeakMap<EditorState, HistoryStateEntry>()
 const meaningfulHistoryEntries = new WeakMap<HistoryState, HistoryStateEntry | null>()
 
 function externalHistoryExtension(historyState: HistoryState) {
@@ -125,7 +133,7 @@ export function createExtensionEditor({
   }
 
   const unregisterHistoryFocusGuard = editorHistoryState
-    ? editor.registerUpdateListener(({ dirtyElements, dirtyLeaves, tags }) => {
+    ? editor.registerUpdateListener(({ editorState, prevEditorState, dirtyElements, dirtyLeaves, tags }) => {
         const current = editorHistoryState.current
         if (tags.has(HISTORIC_TAG)) {
           meaningfulHistoryEntries.set(editorHistoryState, current)
@@ -138,6 +146,15 @@ export function createExtensionEditor({
         }
 
         const meaningfulEntry = meaningfulHistoryEntries.get(editorHistoryState)
+        const exportedEntry = exportedHistoryEntries.get(prevEditorState)
+        if (exportedEntry) exportedHistoryEntries.set(editorState, exportedEntry)
+        if (exportedEntry?.editor === meaningfulEntry?.editor && exportedEntry?.editorState === meaningfulEntry?.editorState) {
+          // This ancestor already contains that exact committed nested state.
+          // Its cached nested snapshots restore the same edit on Redo; another
+          // context boundary here would make the first Undo a no-op.
+          meaningfulHistoryEntries.set(editorHistoryState, current)
+          return
+        }
         if (current?.editor === editor && meaningfulEntry && meaningfulEntry.editor !== editor) {
           // registerHistory treats a selection-only focus update as a merge,
           // even when it switches editors. Preserve the previous editor's
@@ -154,6 +171,58 @@ export function createExtensionEditor({
       })
     : () => undefined
   const availabilityTimers = new Set<ReturnType<typeof setTimeout>>()
+  let restoresFocus = false
+  const preserveNestedFocus = (redo: boolean) => {
+    if (!editorHistoryState || restoringHistories.has(editorHistoryState)) return false
+    const target = (redo ? editorHistoryState.redoStack : editorHistoryState.undoStack).at(-1)?.editor.getRootElement()
+    const root = editor.getRootElement()
+    const focused = root?.ownerDocument.activeElement
+    if (
+      !target ||
+      !(focused instanceof HTMLElement) ||
+      focused === target ||
+      !root?.contains(focused) ||
+      focused.getAttribute('contenteditable') !== 'true'
+    )
+      return false
+    const selection = root.ownerDocument.defaultView?.getSelection()
+    const range =
+      selection?.rangeCount && focused.contains(selection.getRangeAt(0).commonAncestorContainer)
+        ? selection.getRangeAt(0).cloneRange()
+        : null
+    // Lexical restores the saved editor selection before update listeners run.
+    // Do not let that transient focus move commit an unrelated nested editor.
+    restoringHistories.add(editorHistoryState)
+    restoresFocus = true
+    const timer = setTimeout(() => {
+      availabilityTimers.delete(timer)
+      restoringHistories.delete(editorHistoryState)
+      restoresFocus = false
+      const active = root.ownerDocument.activeElement
+      if (!focused.isConnected || (active !== target && active !== focused)) return
+      focused.focus({ preventScroll: true })
+      if (range?.startContainer.isConnected && range.endContainer.isConnected) {
+        selection?.removeAllRanges()
+        selection?.addRange(range)
+      }
+    })
+    availabilityTimers.add(timer)
+    return false
+  }
+  const unregisterUndoFocus = editorHistoryState
+    ? editor.registerCommand(
+        UNDO_COMMAND,
+        (_, sourceEditor) => (sourceEditor === editor ? preserveNestedFocus(false) : false),
+        COMMAND_PRIORITY_HIGH
+      )
+    : () => undefined
+  const unregisterRedoFocus = editorHistoryState
+    ? editor.registerCommand(
+        REDO_COMMAND,
+        (_, sourceEditor) => (sourceEditor === editor ? preserveNestedFocus(true) : false),
+        COMMAND_PRIORITY_HIGH
+      )
+    : () => undefined
   const unregisterHistoryAvailability = editorHistoryState
     ? editor.registerCommand(
         FOCUS_COMMAND,
@@ -182,6 +251,9 @@ export function createExtensionEditor({
     disposed = true
     availabilityTimers.forEach(clearTimeout)
     availabilityTimers.clear()
+    if (restoresFocus && editorHistoryState) restoringHistories.delete(editorHistoryState)
+    unregisterUndoFocus()
+    unregisterRedoFocus()
     unregisterHistoryAvailability()
     unregisterHistoryFocusGuard()
     dispose()
@@ -201,4 +273,53 @@ export function editorHasSharedHistory(editor: LexicalEditor): boolean {
 /** @internal */
 export function editorUsesHistoryState(editor: LexicalEditor, historyState: HistoryState): boolean {
   return editorHistoryStates.get(editor) === historyState
+}
+
+/** @internal */
+export function editorsShareHistory(first: LexicalEditor, second: LexicalEditor): boolean {
+  const history = editorHistoryStates.get(first)
+  return history !== undefined && history === editorHistoryStates.get(second)
+}
+
+/** @internal */
+export function ensureEditorHistoryBaseline(editor: LexicalEditor): void {
+  const history = editorHistoryStates.get(editor)
+  if (history && history.current?.editor !== editor) {
+    const exported = history.current && exportedHistoryEntries.get(history.current.editorState)
+    if (
+      exported?.editor === editor &&
+      (exported.editorState === editor.getEditorState() ||
+        JSON.stringify(exported.editorState.toJSON()) === JSON.stringify(editor.getEditorState().toJSON()))
+    ) {
+      // The ancestor's committed snapshot already contains this exact child
+      // baseline, and downward reconciliation restores it without a context step.
+      return
+    }
+    // A programmatic edit may arrive before this editor has ever been focused.
+    // Let Lexical record its current state through a normal, content-preserving
+    // update; never assign to the shared history stacks or move the DOM caret.
+    editor.update(
+      () => {
+        $getRoot().markDirty()
+      },
+      { discrete: true, tag: SKIP_DOM_SELECTION_TAG }
+    )
+  }
+}
+
+/** @internal */
+export function recordEditorHistoryExport(source: LexicalEditor, parent: LexicalEditor): void {
+  const history = editorHistoryStates.get(source)
+  if (!history || history !== editorHistoryStates.get(parent) || !history.current) return
+  const current = history.current
+  const exported = exportedHistoryEntries.get(source.getEditorState())
+  if (current.editor === source || (exported?.editor === current.editor && exported.editorState === current.editorState)) {
+    exportedHistoryEntries.set(parent.getEditorState(), current)
+  }
+}
+
+/** @internal */
+export function isEditorHistoryRestoring(editor: LexicalEditor): boolean {
+  const history = editorHistoryStates.get(editor)
+  return history !== undefined && restoringHistories.has(history)
 }
