@@ -18,63 +18,78 @@ function rectangle(rows: Mdast.TableCell[][]): ClipboardRegion {
   return rows.map((row) => Array.from({ length: width }, (_, index) => row[index] ?? textCell()))
 }
 
-/** Parse spreadsheet TSV, including quoted tabs/newlines and doubled quotes. */
+/** Parse at least two TSV records with at least two fields each, including quotes. */
 function parseTSV(text: string): ClipboardRegion {
   const rows: Mdast.TableCell[][] = []
   let row: Mdast.TableCell[] = []
   let value = ''
   let quoted = false
   let closedQuote = false
-  let hasTab = false
+  let atFieldStart = true
   let endedRow = false
   let width = 0
+  let height = 0
+  let minimumWidth = Infinity
+  let rowWidth = 0
+  let oversized = text.length > MAX_SOURCE_LENGTH
+
+  function finishCell() {
+    rowWidth++
+    width = Math.max(width, rowWidth)
+    oversized ||= width > MAX_DIMENSION || height + 1 > MAX_DIMENSION || width * (height + 1) > MAX_TABLE_PASTE_CELLS
+    // Keep scanning the shape after reaching the allocation budget. A large
+    // single tabbed line still belongs to ordinary paste, not a rejected grid.
+    if (!oversized) row.push(textCell(value.replace(/\r\n?/g, '\n')))
+    value = ''
+    closedQuote = false
+    atFieldStart = true
+  }
+
+  function finishRow() {
+    finishCell()
+    minimumWidth = Math.min(minimumWidth, rowWidth)
+    height++
+    if (!oversized) rows.push(row)
+    row = []
+    rowWidth = 0
+  }
+
   for (let index = 0; index < text.length; index++) {
     const char = text[index]
     endedRow = false
     if (quoted) {
       if (char === '"') {
         if (text[index + 1] === '"') {
-          value += '"'
+          if (!oversized) value += '"'
           index++
         } else {
           quoted = false
           closedQuote = true
         }
-      } else {
+      } else if (!oversized) {
         value += char
       }
-    } else if (char === '\t' || char === '\n' || char === '\r') {
-      row.push(textCell(value.replace(/\r\n?/g, '\n')))
-      width = Math.max(width, row.length)
-      // Reject as soon as the eventual rectangle exceeds the allocation budget.
-      // An input below the source limit can still contain a million empty fields.
-      if (row.length > MAX_DIMENSION || width * (rows.length + 1) > MAX_TABLE_PASTE_CELLS) return text.includes('\t') ? 'rejected' : null
-      value = ''
-      closedQuote = false
-      if (char === '\t') {
-        hasTab = true
-      } else {
-        if (char === '\r' && text[index + 1] === '\n') index++
-        rows.push(row)
-        row = []
-        endedRow = true
-      }
-      if (rows.length > MAX_DIMENSION) return text.includes('\t') ? 'rejected' : null
+    } else if (char === '\t') {
+      finishCell()
+    } else if (char === '\n' || char === '\r') {
+      if (char === '\r' && text[index + 1] === '\n') index++
+      finishRow()
+      endedRow = true
     } else if (closedQuote) {
       return null
-    } else if (char === '"' && value === '') {
+    } else if (char === '"' && atFieldStart) {
       quoted = true
+      atFieldStart = false
     } else {
-      value += char
+      if (!oversized) value += char
+      atFieldStart = false
     }
   }
-  if (quoted || !hasTab) return null
+  if (quoted) return null
   // One final record separator terminates the last row; it does not add a new row.
-  if (!endedRow) {
-    row.push(textCell(value.replace(/\r\n?/g, '\n')))
-    rows.push(row)
-  }
-  return rectangle(rows)
+  if (!endedRow) finishRow()
+  if (height < 2 || minimumWidth < 2) return null
+  return oversized ? 'rejected' : rectangle(rows)
 }
 
 function standaloneTable(document: Document): HTMLTableElement | null {
@@ -156,13 +171,13 @@ export function readTableClipboard(data: Pick<DataTransfer, 'getData'>): Clipboa
   const text = data.getData('text/plain')
   const htmlRegion = html.length <= MAX_SOURCE_LENGTH ? parseHTML(html) : /<table[\s/>]/i.test(html) ? 'rejected' : null
   if (Array.isArray(htmlRegion)) return htmlRegion
-  const textRegion = text.length <= MAX_SOURCE_LENGTH ? parseTSV(text) : text.includes('\t') ? 'rejected' : null
+  const textRegion = parseTSV(text)
   if (Array.isArray(textRegion)) return textRegion
   return htmlRegion === 'rejected' || textRegion === 'rejected' ? 'rejected' : null
 }
 
 /**
- * Read a standalone HTML table or tab-delimited spreadsheet region. Ordinary text
+ * Read a standalone HTML table or TSV region of at least 2×2 cells. Ordinary text
  * (including multiline prose) and rejected regions return null.
  * HTML formatting is intentionally downgraded to text; merged-cell coverage is empty.
  */

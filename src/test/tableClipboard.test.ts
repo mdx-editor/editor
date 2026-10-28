@@ -23,13 +23,49 @@ describe('table clipboard regions', () => {
     }
   })
 
+  it('leaves tabbed non-grids and one-dimensional snippets to ordinary paste', () => {
+    for (const text of [
+      '\t',
+      '\tindented',
+      '\treturn value;\n',
+      'one\ttwo\tthree',
+      'one\ttwo\r\n',
+      'one\ntwo\nthree',
+      'if (ready) {\n\trun()\n}',
+      'one\ttwo\n\n',
+      'one\ttwo\nthree',
+      '"one\ttwo"\n"three\tfour"',
+      '"line one\nline two"\tsecond cell',
+      '\t'.repeat(1001),
+      'x'.repeat(1000000) + '\t',
+      '"' + 'x'.repeat(1000000) + '\nquoted newline"\tsecond cell'
+    ]) {
+      expect(readTableClipboard(clipboard(text))).toBeNull()
+    }
+  })
+
+  it('counts quoted newlines as cell content, not extra grid rows', () => {
+    expect(values('"line one\nline two"\tsecond\nthird\tfourth')).toEqual([
+      ['line one\nline two', 'second'],
+      ['third', 'fourth']
+    ])
+  })
+
+  it('rejects excessive source length only after recognizing a grid', () => {
+    expect(readTableClipboard(clipboard('x'.repeat(1000000) + '\ty\nz\tw'))).toBe('rejected')
+    expect(readTableClipboard(clipboard('"' + 'x'.repeat(1000000) + '\tinside"\n"also\tquoted"'))).toBeNull()
+  })
+
   it('parses TSV and pads ragged rows without losing trailing empty cells', () => {
     expect(values('a\tb\t\r\nc\td\r\n')).toEqual([
       ['a', 'b', ''],
       ['c', 'd', '']
     ])
-    expect(values('\t')).toEqual([['', '']])
-    expect(values('a\tb\n\n')).toEqual([
+    expect(values('\t\n\t')).toEqual([
+      ['', ''],
+      ['', '']
+    ])
+    expect(values('a\tb\n\t\n')).toEqual([
       ['a', 'b'],
       ['', '']
     ])
@@ -43,7 +79,7 @@ describe('table clipboard regions', () => {
   })
 
   it('round-trips quoted multiline cells and Markdown punctuation through GFM', () => {
-    const rows = parseTableClipboard(clipboard('"line 1\nline 2"\t"a|b *literal*"'))!
+    const rows = parseTableClipboard(clipboard('"line 1\nline 2"\t"a|b *literal*"\nsecond\trow'))!
     const table: Mdast.Table = { type: 'table', children: rows.map((children) => ({ type: 'tableRow', children })) }
     const markdown = toMarkdown(table, { extensions: [gfmTableToMarkdown()] })
     const result = fromMarkdown(markdown, { extensions: [gfmTable()], mdastExtensions: [gfmTableFromMarkdown()] })
@@ -94,8 +130,11 @@ describe('table clipboard regions', () => {
   })
 
   it('normalizes HTML whitespace while preserving plain TSV whitespace', () => {
-    const plain = '  alpha  beta  \t tail '
-    expect(values(plain)).toEqual([['  alpha  beta  ', ' tail ']])
+    const plain = '  alpha  beta  \t tail \nsecond\t row '
+    expect(values(plain)).toEqual([
+      ['  alpha  beta  ', ' tail '],
+      ['second', ' row ']
+    ])
     expect(values(plain, '<table><tr><td>  alpha&nbsp; beta  </td><td><div> tail </div></td></tr></table>')).toEqual([
       ['alpha beta', 'tail']
     ])
@@ -125,7 +164,10 @@ describe('table clipboard regions', () => {
       '<table><tr><td>A</td></tr></table><table><tr><td>B</td></tr></table>'
     ]) {
       expect(parseTableClipboard(clipboard('ordinary', html))).toBeNull()
-      expect(values('a\tb', html)).toEqual([['a', 'b']])
+      expect(values('a\tb\nc\td', html)).toEqual([
+        ['a', 'b'],
+        ['c', 'd']
+      ])
     }
   })
 
@@ -182,11 +224,15 @@ describe('table clipboard regions', () => {
     const oversizedHTML = '<table>' + '<tr><td colspan="1000">A</td></tr>'.repeat(11) + '</table>'
     expect(readTableClipboard(clipboard('', oversizedHTML))).toBe('rejected')
     expect(readTableClipboard(clipboard('', '<table/>' + ' '.repeat(1000000)))).toBe('rejected')
-    expect(readTableClipboard(clipboard(Array(1002).fill('x').join('\t')))).toBe('rejected')
-    expect(readTableClipboard(clipboard('line\n'.repeat(1001) + 'x\ty'))).toBe('rejected')
+    expect(readTableClipboard(clipboard(Array(1002).fill('x').join('\t') + '\nx\ty'))).toBe('rejected')
+    expect(readTableClipboard(clipboard('line\tvalue\n'.repeat(1001) + 'x\ty'))).toBe('rejected')
+    expect(readTableClipboard(clipboard('line\n'.repeat(1001) + 'x\ty'))).toBeNull()
     expect(readTableClipboard(clipboard('ordinary prose'))).toBeNull()
     expect(readTableClipboard(clipboard('line\n'.repeat(1001)))).toBeNull()
-    expect(values('safe\tfallback', oversizedHTML)).toEqual([['safe', 'fallback']])
+    expect(values('safe\tfallback\nsecond\trow', oversizedHTML)).toEqual([
+      ['safe', 'fallback'],
+      ['second', 'row']
+    ])
     expect(values(Array(1002).fill('x').join('\t'), '<table><tr><td>safe</td></tr></table>')).toEqual([['safe']])
   })
 

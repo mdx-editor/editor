@@ -1,13 +1,13 @@
 import { act, fireEvent, render, waitFor } from '@testing-library/react'
 import {
-  BLUR_COMMAND,
   HISTORY_PUSH_TAG,
-  $createParagraphNode,
+  BLUR_COMMAND,
   $createTextNode,
   $getRoot,
   PASTE_COMMAND,
   REDO_COMMAND,
   UNDO_COMMAND,
+  COMMAND_PRIORITY_LOW,
   type LexicalEditor
 } from 'lexical'
 import React from 'react'
@@ -16,6 +16,12 @@ import { MDXEditor, type MDXEditorMethods } from '../MDXEditor'
 import { tablePlugin, TableNode } from '../plugins/table'
 import { toolbarPlugin } from '../plugins/toolbar'
 import { UndoRedo } from '../plugins/toolbar/components/UndoRedo'
+import { directivesPlugin } from '../plugins/directives'
+import { AdmonitionDirectiveDescriptor } from '../directive-editors/AdmonitionDirectiveDescriptor'
+import { jsxPlugin } from '../plugins/jsx'
+import { GenericJsxEditor } from '../jsx-editors/GenericJsxEditor'
+import { getPeerDependencyFromEditor } from '@lexical/extension'
+import { HistoryExtension } from '@lexical/history'
 
 const rangeRectDescriptor = Object.getOwnPropertyDescriptor(Range.prototype, 'getBoundingClientRect')
 beforeAll(() => {
@@ -34,14 +40,24 @@ afterAll(() => {
 async function setup(markdown = '| a | b |\n| - | - |\n| c | d |') {
   const ref = React.createRef<MDXEditorMethods>()
   const view = render(
-    <MDXEditor ref={ref} markdown={markdown} plugins={[tablePlugin(), toolbarPlugin({ toolbarContents: () => <UndoRedo /> })]} />
+    <MDXEditor
+      ref={ref}
+      markdown={markdown}
+      plugins={[
+        tablePlugin(),
+        directivesPlugin({ directiveDescriptors: [AdmonitionDirectiveDescriptor] }),
+        jsxPlugin({ jsxComponentDescriptors: [{ name: 'Box', kind: 'flow', props: [], hasChildren: true, Editor: GenericJsxEditor }] }),
+        toolbarPlugin({ toolbarContents: () => <UndoRedo /> })
+      ]}
+    />
   )
   const cells = () => Array.from(view.container.querySelectorAll<HTMLElement>('tbody [contenteditable="true"]'))
   await waitFor(() => {
     expect(cells().length).toBeGreaterThanOrEqual(4)
   })
   const editor = (index: number) => (cells()[index] as HTMLElement & { __lexicalEditor: LexicalEditor }).__lexicalEditor
-  return { ...view, ref, cells, editor }
+  const parent = editor(0)._parentEditor!
+  return { ...view, ref, cells, editor, parent }
 }
 function paste(editor: LexicalEditor, plain: string, html = '') {
   const event = new ClipboardEvent('paste', { cancelable: true })
@@ -58,204 +74,177 @@ function paste(editor: LexicalEditor, plain: string, html = '') {
   return event
 }
 
+function history(editor: LexicalEditor) {
+  return getPeerDependencyFromEditor<typeof HistoryExtension>(editor, HistoryExtension.name)!.output.historyState.value
+}
+
+function command(editor: LexicalEditor, redo = false) {
+  act(() => {
+    editor.dispatchCommand(redo ? REDO_COMMAND : UNDO_COMMAND, undefined)
+  })
+}
+
+function type(editor: LexicalEditor, text: string) {
+  act(() => {
+    editor.update(
+      () => {
+        $getRoot().selectEnd()
+      },
+      { discrete: true }
+    )
+    editor.update(
+      () => {
+        $getRoot().getLastDescendant()!.insertAfter($createTextNode(text))
+      },
+      { discrete: true, tag: HISTORY_PUSH_TAG }
+    )
+  })
+}
+
 describe('table region paste', () => {
-  it('overwrites from the active cell, grows right and down, preserves blanks, and undoes/redoes once', async () => {
-    const { cells, editor, ref } = await setup()
-    act(() => {
-      cells()[3].focus()
-    })
+  it('records expansion and blanks as one parent undo/redo step without routing cell commands', async () => {
+    const { cells, editor, ref, parent } = await setup()
+    const before = ref.current!.getMarkdown()
     const event = paste(editor(3), 'x\t\ny\tz')
     expect(event.defaultPrevented).toBe(true)
     await waitFor(() => {
       expect(cells()).toHaveLength(9)
     })
-    expect(cells().map((cell) => cell.textContent)).toEqual(['a', 'b', '', 'c', 'x', '', '', 'y', 'z'])
-    expect(cells()[4].closest('td')).toHaveAttribute('data-active', 'true')
-    expect(ref.current!.getMarkdown()).toContain('x')
-    act(() => {
-      editor(4).dispatchCommand(UNDO_COMMAND, undefined)
-    })
+    const expected = ['a', 'b', '', 'c', 'x', '', '', 'y', 'z']
+    expect(cells().map((cell) => cell.textContent)).toEqual(expected)
+    const pasted = ref.current!.getMarkdown()
+    expect(history(parent).undoStack).toHaveLength(1)
+    command(editor(4))
+    expect(ref.current!.getMarkdown()).toBe(pasted)
+    command(parent)
     await waitFor(() => {
       expect(cells().map((cell) => cell.textContent)).toEqual(['a', 'b', 'c', 'd'])
     })
-    act(() => {
-      editor(3).dispatchCommand(REDO_COMMAND, undefined)
-    })
+    expect(ref.current!.getMarkdown()).toBe(before)
+    command(parent, true)
     await waitFor(() => {
-      expect(cells()).toHaveLength(9)
+      expect(cells().map((cell) => cell.textContent)).toEqual(expected)
     })
-    expect(cells().map((cell) => cell.textContent)).toEqual(['a', 'b', '', 'c', 'x', '', '', 'y', 'z'])
+    expect(ref.current!.getMarkdown()).toBe(pasted)
   })
 
   it.each([
     { name: 'HTML', plain: '', html: '<table>' + '<tr><td colspan="1000">A</td></tr>'.repeat(11) + '</table>' },
-    { name: 'TSV', plain: Array(1002).fill('x').join('\t'), html: '' }
-  ])('consumes oversized $name regions instead of falling through to cell paste', async ({ plain, html }) => {
+    { name: 'TSV', plain: Array(1002).fill('x').join('\t') + '\nx\ty', html: '' }
+  ])('consumes oversized $name grids without modifying the table', async ({ plain, html }) => {
     const { cells, editor, ref } = await setup()
     const before = ref.current!.getMarkdown()
-    act(() => {
-      cells()[2].focus()
-      editor(2).update(
-        () => {
-          $getRoot().selectEnd()
-        },
-        { discrete: true }
-      )
-    })
-    const event = paste(editor(2), plain, html)
-    await act(async () => {
-      await Promise.resolve()
-    })
-    expect(event.defaultPrevented).toBe(true)
-    expect(
-      editor(2)
-        .getEditorState()
-        .read(() =>
-          $getRoot()
-            .getChildren()
-            .map((node) => node.getType())
-        )
-    ).toEqual(['paragraph'])
+    expect(paste(editor(2), plain, html).defaultPrevented).toBe(true)
     expect(ref.current!.getMarkdown()).toBe(before)
     expect(cells().map((cell) => cell.textContent)).toEqual(['a', 'b', 'c', 'd'])
-    expect(
-      editor(2)
-        .getEditorState()
-        .read(() => $getRoot().getTextContent())
-    ).toBe('c')
-    expect(cells()).toHaveLength(4)
   })
 
-  it('keeps focus in a surviving cell when Undo removes the newly focused expansion cell', async () => {
-    const { cells, editor } = await setup()
-    act(() => {
-      cells()[3].focus()
-    })
-    paste(editor(3), 'x\t\ny\tz')
-    await waitFor(() => {
-      expect(cells()).toHaveLength(9)
-    })
-    act(() => {
-      cells()[8].focus()
-    })
-    expect(cells()[8]).toHaveFocus()
-    act(() => {
-      editor(8).dispatchCommand(UNDO_COMMAND, undefined)
-    })
-    await waitFor(() => {
-      expect(cells().map((cell) => cell.textContent)).toEqual(['a', 'b', 'c', 'd'])
-      expect(cells()[3].closest('td')).toHaveAttribute('data-active', 'true')
-      expect(cells().filter((cell) => cell.closest('[data-active="true"]'))).toHaveLength(1)
-    })
-    act(() => {
-      editor(3).dispatchCommand(REDO_COMMAND, undefined)
-    })
-    await waitFor(() => {
-      expect(cells()).toHaveLength(9)
-      expect(cells()[4].closest('td')).toHaveAttribute('data-active', 'true')
-    })
-  })
-
-  it('clears a rectangle with empty HTML cells and restores content and focus on Undo', async () => {
-    const { cells, editor } = await setup()
-    act(() => {
-      cells()[0].focus()
-    })
+  it('clears cells with an empty HTML table and restores them from the parent', async () => {
+    const { cells, editor, parent } = await setup()
     paste(editor(0), 'wrong\tfallback', '<table><tr><td></td><td><br></td></tr><tr><td>&nbsp;</td><td> </td></tr></table>')
     await waitFor(() => {
       expect(cells().map((cell) => cell.textContent)).toEqual(['', '', '', ''])
-      expect(cells()[0].closest('th')).toHaveAttribute('data-active', 'true')
     })
-    act(() => {
-      editor(0).dispatchCommand(UNDO_COMMAND, undefined)
-    })
+    command(parent)
     await waitFor(() => {
       expect(cells().map((cell) => cell.textContent)).toEqual(['a', 'b', 'c', 'd'])
-      expect(cells()[0].closest('th')).toHaveAttribute('data-active', 'true')
     })
-    act(() => {
-      editor(0).dispatchCommand(REDO_COMMAND, undefined)
-    })
+    command(parent, true)
     await waitFor(() => {
       expect(cells().map((cell) => cell.textContent)).toEqual(['', '', '', ''])
-      expect(cells()[0].closest('th')).toHaveAttribute('data-active', 'true')
     })
   })
 
-  it('restores unsaved cell text on Undo and ignores a stale blur after paste', async () => {
-    const { cells, editor } = await setup()
-    act(() => {
-      cells()[2].focus()
+  it('accepts a one-cell HTML table, but not one-row TSV', async () => {
+    const { cells, editor, parent } = await setup()
+    paste(editor(2), '', '<table><tr><td>one</td></tr></table>')
+    await waitFor(() => {
+      expect(cells().map((cell) => cell.textContent)).toEqual(['a', 'b', 'one', 'd'])
     })
-    const oldElement = cells()[2]
-    const oldEditor = editor(2)
-    act(() => {
-      oldEditor.update(
-        () => {
-          $getRoot().getLastDescendant()!.insertAfter($createTextNode(' typed'))
-        },
-        { discrete: true }
-      )
+    command(parent)
+    await waitFor(() => {
+      expect(cells().map((cell) => cell.textContent)).toEqual(['a', 'b', 'c', 'd'])
     })
-    paste(oldEditor, 'x\ty')
+  })
+
+  it.each(['root', 'directive', 'jsx', 'multilevel'])('restores pending %s cell text with one parent undo of the paste', async (kind) => {
+    const table = '| a | b |\n| - | - |\n| c | d |'
+    const markdown =
+      kind === 'root'
+        ? table
+        : kind === 'directive'
+          ? `:::note\n${table}\n:::`
+          : kind === 'jsx'
+            ? `<Box>\n\n${table}\n\n</Box>`
+            : `:::note\n<Box>\n\n${table}\n\n</Box>\n:::`
+    const { cells, editor, parent } = await setup(markdown)
+    type(editor(2), ' typed')
+    paste(editor(2), 'x\ty\nz\tw')
     await waitFor(() => {
       expect(cells()[2].textContent).toBe('x')
     })
-    act(() => {
-      fireEvent.blur(oldElement, { relatedTarget: null })
-    })
-    expect(cells()[2].textContent).toBe('x')
-    act(() => {
-      editor(2).dispatchCommand(UNDO_COMMAND, undefined)
-    })
+    command(parent)
     await waitFor(() => {
-      expect(cells()[2].textContent).toBe('c typed')
+      expect(cells().map((cell) => cell.textContent)).toEqual(['a', 'b', 'c typed', 'd'])
     })
   })
 
-  it('keeps repeated pastes as separate Undo steps and roundtrips Markdown', async () => {
-    const { cells, editor, ref } = await setup()
-    paste(editor(2), 'first\trow')
+  it('keeps repeated pastes as separate parent steps and round-trips Markdown', async () => {
+    const { cells, editor, parent, ref } = await setup()
+    paste(editor(2), 'first\trow\nlower\trow')
     await waitFor(() => {
       expect(cells()[2].textContent).toBe('first')
     })
-    paste(editor(2), 'second\trow')
+    paste(editor(2), 'second\trow\nlast\trow')
     await waitFor(() => {
       expect(cells()[2].textContent).toBe('second')
     })
-    act(() => {
-      editor(2).dispatchCommand(UNDO_COMMAND, undefined)
-    })
+    command(parent)
     await waitFor(() => {
       expect(cells()[2].textContent).toBe('first')
     })
-    act(() => {
-      editor(2).dispatchCommand(UNDO_COMMAND, undefined)
-    })
+    command(parent)
     await waitFor(() => {
       expect(cells()[2].textContent).toBe('c')
     })
-    act(() => {
-      editor(2).dispatchCommand(REDO_COMMAND, undefined)
-    })
+    command(parent, true)
     await waitFor(() => {
       expect(cells()[2].textContent).toBe('first')
     })
     const markdown = ref.current!.getMarkdown()
     act(() => {
+      ref.current!.setMarkdown('replacement')
+    })
+    act(() => {
       ref.current!.setMarkdown(markdown)
     })
     await waitFor(() => {
-      expect(cells().map((cell) => cell.textContent)).toEqual(['a', 'b', 'first', 'row'])
+      expect(cells().map((cell) => cell.textContent)).toEqual(['a', 'b', 'first', 'row', 'lower', 'row'])
     })
   })
+
+  it.each([' plain', '\tindented', 'one\ttwo\tthree', 'first\nsecond', 'if (ready) {\n\trun()\n}'])(
+    'leaves non-grid clipboard text to the normal paste handler: %j',
+    async (plain) => {
+      const { cells, editor, ref } = await setup()
+      const before = ref.current!.getMarkdown()
+      const fallback = vi.fn(() => true)
+      const unregister = editor(2).registerCommand(PASTE_COMMAND, fallback, COMMAND_PRIORITY_LOW)
+      const event = paste(editor(2), plain)
+      expect(fallback).toHaveBeenCalledOnce()
+      expect(event.defaultPrevented).toBe(false)
+      expect(ref.current!.getMarkdown()).toBe(before)
+      expect(cells().map((cell) => cell.textContent)).toEqual(['a', 'b', 'c', 'd'])
+      unregister()
+    }
+  )
 
   it('keeps ordinary text paste in the current cell', async () => {
     const { cells, editor } = await setup()
     act(() => {
       editor(2).update(
         () => {
-          $getRoot().getLastChildOrThrow().selectEnd()
+          $getRoot().selectEnd()
         },
         { discrete: true }
       )
@@ -267,32 +256,8 @@ describe('table region paste', () => {
     expect(cells()).toHaveLength(4)
   })
 
-  it('exposes parent paste history to the focused cell toolbar', async () => {
-    const { cells, editor, getByRole } = await setup()
-    paste(editor(2), 'x\ty')
-    await waitFor(() => {
-      expect(cells()[2].textContent).toBe('x')
-    })
-    fireEvent.focus(cells()[2])
-    await waitFor(() => {
-      expect(getByRole('radio', { name: /Undo/ })).toBeEnabled()
-    })
-    fireEvent.click(getByRole('radio', { name: /Undo/ }))
-    await waitFor(() => {
-      expect(cells()[2].textContent).toBe('c')
-    })
-    fireEvent.focus(cells()[2])
-    await waitFor(() => {
-      expect(getByRole('radio', { name: /Redo/ })).toBeEnabled()
-    })
-    fireEvent.click(getByRole('radio', { name: /Redo/ }))
-    await waitFor(() => {
-      expect(cells()[2].textContent).toBe('x')
-    })
-  })
-
-  it('ignores an actual retained blur callback from a replaced editor', async () => {
-    const { cells, editor } = await setup()
+  it('ignores a late blur from the cell replaced by the paste', async () => {
+    const { cells, editor, ref } = await setup()
     const oldEditor = editor(2)
     const register = oldEditor.registerCommand.bind(oldEditor)
     let retainedBlur: ((event: FocusEvent) => boolean) | undefined
@@ -305,315 +270,143 @@ describe('table region paste', () => {
       expect(retainedBlur).toBeDefined()
     })
     spy.mockRestore()
-    paste(oldEditor, 'new\tregion')
+    paste(oldEditor, 'x\ty\nz\tw')
     await waitFor(() => {
-      expect(cells()[2].textContent).toBe('new')
+      expect(cells()[2].textContent).toBe('x')
     })
+    const pasted = ref.current!.getMarkdown()
     act(() => {
       retainedBlur!(new FocusEvent('blur', { relatedTarget: null }))
     })
-    expect(cells()[2].textContent).toBe('new')
-    expect(cells()[2].closest('td')).toHaveAttribute('data-active', 'true')
+    expect(ref.current!.getMarkdown()).toBe(pasted)
+    expect(cells()[2].textContent).toBe('x')
   })
 
-  it('rejects oversized destination before saving pending cell edits', async () => {
-    const { cells, editor, ref } = await setup()
-    act(() => {
-      editor(2).update(
-        () => {
-          $getRoot().getLastDescendant()!.insertAfter($createTextNode(' pending'))
-        },
-        { discrete: true }
-      )
-    })
+  it('rejects an oversized destination before saving pending text', async () => {
+    const { cells, editor, ref, parent } = await setup()
+    type(editor(2), ' pending')
     const before = ref.current!.getMarkdown()
-    const limit = vi.spyOn(TableNode.prototype, 'canPasteCells').mockReturnValue(false)
+    const canPaste = vi.spyOn(TableNode.prototype, 'canPasteCells').mockReturnValue(false)
     try {
-      expect(paste(editor(2), 'x\ty').defaultPrevented).toBe(true)
-      expect(cells()[2].textContent).toBe('c pending')
-      expect(ref.current!.getMarkdown()).toBe(before)
+      expect(paste(editor(2), 'x\ty\nz\tw').defaultPrevented).toBe(true)
     } finally {
-      limit.mockRestore()
+      canPaste.mockRestore()
     }
+    expect(ref.current!.getMarkdown()).toBe(before)
+    expect(history(parent).undoStack).toHaveLength(0)
+    expect(cells()[2].textContent).toBe('c pending')
   })
 
-  it('keeps local typing undo, then committed edits and paste undo in order', async () => {
-    const { cells, editor } = await setup()
-    paste(editor(2), 'x\ty')
+  it('preserves local typing undo/redo in an untouched cell across parent paste undo/redo', async () => {
+    const { cells, editor, parent, ref } = await setup()
+    paste(editor(2), 'x\ty\nz\tw')
     await waitFor(() => {
       expect(cells()[2].textContent).toBe('x')
     })
-    act(() => {
-      editor(2).update(
-        () => {
-          $getRoot().getLastChildOrThrow().selectEnd()
-        },
-        { discrete: true }
-      )
-    })
-    act(() => {
-      editor(2).update(
-        () => {
-          $getRoot().getLastDescendant()!.insertAfter($createTextNode(' new'))
-        },
-        { discrete: true }
-      )
-    })
-    act(() => {
-      editor(2).dispatchCommand(UNDO_COMMAND, undefined)
-    })
+    const untouched = editor(0)
+    type(untouched, ' local')
+    command(untouched)
     await waitFor(() => {
-      expect(cells()[2].textContent).toBe('x')
+      expect(cells()[0].textContent).toBe('a')
     })
-    act(() => {
-      editor(2).dispatchCommand(REDO_COMMAND, undefined)
-    })
-    await waitFor(() => {
-      expect(cells()[2].textContent).toBe('x new')
-    })
-    fireEvent.blur(cells()[2], { relatedTarget: null })
-    act(() => {
-      editor(2).dispatchCommand(UNDO_COMMAND, undefined)
-    })
-    await waitFor(() => {
-      expect(cells()[2].textContent).toBe('x')
-    })
-    act(() => {
-      editor(2).dispatchCommand(UNDO_COMMAND, undefined)
-    })
+    command(parent)
     await waitFor(() => {
       expect(cells()[2].textContent).toBe('c')
     })
-    act(() => {
-      editor(2).dispatchCommand(REDO_COMMAND, undefined)
-    })
+    command(untouched, true)
     await waitFor(() => {
-      expect(cells()[2].textContent).toBe('x')
-    })
-    act(() => {
-      editor(2).dispatchCommand(REDO_COMMAND, undefined)
-    })
-    await waitFor(() => {
-      expect(cells()[2].textContent).toBe('x new')
-    })
-  })
-
-  it('uses standalone HTML table content rather than the plain fallback', async () => {
-    const { cells, editor } = await setup()
-    act(() => {
-      cells()[0].focus()
-    })
-    paste(editor(0), 'wrong\tdata', '<table><tr><td>one</td><td></td></tr><tr><td>two</td><td>three</td></tr></table>')
-    await waitFor(() => {
-      expect(cells().map((cell) => cell.textContent)).toEqual(['one', '', 'two', 'three'])
-    })
-  })
-  it('undo from untouched cell undoes last region paste before older typing', async () => {
-    const { cells, editor } = await setup()
-    act(() => {
-      editor(0).update(
-        () => {
-          $getRoot().getLastChildOrThrow().selectEnd()
-        },
-        { discrete: true }
-      )
-    })
-    act(() => {
-      editor(0).update(
-        () => {
-          $getRoot().getLastDescendant()!.insertAfter($createTextNode(' old'))
-        },
-        { discrete: true }
-      )
-    })
-    fireEvent.blur(cells()[0], { relatedTarget: null })
-    await waitFor(() => {
-      expect(cells()[0].textContent).toBe('a old')
-    })
-    paste(editor(2), 'x\ty')
-    await waitFor(() => {
-      expect(cells()[2].textContent).toBe('x')
-    })
-    act(() => {
-      editor(0).dispatchCommand(UNDO_COMMAND, undefined)
-    })
-    await waitFor(() => {
-      expect(cells().map((c) => c.textContent)).toEqual(['a old', 'b', 'c', 'd'])
-    })
-    act(() => {
-      editor(0).dispatchCommand(UNDO_COMMAND, undefined)
-    })
-    await waitFor(() => {
-      expect(cells().map((c) => c.textContent)).toEqual(['a', 'b', 'c', 'd'])
-    })
-    act(() => {
-      editor(0).dispatchCommand(REDO_COMMAND, undefined)
-    })
-    await waitFor(() => {
-      expect(cells().map((c) => c.textContent)).toEqual(['a old', 'b', 'c', 'd'])
-    })
-    act(() => {
-      editor(0).dispatchCommand(REDO_COMMAND, undefined)
-    })
-    await waitFor(() => {
-      expect(cells().map((c) => c.textContent)).toEqual(['a old', 'b', 'x', 'y'])
-    })
-  })
-  it('keeps ordinary cell undo local even when the parent has older history', async () => {
-    const { cells, editor, getByRole } = await setup()
-    const parent = editor(0)._parentEditor!
-    act(() => {
-      parent.update(
-        () => {
-          $getRoot().selectEnd()
-        },
-        { discrete: true }
-      )
-    })
-    act(() => {
-      parent.update(
-        () => {
-          $getRoot().append($createParagraphNode().append($createTextNode('root edit')))
-        },
-        { discrete: true, tag: HISTORY_PUSH_TAG }
-      )
-    })
-    act(() => {
-      cells()[0].focus()
-      editor(0).update(
-        () => {
-          $getRoot().selectEnd()
-        },
-        { discrete: true }
-      )
-    })
-    act(() => {
-      editor(0).update(
-        () => {
-          $getRoot().getLastDescendant()!.insertAfter($createTextNode(' local'))
-        },
-        { discrete: true, tag: HISTORY_PUSH_TAG }
-      )
-    })
-    act(() => {
-      editor(0).dispatchCommand(UNDO_COMMAND, undefined)
-    })
-    await waitFor(() => {
-      expect(cells()[0]).toHaveTextContent('a')
-    })
-    await waitFor(() => {
-      expect(getByRole('radio', { name: /Undo/ })).toBeDisabled()
-    })
-    act(() => {
-      editor(0).dispatchCommand(UNDO_COMMAND, undefined)
-    })
-    expect(parent.getEditorState().read(() => $getRoot().getTextContent())).toContain('root edit')
-    act(() => {
-      editor(0).dispatchCommand(REDO_COMMAND, undefined)
-    })
-    await waitFor(() => {
-      expect(cells()[0]).toHaveTextContent('a local')
-    })
-  })
-
-  it('retains paste routing through a parent selection-only history merge', async () => {
-    const { cells, editor } = await setup()
-    paste(editor(2), 'x\ty')
-    await waitFor(() => {
-      expect(cells()[2]).toHaveTextContent('x')
-    })
-    const parent = editor(2)._parentEditor!
-    act(() => {
-      parent.update(
-        () => {
-          $getRoot().selectEnd()
-        },
-        { discrete: true }
-      )
-    })
-    act(() => {
-      editor(2).dispatchCommand(UNDO_COMMAND, undefined)
-    })
-    await waitFor(() => {
-      expect(cells()[2]).toHaveTextContent('c')
-    })
-    act(() => {
-      editor(2).dispatchCommand(REDO_COMMAND, undefined)
-    })
-    await waitFor(() => {
-      expect(cells()[2]).toHaveTextContent('x')
-    })
-  })
-
-  it('does not route paste history through another table or an unrelated root edit', async () => {
-    const { cells, editor } = await setup('| a | b |\n| - | - |\n| c | d |\n\nBetween\n\n| e | f |\n| - | - |\n| g | h |')
-    await waitFor(() => {
-      expect(cells()).toHaveLength(8)
-    })
-    paste(editor(2), 'x\ty')
-    await waitFor(() => {
-      expect(cells()[2]).toHaveTextContent('x')
-    })
-    act(() => {
-      editor(6).dispatchCommand(UNDO_COMMAND, undefined)
-    })
-    expect(cells()[2]).toHaveTextContent('x')
-    const parent = editor(2)._parentEditor!
-    act(() => {
-      parent.update(
-        () => {
-          $getRoot().append($createParagraphNode().append($createTextNode('root edit')))
-        },
-        { discrete: true, tag: HISTORY_PUSH_TAG }
-      )
-    })
-    act(() => {
-      editor(2).dispatchCommand(UNDO_COMMAND, undefined)
-    })
-    expect(parent.getEditorState().read(() => $getRoot().getTextContent())).toContain('root edit')
-    expect(cells()[2]).toHaveTextContent('x')
-  })
-
-  it('a new branch after undoing paste does not retain parent routing', async () => {
-    const { cells, editor, getByRole } = await setup()
-    paste(editor(2), 'x\ty')
-    await waitFor(() => {
-      expect(cells()[2].textContent).toBe('x')
-    })
-    act(() => {
-      editor(2).dispatchCommand(UNDO_COMMAND, undefined)
-    })
-    await waitFor(() => {
-      expect(cells()[2].textContent).toBe('c')
-    })
-    const parent = editor(0)._parentEditor!
-    act(() => {
-      parent.update(
-        () => {
-          $getRoot().getLastChildOrThrow().selectEnd()
-        },
-        { discrete: true }
-      )
-    })
-    act(() => {
-      parent.update(
-        () => {
-          $getRoot().append($createParagraphNode().append($createTextNode('NEWBRANCH')))
-        },
-        { discrete: true }
-      )
-    })
-    fireEvent.focus(cells()[0])
-    fireEvent.focus(cells()[2])
-    await waitFor(() => {
-      expect(getByRole('radio', { name: /Redo/ })).toBeDisabled()
-    })
-    await waitFor(() => {
-      expect(getByRole('radio', { name: /Undo/ })).toBeDisabled()
-    })
-    act(() => {
-      editor(2).dispatchCommand(REDO_COMMAND, undefined)
+      expect(cells()[0].textContent).toBe('a local')
     })
     expect(cells()[2].textContent).toBe('c')
+    expect(ref.current!.getMarkdown()).not.toContain('x')
+    command(parent, true)
+    await waitFor(() => {
+      expect(cells()[2].textContent).toBe('x')
+    })
+    expect(cells()[0].textContent).toBe('a local')
+    expect(editor(0)).toBe(untouched)
+  })
+
+  it.each(['directive', 'jsx', 'multilevel'])(
+    'pastes in an actual %s table and restores the whole region from parent history',
+    async (kind) => {
+      const table = '| a | b |\n| - | - |\n| c | d |'
+      const markdown =
+        kind === 'directive'
+          ? `:::note\n${table}\n:::`
+          : kind === 'jsx'
+            ? `<Box>\n\n${table}\n\n</Box>`
+            : `:::note\n<Box>\n\n${table}\n\n</Box>\n:::`
+      const { cells, editor, parent, ref } = await setup(markdown)
+      expect(parent._parentEditor).not.toBeNull()
+      const before = ref.current!.getMarkdown()
+      paste(editor(2), 'x\ty\nz\tw')
+      await waitFor(() => {
+        expect(cells()[2].textContent).toBe('x')
+        expect(ref.current!.getMarkdown()).toContain('x')
+      })
+      const pasted = ref.current!.getMarkdown()
+      const pasteUndoEntries = history(parent).undoStack.length
+      command(parent)
+      await waitFor(() => {
+        expect(history(parent).redoStack).toHaveLength(1)
+      })
+      const afterUndo = { cells: cells().map((cell) => cell.textContent), markdown: ref.current!.getMarkdown() }
+      command(parent, true)
+      await waitFor(() => {
+        expect(cells()[2].textContent).toBe('x')
+        expect(ref.current!.getMarkdown()).toBe(pasted)
+      })
+      // An outward export must not add a separate undo step at any depth.
+      expect({ pasteUndoEntries, afterUndo }).toEqual({
+        pasteUndoEntries: 1,
+        afterUndo: { cells: ['a', 'b', 'c', 'd'], markdown: before }
+      })
+    }
+  )
+  it.each(['directive', 'jsx', 'multilevel'])('keeps repeated %s pastes and root focus as two logical steps', async (kind) => {
+    const table = '| a | b |\n| - | - |\n| c | d |'
+    const markdown =
+      kind === 'directive'
+        ? `:::note\n${table}\n:::`
+        : kind === 'jsx'
+          ? `<Box>\n\n${table}\n\n</Box>`
+          : `:::note\n<Box>\n\n${table}\n\n</Box>\n:::`
+    const { cells, editor, parent, ref } = await setup(markdown)
+    let root = parent
+    while (root._parentEditor) root = root._parentEditor
+    const before = ref.current!.getMarkdown()
+    for (const value of ['first', 'second']) {
+      paste(editor(2), `${value}\trow\nlower\trow`)
+      await waitFor(() => {
+        expect(cells()[2].textContent).toBe(value)
+      })
+      act(() => {
+        root.update(
+          () => {
+            $getRoot().selectEnd()
+          },
+          { discrete: true }
+        )
+      })
+    }
+    expect(history(root).undoStack).toHaveLength(2)
+    command(root)
+    await waitFor(() => {
+      expect(cells()[2].textContent).toBe('first')
+    })
+    command(root)
+    await waitFor(() => {
+      expect(cells().map((cell) => cell.textContent)).toEqual(['a', 'b', 'c', 'd'])
+    })
+    expect(ref.current!.getMarkdown()).toBe(before)
+    command(root, true)
+    await waitFor(() => {
+      expect(cells()[2].textContent).toBe('first')
+    })
+    command(root, true)
+    await waitFor(() => {
+      expect(cells()[2].textContent).toBe('second')
+    })
   })
 })
