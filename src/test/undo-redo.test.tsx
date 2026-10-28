@@ -146,7 +146,7 @@ describe('nested editor saves', () => {
     ['directive', 'nested editor update', ':::info\nhello\n:::'],
     ['jsx', 'blur', '<Grid>\n  hello\n</Grid>'],
     ['jsx', 'nested editor update', '<Grid>\n  hello\n</Grid>']
-  ])('adds a root Undo step only when the %s content changed (%s)', async (_kind, trigger, markdown) => {
+  ])('exports changed %s content without a separate history step (%s)', async (_kind, trigger, markdown) => {
     let rootEditor!: LexicalEditor
     const ref = React.createRef<MDXEditorMethods>()
     const { container } = render(
@@ -208,7 +208,7 @@ describe('nested editor saves', () => {
     })
     const editedDepth = history.undoStack.length
     saveNested()
-    expect(history.undoStack).toHaveLength(editedDepth + 1)
+    expect(history.undoStack).toHaveLength(editedDepth)
     expect(ref.current!.getMarkdown()).toContain('hellox')
   })
 })
