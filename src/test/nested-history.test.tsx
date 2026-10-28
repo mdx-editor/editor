@@ -1,6 +1,7 @@
 import { act, fireEvent, render, waitFor } from '@testing-library/react'
 import {
   HISTORY_PUSH_TAG,
+  COMMAND_PRIORITY_LOW,
   BLUR_COMMAND,
   $createTextNode,
   $createParagraphNode,
@@ -20,6 +21,7 @@ import { UndoRedo } from '../plugins/toolbar/components/UndoRedo'
 import { directivesPlugin } from '../plugins/directives'
 import { AdmonitionDirectiveDescriptor } from '../directive-editors/AdmonitionDirectiveDescriptor'
 import { jsxPlugin } from '../plugins/jsx'
+import { isEditorHistoryRestoring } from '../plugins/core/lexicalExtensions'
 import { useMdastNodeUpdater } from '../plugins/core/NestedLexicalEditor'
 import { GenericJsxEditor } from '../jsx-editors/GenericJsxEditor'
 import { getPeerDependencyFromEditor } from '@lexical/extension'
@@ -387,5 +389,61 @@ describe('nested editor committed history', () => {
     await waitFor(() => {
       expect(cells()[2].textContent).toBe('c one two')
     })
+  })
+  it('does not commit a focused sibling when parent Redo transiently restores root focus', async () => {
+    const { cells, editor, root } = await setup(cases[3].markdown)
+    type(editor(2), ' committed')
+    blur(editor(2))
+    act(() => {
+      root.update(
+        () => {
+          $getRoot().selectEnd()
+        },
+        { discrete: true }
+      )
+    })
+    const sibling = editor(0)
+    type(sibling, ' pending')
+    cells()[0].tabIndex = 0
+    root.getRootElement()!.tabIndex = 0
+    act(() => {
+      cells()[0].focus()
+    })
+    command(root)
+    await waitFor(() => {
+      expect(cells()[2].textContent).toBe('c')
+      expect(cells()[0]).toHaveFocus()
+    })
+    // Model the DOM focus/blur that native setEditorState produces before its
+    // update listeners run; the browser suite exercises the native sequence.
+    const unregister = root.registerCommand(
+      REDO_COMMAND,
+      () => {
+        root.getRootElement()!.focus()
+        sibling.dispatchCommand(BLUR_COMMAND, new FocusEvent('blur', { relatedTarget: root.getRootElement() }))
+        return false
+      },
+      COMMAND_PRIORITY_LOW
+    )
+    command(root, true)
+    unregister()
+    await waitFor(() => {
+      expect(cells()[2].textContent).toBe('c committed')
+      expect(cells()[0].textContent).toBe('a pending')
+      expect(cells()[0]).toHaveFocus()
+    })
+    expect(editor(0)).toBe(sibling)
+  })
+  it('does not mark root history as restoring for a cell-local Undo', async () => {
+    const { cells, editor, root } = await setup()
+    type(editor(2), ' committed')
+    blur(editor(2))
+    type(editor(0), ' local')
+    cells()[0].tabIndex = 0
+    act(() => {
+      cells()[0].focus()
+    })
+    command(editor(0))
+    expect(isEditorHistoryRestoring(root)).toBe(false)
   })
 })

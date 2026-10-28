@@ -9,6 +9,9 @@ import {
   CAN_REDO_COMMAND,
   CAN_UNDO_COMMAND,
   COMMAND_PRIORITY_LOW,
+  COMMAND_PRIORITY_HIGH,
+  UNDO_COMMAND,
+  REDO_COMMAND,
   configExtension,
   CreateEditorArgs,
   defineExtension,
@@ -44,6 +47,7 @@ export interface ExtensionEditorConfig {
 const editorsWithSharedHistory = new WeakSet<LexicalEditor>()
 const editorHistoryStates = new WeakMap<LexicalEditor, HistoryState>()
 const extensionBuiltinNodes = new Set<unknown>([RootNode, TextNode, LineBreakNode, TabNode, ParagraphNode])
+const restoringHistories = new WeakSet<HistoryState>()
 const exportedHistoryEntries = new WeakMap<EditorState, HistoryStateEntry>()
 const meaningfulHistoryEntries = new WeakMap<HistoryState, HistoryStateEntry | null>()
 
@@ -167,6 +171,58 @@ export function createExtensionEditor({
       })
     : () => undefined
   const availabilityTimers = new Set<ReturnType<typeof setTimeout>>()
+  let restoresFocus = false
+  const preserveNestedFocus = (redo: boolean) => {
+    if (!editorHistoryState || restoringHistories.has(editorHistoryState)) return false
+    const target = (redo ? editorHistoryState.redoStack : editorHistoryState.undoStack).at(-1)?.editor.getRootElement()
+    const root = editor.getRootElement()
+    const focused = root?.ownerDocument.activeElement
+    if (
+      !target ||
+      !(focused instanceof HTMLElement) ||
+      focused === target ||
+      !root?.contains(focused) ||
+      focused.getAttribute('contenteditable') !== 'true'
+    )
+      return false
+    const selection = root.ownerDocument.defaultView?.getSelection()
+    const range =
+      selection?.rangeCount && focused.contains(selection.getRangeAt(0).commonAncestorContainer)
+        ? selection.getRangeAt(0).cloneRange()
+        : null
+    // Lexical restores the saved editor selection before update listeners run.
+    // Do not let that transient focus move commit an unrelated nested editor.
+    restoringHistories.add(editorHistoryState)
+    restoresFocus = true
+    const timer = setTimeout(() => {
+      availabilityTimers.delete(timer)
+      restoringHistories.delete(editorHistoryState)
+      restoresFocus = false
+      const active = root.ownerDocument.activeElement
+      if (!focused.isConnected || (active !== target && active !== focused)) return
+      focused.focus({ preventScroll: true })
+      if (range?.startContainer.isConnected && range.endContainer.isConnected) {
+        selection?.removeAllRanges()
+        selection?.addRange(range)
+      }
+    })
+    availabilityTimers.add(timer)
+    return false
+  }
+  const unregisterUndoFocus = editorHistoryState
+    ? editor.registerCommand(
+        UNDO_COMMAND,
+        (_, sourceEditor) => (sourceEditor === editor ? preserveNestedFocus(false) : false),
+        COMMAND_PRIORITY_HIGH
+      )
+    : () => undefined
+  const unregisterRedoFocus = editorHistoryState
+    ? editor.registerCommand(
+        REDO_COMMAND,
+        (_, sourceEditor) => (sourceEditor === editor ? preserveNestedFocus(true) : false),
+        COMMAND_PRIORITY_HIGH
+      )
+    : () => undefined
   const unregisterHistoryAvailability = editorHistoryState
     ? editor.registerCommand(
         FOCUS_COMMAND,
@@ -195,6 +251,9 @@ export function createExtensionEditor({
     disposed = true
     availabilityTimers.forEach(clearTimeout)
     availabilityTimers.clear()
+    if (restoresFocus && editorHistoryState) restoringHistories.delete(editorHistoryState)
+    unregisterUndoFocus()
+    unregisterRedoFocus()
     unregisterHistoryAvailability()
     unregisterHistoryFocusGuard()
     dispose()
@@ -257,4 +316,10 @@ export function recordEditorHistoryExport(source: LexicalEditor, parent: Lexical
   if (current.editor === source || (exported?.editor === current.editor && exported.editorState === current.editorState)) {
     exportedHistoryEntries.set(parent.getEditorState(), current)
   }
+}
+
+/** @internal */
+export function isEditorHistoryRestoring(editor: LexicalEditor): boolean {
+  const history = editorHistoryStates.get(editor)
+  return history !== undefined && restoringHistories.has(history)
 }

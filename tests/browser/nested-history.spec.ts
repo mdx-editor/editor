@@ -61,4 +61,6 @@ test('parent Undo keeps unsaved sibling content, focus, caret and local history 
   await page.getByRole('button', { name: 'Parent Redo', exact: true }).click()
   await expect(cells.nth(2)).toHaveText('c committed')
   await expect(cells.nth(0)).toHaveText('a pending')
+  await expect(cells.nth(0)).toBeFocused()
+  expect(await cells.nth(0).evaluate(() => window.getSelection()!.anchorOffset)).toBe(caret)
 })

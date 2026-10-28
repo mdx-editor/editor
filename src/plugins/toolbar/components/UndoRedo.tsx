@@ -5,6 +5,7 @@ import { useCellValues } from '@mdxeditor/gurx'
 import { CAN_REDO_COMMAND, CAN_UNDO_COMMAND, COMMAND_PRIORITY_CRITICAL, REDO_COMMAND, UNDO_COMMAND } from 'lexical'
 import React from 'react'
 import { IS_APPLE } from '../../../utils/detectMac'
+import { editorsShareHistory } from '../../core/lexicalExtensions'
 import { activeEditor$, iconComponentFor$, useTranslation } from '../../core'
 import { MultipleChoiceToggleGroup } from '.././primitives/toolbar'
 
@@ -31,7 +32,8 @@ export const UndoRedo: React.FC = () => {
       return mergeRegister(
         activeEditor.registerCommand<boolean>(
           CAN_UNDO_COMMAND,
-          (payload) => {
+          (payload, sourceEditor) => {
+            if (sourceEditor !== activeEditor && !editorsShareHistory(sourceEditor, activeEditor)) return false
             setCanUndo(payload)
             return false
           },
@@ -39,7 +41,8 @@ export const UndoRedo: React.FC = () => {
         ),
         activeEditor.registerCommand<boolean>(
           CAN_REDO_COMMAND,
-          (payload) => {
+          (payload, sourceEditor) => {
+            if (sourceEditor !== activeEditor && !editorsShareHistory(sourceEditor, activeEditor)) return false
             setCanRedo(payload)
             return false
           },
