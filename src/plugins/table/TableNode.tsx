@@ -13,6 +13,7 @@ import React, { JSX } from 'react'
 import { noop } from '../../utils/fp'
 import { isMdastEqualIgnoringPositions } from '../../utils/mdastEquality'
 import { TableEditor } from './TableEditor'
+import { MAX_TABLE_PASTE_CELLS } from './tableClipboard'
 import { TableCell, TableRow } from 'mdast-util-gfm-table/lib'
 
 /**
@@ -148,6 +149,43 @@ export class TableNode extends DecoratorNode<JSX.Element> {
     const rowClone = { ...row, children: cellsClone }
     cellsClone[colIndex] = cellClone
     table.children[rowIndex] = rowClone
+  }
+
+  /** @internal */
+  canPasteCells(colIndex: number, rowIndex: number, cells: Mdast.TableCell[][]): boolean {
+    if (!Number.isInteger(colIndex) || !Number.isInteger(rowIndex) || colIndex < 0 || rowIndex < 0) return false
+    const width = cells[0]?.length ?? 0
+    if (!width || !cells.every((row) => row.length === width)) return false
+    const table = this.getLatest()
+    const targetWidth = Math.max(table.getColCount(), colIndex + width)
+    const targetHeight = Math.max(table.getRowCount(), rowIndex + cells.length)
+    return targetWidth * targetHeight <= MAX_TABLE_PASTE_CELLS
+  }
+
+  /** @internal */
+  pasteCells(colIndex: number, rowIndex: number, cells: Mdast.TableCell[][]): void {
+    // Bound the destination, not just the clipboard: a narrow/tall paste into
+    // a wide/short table can otherwise allocate a huge rectangle.
+    if (!this.canPasteCells(colIndex, rowIndex, cells)) return
+    const table = this.getWritable().__mdastNode
+    const width = Math.max(this.getColCount(), colIndex + cells[0].length)
+    const height = Math.max(table.children.length, rowIndex + cells.length)
+    while (table.children.length < height) {
+      table.children.push({ type: 'tableRow', children: [] })
+    }
+    for (const row of table.children) {
+      while (row.children.length < width) row.children.push(structuredClone(EMPTY_CELL))
+    }
+    if (table.align) {
+      while (table.align.length < width) table.align.push(null)
+    }
+    cells.forEach((row, y) => {
+      row.forEach((cell, x) => {
+        // New identities remount replaced cell editors, including their local
+        // history. Undo restores the previous cells from the parent snapshot.
+        table.children[rowIndex + y].children[colIndex + x] = structuredClone(cell)
+      })
+    })
   }
 
   insertColumnAt(colIndex: number): void {
