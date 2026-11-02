@@ -120,6 +120,18 @@ describe('imports from nested MDAST subtrees', () => {
     expect(result.children[0]).toMatchObject({ children: [existingImport, jsx('Alias')] })
   })
 
+  it('does not import a component that directive content declares with export', () => {
+    const children = parsedMdx('export const Existing = () => null\n\n<Existing />')
+    const result = exportNodes(() => [admonition(children)], [descriptor('*', '@fallback')])
+    expect(importValues(result)).toEqual([])
+  })
+
+  it('ignores import provenance that no longer matches a renamed component', () => {
+    const stale = { source: '@old', defaultExport: false, kind: 'named' as const, importedName: 'Old', localName: 'Old' }
+    const result = exportNodes(() => [$createLexicalJsxNode(jsx('New'), stale)], [descriptor('New', '@new')])
+    expect(importValues(result)).toEqual(["import { New } from '@new'"])
+  })
+
   it.each([true, false])('exports Lexical fragments and their children (addImportStatements: %s)', (addImportStatements) => {
     const fragment = jsx(null, [jsx('Fresh'), jsx(null, [jsx('Other')])])
     const result = exportNodes(() => [$createLexicalJsxNode(fragment)], [descriptor('*', '@components')], addImportStatements)
@@ -148,7 +160,7 @@ describe('imports from nested MDAST subtrees', () => {
 
   it('uses a Unicode-aware identifier guard in root, JSX-child, directive and table paths', () => {
     const invalid = ['UI.Badge', 'my-element', 'svg', 'foo', 'img']
-    const valid = ['Äpfel', 'A\u0308pfel']
+    const valid = ['Äpfel', 'A\u0308pfel', '组件']
     const names = [...valid, ...invalid]
     const placements: (() => LexicalNode[])[] = [
       () => names.map((name) => $createLexicalJsxNode(jsx(name))),
@@ -177,7 +189,7 @@ describe('imports from nested MDAST subtrees', () => {
     ]
     for (const createNodes of placements) {
       expect(importValues(exportNodes(createNodes, [descriptor('*', '@components')]))).toEqual([
-        "import { Äpfel, A\u0308pfel } from '@components'"
+        "import { Äpfel, A\u0308pfel, 组件 } from '@components'"
       ])
     }
   })

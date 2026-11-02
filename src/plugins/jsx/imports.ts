@@ -55,6 +55,17 @@ export function getImportSpecifiers(node: MdxjsEsm): ComponentImport[] {
   })
 }
 
+export function getDeclaredExports(node: MdxjsEsm): string[] {
+  return (node.data?.estree?.body ?? []).flatMap((statement) => {
+    if (statement.type !== 'ExportNamedDeclaration' || !statement.declaration) return []
+    const declaration = statement.declaration
+    if (declaration.type === 'VariableDeclaration') {
+      return declaration.declarations.flatMap((declarator) => (declarator.id.type === 'Identifier' ? [declarator.id.name] : []))
+    }
+    return [declaration.id.name]
+  })
+}
+
 function quote(value: string): string {
   return `'${JSON.stringify(value).slice(1, -1).replace(/'/g, "\\'")}'`
 }

@@ -9,6 +9,7 @@ import {
   type ComponentImport,
   createImportDeclaration,
   getComponentImport,
+  getDeclaredExports,
   getImportSpecifier,
   getImportSpecifiers
 } from './plugins/jsx/imports'
@@ -133,7 +134,7 @@ export function exportLexicalTreeToMdast({
   function registerReferredComponent(componentName: string | null, importStatement?: ImportStatement) {
     if (
       componentName === null ||
-      (!getImportSpecifier(importStatement) && !/^[\p{Lu}\p{Lt}_$][\p{ID_Continue}$\u200C\u200D]*$/u.test(componentName))
+      (!getImportSpecifier(importStatement) && !/^(?!\p{Ll})[\p{ID_Start}_$][\p{ID_Continue}$\u200C\u200D]*$/u.test(componentName))
     ) {
       return
     }
@@ -224,6 +225,8 @@ export function exportLexicalTreeToMdast({
   const collectPreservedImports = (node: Mdast.Nodes) => {
     if (node.type === 'mdxjsEsm') {
       for (const specifier of getImportSpecifiers(node)) preservedImports.add(specifier.localName)
+      // MDX hoists nested ESM, so a component declared in a directive must not be imported as well.
+      for (const name of getDeclaredExports(node)) preservedImports.add(name)
     }
     if ('children' in node) node.children.forEach(collectPreservedImports)
   }
@@ -252,8 +255,12 @@ export function exportLexicalTreeToMdast({
   // contain unused imports or exports). Local nested declarations stay in place.
   const usedImports = new Map<string, ComponentImport>()
   for (const componentName of referredComponents) {
-    const original = knownImportSources.get(componentName)
-    const specifier = getImportSpecifier(original)
+    const known = knownImportSources.get(componentName)
+    const knownSpecifier = getImportSpecifier(known)
+    // A custom editor can rename a component while its node keeps the old import.
+    const stale = knownSpecifier !== undefined && knownSpecifier.localName !== componentName.split('.')[0]
+    const original = stale ? undefined : known
+    const specifier = stale ? undefined : knownSpecifier
     const localName = specifier?.localName ?? componentName
     if (preservedImports.has(localName) || usedImports.has(localName)) continue
     if (!addImportStatements && (!original || specifier?.inherited)) continue
