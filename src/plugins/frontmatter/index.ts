@@ -1,4 +1,5 @@
 import { realmPlugin } from '../../RealmWithPlugins'
+import { ComponentType } from 'react'
 import {
   addExportVisitor$,
   addImportVisitor$,
@@ -25,7 +26,15 @@ import { frontmatter } from 'micromark-extension-frontmatter'
 import { $createFrontmatterNode, $isFrontmatterNode, FrontmatterNode } from './FrontmatterNode'
 import { LexicalFrontmatterVisitor } from './LexicalFrontmatterVisitor'
 import { MdastFrontmatterVisitor } from './MdastFrontmatterVisitor'
+import { FrontmatterEditor, FrontmatterEditorProps } from './FrontmatterEditor'
 export * from './FrontmatterNode'
+export { FrontmatterEditor, type FrontmatterEditorProps } from './FrontmatterEditor'
+
+/**
+ * The component used to edit frontmatter. Defaults to the key-value form.
+ * @group Frontmatter
+ */
+export const frontmatterEditor$ = Cell<ComponentType<FrontmatterEditorProps>>(FrontmatterEditor)
 
 /**
  * Whether the frontmatter dialog is open.
@@ -88,9 +97,13 @@ export const hasFrontmatter$ = Cell(false, (r) => {
  * A plugin that adds support for frontmatter.
  * @group Frontmatter
  */
-export const frontmatterPlugin = realmPlugin({
-  init: (realm) => {
+export const frontmatterPlugin = realmPlugin<{
+  /** Overrides the default key-value form. */
+  FrontmatterEditor?: ComponentType<FrontmatterEditorProps>
+}>({
+  init: (realm, params) => {
     realm.pubIn({
+      [frontmatterEditor$]: params?.FrontmatterEditor ?? FrontmatterEditor,
       [addMdastExtension$]: frontmatterFromMarkdown('yaml'),
       [addSyntaxExtension$]: frontmatter(),
       [addLexicalNode$]: FrontmatterNode,
@@ -148,5 +161,8 @@ export const frontmatterPlugin = realmPlugin({
         )
       }
     })
+  },
+  update: (realm, params) => {
+    realm.pub(frontmatterEditor$, params?.FrontmatterEditor ?? FrontmatterEditor)
   }
 })

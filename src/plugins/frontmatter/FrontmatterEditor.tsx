@@ -8,14 +8,30 @@ import styles from '../../styles/ui.module.css'
 import { editorRootElementRef$, iconComponentFor$, readOnly$, useTranslation } from '../core'
 import { useCellValues, usePublisher } from '@mdxeditor/gurx'
 
-type YamlConfig = { key: string; value: string }[]
+type YamlConfig = { key: string; value: unknown }[]
 
+/**
+ * Props passed to the frontmatter editor component.
+ * @group Frontmatter
+ */
 export interface FrontmatterEditorProps {
+  /** The frontmatter contents, without the enclosing `---` delimiters. */
   yaml: string
+  /** Replaces the frontmatter contents, without the enclosing `---` delimiters. */
   onChange: (yaml: string) => void
 }
 
+/**
+ * The default key-value frontmatter editor.
+ * @group Frontmatter
+ */
 export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) => {
+  const [frontmatterDialogOpen] = useCellValues(frontmatterDialogOpen$)
+  // Mount a fresh form on reopen, and when external edits replace the YAML.
+  return frontmatterDialogOpen ? <FrontmatterForm key={yaml} yaml={yaml} onChange={onChange} /> : null
+}
+
+const FrontmatterForm = ({ yaml, onChange }: FrontmatterEditorProps) => {
   const [readOnly, editorRootElementRef, iconComponentFor, frontmatterDialogOpen] = useCellValues(
     readOnly$,
     editorRootElementRef$,
@@ -25,11 +41,31 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
   const t = useTranslation()
   const setFrontmatterDialogOpen = usePublisher(frontmatterDialogOpen$)
   const removeFrontmatter = usePublisher(removeFrontmatter$)
-  const yamlConfig = React.useMemo<YamlConfig>(() => {
-    if (!yaml) {
-      return []
+  const { yamlConfig, invalid } = React.useMemo(() => {
+    try {
+      const value: unknown = YamlParser.load(yaml, {
+        schema: YamlParser.CORE_SCHEMA,
+        listener: (event, state) => {
+          // Do not round existing large integers while saving unrelated fields.
+          if (
+            event === 'close' &&
+            typeof state.result === 'number' &&
+            Number.isInteger(state.result) &&
+            !Number.isSafeInteger(state.result)
+          ) {
+            throw new Error('Unsafe integer')
+          }
+        }
+      })
+      if (value === undefined) return { yamlConfig: [], invalid: false }
+      if (value === null || typeof value !== 'object' || Array.isArray(value)) return { yamlConfig: [], invalid: true }
+      // The form library clones defaults recursively; recursive aliases cannot
+      // safely become form values. Leave their original source untouched.
+      JSON.stringify(value)
+      return { yamlConfig: Object.entries(value as Record<string, unknown>).map(([key, value]) => ({ key, value })), invalid: false }
+    } catch {
+      return { yamlConfig: [], invalid: true }
     }
-    return Object.entries(YamlParser.load(yaml) as Record<string, string>).map(([key, value]) => ({ key, value }))
   }, [yaml])
 
   const { register, control, handleSubmit } = useForm({
@@ -42,24 +78,32 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
     control,
     name: 'yamlConfig'
   })
+  // Field-array operations refresh item.value from the current form. Keep the
+  // initial YAML value by stable row identity so edits can still be reverted.
+  const originalValues = React.useRef(new Map<string, unknown>())
 
   const onSubmit = React.useCallback(
-    ({ yamlConfig }: { yamlConfig: YamlConfig }) => {
-      if (yamlConfig.length === 0) {
+    ({ yamlConfig: updatedConfig }: { yamlConfig: YamlConfig }) => {
+      if (readOnly || invalid) return
+      // Compare values, not just dirty fields: edit-then-revert must preserve
+      // comments, quoting and whitespace just like an untouched Save.
+      const options = { schema: YamlParser.CORE_SCHEMA }
+      // Form defaults are cloned, so alias identity must not count as an edit.
+      const comparisonOptions = { ...options, noRefs: true }
+      if (YamlParser.dump(updatedConfig, comparisonOptions) === YamlParser.dump(yamlConfig, comparisonOptions)) {
+        setFrontmatterDialogOpen(false)
+        return
+      }
+      if (updatedConfig.length === 0) {
         removeFrontmatter()
         setFrontmatterDialogOpen(false)
         return
       }
-      const yaml = yamlConfig.reduce<Record<string, string>>((acc, { key, value }) => {
-        if (key && value) {
-          acc[key] = value
-        }
-        return acc
-      }, {})
-      onChange(YamlParser.dump(yaml).trim())
+      const yaml = Object.fromEntries(updatedConfig.filter(({ key }) => key).map(({ key, value }) => [key, value] as const))
+      onChange(YamlParser.dump(yaml, options).trimEnd())
       setFrontmatterDialogOpen(false)
     },
-    [onChange, setFrontmatterDialogOpen, removeFrontmatter]
+    [onChange, setFrontmatterDialogOpen, removeFrontmatter, yamlConfig, readOnly, invalid]
   )
 
   return (
@@ -87,6 +131,14 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
                 setFrontmatterDialogOpen(false)
               }}
             >
+              {invalid && (
+                <p role="alert">
+                  {t(
+                    'frontmatterEditor.invalidYaml',
+                    'This frontmatter cannot be edited as key-value fields. Edit the Markdown source instead.'
+                  )}
+                </p>
+              )}
               <table className={styles.propertyEditorTable}>
                 <colgroup>
                   <col />
@@ -102,13 +154,38 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
                 </thead>
                 <tbody>
                   {fields.map((item, index) => {
+                    if (!originalValues.current.has(item.id)) originalValues.current.set(item.id, item.value)
+                    const original = originalValues.current.get(item.id)
                     return (
                       <tr key={item.id}>
                         <td>
-                          <TableInput {...register(`yamlConfig.${index}.key`, { required: true })} autofocusIfEmpty readOnly={readOnly} />
+                          <TableInput
+                            {...register(`yamlConfig.${index}.key`, { required: true })}
+                            aria-label={t('frontmatterEditor.key', 'Key')}
+                            autofocusIfEmpty
+                            readOnly={readOnly}
+                          />
                         </td>
                         <td>
-                          <TableInput {...register(`yamlConfig.${index}.value`, { required: true })} readOnly={readOnly} />
+                          <TableInput
+                            {...register(`yamlConfig.${index}.value`, {
+                              // Text inputs stringify their values. Restore the original
+                              // YAML type if a field is unchanged or edited then reverted.
+                              setValueAs: (value: unknown) => {
+                                if (
+                                  original === null ||
+                                  typeof original === 'string' ||
+                                  typeof original === 'number' ||
+                                  typeof original === 'boolean'
+                                ) {
+                                  return value === String(original ?? '') ? original : value
+                                }
+                                return original
+                              }
+                            })}
+                            aria-label={t('frontmatterEditor.value', 'Value')}
+                            readOnly={readOnly || (typeof original === 'object' && original !== null)}
+                          />
                         </td>
                         <td>
                           <button
@@ -130,7 +207,7 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
                   <tr>
                     <td>
                       <button
-                        disabled={readOnly}
+                        disabled={readOnly || invalid}
                         className={classNames(styles.primaryButton, styles.smallButton)}
                         type="button"
                         onClick={() => {
@@ -144,7 +221,7 @@ export const FrontmatterEditor = ({ yaml, onChange }: FrontmatterEditorProps) =>
                 </tfoot>
               </table>
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--spacing-2)' }}>
-                <button type="submit" className={styles.primaryButton}>
+                <button type="submit" disabled={readOnly || invalid} className={styles.primaryButton}>
                   {t('dialogControls.save', 'Save')}
                 </button>
                 <button type="reset" className={styles.secondaryButton}>
