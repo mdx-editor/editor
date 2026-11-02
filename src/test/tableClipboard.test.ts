@@ -51,8 +51,26 @@ describe('table clipboard regions', () => {
     ])
   })
 
+  it('leaves an entirely empty TSV first column to ordinary paste, including indented code and Makefile recipes', () => {
+    for (const text of [
+      '\tfoo()\n\tbar()',
+      '\tA\tint\n\tB\tstring',
+      '\t@echo building\n\t$(CC) -o app app.c',
+      '\t\n\t',
+      '""\tfirst\n""\tsecond',
+      '\t' + 'x'.repeat(1000000) + '\n\tsecond'
+    ]) {
+      expect(readTableClipboard(clipboard(text))).toBeNull()
+    }
+    expect(values('\tfirst\nkey\tsecond')).toEqual([
+      ['', 'first'],
+      ['key', 'second']
+    ])
+  })
+
   it('rejects excessive source length only after recognizing a grid', () => {
     expect(readTableClipboard(clipboard('x'.repeat(1000000) + '\ty\nz\tw'))).toBe('rejected')
+    expect(readTableClipboard(clipboard('\t' + 'x'.repeat(1000000) + '\nz\tw'))).toBe('rejected')
     expect(readTableClipboard(clipboard('"' + 'x'.repeat(1000000) + '\tinside"\n"also\tquoted"'))).toBeNull()
   })
 
@@ -60,10 +78,6 @@ describe('table clipboard regions', () => {
     expect(values('a\tb\t\r\nc\td\r\n')).toEqual([
       ['a', 'b', ''],
       ['c', 'd', '']
-    ])
-    expect(values('\t\n\t')).toEqual([
-      ['', ''],
-      ['', '']
     ])
     expect(values('a\tb\n\t\n')).toEqual([
       ['a', 'b'],
@@ -105,11 +119,25 @@ describe('table clipboard regions', () => {
     ])
   })
 
+  it('leaves single-cell and one-dimensional HTML tables to ordinary paste', () => {
+    for (const html of [
+      '<table><tr><td>cell</td></tr></table>',
+      '<table><tr><td>first</td><td>second</td></tr></table>',
+      '<table><tr><td>first</td></tr><tr><td>second</td></tr></table>',
+      '<table><tr><td colspan="2">merged row</td></tr></table>'
+    ]) {
+      expect(readTableClipboard(clipboard('ordinary', html))).toBeNull()
+    }
+  })
+
   it('round-trips a wrapped HTML document with entities and Markdown punctuation as literal cells', () => {
     // Representative browser-copy serialization, not an actual OS clipboard capture.
     const html =
-      '<!doctype html><html><head><meta charset="utf-8"></head><body><!--StartFragment--><div><span><table><tbody><tr><td>A &amp; B</td><td>&lt;tag&gt; | *literal* [label](url) "quote"</td><td></td></tr></tbody></table></span></div><!--EndFragment--></body></html>'
-    expect(values('wrong\tfallback', html)).toEqual([['A & B', '<tag> | *literal* [label](url) "quote"', '']])
+      '<!doctype html><html><head><meta charset="utf-8"></head><body><!--StartFragment--><div><span><table><tbody><tr><td>A &amp; B</td><td>&lt;tag&gt; | *literal* [label](url) "quote"</td><td></td></tr><tr><td>second</td><td>row</td><td></td></tr></tbody></table></span></div><!--EndFragment--></body></html>'
+    expect(values('wrong\tfallback', html)).toEqual([
+      ['A & B', '<tag> | *literal* [label](url) "quote"', ''],
+      ['second', 'row', '']
+    ])
     const rows = parseTableClipboard(clipboard('wrong\tfallback', html))!
     const table: Mdast.Table = { type: 'table', children: rows.map((children) => ({ type: 'tableRow', children })) }
     const markdown = toMarkdown(table, { extensions: [gfmTableToMarkdown()] })
@@ -135,8 +163,11 @@ describe('table clipboard regions', () => {
       ['  alpha  beta  ', ' tail '],
       ['second', ' row ']
     ])
-    expect(values(plain, '<table><tr><td>  alpha&nbsp; beta  </td><td><div> tail </div></td></tr></table>')).toEqual([
-      ['alpha beta', 'tail']
+    expect(
+      values(plain, '<table><tr><td>  alpha&nbsp; beta  </td><td><div> tail </div></td></tr><tr><td>second</td><td>row</td></tr></table>')
+    ).toEqual([
+      ['alpha beta', 'tail'],
+      ['second', 'row']
     ])
   })
 
@@ -144,9 +175,12 @@ describe('table clipboard regions', () => {
     expect(
       values(
         '',
-        '<table><tr><td><p><strong>Bold</strong> <a href="https://example.com">link</a></p><div>Next<br>line</div><script>alert(1)</script></td></tr></table>'
+        '<table><tr><td><p><strong>Bold</strong> <a href="https://example.com">link</a></p><div>Next<br>line</div><script>alert(1)</script></td><td>next</td></tr><tr><td>second</td><td>row</td></tr></table>'
       )
-    ).toEqual([['Bold link Next line']])
+    ).toEqual([
+      ['Bold link Next line', 'next'],
+      ['second', 'row']
+    ])
   })
 
   it('expands merged cells with empty placeholders and normalizes rows', () => {
@@ -233,13 +267,19 @@ describe('table clipboard regions', () => {
       ['safe', 'fallback'],
       ['second', 'row']
     ])
-    expect(values(Array(1002).fill('x').join('\t'), '<table><tr><td>safe</td></tr></table>')).toEqual([['safe']])
+    expect(parseTableClipboard(clipboard('ordinary', '<table/>' + ' '.repeat(1000000)))).toBeNull()
+    expect(
+      values(Array(1002).fill('x').join('\t'), '<table><tr><td>safe</td><td>HTML</td></tr><tr><td>second</td><td>row</td></tr></table>')
+    ).toEqual([
+      ['safe', 'HTML'],
+      ['second', 'row']
+    ])
   })
 
   it('returns independent empty cells', () => {
-    const rows = parseTableClipboard(clipboard('\t\n\t'))!
-    rows[0][0].children.push({ type: 'text', value: 'changed' })
-    expect(rows[0][1].children).toEqual([])
+    const rows = parseTableClipboard(clipboard('a\t\n\t'))!
+    rows[0][1].children.push({ type: 'text', value: 'changed' })
     expect(rows[1][0].children).toEqual([])
+    expect(rows[1][1].children).toEqual([])
   })
 })

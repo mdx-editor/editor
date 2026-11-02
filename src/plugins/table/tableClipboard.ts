@@ -13,7 +13,7 @@ function textCell(value = ''): Mdast.TableCell {
 
 function rectangle(rows: Mdast.TableCell[][]): ClipboardRegion {
   const width = rows.reduce((max, row) => Math.max(max, row.length), 0)
-  if (!width) return null
+  if (rows.length < 2 || width < 2) return null
   if (width > MAX_DIMENSION || rows.length > MAX_DIMENSION || width * rows.length > MAX_TABLE_PASTE_CELLS) return 'rejected'
   return rows.map((row) => Array.from({ length: width }, (_, index) => row[index] ?? textCell()))
 }
@@ -31,9 +31,12 @@ function parseTSV(text: string): ClipboardRegion {
   let height = 0
   let minimumWidth = Infinity
   let rowWidth = 0
+  let fieldHasContent = false
+  let firstColumnHasContent = false
   let oversized = text.length > MAX_SOURCE_LENGTH
 
   function finishCell() {
+    if (rowWidth === 0) firstColumnHasContent ||= fieldHasContent
     rowWidth++
     width = Math.max(width, rowWidth)
     oversized ||= width > MAX_DIMENSION || height + 1 > MAX_DIMENSION || width * (height + 1) > MAX_TABLE_PASTE_CELLS
@@ -41,6 +44,7 @@ function parseTSV(text: string): ClipboardRegion {
     // single tabbed line still belongs to ordinary paste, not a rejected grid.
     if (!oversized) row.push(textCell(value.replace(/\r\n?/g, '\n')))
     value = ''
+    fieldHasContent = false
     closedQuote = false
     atFieldStart = true
   }
@@ -60,14 +64,16 @@ function parseTSV(text: string): ClipboardRegion {
     if (quoted) {
       if (char === '"') {
         if (text[index + 1] === '"') {
+          fieldHasContent = true
           if (!oversized) value += '"'
           index++
         } else {
           quoted = false
           closedQuote = true
         }
-      } else if (!oversized) {
-        value += char
+      } else {
+        fieldHasContent = true
+        if (!oversized) value += char
       }
     } else if (char === '\t') {
       finishCell()
@@ -81,6 +87,7 @@ function parseTSV(text: string): ClipboardRegion {
       quoted = true
       atFieldStart = false
     } else {
+      fieldHasContent = true
       if (!oversized) value += char
       atFieldStart = false
     }
@@ -88,7 +95,9 @@ function parseTSV(text: string): ClipboardRegion {
   if (quoted) return null
   // One final record separator terminates the last row; it does not add a new row.
   if (!endedRow) finishRow()
-  if (height < 2 || minimumWidth < 2) return null
+  // An empty first field in every row is also common in tab-indented source
+  // snippets and Makefile recipes. Without HTML evidence, preserve normal paste.
+  if (height < 2 || minimumWidth < 2 || !firstColumnHasContent) return null
   return oversized ? 'rejected' : rectangle(rows)
 }
 
@@ -133,7 +142,7 @@ function cellText(cell: HTMLTableCellElement): string {
 function parseHTML(html: string): ClipboardRegion {
   if (!html || typeof DOMParser === 'undefined') return null
   const table = standaloneTable(new DOMParser().parseFromString(html, 'text/html'))
-  if (!table?.rows.length) return null
+  if (!table || table.rows.length < 2) return null
   if (table.rows.length > MAX_DIMENSION) return 'rejected'
   const rows: Mdast.TableCell[][] = Array.from({ length: table.rows.length }, () => [])
   let groupEnd = 0
@@ -164,7 +173,7 @@ function parseHTML(html: string): ClipboardRegion {
 
 /**
  * Read a region while distinguishing rejected oversized tables from ordinary text.
- * A rejected region must not fall through to rich-text paste and create a nested table.
+ * Rejected regions, like ordinary text, must fall through to the normal paste handler.
  */
 export function readTableClipboard(data: Pick<DataTransfer, 'getData'>): ClipboardRegion {
   const html = data.getData('text/html')
@@ -184,4 +193,37 @@ export function readTableClipboard(data: Pick<DataTransfer, 'getData'>): Clipboa
 export function parseTableClipboard(data: Pick<DataTransfer, 'getData'>): Mdast.TableCell[][] | null {
   const result = readTableClipboard(data)
   return Array.isArray(result) ? result : null
+}
+
+/** Plain caret-paste fallback for table-shaped data that cannot become a region. */
+export function readTableClipboardText(data: Pick<DataTransfer, 'getData'>): string | null {
+  const text = data.getData('text/plain')
+  const html = data.getData('text/html')
+  const hasTable = /<table[\s/>]/i.test(html)
+  if (!text.includes('\t') && !hasTable) return null
+  if (text) return text
+  if (!hasTable || typeof DOMParser === 'undefined') return null
+  const document = new DOMParser().parseFromString(html, 'text/html')
+  document.querySelectorAll('script, style, template').forEach((element) => {
+    element.remove()
+  })
+  document.querySelectorAll('br').forEach((element) => {
+    element.replaceWith('\n')
+  })
+  document.querySelectorAll('p, div').forEach((element) => {
+    if (element.nextElementSibling) element.append('\n')
+  })
+  document.querySelectorAll('tr').forEach((row) => {
+    const cells = Array.from(row.children).filter((element) => element.matches('td, th'))
+    cells.slice(0, -1).forEach((cell) => {
+      cell.append('\t')
+    })
+  })
+  const rows = Array.from(document.querySelectorAll('tr'))
+  rows.slice(0, -1).forEach((row) => {
+    row.append('\n')
+  })
+  // Empty HTML cells are still recognized: returning null here would let the
+  // rich-text importer create an unrepresentable nested table.
+  return document.body.textContent
 }

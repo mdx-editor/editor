@@ -1,6 +1,7 @@
 import { DecoratorNode, EditorConfig, LexicalEditor, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical'
 import React, { JSX } from 'react'
-import { FrontmatterEditor } from './FrontmatterEditor'
+import { useCellValue } from '@mdxeditor/gurx'
+import { frontmatterEditor$, FrontmatterEditorProps } from '.'
 
 /**
  * A serialized representation of an {@link FrontmatterNode}.
@@ -61,18 +62,20 @@ export class FrontmatterNode extends DecoratorNode<JSX.Element> {
   }
 
   setYaml(yaml: string) {
-    if (yaml !== this.__yaml) {
+    // decorate() callbacks keep the instance they were created with, which goes stale after an update.
+    if (yaml !== this.getLatest().__yaml) {
       this.getWritable().__yaml = yaml
     }
   }
 
   decorate(editor: LexicalEditor): JSX.Element {
     return (
-      <FrontmatterEditor
+      <FrontmatterEditorContainer
         yaml={this.getYaml()}
         onChange={(yaml) => {
+          if (!editor.isEditable()) return
           editor.update(() => {
-            this.setYaml(yaml)
+            if (editor.isEditable() && this.isAttached()) this.setYaml(yaml)
           })
         }}
       />
@@ -86,6 +89,11 @@ export class FrontmatterNode extends DecoratorNode<JSX.Element> {
   isInline(): boolean {
     return false
   }
+}
+
+function FrontmatterEditorContainer(props: FrontmatterEditorProps) {
+  const Editor = useCellValue(frontmatterEditor$)
+  return <Editor {...props} />
 }
 
 /**

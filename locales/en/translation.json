@@ -1,5 +1,6 @@
 {
   "frontmatterEditor": {
+    "invalidYaml": "This frontmatter cannot be edited as key-value fields. Edit the Markdown source instead.",
     "title": "Edit document frontmatter",
     "key": "Key",
     "value": "Value",

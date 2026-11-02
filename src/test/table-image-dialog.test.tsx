@@ -155,6 +155,8 @@ describe('table image dialog persistence', () => {
 
   it.each([false, true])('saves image edits without refocusing its cell (dimensions: %s)', async (withDimensions) => {
     const { ref, onChange, sourceCell, otherCell } = await setup(markdown.replace('| A |', `| A![old](${imageUrl}) |`))
+    // The image settings button may be clicked without first selecting its cell.
+    await focusCell(otherCell)
     const edit = await screen.findByRole('button', { name: 'Edit image' })
     await act(async () => {
       edit.focus()

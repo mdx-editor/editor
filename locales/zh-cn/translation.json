@@ -1,5 +1,6 @@
 {
   "frontmatterEditor": {
+    "invalidYaml": "无法以键值字段的形式编辑此前置元数据。请改为编辑 Markdown 源码。",
     "title": "编辑前置元数据",
     "key": "键",
     "value": "值",

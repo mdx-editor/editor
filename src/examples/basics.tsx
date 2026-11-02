@@ -236,16 +236,34 @@ export function Table() {
 
 /** Paste a standalone HTML table or a TSV grid into an existing cell. */
 export function TableRegionPaste() {
+  const [markdown, setMarkdown] = React.useState(tableMarkdown + '\n\nOutside the table.')
   return (
     <div>
       <p>Copy an HTML table or a TSV grid with at least two rows and two columns, then paste into a cell below.</p>
-      <p>Focus outside the table to undo or redo the whole region. Undo inside a cell remains local to that cell.</p>
+      <p>Region paste moves focus outside the cell so Undo immediately restores the region, including pending anchor text, in one step.</p>
+      <p>Tab-indented text, one-dimensional tables, rejected regions, and tables inside nested editors keep ordinary paste behavior.</p>
       <p>HTML formatting is reduced to text, and merged cells become text in the top-left cell with empty covered cells.</p>
+      <p>Rejected table-shaped data is inserted as plain text at the caret, preserving all rows without nested tables.</p>
       <MDXEditor
         markdown={tableMarkdown + '\n\nOutside the table.'}
+        onChange={setMarkdown}
         plugins={[tablePlugin(), toolbarPlugin({ toolbarContents: () => <UndoRedo /> })]}
       />
+      <pre aria-label="Current Markdown">{markdown}</pre>
     </div>
+  )
+}
+
+export function TableRegionPasteInlineJsx() {
+  return (
+    <MDXEditor
+      markdown={'| a | b |\n| - | - |\n| <Inline>inside</Inline> | d |\n\nOutside the table.'}
+      plugins={[
+        tablePlugin(),
+        jsxPlugin({ jsxComponentDescriptors: [{ name: 'Inline', kind: 'text', props: [], hasChildren: true, Editor: GenericJsxEditor }] }),
+        toolbarPlugin({ toolbarContents: () => <UndoRedo /> })
+      ]}
+    />
   )
 }
 
