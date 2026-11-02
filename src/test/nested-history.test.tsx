@@ -1,5 +1,17 @@
 import { act, render, waitFor } from '@testing-library/react'
-import { HISTORY_PUSH_TAG, BLUR_COMMAND, $createTextNode, $getRoot, REDO_COMMAND, UNDO_COMMAND, type LexicalEditor } from 'lexical'
+import {
+  $isTextNode,
+  CAN_UNDO_COMMAND,
+  CAN_REDO_COMMAND,
+  COMMAND_PRIORITY_CRITICAL,
+  HISTORY_PUSH_TAG,
+  BLUR_COMMAND,
+  $createTextNode,
+  $getRoot,
+  REDO_COMMAND,
+  UNDO_COMMAND,
+  type LexicalEditor
+} from 'lexical'
 import React from 'react'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { MDXEditor, type MDXEditorMethods } from '../MDXEditor'
@@ -134,6 +146,60 @@ describe('table persisted-content reconciliation', () => {
     })
     expect(cells()[0].textContent).toBe('a pending')
     expect(editor(0)).toBe(sibling)
+  })
+
+  it('does not overwrite parent history availability while clearing a restored cell', async () => {
+    const { cells, editor, root } = await setup('before\n\n' + table)
+    act(() => {
+      root.update(
+        () => {
+          const text = $getRoot().getFirstDescendant()
+          if ($isTextNode(text)) text.setTextContent('changed')
+        },
+        { discrete: true, tag: HISTORY_PUSH_TAG }
+      )
+    })
+    type(editor(2), ' committed')
+    blur(editor(2))
+    const cellAvailability: boolean[] = []
+    const removeCell = editor(2).registerCommand(
+      CAN_UNDO_COMMAND,
+      (value) => {
+        cellAvailability.push(value)
+        return false
+      },
+      COMMAND_PRIORITY_CRITICAL
+    )
+    const undoAvailability: boolean[] = []
+    const redoAvailability: boolean[] = []
+    const removeUndo = root.registerCommand(
+      CAN_UNDO_COMMAND,
+      (value) => {
+        undoAvailability.push(value)
+        return false
+      },
+      COMMAND_PRIORITY_CRITICAL
+    )
+    const removeRedo = root.registerCommand(
+      CAN_REDO_COMMAND,
+      (value) => {
+        redoAvailability.push(value)
+        return false
+      },
+      COMMAND_PRIORITY_CRITICAL
+    )
+    command(root)
+    await waitFor(() => {
+      expect(cells()[2].textContent).toBe('c')
+    })
+    expect(history(root).undoStack.length).toBeGreaterThan(0)
+    expect(history(root).redoStack.length).toBeGreaterThan(0)
+    expect(undoAvailability).not.toContain(false)
+    expect(redoAvailability.at(-1)).toBe(true)
+    expect(cellAvailability).toContain(false)
+    removeCell()
+    removeUndo()
+    removeRedo()
   })
 
   it('does not let a retained blur overwrite an authoritative parent Undo before reconciliation', async () => {

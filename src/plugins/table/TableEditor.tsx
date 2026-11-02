@@ -14,6 +14,8 @@ import {
   BLUR_COMMAND,
   HISTORIC_TAG,
   CLEAR_HISTORY_COMMAND,
+  CAN_UNDO_COMMAND,
+  CAN_REDO_COMMAND,
   SKIP_DOM_SELECTION_TAG,
   COMMAND_PRIORITY_CRITICAL,
   COMMAND_PRIORITY_EDITOR,
@@ -507,7 +509,18 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
     )
     // The authoritative source replaced this cell, not its siblings. Its old
     // local Undo/Redo states are no longer a valid baseline for subsequent edits.
-    editor.dispatchCommand(CLEAR_HISTORY_COMMAND, undefined)
+    // Clearing this cell must not publish its availability to an active parent.
+    // The existing cell toolbar listeners use this same priority and were
+    // registered first, so they still receive the local reset notifications.
+    const stopAvailabilityPropagation = mergeRegister(
+      editor.registerCommand(CAN_UNDO_COMMAND, () => true, COMMAND_PRIORITY_CRITICAL),
+      editor.registerCommand(CAN_REDO_COMMAND, () => true, COMMAND_PRIORITY_CRITICAL)
+    )
+    try {
+      editor.dispatchCommand(CLEAR_HISTORY_COMMAND, undefined)
+    } finally {
+      stopAvailabilityPropagation()
+    }
   }, [
     editor,
     contents,
