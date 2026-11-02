@@ -62,7 +62,8 @@ export class FrontmatterNode extends DecoratorNode<JSX.Element> {
   }
 
   setYaml(yaml: string) {
-    if (yaml !== this.__yaml) {
+    // decorate() callbacks keep the instance they were created with, which goes stale after an update.
+    if (yaml !== this.getLatest().__yaml) {
       this.getWritable().__yaml = yaml
     }
   }

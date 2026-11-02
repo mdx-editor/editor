@@ -232,6 +232,17 @@ describe('default frontmatter key-value form', () => {
     }
   )
 
+  it('keeps multiline strings intact when they are focused and another field is saved', async () => {
+    const editor = setup('title: original\nbody: |-\n  first\n  second\nkeep: |+\n  foo\n\n')
+    open()
+    expect(valueField('body')).toHaveAttribute('readonly')
+    fireEvent.focus(valueField('body'))
+    fireEvent.blur(valueField('body'))
+    fireEvent.change(valueField('title'), { target: { value: 'changed' } })
+    await save()
+    expect(parse(editor.markdown())).toEqual({ title: 'changed', body: 'first\nsecond', keep: 'foo\n\n' })
+  })
+
   it('uses the translation callback for the controlled invalid-source message', () => {
     const translation = vi.fn((key: string, fallback: string) =>
       key === 'frontmatterEditor.invalidYaml' ? '请在 Markdown 源码中修改前置元数据。' : fallback
@@ -285,6 +296,27 @@ describe('frontmatter editor component extension', () => {
     expect(screen.queryByLabelText('Other frontmatter')).not.toBeInTheDocument()
     open()
     expect(valueField('title')).toHaveValue('original')
+  })
+
+  it('applies repeated changes from a retained custom editor callback', async () => {
+    let retained: FrontmatterEditorProps['onChange'] | null = null
+    const Retaining = ({ onChange }: FrontmatterEditorProps) => {
+      retained ??= onChange
+      return null
+    }
+    const editor = setup('title: original', { plugins: [frontmatterPlugin({ FrontmatterEditor: Retaining })] })
+    act(() => {
+      retained!('title: changed')
+    })
+    await waitFor(() => {
+      expect(editor.markdown()).toBe('---\ntitle: changed\n---\n\nBody')
+    })
+    act(() => {
+      retained!('title: original')
+    })
+    await waitFor(() => {
+      expect(editor.markdown()).toBe('---\ntitle: original\n---\n\nBody')
+    })
   })
 
   it('does not allow a custom component to change a read-only document', () => {

@@ -100,7 +100,8 @@ const FrontmatterForm = ({ yaml, onChange }: FrontmatterEditorProps) => {
         return
       }
       const yaml = Object.fromEntries(updatedConfig.filter(({ key }) => key).map(({ key, value }) => [key, value] as const))
-      onChange(YamlParser.dump(yaml, options).trimEnd())
+      // Strip only the serializer's final newline; more would cut a `|+` block scalar's content.
+      onChange(YamlParser.dump(yaml, options).replace(/\n$/, ''))
       setFrontmatterDialogOpen(false)
     },
     [onChange, setFrontmatterDialogOpen, removeFrontmatter, yamlConfig, readOnly, invalid]
@@ -156,6 +157,10 @@ const FrontmatterForm = ({ yaml, onChange }: FrontmatterEditorProps) => {
                   {fields.map((item, index) => {
                     if (!originalValues.current.has(item.id)) originalValues.current.set(item.id, item.value)
                     const original = originalValues.current.get(item.id)
+                    // A single-line input drops line breaks as soon as it is focused, so
+                    // multiline strings stay read-only like structured values.
+                    const preserved =
+                      (typeof original === 'object' && original !== null) || (typeof original === 'string' && original.includes('\n'))
                     return (
                       <tr key={item.id}>
                         <td>
@@ -173,10 +178,11 @@ const FrontmatterForm = ({ yaml, onChange }: FrontmatterEditorProps) => {
                               // YAML type if a field is unchanged or edited then reverted.
                               setValueAs: (value: unknown) => {
                                 if (
-                                  original === null ||
-                                  typeof original === 'string' ||
-                                  typeof original === 'number' ||
-                                  typeof original === 'boolean'
+                                  !preserved &&
+                                  (original === null ||
+                                    typeof original === 'string' ||
+                                    typeof original === 'number' ||
+                                    typeof original === 'boolean')
                                 ) {
                                   return value === String(original ?? '') ? original : value
                                 }
@@ -184,7 +190,7 @@ const FrontmatterForm = ({ yaml, onChange }: FrontmatterEditorProps) => {
                               }
                             })}
                             aria-label={t('frontmatterEditor.value', 'Value')}
-                            readOnly={readOnly || (typeof original === 'object' && original !== null)}
+                            readOnly={readOnly || preserved}
                           />
                         </td>
                         <td>
