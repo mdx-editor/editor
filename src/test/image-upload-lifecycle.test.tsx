@@ -6,7 +6,7 @@ import { MDXEditor, type MDXEditorMethods } from '../MDXEditor'
 import { toolbarPlugin } from '../plugins/toolbar'
 import { tablePlugin } from '../plugins/table'
 import { closeImageDialog$, imagePlugin, insertImage$, openNewImageDialog$, saveImage$, type ImageUploadHandler } from '../plugins/image'
-import { activeEditor$, rootEditor$ } from '../plugins/core'
+import { activeEditor$, rootEditor$, viewMode$, markdownSourceEditorValue$ } from '../plugins/core'
 import { directivesPlugin } from '../plugins/directives'
 import { AdmonitionDirectiveDescriptor } from '../directive-editors/AdmonitionDirectiveDescriptor'
 import { InsertImage } from '../plugins/toolbar/components/InsertImage'
@@ -549,10 +549,9 @@ describe('imperative image upload lifecycle', () => {
     expect(ref.current!.getMarkdown()).toContain('![second](https://example.com/second.png)')
   })
 
-  it('invalidates an imperative upload associated with a cancelled dialog', async () => {
+  it('keeps imperative uploads independent from a cancelled dialog', async () => {
     const pending = deferred()
     const { realm, ref } = await setup(() => pending.promise)
-    const before = ref.current!.getMarkdown()
     await act(async () => {
       realm.pub(insertImage$, { file })
       await Promise.resolve()
@@ -564,7 +563,7 @@ describe('imperative image upload lifecycle', () => {
       pending.resolve(url)
       await Promise.resolve()
     })
-    expect(ref.current!.getMarkdown()).toBe(before)
+    expect(ref.current!.getMarkdown()).toContain(url)
   })
 
   it('preserves immediate URL insertion and metadata without an upload handler', async () => {
@@ -578,5 +577,93 @@ describe('imperative image upload lifecycle', () => {
     expect(ref.current!.getMarkdown()).toContain('title="URL title"')
     expect(ref.current!.getMarkdown()).toContain('width="90"')
     expect(ref.current!.getMarkdown()).toContain('height="60"')
+  })
+})
+
+describe('reviewed public insertion and target removal contracts', () => {
+  it('inserts a synchronous URL from postInit before the root is attached', async () => {
+    const ref = React.createRef<MDXEditorMethods>()
+    let attached: boolean | undefined
+    const publisher = realmPlugin({
+      postInit(r) {
+        attached = Boolean(r.getValue(rootEditor$)?.getRootElement()?.isConnected)
+        r.pub(insertImage$, { src: url, altText: 'postInit' })
+      }
+    })
+    render(<MDXEditor ref={ref} markdown="Hello" plugins={[imagePlugin(), publisher()]} />)
+    expect(attached).toBe(false)
+    await waitFor(() => {
+      expect(ref.current!.getMarkdown()).toContain('![postInit]')
+    })
+  })
+
+  it.each(['insert', 'save'] as const)('preserves synchronous %s without a dialog in readOnly mode', async (method) => {
+    const { realm, ref, setReadOnly } = await setup(null, 'root', false, { openDialog: false })
+    setReadOnly()
+    await act(async () => {
+      if (method === 'insert') realm.pub(insertImage$, { src: url, altText: 'synchronous' })
+      else realm.pub(saveImage$, { src: url, altText: 'synchronous', title: '' })
+      await Promise.resolve()
+    })
+    expect(ref.current!.getMarkdown()).toContain('![synchronous]')
+  })
+
+  it.each(['resolve', 'reject'] as const)('closes a current uploading dialog when its removed target upload %s', async (outcome) => {
+    const pending = deferred()
+    const { realm, ref, target, submit } = await setup(() => pending.promise, 'table')
+    await submit()
+    await act(async () => {
+      realm.getValue(rootEditor$)!.update(() => {
+        $getRoot()
+          .clear()
+          .append($createParagraphNode().append($createTextNode('Removed target')))
+      })
+      await Promise.resolve()
+    })
+    expect(target.isConnected).toBe(false)
+    await act(async () => {
+      if (outcome === 'resolve') pending.resolve(url)
+      else pending.reject(new Error('removed target failure'))
+      await Promise.resolve()
+    })
+    expect(screen.queryByRole('dialog')).toBeNull()
+    expect(ref.current!.getMarkdown()).toBe('Removed target')
+  })
+
+  it('closes an idle URL dialog whose table target was removed by setMarkdown', async () => {
+    const { ref, dialog, submit } = await setup(vi.fn().mockResolvedValue(url), 'table')
+    fireEvent.change(dialog.querySelector('input[type="file"]')!, { target: { files: [] } })
+    fireEvent.change(dialog.querySelector('input[name="src"]')!, { target: { value: url } })
+    await act(async () => {
+      ref.current!.setMarkdown('Replacement')
+      await Promise.resolve()
+    })
+    expect(screen.getByRole('dialog')).toBe(dialog)
+    await submit()
+    expect(screen.queryByRole('dialog')).toBeNull()
+    expect(ref.current!.getMarkdown()).toBe('Replacement')
+  })
+
+  it('uses source-mode content rather than stale rich-text content for replacement invalidation', async () => {
+    const pending = deferred()
+    const { realm, ref } = await setup(() => pending.promise, 'root', false, { openDialog: false })
+    const original = ref.current!.getMarkdown()
+    await act(async () => {
+      realm.pub(insertImage$, { file })
+      await Promise.resolve()
+    })
+    act(() => {
+      realm.pub(viewMode$, 'source')
+      realm.pub(markdownSourceEditorValue$, 'Different source')
+    })
+    await act(async () => {
+      ref.current!.setMarkdown(original)
+      await Promise.resolve()
+    })
+    await act(async () => {
+      pending.resolve(url)
+      await Promise.resolve()
+    })
+    expect(JSON.stringify(realm.getValue(rootEditor$)!.getEditorState().toJSON())).not.toContain(url)
   })
 })

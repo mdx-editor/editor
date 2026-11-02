@@ -39,6 +39,8 @@ import {
   addLexicalNode$,
   createActiveEditorSubscription$,
   markdown$,
+  markdownSourceEditorValue$,
+  viewMode$,
   readOnly$,
   setMarkdown$
 } from '../core'
@@ -195,7 +197,10 @@ export const imagePreviewHandler$ = Cell<ImagePreviewHandler>(null)
 export const imagePlaceholder$ = Cell<typeof ImagePlaceholder | null>(null)
 
 /**
- * Upload status of the current image dialog. Dismissal ignores pending results;
+ * Upload status of the current image dialog. Custom dialogs must stay open after
+ * publishing saveImage$ until the upload settles; closing immediately discards it.
+ * Independent insertImage$ uploads are not tied to dialog dismissal.
+ * Dismissal ignores pending dialog results;
  * it does not abort the consumer's upload request.
  * @group Image
  */
@@ -234,8 +239,11 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
     r.sub(
       r.pipe(
         setMarkdown$,
-        withLatestFrom(markdown$),
-        filter(([nextMarkdown, currentMarkdown]) => nextMarkdown.trim() !== currentMarkdown.trim())
+        withLatestFrom(markdown$, viewMode$, markdownSourceEditorValue$),
+        // Match the core setMarkdown no-op contract in both editor modes.
+        filter(([nextMarkdown, currentMarkdown, viewMode, sourceMarkdown]) =>
+          viewMode === 'rich-text' ? nextMarkdown.trim() !== currentMarkdown.trim() : nextMarkdown !== sourceMarkdown
+        )
       ),
       () => {
         const pendingDialogUpload = [...requests].some((request) => request.dialog !== null)
@@ -288,47 +296,60 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
         })
       }, syncNestedEditorOnUpdate(editor))
     }
-    r.sub(
-      r.pipe(insertImage$, withLatestFrom(activeEditor$, imageUploadHandler$, imageDialogState$)),
-      ([values, editor, upload, dialog]) => {
-        const request = startRequest(editor, dialog.type === 'inactive' ? null : dialog)
-        if (!request || !editor) return
-        const save = (src: string) => {
-          if (!request.isCurrent()) {
-            request.finish()
-            return
-          }
-          insert(editor, { ...values, src })
+    r.sub(r.pipe(insertImage$, withLatestFrom(activeEditor$, imageUploadHandler$)), ([values, editor, upload]) => {
+      if (!editor) return
+      // Synchronous public insertion retains its pre-upload-lifecycle semantics.
+      if (!('file' in values)) {
+        insert(editor, values)
+        return
+      }
+      const request = startRequest(editor, null)
+      if (!request) return
+      const save = (src: string) => {
+        if (!request.isCurrent()) {
+          request.finish()
+          return
+        }
+        insert(editor, { ...values, src })
+        request.finish()
+      }
+      if ('file' in values) {
+        const fail = (error: unknown) => {
+          console.error(error)
           request.finish()
         }
-        if ('file' in values) {
-          const fail = (error: unknown) => {
-            console.error(error)
-            request.finish()
-          }
-          if (!upload) {
-            fail(new Error('No image upload handler is configured'))
-            return
-          }
-          Promise.resolve()
-            .then(() => upload(values.file))
-            .then(save, fail)
-        } else {
-          save(values.src)
+        if (!upload) {
+          fail(new Error('No image upload handler is configured'))
+          return
         }
+        Promise.resolve()
+          .then(() => upload(values.file))
+          .then(save, fail)
       }
-    )
+    })
     r.sub(
       r.pipe(saveImage$, withLatestFrom(imageUploadHandler$, imageDialogState$, allowSetImageDimensions$)),
       ([values, upload, dialog, allowDimensions]) => {
-        const editor = dialogEditor
-        if (dialogRequest || dialog.type === 'inactive' || !editor) return
-        const request = startRequest(editor, dialog)
-        if (!request) return
-        dialogRequest = request.token
+        const editor = dialog.type === 'inactive' ? r.getValue(activeEditor$) : dialogEditor
+        if (dialogRequest) return
+        const closeMissingTarget = () => {
+          if (dialog.type !== 'inactive' && r.getValue(imageDialogState$) === dialog) r.pub(closeImageDialog$)
+        }
+        if (!editor || (dialog.type !== 'inactive' && !editor.getRootElement()?.isConnected)) {
+          closeMissingTarget()
+          return
+        }
+        const hasFile = Boolean(values.file && values.file.length > 0)
+        const request = hasFile ? startRequest(editor, dialog.type === 'inactive' ? null : dialog) : undefined
+        if (hasFile && !request) {
+          closeMissingTarget()
+          return
+        }
+        if (request) dialogRequest = request.token
         const save = (src: string) => {
-          if (!request.isCurrent()) {
+          if (request && !request.isCurrent()) {
             request.finish()
+            closeMissingTarget()
             return
           }
           if (dialog.type === 'editing') {
@@ -345,16 +366,17 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
           } else {
             insert(editor, { ...values, src })
           }
-          request.finish()
+          request?.finish()
           r.pub(closeImageDialog$)
         }
         const fail = (error: unknown) => {
           console.error(error)
-          if (!request.isCurrent()) {
+          if (request && !request.isCurrent()) {
             request.finish()
+            closeMissingTarget()
             return
           }
-          request.finish()
+          request?.finish()
           r.pub(imageUploadState$, 'error')
         }
         if (values.file && values.file.length > 0) {
@@ -369,7 +391,7 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
         } else if (values.src) {
           save(values.src)
         } else {
-          request.finish()
+          request?.finish()
         }
       }
     )
@@ -454,6 +476,7 @@ export const openNewImageDialog$ = Action((r) => {
   r.link(
     r.pipe(
       openNewImageDialog$,
+      // A fresh object is the opening-session identity, including repeated opens.
       map(() => ({ type: 'new' as const }))
     ),
     imageDialogState$
