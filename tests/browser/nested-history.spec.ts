@@ -1,0 +1,37 @@
+import { expect, test } from '@playwright/test'
+
+for (const kind of ['root']) {
+  test(`ordinary ${kind} cell edit, blur and parent keyboard Undo/Redo reconcile mounted content`, async ({ page }) => {
+    const errors: string[] = []
+    page.on('pageerror', (error) => errors.push(error.message))
+    await page.goto('/?story=nested-history--committed-cells&mode=preview')
+    const cells = page.locator('tbody [contenteditable=true]')
+    const markdown = page.getByLabel('Current Markdown')
+    await expect(cells).toHaveCount(4)
+    await cells.nth(2).click()
+    await page.keyboard.press('End')
+    await page.keyboard.type(' edited')
+    await page.getByText('Outside the table.', { exact: true }).click()
+    await expect(markdown).toContainText('c edited')
+    const edited = await markdown.textContent()
+    await page.keyboard.press('ControlOrMeta+z')
+    await expect(cells.nth(2)).toHaveText('c')
+    await expect(markdown).not.toContainText('edited')
+    await page.keyboard.press('ControlOrMeta+Shift+z')
+    await expect(cells.nth(2)).toHaveText('c edited')
+    await expect(markdown).toHaveText(edited!)
+    await cells.nth(2).click()
+    await page.keyboard.press('End')
+    await page.keyboard.type(' again')
+    await page.getByText('Outside the table.', { exact: true }).click()
+    await page.keyboard.press('ControlOrMeta+z')
+    await expect(cells.nth(2)).toHaveText('c edited')
+    await page.keyboard.press('ControlOrMeta+z')
+    await expect(cells.nth(2)).toHaveText('c')
+    await page.keyboard.press('ControlOrMeta+Shift+z')
+    await expect(cells.nth(2)).toHaveText('c edited')
+    await page.keyboard.press('ControlOrMeta+Shift+z')
+    await expect(cells.nth(2)).toHaveText('c edited again')
+    expect(errors).toEqual([])
+  })
+}
