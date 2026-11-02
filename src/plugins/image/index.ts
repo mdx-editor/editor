@@ -313,19 +313,17 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
         insert(editor, { ...values, src })
         request.finish()
       }
-      if ('file' in values) {
-        const fail = (error: unknown) => {
-          console.error(error)
-          request.finish()
-        }
-        if (!upload) {
-          fail(new Error('No image upload handler is configured'))
-          return
-        }
-        Promise.resolve()
-          .then(() => upload(values.file))
-          .then(save, fail)
+      const fail = (error: unknown) => {
+        console.error(error)
+        request.finish()
       }
+      if (!upload) {
+        fail(new Error('No image upload handler is configured'))
+        return
+      }
+      Promise.resolve()
+        .then(() => upload(values.file))
+        .then(save, fail)
     })
     r.sub(
       r.pipe(saveImage$, withLatestFrom(imageUploadHandler$, imageDialogState$, allowSetImageDimensions$)),
@@ -335,6 +333,8 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
         const closeMissingTarget = () => {
           if (dialog.type !== 'inactive' && r.getValue(imageDialogState$) === dialog) r.pub(closeImageDialog$)
         }
+        // A save without a dialog must not close or flag a dialog opened while it uploads.
+        const ownsDialogState = () => dialog.type !== 'inactive' || r.getValue(imageDialogState$).type === 'inactive'
         if (!editor || (dialog.type !== 'inactive' && !editor.getRootElement()?.isConnected)) {
           closeMissingTarget()
           return
@@ -367,7 +367,7 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
             insert(editor, { ...values, src })
           }
           request?.finish()
-          r.pub(closeImageDialog$)
+          if (ownsDialogState()) r.pub(closeImageDialog$)
         }
         const fail = (error: unknown) => {
           console.error(error)
@@ -377,7 +377,7 @@ export const imageDialogState$ = Cell<InactiveImageDialogState | NewImageDialogS
             return
           }
           request?.finish()
-          r.pub(imageUploadState$, 'error')
+          if (ownsDialogState()) r.pub(imageUploadState$, 'error')
         }
         if (values.file && values.file.length > 0) {
           if (!upload) {

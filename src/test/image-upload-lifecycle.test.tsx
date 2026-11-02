@@ -5,7 +5,15 @@ import { $createParagraphNode, $createTextNode, $getRoot, getNearestEditorFromDO
 import { MDXEditor, type MDXEditorMethods } from '../MDXEditor'
 import { toolbarPlugin } from '../plugins/toolbar'
 import { tablePlugin } from '../plugins/table'
-import { closeImageDialog$, imagePlugin, insertImage$, openNewImageDialog$, saveImage$, type ImageUploadHandler } from '../plugins/image'
+import {
+  closeImageDialog$,
+  imagePlugin,
+  imageUploadState$,
+  insertImage$,
+  openNewImageDialog$,
+  saveImage$,
+  type ImageUploadHandler
+} from '../plugins/image'
 import { activeEditor$, rootEditor$, viewMode$, markdownSourceEditorValue$ } from '../plugins/core'
 import { directivesPlugin } from '../plugins/directives'
 import { AdmonitionDirectiveDescriptor } from '../directive-editors/AdmonitionDirectiveDescriptor'
@@ -629,6 +637,30 @@ describe('reviewed public insertion and target removal contracts', () => {
     expect(screen.queryByRole('dialog')).toBeNull()
     expect(ref.current!.getMarkdown()).toBe('Removed target')
   })
+
+  it.each(['resolve', 'reject'] as const)(
+    'leaves a dialog opened during a dialogless save alone when the upload settles (%s)',
+    async (outcome) => {
+      const pending = deferred()
+      const { realm, ref } = await setup(() => pending.promise, 'root', false, { openDialog: false })
+      await act(async () => {
+        realm.pub(saveImage$, { file: files as unknown as FileList, altText: 'dialogless' })
+        await Promise.resolve()
+      })
+      act(() => {
+        realm.pub(openNewImageDialog$)
+      })
+      const dialog = await screen.findByRole('dialog')
+      await act(async () => {
+        if (outcome === 'resolve') pending.resolve(url)
+        else pending.reject(new Error('dialogless failure'))
+        await Promise.resolve()
+      })
+      expect(screen.getByRole('dialog')).toBe(dialog)
+      expect(realm.getValue(imageUploadState$)).toBe('idle')
+      if (outcome === 'resolve') expect(ref.current!.getMarkdown()).toContain('![dialogless]')
+    }
+  )
 
   it('closes an idle URL dialog whose table target was removed by setMarkdown', async () => {
     const { ref, dialog, submit } = await setup(vi.fn().mockResolvedValue(url), 'table')
