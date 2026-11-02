@@ -60,7 +60,7 @@ import {
   usedLexicalNodes$
 } from '../core'
 import { useCellValues } from '@mdxeditor/gurx'
-import { createExtensionEditor, ensureEditorHistoryBaseline, isEditorHistoryRestoring } from '../core/lexicalExtensions'
+import { createExtensionEditor } from '../core/lexicalExtensions'
 
 /**
  * Returns the element type for the cell based on the rowIndex
@@ -478,15 +478,18 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
   React.useEffect(() => {
     if (!editor || isMdastEqualIgnoringPositions(persistedContents.current, contents)) return
     persistedContents.current = contents
-    const currentContents = editor
-      .getEditorState()
-      .read(
-        () =>
-          (
-            exportLexicalTreeToMdast({ root: $getRoot(), jsxComponentDescriptors, visitors: exportVisitors, jsxIsAvailable })
-              .children[0] as Mdast.Paragraph
-          ).children
-      )
+    const currentContents = editor.getEditorState().read(
+      () =>
+        (
+          exportLexicalTreeToMdast({
+            root: $getRoot(),
+            jsxComponentDescriptors,
+            visitors: exportVisitors,
+            jsxIsAvailable,
+            addImportStatements: false
+          }).children.find((node) => node.type === 'paragraph') as Mdast.Paragraph | undefined
+        )?.children ?? []
+    )
     if (isMdastEqualIgnoringPositions(currentContents, contents)) return
     editor.update(
       () => {
@@ -505,7 +508,6 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
     // The authoritative source replaced this cell, not its siblings. Its old
     // local Undo/Redo states are no longer a valid baseline for subsequent edits.
     editor.dispatchCommand(CLEAR_HISTORY_COMMAND, undefined)
-    ensureEditorHistoryBaseline(editor)
   }, [
     editor,
     contents,
@@ -527,9 +529,10 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
         root: $getRoot(),
         jsxComponentDescriptors,
         visitors: exportVisitors,
-        jsxIsAvailable
+        jsxIsAvailable,
+        addImportStatements: false
       })
-      const nextContents = (mdast.children[0] as Mdast.Paragraph).children
+      const nextContents = mdast.children.find((node) => node.type === 'paragraph')?.children ?? []
       const sourceContents = parentEditor
         .getEditorState()
         .read(() => $getTableNodeByKey(tableKey)?.getMdastNode().children[rowIndex]?.children[colIndex]?.children)
@@ -540,7 +543,6 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
         isMdastEqualIgnoringPositions(sourceContents, nextContents)
       )
         return
-      ensureEditorHistoryBaseline(parentEditor)
       parentEditor.update(
         () => {
           const currentTable = $getTableNodeByKey(tableKey)
@@ -607,7 +609,6 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
       editor.registerCommand(
         BLUR_COMMAND,
         (payload) => {
-          if (isEditorHistoryRestoring(parentEditor)) return true
           const relatedTarget = payload.relatedTarget as HTMLElement | null
 
           if (isPartOftheEditorUI(relatedTarget, rootEditor!.getRootElement()!)) {
@@ -634,7 +635,7 @@ const CellEditor: React.FC<CellProps> = ({ focus, setActiveCell, parentEditor, l
         COMMAND_PRIORITY_EDITOR
       )
     )
-  }, [colIndex, editor, focus, parentEditor, rootEditor, rowIndex, save, saveAndFocus, setActiveCell])
+  }, [colIndex, editor, focus, rootEditor, rowIndex, save, saveAndFocus, setActiveCell])
 
   React.useEffect(() => {
     if (focus && editor) {

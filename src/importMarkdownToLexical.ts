@@ -2,7 +2,6 @@
 import { ElementNode, LexicalNode } from 'lexical'
 import * as Mdast from 'mdast'
 import { fromMarkdown, type Extension as FromMarkdownExtension } from 'mdast-util-from-markdown'
-import { MdxjsEsm } from 'mdast-util-mdx'
 import { toMarkdown } from 'mdast-util-to-markdown'
 import { ParseOptions } from 'micromark-util-types'
 import { FORMAT } from './FormatConstants'
@@ -10,6 +9,8 @@ import { CodeBlockEditorDescriptor } from './plugins/codeblock'
 import { DirectiveDescriptor } from './plugins/directives'
 import { JsxComponentDescriptor } from './plugins/jsx'
 import { type JsxKindMismatchPolicy, reconcileJsxKindMismatches } from './plugins/jsx/reconcileJsxKind'
+import { isHtmlTagName } from './plugins/jsx/jsxTagName'
+import { type ComponentImport, getImportSpecifiers, withComponentImport } from './plugins/jsx/imports'
 
 export interface ImportStatement {
   source: string
@@ -186,28 +187,41 @@ export class UnrecognizedMarkdownConstructError extends Error {
 }
 
 function gatherMetadata(mdastNode: Mdast.RootContent | Mdast.Root): MetaData {
-  const importsMap = new Map<string, ImportStatement>()
+  const importsMap = new Map<string, ComponentImport>()
   if (mdastNode.type !== 'root') {
     return {
       importDeclarations: {}
     }
   }
-  const importStatements = mdastNode.children
-    .filter((n) => n.type === 'mdxjsEsm')
-    .filter((n) => (n as MdxjsEsm).value.startsWith('import ')) as MdxjsEsm[]
-  importStatements.forEach((imp) => {
-    ;(imp.data?.estree?.body ?? []).forEach((declaration) => {
-      if (declaration.type !== 'ImportDeclaration') {
-        return
+  for (const node of mdastNode.children) {
+    if (node.type === 'mdxjsEsm') {
+      for (const specifier of getImportSpecifiers(node)) {
+        importsMap.set(specifier.localName, specifier)
       }
-      declaration.specifiers.forEach((specifier) => {
-        importsMap.set(specifier.local.name, {
-          source: `${declaration.source.value}`,
-          defaultExport: specifier.type === 'ImportDefaultSpecifier'
-        })
+    }
+  }
+  function carryImports(node: Mdast.Nodes, inherited = false) {
+    if ((node.type === 'mdxJsxFlowElement' || node.type === 'mdxJsxTextElement') && node.name) {
+      const declaration = importsMap.get(node.name.split('.')[0])
+      if (declaration) {
+        const importSpecifier: ComponentImport = { ...declaration, inherited }
+        node.data = withComponentImport(node, importSpecifier).data
+      }
+    }
+    if ('children' in node) {
+      const nested =
+        inherited ||
+        node.type === 'containerDirective' ||
+        node.type === 'textDirective' ||
+        node.type === 'leafDirective' ||
+        node.type === 'table' ||
+        ((node.type === 'mdxJsxFlowElement' || node.type === 'mdxJsxTextElement') && (node.name === null || !isHtmlTagName(node.name)))
+      node.children.forEach((child) => {
+        carryImports(child, nested)
       })
-    })
-  })
+    }
+  }
+  carryImports(mdastNode)
   return {
     importDeclarations: Object.fromEntries(importsMap.entries())
   }

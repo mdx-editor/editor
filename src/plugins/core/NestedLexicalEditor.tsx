@@ -9,16 +9,12 @@ import {
   COMMAND_PRIORITY_EDITOR,
   COMMAND_PRIORITY_HIGH,
   DecoratorNode,
-  EditorState,
   EditorConfig,
   KEY_BACKSPACE_COMMAND,
   LexicalEditor,
   LexicalEditorWithDispose,
   SELECTION_CHANGE_COMMAND,
-  COMMAND_PRIORITY_LOW,
-  HISTORIC_TAG,
-  HISTORY_PUSH_TAG,
-  SKIP_DOM_SELECTION_TAG
+  COMMAND_PRIORITY_LOW
 } from 'lexical'
 import * as Mdast from 'mdast'
 import { Node } from 'unist'
@@ -54,14 +50,7 @@ import { isMdastEqualIgnoringPositions } from '../../utils/mdastEquality'
 import { useCellValues, usePublisher, useRealm } from '@mdxeditor/gurx'
 import { DirectiveNode } from '../directives'
 import { LexicalJsxNode } from '../jsx/LexicalJsxNode'
-import {
-  createExtensionEditor,
-  editorHasSharedHistory,
-  editorsShareHistory,
-  ensureEditorHistoryBaseline,
-  recordEditorHistoryExport,
-  isEditorHistoryRestoring
-} from './lexicalExtensions'
+import { createExtensionEditor, editorHasSharedHistory } from './lexicalExtensions'
 
 /**
  * The value of the {@link NestedEditorsContext} React context.
@@ -119,38 +108,20 @@ export function useNestedEditorContext<T extends Mdast.RootContent>() {
  * @group Custom Editor Primitives
  */
 export function useMdastNodeUpdater<T extends Mdast.RootContent>() {
-  return useTaggedMdastNodeUpdater<T>(HISTORY_PUSH_TAG)
-}
-
-const NESTED_EXPORT_TAG = 'mdxeditor:nested-export'
-const NESTED_RESTORE_TAG = 'mdxeditor:nested-restore'
-
-// Exporting shared-history content is derived synchronization, not another edit.
-function useTaggedMdastNodeUpdater<T extends Mdast.RootContent>(tag: string, sourceEditor?: LexicalEditor | null) {
-  const { parentEditor, lexicalNode } = useNestedEditorContext<T>()
+  const { parentEditor, mdastNode, lexicalNode } = useNestedEditorContext<T>()
 
   return function updateMdastNode(node: Partial<T>) {
-    const current = parentEditor
-      .getEditorState()
-      .read(() => ($getNodeByKey(lexicalNode.getKey()) as DirectiveNode | LexicalJsxNode | null)?.getMdastNode())
-    if (!current || isMdastEqualIgnoringPositions(current, { ...current, ...node })) return
-    if (tag === HISTORY_PUSH_TAG) ensureEditorHistoryBaseline(parentEditor)
     parentEditor.update(
       () => {
+        $addUpdateTag('history-push')
         const currentNode = $getNodeByKey(lexicalNode.getKey()) as DirectiveNode | LexicalJsxNode | null
         if (currentNode) {
-          currentNode.setMdastNode({ ...currentNode.getMdastNode(), ...node } as any)
+          currentNode.setMdastNode({ ...mdastNode, ...node } as any)
         }
       },
-      {
-        discrete: true,
-        tag: [tag, SKIP_DOM_SELECTION_TAG, ...(sourceEditor ? [NESTED_EXPORT_TAG] : [])],
-        onUpdate: () => {
-          if (sourceEditor) recordEditorHistoryExport(sourceEditor, parentEditor)
-          parentEditor.dispatchCommand(NESTED_EDITOR_UPDATED_COMMAND, undefined)
-        }
-      }
+      { discrete: true }
     )
+    parentEditor.dispatchCommand(NESTED_EDITOR_UPDATED_COMMAND, undefined)
   }
 }
 
@@ -210,6 +181,7 @@ export const NestedLexicalEditor = function <T extends Mdast.RootContent>(props:
 }) {
   const { getContent, getUpdatedMdastNode, contentEditableProps, block = false } = props
   const { parentEditor, mdastNode, lexicalNode, focusEmitter } = useNestedEditorContext<T>()
+  const updateMdastNode = useMdastNodeUpdater<T>()
   const removeNode = useLexicalNodeRemove()
   const content = getContent(mdastNode)
   const realm = useRealm()
@@ -243,12 +215,6 @@ export const NestedLexicalEditor = function <T extends Mdast.RootContent>(props:
   const setEditorInFocus = usePublisher(editorInFocus$)
 
   const [editor, setEditor] = React.useState<LexicalEditorWithDispose | null>(null)
-  const updateMdastNode = useTaggedMdastNodeUpdater<T>(
-    editor && editorsShareHistory(editor, parentEditor) ? HISTORIC_TAG : HISTORY_PUSH_TAG,
-    editor
-  )
-
-  const committedStates = React.useRef(new WeakMap<Node, EditorState>())
 
   React.useEffect(() => {
     if (!rootEditor) {
@@ -310,12 +276,6 @@ export const NestedLexicalEditor = function <T extends Mdast.RootContent>(props:
     if (!editor) {
       return
     }
-    const readSource = (state: EditorState) =>
-      state.read(() => ($getNodeByKey(lexicalNode.getKey()) as DirectiveNode | LexicalJsxNode | null)?.getMdastNode())
-    const initialSource = readSource(parentEditor.getEditorState())
-    if (initialSource && !committedStates.current.has(initialSource)) {
-      committedStates.current.set(initialSource, editor.getEditorState())
-    }
     function updateParentNode() {
       editor!.getEditorState().read(() => {
         const mdast = exportLexicalTreeToMdast({
@@ -326,11 +286,10 @@ export const NestedLexicalEditor = function <T extends Mdast.RootContent>(props:
           addImportStatements: false
         })
         const content: Mdast.RootContent[] = block ? mdast.children : (mdast.children[0] as Mdast.Paragraph)!.children
+        const updatedMdastNode = getUpdatedMdastNode(structuredClone(mdastNode) as any, content as any)
         const currentMdastNode = parentEditor.getEditorState().read(() => {
           return ($getNodeByKey(lexicalNode.getKey()) as DirectiveNode | LexicalJsxNode | null)?.getMdastNode()
         })
-        if (!currentMdastNode) return
-        const updatedMdastNode = getUpdatedMdastNode(structuredClone(currentMdastNode) as any, content as any)
         // Blur and view mode switches save unconditionally. Rewriting an
         // unchanged node would push an extra root Undo step.
         if (isMdastEqualIgnoringPositions(currentMdastNode, updatedMdastNode)) {
@@ -341,39 +300,6 @@ export const NestedLexicalEditor = function <T extends Mdast.RootContent>(props:
     }
 
     return mergeRegister(
-      parentEditor.registerUpdateListener(({ editorState, prevEditorState, tags }) => {
-        const source = readSource(editorState)
-        const previous = readSource(prevEditorState)
-        if (!source || source === previous) return
-        if (previous && isMdastEqualIgnoringPositions(getContent(previous as T), getContent(source as T))) {
-          const committed = committedStates.current.get(previous)
-          if (committed) committedStates.current.set(source, committed)
-          return
-        }
-        if (tags.has(NESTED_EXPORT_TAG)) {
-          committedStates.current.set(source, editor.getEditorState())
-          return
-        }
-        const restored = committedStates.current.get(source)
-        if (restored) {
-          // History restores the same MDAST object, even when Lexical clones
-          // EditorState. Reuse the committed child state so descendant editor
-          // keys (and their shared history references) remain mounted.
-          editor.update(
-            () => {
-              editor.setEditorState(restored, { tag: HISTORIC_TAG })
-              $addUpdateTag(SKIP_DOM_SELECTION_TAG)
-              $addUpdateTag(NESTED_RESTORE_TAG)
-            },
-            { discrete: true, tag: [HISTORIC_TAG, SKIP_DOM_SELECTION_TAG, NESTED_RESTORE_TAG] }
-          )
-        }
-      }),
-      // Undo/Redo restores the originating editor. Re-export that state through
-      // every ancestor without adding export-only steps to the shared history.
-      editor.registerUpdateListener(({ tags }) => {
-        if (tags.has(HISTORIC_TAG) && !tags.has(NESTED_EXPORT_TAG) && !tags.has(NESTED_RESTORE_TAG)) updateParentNode()
-      }),
       editor.registerCommand(
         FOCUS_COMMAND,
         () => {
@@ -385,7 +311,6 @@ export const NestedLexicalEditor = function <T extends Mdast.RootContent>(props:
       editor.registerCommand(
         BLUR_COMMAND,
         (payload) => {
-          if (isEditorHistoryRestoring(editor)) return true
           const relatedTarget = payload.relatedTarget as HTMLElement | null
           if (isPartOftheEditorUI(relatedTarget, rootEditor!.getRootElement()!)) {
             return false
@@ -431,7 +356,6 @@ export const NestedLexicalEditor = function <T extends Mdast.RootContent>(props:
     block,
     editor,
     exportVisitors,
-    getContent,
     getUpdatedMdastNode,
     jsxComponentDescriptors,
     jsxIsAvailable,
