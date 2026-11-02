@@ -133,7 +133,20 @@ test('paste in editable inline JSX preserves the component and neighboring cells
   // editor. Only then place the real caret inside the editable JSX child.
   await cells.nth(2).focus()
   await expect(cells.nth(2).locator('..')).toHaveAttribute('data-active', 'true')
-  await nested.click()
+  // Match the public DOM caret setup used by the compatibility fixtures;
+  // clicking an inline nested editor does not focus it consistently in Firefox.
+  await nested.evaluate((element) => {
+    const editable = element.closest<HTMLElement>('[contenteditable="true"]')!
+    editable.focus()
+    const range = document.createRange()
+    range.selectNodeContents(element)
+    range.collapse(false)
+    const selection = window.getSelection()
+    if (!selection) throw new Error('The browser did not expose a DOM selection')
+    selection.removeAllRanges()
+    selection.addRange(range)
+    document.dispatchEvent(new Event('selectionchange', { bubbles: true }))
+  })
   await expect(nested).toBeFocused()
   await page.keyboard.press('End')
   await expect.poll(() => nested.evaluate((element) => element.contains(window.getSelection()?.anchorNode ?? null))).toBe(true)
