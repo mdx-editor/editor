@@ -1,11 +1,17 @@
 import { $isElementNode, ElementNode as LexicalElementNode, LexicalNode, RootNode as LexicalRootNode } from 'lexical'
 import * as Mdast from 'mdast'
-import type { MdxjsEsm } from 'mdast-util-mdx'
 import { type Options as MdastToMarkdownOptions, toMarkdown } from 'mdast-util-to-markdown'
 import { ImportStatement } from './importMarkdownToLexical'
 import { isMdastHTMLNode } from './plugins/core/MdastHTMLNode'
 import type { JsxComponentDescriptor } from './plugins/jsx'
 import { mergeStyleAttributes } from './utils/mergeStyleAttributes'
+import {
+  type ComponentImport,
+  createImportDeclaration,
+  getComponentImport,
+  getImportSpecifier,
+  getImportSpecifiers
+} from './plugins/jsx/imports'
 
 // Keep this as an interface so API Extractor emits the package-root import.
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -61,7 +67,7 @@ export interface LexicalExportVisitor<LN extends LexicalNode, UN extends Mdast.N
        * @param componentName - the name of the component that has to be imported.
        * @see {@link JsxComponentDescriptor}
        */
-      registerReferredComponent(componentName: string, importStatement?: ImportStatement): void
+      registerReferredComponent(componentName: string | null, importStatement?: ImportStatement): void
       /**
        * visits the specified lexical node
        */
@@ -124,7 +130,13 @@ export function exportLexicalTreeToMdast({
 
   visit(root, null)
 
-  function registerReferredComponent(componentName: string, importStatement?: ImportStatement) {
+  function registerReferredComponent(componentName: string | null, importStatement?: ImportStatement) {
+    if (
+      componentName === null ||
+      (!getImportSpecifier(importStatement) && !/^[\p{Lu}\p{Lt}_$][\p{ID_Continue}$\u200C\u200D]*$/u.test(componentName))
+    ) {
+      return
+    }
     referredComponents.add(componentName)
     if (importStatement) {
       knownImportSources.set(componentName, { ...importStatement })
@@ -207,71 +219,80 @@ export function exportLexicalTreeToMdast({
     throw new Error('traversal ended with no root element')
   }
 
-  // iterate over all referred components and construct import statements, then append them to the root
-  const importsMap = new Map<string, string[]>()
-  const defaultImportsMap = new Map<string, string>()
+  const typedRoot = unistRoot as Mdast.Root
+  const preservedImports = new Set<string>()
+  const collectPreservedImports = (node: Mdast.Nodes) => {
+    if (node.type === 'mdxjsEsm') {
+      for (const specifier of getImportSpecifiers(node)) preservedImports.add(specifier.localName)
+    }
+    if ('children' in node) node.children.forEach(collectPreservedImports)
+  }
+  collectPreservedImports(typedRoot)
+
+  // Decorators such as directives and tables contain MDAST subtrees rather than
+  // Lexical children, so their JSX references never reach the JSX visitor.
+  if (addImportStatements) {
+    const registerNestedComponents = (node: Mdast.Nodes) => {
+      if ((node.type === 'mdxJsxFlowElement' || node.type === 'mdxJsxTextElement') && node.name !== null) {
+        const descriptor =
+          jsxComponentDescriptors.find((descriptor) => descriptor.name === node.name) ??
+          jsxComponentDescriptors.find((descriptor) => descriptor.name === '*')
+        if (descriptor?.source || getComponentImport(node)) {
+          registerReferredComponent(node.name, getComponentImport(node))
+        }
+      }
+      if ('children' in node) {
+        node.children.forEach(registerNestedComponents)
+      }
+    }
+    registerNestedComponents(typedRoot)
+  }
+
+  // Rebuild only used bindings, never the original ESM block (which can also
+  // contain unused imports or exports). Local nested declarations stay in place.
+  const usedImports = new Map<string, ComponentImport>()
   for (const componentName of referredComponents) {
+    const original = knownImportSources.get(componentName)
+    const specifier = getImportSpecifier(original)
+    const localName = specifier?.localName ?? componentName
+    if (preservedImports.has(localName) || usedImports.has(localName)) continue
+    if (!addImportStatements && (!original || specifier?.inherited)) continue
+    if (specifier) {
+      usedImports.set(localName, specifier)
+      continue
+    }
     const descriptor =
       jsxComponentDescriptors.find((descriptor) => descriptor.name === componentName) ??
-      knownImportSources.get(componentName) ??
+      original ??
       jsxComponentDescriptors.find((descriptor) => descriptor.name === '*')
     if (!descriptor) {
       throw new Error(`Component ${componentName} is used but not imported`)
     }
-    if (!descriptor.source) {
-      continue
-    }
-    if (descriptor.defaultExport) {
-      defaultImportsMap.set(componentName, descriptor.source)
-    } else {
-      const { source } = descriptor
-      const existing = importsMap.get(source)
-      if (existing) {
-        existing.push(componentName)
-      } else {
-        importsMap.set(source, [componentName])
-      }
-    }
-  }
-
-  /**
-   * even when the import statements should not be added,
-   * raw import statements should not be removed.
-   */
-  if (!addImportStatements) {
-    // filter out new imports
-    for (const [path, names] of importsMap.entries()) {
-      const cleaned = names.filter((n) => knownImportSources.has(n))
-      if (cleaned.length > 0) {
-        importsMap.set(path, cleaned)
-      } else {
-        importsMap.delete(path)
-      }
-    }
-    for (const key of defaultImportsMap.keys()) {
-      if (!knownImportSources.has(key)) {
-        defaultImportsMap.delete(key)
-      }
-    }
-  }
-
-  const imports = Array.from(importsMap).map(([source, componentNames]) => {
-    return {
-      type: 'mdxjsEsm',
-      value: `import { ${componentNames.join(', ')} } from '${source}'`
-    } as MdxjsEsm
-  })
-
-  imports.push(
-    ...Array.from(defaultImportsMap).map(([componentName, source]) => {
-      return {
-        type: 'mdxjsEsm',
-        value: `import ${componentName} from '${source}'`
-      } as MdxjsEsm
+    if (!descriptor.source) continue
+    usedImports.set(localName, {
+      source: descriptor.source,
+      defaultExport: descriptor.defaultExport ?? false,
+      kind: descriptor.defaultExport ? 'default' : 'named',
+      importedName: descriptor.defaultExport ? 'default' : localName,
+      localName
     })
-  )
+  }
 
-  const typedRoot = unistRoot as Mdast.Root
+  const namedImports = new Map<string, ComponentImport[]>()
+  const otherImports: ComponentImport[] = []
+  for (const specifier of usedImports.values()) {
+    if (specifier.kind === 'named') {
+      const group = namedImports.get(specifier.source) ?? []
+      group.push(specifier)
+      namedImports.set(specifier.source, group)
+    } else {
+      otherImports.push(specifier)
+    }
+  }
+  const imports = [
+    ...Array.from(namedImports.values(), createImportDeclaration),
+    ...otherImports.map((specifier) => createImportDeclaration([specifier]))
+  ]
 
   const frontmatter = typedRoot.children.find((child) => child.type === 'yaml')
   if (frontmatter) {
