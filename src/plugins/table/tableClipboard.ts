@@ -32,11 +32,11 @@ function parseTSV(text: string): ClipboardRegion {
   let minimumWidth = Infinity
   let rowWidth = 0
   let fieldHasContent = false
-  let firstColumnHasContent = false
+  const firstColumn = { hasContent: false }
   let oversized = text.length > MAX_SOURCE_LENGTH
 
   function finishCell() {
-    if (rowWidth === 0) firstColumnHasContent ||= fieldHasContent
+    if (rowWidth === 0) firstColumn.hasContent ||= fieldHasContent
     rowWidth++
     width = Math.max(width, rowWidth)
     oversized ||= width > MAX_DIMENSION || height + 1 > MAX_DIMENSION || width * (height + 1) > MAX_TABLE_PASTE_CELLS
@@ -97,7 +97,7 @@ function parseTSV(text: string): ClipboardRegion {
   if (!endedRow) finishRow()
   // An empty first field in every row is also common in tab-indented source
   // snippets and Makefile recipes. Without HTML evidence, preserve normal paste.
-  if (height < 2 || minimumWidth < 2 || !firstColumnHasContent) return null
+  if (height < 2 || minimumWidth < 2 || !firstColumn.hasContent) return null
   return oversized ? 'rejected' : rectangle(rows)
 }
 

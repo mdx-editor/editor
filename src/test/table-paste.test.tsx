@@ -428,7 +428,7 @@ describe('table region paste', () => {
   })
 
   it('rejects an oversized destination before saving pending text', async () => {
-    const { cells, editor, ref, parent } = await setup()
+    const { editor, ref, parent } = await setup()
     type(editor(2), ' pending')
     act(() => {
       editor(2).update(

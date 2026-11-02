@@ -129,8 +129,14 @@ test('paste in editable inline JSX preserves the component and neighboring cells
   const cells = page.locator('tbody > tr > :is(th, td) > [contenteditable=true]')
   const nested = cells.nth(2).locator('[contenteditable=true]')
   await expect(cells).toHaveCount(4)
+  // Activate the cell first: entering an inactive cell focuses its outer
+  // editor. Only then place the real caret inside the editable JSX child.
+  await cells.nth(2).focus()
+  await expect(cells.nth(2).locator('..')).toHaveAttribute('data-active', 'true')
   await nested.click()
+  await expect(nested).toBeFocused()
   await page.keyboard.press('End')
+  await expect.poll(() => nested.evaluate((element) => element.contains(window.getSelection()?.anchorNode ?? null))).toBe(true)
   await paste(nested, 'a\tb\nc\td')
   await expect(nested).toContainText('insidea')
   await expect(nested).toContainText('d')
