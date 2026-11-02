@@ -5,7 +5,7 @@ import { $getNodeByKey } from 'lexical'
 import React, { JSX } from 'react'
 import { disableImageSettingsButton$, openEditImageDialog$, parseImageDimension } from '.'
 import styles from '../../styles/ui.module.css'
-import { iconComponentFor$, readOnly$, useTranslation } from '../core'
+import { activeEditor$, iconComponentFor$, readOnly$, useTranslation } from '../core'
 
 export interface EditImageToolbarProps {
   nodeKey: string
@@ -22,6 +22,7 @@ export function EditImageToolbar(props: EditImageToolbarProps): JSX.Element {
   const [disableImageSettingsButton, iconComponentFor, readOnly] = useCellValues(disableImageSettingsButton$, iconComponentFor$, readOnly$)
   const [editor] = useLexicalComposerContext()
   const openEditImageDialog = usePublisher(openEditImageDialog$)
+  const setActiveEditor = usePublisher(activeEditor$)
   const t = useTranslation()
 
   return (
@@ -47,6 +48,8 @@ export function EditImageToolbar(props: EditImageToolbarProps): JSX.Element {
           title={t('imageEditor.editImage', 'Edit image')}
           disabled={readOnly}
           onClick={() => {
+            // A toolbar button can be clicked before its nested editor is selected.
+            setActiveEditor(editor)
             openEditImageDialog({
               nodeKey: nodeKey,
               initialValues: {
